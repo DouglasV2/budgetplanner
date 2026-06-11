@@ -2,7 +2,17 @@ export type Retailer = 'IKEA' | 'JYSK' | 'Pevex' | 'Decathlon' | 'Emmezeta';
 
 export type RoomType = 'living-room' | 'home-office' | 'bedroom' | 'home-gym';
 
-export type StyleType = 'scandinavian' | 'modern' | 'minimal' | 'cozy' | 'industrial';
+export type StyleType =
+  | 'bright'
+  | 'warm'
+  | 'modern'
+  | 'minimal'
+  | 'classic'
+  | 'industrial'
+  | 'boho'
+  | 'surprise'
+  | 'scandinavian'
+  | 'cozy';
 
 export type RetailerMode = 'single' | 'multi';
 
@@ -29,7 +39,7 @@ export interface Product {
   category: ProductCategory;
   price: number;
   originalPrice?: number;
-  styleTags: StyleType[];
+  styleTags: string[];
   roomTags: RoomType[];
   image: string;
   url: string;
@@ -63,6 +73,9 @@ export interface FurnishingPlan {
   name: string;
   label: string;
   description: string;
+  summary: string;
+  goodFor: string;
+  tradeoff: string;
   items: PlanItem[];
   total: number;
   savings: number;
@@ -71,7 +84,6 @@ export interface FurnishingPlan {
   styleConsistency: number;
   retailersUsed: Retailer[];
 }
-
 
 export interface SavedPlanResponse {
   id: string;

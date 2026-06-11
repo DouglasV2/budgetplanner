@@ -6,10 +6,10 @@ import { PlanResults, type QuickPlanAction } from './PlanResults';
 
 const initialInput: PlannerInput = {
   prompt:
-    'Imam 1500 € za dnevni boravak od 20 m² u Zagrebu. Želim skandinavski stil, kombiniraj IKEA i JYSK ako ima smisla. Trebam kauč, TV komodu, klub stolić, tepih i lampu.',
+    'Imam 1500 € za dnevni boravak od 20 m² u Zagrebu. Želim svijetli i prozračni stil, kombiniraj IKEA i JYSK ako ima smisla. Trebam kauč, TV komodu, klub stolić, tepih i lampu.',
   budget: 1500,
   roomType: 'living-room',
-  style: 'scandinavian',
+  style: 'bright',
   location: 'Zagreb',
   size: 20,
   retailerMode: 'multi',

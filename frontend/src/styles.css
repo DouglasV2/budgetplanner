@@ -1907,3 +1907,171 @@ textarea {
     position: static;
   }
 }
+
+/* Sprint 5: smarter results and clearer style choices */
+.field-help {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.plan-choice-panel {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.58);
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.plan-choice-panel h4 {
+  margin: 8px 0 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+}
+
+.plan-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.plan-choice-card {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ink);
+  padding: 14px;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  min-height: 118px;
+}
+
+.plan-choice-card span,
+.plan-choice-card small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.plan-choice-card span {
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.plan-choice-card strong {
+  font-size: 1.45rem;
+  letter-spacing: -0.05em;
+}
+
+.plan-choice-card.active {
+  border-color: rgba(236, 122, 46, 0.42);
+  background: rgba(236, 122, 46, 0.12);
+  box-shadow: 0 16px 35px rgba(236, 122, 46, 0.12);
+}
+
+.focused-plan-card {
+  border: 1px solid rgba(236, 122, 46, 0.16);
+}
+
+.plan-summary-box {
+  border: 1px solid rgba(102, 120, 95, 0.18);
+  border-radius: 24px;
+  background: rgba(102, 120, 95, 0.09);
+  padding: 16px;
+  margin-top: 16px;
+  display: grid;
+  gap: 7px;
+}
+
+.plan-summary-box span,
+.plan-explainer-grid span,
+.product-reason-box span {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+}
+
+.plan-summary-box p,
+.plan-explainer-grid p,
+.product-reason-box p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.58;
+}
+
+.plan-summary-box p {
+  color: var(--ink);
+  font-weight: 750;
+}
+
+.plan-summary-box small {
+  color: #3f563a;
+  line-height: 1.5;
+  font-weight: 800;
+}
+
+.plan-explainer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.plan-explainer-grid div {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.product-reason-box {
+  border: 1px solid rgba(31, 29, 26, 0.08);
+  border-radius: 16px;
+  padding: 11px;
+  background: rgba(255, 255, 255, 0.55);
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.improved-missing-box {
+  display: grid;
+  gap: 7px;
+}
+
+.improved-missing-box span,
+.improved-missing-box p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.improved-missing-box button {
+  width: fit-content;
+  border: 1px solid rgba(236, 122, 46, 0.28);
+  border-radius: 999px;
+  background: rgba(236, 122, 46, 0.1);
+  color: var(--orange-dark);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+@media (max-width: 760px) {
+  .plan-choice-grid,
+  .plan-explainer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-choice-card {
+    min-height: auto;
+  }
+}

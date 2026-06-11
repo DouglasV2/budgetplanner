@@ -21,7 +21,7 @@ public record PlannerInputDto(
                 prompt == null ? "" : prompt,
                 budget <= 0 ? 1500 : budget,
                 blank(roomType) ? "living-room" : roomType,
-                blank(style) ? "scandinavian" : style,
+                blank(style) ? "bright" : style,
                 blank(location) ? "Zagreb" : location,
                 size <= 0 ? 20 : size,
                 blank(retailerMode) ? "multi" : retailerMode,

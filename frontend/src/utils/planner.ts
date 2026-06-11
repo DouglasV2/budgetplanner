@@ -25,11 +25,16 @@ export const roomLabels: Record<RoomType, string> = {
 };
 
 export const styleLabels: Record<StyleType, string> = {
-  scandinavian: 'skandinavski',
-  modern: 'moderni',
-  minimal: 'minimalistički',
-  cozy: 'topli i ugodni',
-  industrial: 'industrijski'
+  bright: 'svijetlo i prozračno',
+  warm: 'toplo i domaće',
+  modern: 'moderno i uredno',
+  minimal: 'jednostavno i čisto',
+  classic: 'klasično',
+  industrial: 'tamno / industrijski',
+  boho: 'boho / prirodno',
+  surprise: 'nisam siguran, predloži mi',
+  scandinavian: 'svijetlo i prozračno',
+  cozy: 'toplo i domaće'
 };
 
 export function getRetailerBreakdown(plan: FurnishingPlan) {
@@ -54,7 +59,9 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
 
   return [
     `BudgetSpace AI plan: ${plan.name}`,
-    `Prostorija: ${roomLabels[input.roomType]}, stil: ${styleLabels[input.style]}, budžet: ${formatCurrency(input.budget)}`,
+    `Prostorija: ${roomLabels[input.roomType]}, izgled: ${styleLabels[input.style]}, budžet: ${formatCurrency(input.budget)}`,
+    plan.summary ? `Sažetak: ${plan.summary}` : '',
+    plan.goodFor ? `Za koga je dobro: ${plan.goodFor}` : '',
     `Ukupno: ${formatCurrency(plan.total)} | Poklapanje sa željama: ${plan.fitScore}% | Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
     breakdown ? `Trošak po trgovini: ${breakdown}` : '',
     '',

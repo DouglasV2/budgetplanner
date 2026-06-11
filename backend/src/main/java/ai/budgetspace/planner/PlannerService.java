@@ -23,7 +23,7 @@ public class PlannerService {
     );
     private static final Map<String, String> ROOM_LABELS = Map.of(
             "living-room", "dnevni boravak",
-            "home-office", "home office",
+            "home-office", "radni kutak",
             "bedroom", "spavaća soba",
             "home-gym", "kućna teretana"
     );
@@ -123,7 +123,7 @@ public class PlannerService {
                 currentRetailers.add(lockedProduct.getRetailer());
                 total += lockedProduct.getPrice().doubleValue();
                 categories.removeIf(category -> category.equalsIgnoreCase(lockedProduct.getCategory()));
-                items.add(new PlanItemDto(ProductDto.from(lockedProduct), "Zaključano iz prethodnog plana — zadržavam ovaj proizvod i slažem ostatak oko njega."));
+                items.add(new PlanItemDto(ProductDto.from(lockedProduct), "Zadržano iz prethodnog plana — ovaj proizvod ostaje, a ostatak plana slažemo oko njega."));
             }
         }
 
@@ -139,14 +139,14 @@ public class PlannerService {
         }
 
         String label = switch (mode) {
-            case "stretch" -> "Malo iznad budžeta, ali najkompletnije";
-            case "value" -> "Najbolji omjer izgleda i cijene";
-            default -> "Najsigurnija opcija za manji trošak";
+            case "stretch" -> "Ljepša verzija s jačim dojmom";
+            case "value" -> "Najbolji omjer cijene i izgleda";
+            default -> "Najpovoljnija razumna verzija";
         };
         String name = switch (mode) {
-            case "stretch" -> "Kompletniji plan";
-            case "value" -> "Preporučeni plan";
-            default -> "Štedljivi plan";
+            case "stretch" -> "Ljepša verzija";
+            case "value" -> "Najbolji izbor";
+            default -> "Najjeftinije";
         };
 
         return calculatePlan(mode, name, label, describePlan(mode, input, total, currentRetailers), input, items);
@@ -166,7 +166,7 @@ public class PlannerService {
     }
 
     private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers) {
-        double styleScore = hasTag(product.getStyleTags(), input.style()) ? 38 : 12;
+        double styleScore = styleMatches(product, input.style()) ? 38 : 12;
         double roomScore = hasTag(product.getRoomTags(), input.roomType()) ? 36 : 0;
         double ratingScore = product.getRating() * 5;
         double stockScore = product.isInStock() ? 10 : -80;
@@ -185,7 +185,7 @@ public class PlannerService {
         double leastStoresBonus = input.optimizationGoal().equals("least-stores")
                 ? (currentRetailers.contains(product.getRetailer()) || currentRetailers.isEmpty() ? 22 : -14)
                 : 0;
-        double stylePriorityBonus = input.optimizationGoal().equals("style-match") && hasTag(product.getStyleTags(), input.style()) ? 20 : 0;
+        double stylePriorityBonus = input.optimizationGoal().equals("style-match") && styleMatches(product, input.style()) ? 20 : 0;
         double singleStoreBonus = input.retailerMode().equals("single") ? 8 : 0;
 
         return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias + leastStoresBonus + stylePriorityBonus + singleStoreBonus;
@@ -208,7 +208,7 @@ public class PlannerService {
                 .map(item -> item.product().retailer())
                 .distinct()
                 .toList();
-        long styleMatches = items.stream().filter(item -> item.product().styleTags().contains(input.style())).count();
+        long styleMatches = items.stream().filter(item -> productStyleMatches(item.product().styleTags(), input.style())).count();
         int styleConsistency = items.isEmpty() ? 0 : Math.min(99, (int) Math.round(((double) styleMatches / items.size()) * 100 + 8));
         String shoppingEffort = retailersUsed.size() <= 1 ? "Low" : retailersUsed.size() <= 3 ? "Medium" : "High";
         int budgetFit = total <= input.budget() ? 8 : -6;
@@ -219,6 +219,9 @@ public class PlannerService {
                 name,
                 label,
                 description,
+                buildSummary(id, input, items, total, retailersUsed),
+                buildGoodFor(id, input),
+                buildTradeoff(id, input, total, retailersUsed),
                 items,
                 money(total),
                 money(Math.max(0, input.budget() - total)),
@@ -230,13 +233,76 @@ public class PlannerService {
     }
 
     private String buildReason(Product product, PlannerInputDto input, String mode) {
-        String styleMatch = hasTag(product.getStyleTags(), input.style()) ? "paše uz odabrani stil" : "neutralno se uklapa u prostor";
+        String styleMatch = styleMatches(product, input.style())
+                ? "izgledom ide uz ono što si tražio"
+                : "dovoljno je neutralan da se lako uklopi";
         String priceNote = input.optimizationGoal().equals("lowest-price") || mode.equals("budget")
-                ? "čuva budžet"
+                ? "ne jede previše budžeta"
                 : mode.equals("value")
-                ? "ima dobar omjer cijene i kvalitete"
-                : "diže finalni dojam prostora";
-        return styleMatch + ", " + priceNote + ". " + product.getNote();
+                ? "daje dobar omjer cijene, izgleda i korisnosti"
+                : "podiže finalni dojam prostora";
+        String categoryNote = mainPieceCategories().contains(product.getCategory())
+                ? "Ovo je jedan od glavnih komada pa ima smisla da ovdje ode veći dio novca."
+                : "Dobar je dodatak jer za manji iznos čini prostor dovršenijim.";
+        return categoryNote + " " + styleMatch + " i " + priceNote + ". " + product.getNote();
+    }
+
+
+    private String buildSummary(String mode, PlannerInputDto input, List<PlanItemDto> items, double total, List<String> retailersUsed) {
+        String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
+        String categories = items.stream()
+                .map(item -> categoryLabel(item.product().category()))
+                .distinct()
+                .limit(6)
+                .collect(Collectors.joining(", "));
+        String budgetText = total <= input.budget()
+                ? "ostaje unutar budžeta"
+                : "prelazi budžet za " + money(total - input.budget());
+        String stores = retailersUsed.size() <= 1 ? "iz jedne trgovine" : "iz " + retailersUsed.size() + " trgovine";
+        return switch (mode) {
+            case "stretch" -> "Za " + room + " smo složili ljepšu verziju " + stores + ": " + categories + ". Plan " + budgetText + ", ali daje dovršeniji izgled.";
+            case "value" -> "Za " + room + " smo složili uravnotežen plan " + stores + ": " + categories + ". Plan " + budgetText + " i pokušava izbjeći nepotrebno skupe komade.";
+            default -> "Za " + room + " smo složili najpovoljniju razumnu bazu " + stores + ": " + categories + ". Plan " + budgetText + ".";
+        };
+    }
+
+    private String buildGoodFor(String mode, PlannerInputDto input) {
+        return switch (mode) {
+            case "stretch" -> "Dobro ako želiš da prostor odmah izgleda dovršenije i spreman si dodati malo novca za bolji dojam.";
+            case "value" -> "Dobro za većinu ljudi: ne ide na najjeftinije po svaku cijenu, ali pazi da novac ode na važne komade.";
+            default -> "Dobro ako se useljavaš, imaš ograničen budžet ili želiš prvo kupiti osnovne stvari pa kasnije nadograditi.";
+        };
+    }
+
+    private String buildTradeoff(String mode, PlannerInputDto input, double total, List<String> retailersUsed) {
+        String storeWarning = retailersUsed.size() > 2 ? " Ima više trgovina, pa će kupnja tražiti malo više organizacije." : "";
+        return switch (mode) {
+            case "stretch" -> "Može prijeći budžet jer daje prednost boljem izgledu i potpunijem prostoru." + storeWarning;
+            case "value" -> "Neki proizvodi neće biti najjeftiniji, ali su odabrani jer bolje nose cijeli prostor." + storeWarning;
+            default -> "Može izgledati jednostavnije jer izbacuje skuplje detalje i dekoracije da bi ostao povoljan." + storeWarning;
+        };
+    }
+
+    private String categoryLabel(String category) {
+        return switch (category) {
+            case "sofa" -> "kauč";
+            case "chair" -> "stolice";
+            case "table" -> "stolić";
+            case "tv-unit" -> "TV komoda";
+            case "storage" -> "spremanje";
+            case "rug" -> "tepih";
+            case "lighting" -> "rasvjeta";
+            case "decor" -> "dekoracije";
+            case "desk" -> "radni stol";
+            case "bed" -> "krevet";
+            case "mattress" -> "madrac";
+            case "gym-equipment" -> "oprema za vježbanje";
+            default -> category;
+        };
+    }
+
+    private Set<String> mainPieceCategories() {
+        return Set.of("sofa", "bed", "mattress", "desk", "chair", "gym-equipment", "tv-unit");
     }
 
     private String describePlan(String mode, PlannerInputDto input, double total, Set<String> retailersUsed) {
@@ -246,9 +312,9 @@ public class PlannerService {
         String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
 
         return switch (mode) {
-            case "stretch" -> "Malo ambicioznija kombinacija od " + money(total) + ", koristan ako želiš bolji finalni izgled i manje naknadnih zamjena. " + storeText + ".";
-            case "value" -> "Najuravnoteženija kombinacija za " + input.size() + " m²: dobra baza, usklađen stil i pametno iskorišten budžet. " + storeText + ".";
-            default -> "Složen da ostane ispod budžeta od " + money(input.budget()) + ", za " + room + " u " + input.location() + ". " + storeText + ".";
+            case "stretch" -> "Ova verzija bira malo ljepše i kompletnije komade, čak i ako treba rastegnuti budžet. " + storeText + ".";
+            case "value" -> "Ovo je najuravnoteženija verzija za " + input.size() + " m²: dobra baza, usklađen izgled i razuman trošak. " + storeText + ".";
+            default -> "Ova verzija prvo čuva budžet za " + room + " u " + input.location() + ", ali i dalje pokriva osnovne stvari. " + storeText + ".";
         };
     }
 
@@ -267,7 +333,7 @@ public class PlannerService {
     }
 
     private PlannerInputDto normalizePrompt(PlannerInputDto rawInput) {
-        PlannerInputDto input = rawInput == null ? new PlannerInputDto("", 1500, "living-room", "scandinavian", "Zagreb", 20, "multi", List.of("IKEA", "JYSK", "Pevex"), "best-value", List.of(), List.of(), List.of()) : rawInput.normalized();
+        PlannerInputDto input = rawInput == null ? new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi", List.of("IKEA", "JYSK", "Pevex"), "best-value", List.of(), List.of(), List.of()) : rawInput.normalized();
         String text = normalize(input.prompt());
         if (text.isBlank()) return input;
 
@@ -282,11 +348,14 @@ public class PlannerService {
         if (matches(text, "spava|bedroom|krevet")) input = input.withRoomType("bedroom");
         if (matches(text, "teretan|gym|trening|fitness")) input = input.withRoomType("home-gym");
 
-        if (matches(text, "skandi|scandi|nordic|skandinav")) input = input.withStyle("scandinavian");
-        if (matches(text, "modern")) input = input.withStyle("modern");
-        if (matches(text, "minimal")) input = input.withStyle("minimal");
-        if (matches(text, "cozy|toplo|ugodno|mekano")) input = input.withStyle("cozy");
-        if (matches(text, "industrial|industrij")) input = input.withStyle("industrial");
+        if (matches(text, "ne znam|svejedno|predlozi|predloži")) input = input.withStyle("surprise");
+        if (matches(text, "svijetl|prozrac|prozrač|skandi|scandi|nordic|skandinav")) input = input.withStyle("bright");
+        if (matches(text, "toplo|ugodno|mekano|domac|domać|cozy")) input = input.withStyle("warm");
+        if (matches(text, "modern|uredno")) input = input.withStyle("modern");
+        if (matches(text, "minimal|jednostavn|cisto|čisto")) input = input.withStyle("minimal");
+        if (matches(text, "classic|klasic|klasič")) input = input.withStyle("classic");
+        if (matches(text, "industrial|industrij|tamno|crno|metal")) input = input.withStyle("industrial");
+        if (matches(text, "boho|prirodn|biljk|ratan")) input = input.withStyle("boho");
 
         List<String> mentionedRetailers = RETAILERS.stream()
                 .filter(retailer -> text.contains(normalize(retailer)))
@@ -356,6 +425,40 @@ public class PlannerService {
         String normalized = Normalizer.normalize(value.toLowerCase(Locale.ROOT), Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "");
         return normalized;
+    }
+
+
+    private boolean styleMatches(Product product, String requestedStyle) {
+        return productStyleMatches(splitCsv(product.getStyleTags()), requestedStyle);
+    }
+
+    private boolean productStyleMatches(List<String> productTags, String requestedStyle) {
+        if (productTags == null || productTags.isEmpty()) return false;
+        if ("surprise".equalsIgnoreCase(requestedStyle)) return true;
+        Set<String> aliases = styleAliases(requestedStyle);
+        return productTags.stream().anyMatch(tag -> aliases.contains(tag.toLowerCase(Locale.ROOT).trim()));
+    }
+
+    private Set<String> styleAliases(String requestedStyle) {
+        return switch (requestedStyle == null ? "" : requestedStyle.toLowerCase(Locale.ROOT)) {
+            case "bright", "scandinavian" -> Set.of("scandinavian", "minimal", "modern");
+            case "warm", "cozy" -> Set.of("cozy", "scandinavian");
+            case "modern" -> Set.of("modern", "minimal");
+            case "minimal" -> Set.of("minimal", "scandinavian", "modern");
+            case "classic" -> Set.of("cozy", "modern", "scandinavian");
+            case "industrial" -> Set.of("industrial", "modern");
+            case "boho" -> Set.of("cozy", "scandinavian");
+            case "surprise" -> Set.of("scandinavian", "modern", "minimal", "cozy", "industrial");
+            default -> Set.of(requestedStyle == null ? "" : requestedStyle.toLowerCase(Locale.ROOT));
+        };
+    }
+
+    private List<String> splitCsv(String csv) {
+        if (csv == null || csv.isBlank()) return List.of();
+        return Arrays.stream(csv.split(","))
+                .map(value -> value.trim().toLowerCase(Locale.ROOT))
+                .filter(value -> !value.isBlank())
+                .toList();
     }
 
     private boolean hasTag(String csv, String tag) {

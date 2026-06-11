@@ -15,12 +15,15 @@ const rooms: Array<{ value: RoomType; label: string; icon: string; hint: string 
   { value: 'home-gym', label: 'Kućna teretana', icon: '🏋️', hint: 'oprema, spremanje, podloga' }
 ];
 
-const styles: Array<{ value: StyleType; label: string }> = [
-  { value: 'scandinavian', label: 'Skandinavski' },
-  { value: 'modern', label: 'Moderni' },
-  { value: 'minimal', label: 'Minimalistički' },
-  { value: 'cozy', label: 'Toplo i ugodno' },
-  { value: 'industrial', label: 'Industrijski' }
+const styles: Array<{ value: StyleType; label: string; hint: string }> = [
+  { value: 'surprise', label: 'Nisam siguran, predloži mi', hint: 'najbolje ako ne znaš stilove' },
+  { value: 'bright', label: 'Svijetlo i prozračno', hint: 'svijetle boje, lagan osjećaj' },
+  { value: 'warm', label: 'Toplo i domaće', hint: 'ugodnije, mekše, više tekstura' },
+  { value: 'modern', label: 'Moderno i uredno', hint: 'čiste linije, praktično' },
+  { value: 'minimal', label: 'Jednostavno i čisto', hint: 'bez puno detalja' },
+  { value: 'classic', label: 'Klasično', hint: 'sigurno i dugoročno' },
+  { value: 'industrial', label: 'Tamno / industrijski', hint: 'crni metal, drvo, jači kontrast' },
+  { value: 'boho', label: 'Boho / prirodno', hint: 'drvo, tepisi, biljke, opušteno' }
 ];
 
 const optimizationGoals: Array<{ value: OptimizationGoal; label: string; description: string }> = [
@@ -46,7 +49,7 @@ const categoryOrder: ProductCategory[] = [
 ];
 
 const sizePresets = [
-  { label: 'Ne znam', size: 20, description: 'app uzme sigurnu procjenu' },
+  { label: 'Ne znam', size: 20, description: 'aplikacija uzme sigurnu procjenu' },
   { label: 'Mala', size: 12, description: 'garsonijera ili manji kutak' },
   { label: 'Srednja', size: 20, description: 'tipična soba u stanu' },
   { label: 'Velika', size: 32, description: 'veći dnevni boravak' }
@@ -59,10 +62,10 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
     title: 'Dnevni boravak do 1500 €',
     subtitle: 'kauč, TV komoda, tepih, stolić, rasvjeta',
     input: {
-      prompt: 'Imam 1500 € za dnevni boravak u Zagrebu. Želim skandinavski stil, preferiram IKEA i JYSK. Trebam kauč, TV komodu, klub stolić, tepih i lampu.',
+      prompt: 'Imam 1500 € za dnevni boravak u Zagrebu. Želim svijetli i prozračni stil, preferiram IKEA i JYSK. Trebam kauč, TV komodu, klub stolić, tepih i lampu.',
       budget: 1500,
       roomType: 'living-room',
-      style: 'scandinavian',
+      style: 'bright',
       size: 20,
       selectedRetailers: ['IKEA', 'JYSK'],
       retailerMode: 'multi',
@@ -74,7 +77,7 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
     title: 'Radni kutak do 800 €',
     subtitle: 'stol, stolica, polica i rasvjeta',
     input: {
-      prompt: 'Imam 800 € za radni kutak. Želim moderan minimalistički radni prostor, može IKEA, JYSK i Pevex. Trebam radni stol, stolicu, policu i lampu.',
+      prompt: 'Imam 800 € za radni kutak. Želim jednostavan i uredan radni prostor, može IKEA, JYSK i Pevex. Trebam radni stol, stolicu, policu i lampu.',
       budget: 800,
       roomType: 'home-office',
       style: 'minimal',
@@ -104,10 +107,10 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
     title: 'Samo IKEA dnevni boravak',
     subtitle: 'jedna trgovina, manje logistike',
     input: {
-      prompt: 'Imam 1800 € za dnevni boravak i želim sve iz IKEA-e. Želim moderni skandinavski stil. Već imam TV, trebam ostatak prostora.',
+      prompt: 'Imam 1800 € za dnevni boravak i želim sve iz IKEA-e. Želim svijetli, uredan stil. Već imam TV, trebam ostatak prostora.',
       budget: 1800,
       roomType: 'living-room',
-      style: 'scandinavian',
+      style: 'bright',
       size: 22,
       selectedRetailers: ['IKEA'],
       retailerMode: 'single',
@@ -171,7 +174,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             aria-label="Opis prostora i želja"
             rows={7}
             value={input.prompt}
-            placeholder="Npr. Imam 1500 € za dnevni boravak. Želim svijetli skandinavski stil, ne želim obilaziti puno trgovina i već imam TV."
+            placeholder="Npr. Imam 1500 € za dnevni boravak. Želim svijetli i prozračni stil, ne želim obilaziti puno trgovina i već imam TV."
             onChange={(event) => onChange({ ...input, prompt: event.target.value })}
           />
         </label>
@@ -270,7 +273,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
 
         <div className="form-row compact-row">
           <label>
-            <span>Koji stil želiš?</span>
+            <span>Kakav izgled želiš?</span>
             <select value={input.style} onChange={(event) => onChange({ ...input, style: event.target.value as StyleType })}>
               {styles.map((style) => (
                 <option key={style.value} value={style.value}>
@@ -278,10 +281,12 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 </option>
               ))}
             </select>
+            <small className="field-help">{styles.find((style) => style.value === input.style)?.hint}</small>
           </label>
           <label>
             <span>Grad ili država</span>
             <input aria-label="Lokacija" value={input.location} onChange={(event) => onChange({ ...input, location: event.target.value })} />
+            <small className="field-help">Koristimo ovo kasnije za dostupnost i trgovine u blizini.</small>
           </label>
         </div>
       </div>
