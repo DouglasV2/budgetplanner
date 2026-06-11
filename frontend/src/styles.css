@@ -560,6 +560,16 @@ input[type='range'] {
   color: var(--orange-dark);
 }
 
+/* Small label indicating furnishing level (Osnovno/Udobnije/Kompletno) */
+.plan-tier {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
 .score-row {
   margin: 18px 0;
 }
@@ -600,6 +610,31 @@ input[type='range'] {
   object-fit: cover;
   border-radius: 18px;
   background: var(--sand);
+}
+
+/* Grouped item display for PlanResults
+ * Each category group begins with a small heading and then lists its items.
+ * This improves readability, especially for older users, by structuring the
+ * shopping list into familiar sections like "Sofa", "Rasvjeta" and so on. */
+.grouped-items .category-group {
+  margin-top: 20px;
+}
+
+.grouped-items .category-group:first-of-type {
+  margin-top: 0;
+}
+
+.category-title {
+  margin: 6px 0 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* adjust spacing between products when grouped */
+.category-group .product-row {
+  margin-top: 8px;
 }
 
 .product-title-line strong {
@@ -2063,6 +2098,18 @@ textarea {
   padding: 9px 12px;
   cursor: pointer;
   font-weight: 900;
+}
+
+/* List style inside missing-box for clearer display of each category */
+.missing-list {
+  margin: 6px 0;
+  padding-left: 18px;
+  list-style-type: disc;
+  color: var(--muted);
+}
+
+.missing-list li {
+  margin-bottom: 4px;
 }
 
 @media (max-width: 760px) {

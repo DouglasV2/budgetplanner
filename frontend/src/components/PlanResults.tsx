@@ -1,6 +1,21 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import type { FurnishingPlan, PlanFeedback, PlannerInput, Product, ProductCategory } from '../types';
-import { categoryLabels, formatCurrency, formatPlanForSharing, getRetailerBreakdown, roomLabels, styleLabels } from '../utils/planner';
+import type {
+  FurnishingPlan,
+  PlanFeedback,
+  PlannerInput,
+  Product,
+  ProductCategory,
+  RoomType,
+  PlanItem
+} from '../types';
+import {
+  categoryLabels,
+  formatCurrency,
+  formatPlanForSharing,
+  getRetailerBreakdown,
+  roomLabels,
+  styleLabels
+} from '../utils/planner';
 
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
 
@@ -38,6 +53,68 @@ function labelCategories(categories: ProductCategory[]) {
 
 function missingCategories(plan: FurnishingPlan, input: PlannerInput) {
   return input.mustHaveCategories.filter((category) => !plan.items.some((item) => item.product.category === category));
+}
+
+// Room specific category order. This helps group products into intuitive sections per room
+// and identify which categories might still be missing from a plan. The order roughly
+// reflects a natural furnishing flow: large items first, then accessories.
+const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
+  'living-room': ['sofa', 'chair', 'table', 'tv-unit', 'rug', 'lighting', 'storage', 'decor'],
+  'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
+  bedroom: ['bed', 'mattress', 'storage', 'lighting', 'decor'],
+  'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor']
+};
+
+// Map internal plan labels to more user friendly furnishing tiers. The tiers convey how
+// complete the setup is and help users understand what to expect: "Osnovno" is a
+// minimal setup, "Udobnije" adds comfort, and "Kompletno" includes everything for the space.
+const TIER_LABELS: Record<string, string> = {
+  'Najbolji izbor': 'Udobnije',
+  'Najjeftinije': 'Osnovno',
+  'Ljepša verzija': 'Kompletno'
+};
+
+/**
+ * Groups plan items by their product category and orders them based on a
+ * predefined list for the given room type. Any categories that aren't in the
+ * predefined list will appear at the end in the order they were encountered.
+ */
+function groupItemsByCategory(plan: FurnishingPlan, roomType: RoomType) {
+  const orderedCategories = ROOM_CATEGORY_ORDER[roomType] ?? [];
+  const itemMap = new Map<ProductCategory, PlanItem[]>();
+  plan.items.forEach((item) => {
+    const cat = item.product.category;
+    if (!itemMap.has(cat)) itemMap.set(cat, []);
+    itemMap.get(cat)!.push(item);
+  });
+  const grouped: { category: ProductCategory; items: PlanItem[] }[] = [];
+  // push in defined order
+  orderedCategories.forEach((cat) => {
+    if (itemMap.has(cat)) {
+      grouped.push({ category: cat, items: itemMap.get(cat)! });
+      itemMap.delete(cat);
+    }
+  });
+  // any remaining categories (unexpected or extras)
+  itemMap.forEach((items, cat) => {
+    grouped.push({ category: cat, items });
+  });
+  return grouped;
+}
+
+/**
+ * Determines which typical room categories are missing from the plan. It ignores
+ * categories the user indicated they already have. This provides a nicer
+ * explanation of what could be added to make the space more complete or
+ * comfortable.
+ */
+function missingForRoom(plan: FurnishingPlan, input: PlannerInput) {
+  const typical = ROOM_CATEGORY_ORDER[input.roomType] ?? [];
+  return typical.filter(
+    (category) =>
+      !plan.items.some((item) => item.product.category === category) &&
+      !input.alreadyHaveCategories.includes(category)
+  );
 }
 
 function defaultSummary(plan: FurnishingPlan, input: PlannerInput) {
@@ -205,7 +282,12 @@ export function PlanResults({
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans[0];
   const overBudget = selectedPlan.total > input.budget;
   const breakdown = getRetailerBreakdown(selectedPlan);
-  const missing = missingCategories(selectedPlan, input);
+  // Group items by category for a more structured presentation and determine
+  // which typical categories are missing from this plan. Also derive a
+  // human-friendly tier based on the plan label.
+  const groupedItems = groupItemsByCategory(selectedPlan, input.roomType);
+  const missing = missingForRoom(selectedPlan, input);
+  const tier = TIER_LABELS[selectedPlan.label] ?? '';
   const selectedFeedback = feedbackByPlan[selectedPlan.id];
 
   return (
@@ -238,6 +320,7 @@ export function PlanResults({
             <div>
               <span className="plan-label">{selectedPlan.label}</span>
               <h3>{selectedPlan.name}</h3>
+              {tier && <small className="plan-tier">{tier} oprema</small>}
             </div>
             <div className={overBudget ? 'total over' : 'total'}>{formatCurrency(selectedPlan.total)}</div>
           </div>
@@ -313,50 +396,62 @@ export function PlanResults({
 
           {missing.length > 0 && (
             <div className="missing-box improved-missing-box">
-              <strong>Još bi bilo dobro dodati:</strong>
-              <span>{labelCategories(missing)}.</span>
-              <p>Nismo ih dodali jer bi plan mogao otići iznad budžeta ili nema dovoljno dobrih proizvoda u odabranim trgovinama.</p>
-              <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Pokušaj dodati svejedno</button>
+              <strong>Nedostaju još neke stvari</strong>
+              <p>Za {roomLabels[input.roomType]} obično treba i:</p>
+              <ul className="missing-list">
+                {missing.map((category) => (
+                  <li key={category}>
+                    {categoryLabels[category]}{' '}
+                    <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Dodaj</button>
+                  </li>
+                ))}
+              </ul>
+              <small>Ako ih uključiš, cijena može porasti ili nema dovoljno dobrih opcija u tvojim trgovinama.</small>
             </div>
           )}
 
-          <div className="items-list">
-            {selectedPlan.items.map(({ product, reason }) => {
-              const locked = lockedProductIds.includes(product.id);
-              return (
-                <div className={locked ? 'product-row locked' : 'product-row'} key={product.id}>
-                  <img src={product.image} alt="" loading="lazy" />
-                  <div className="product-info">
-                    <div className="product-title-line">
-                      <strong>{product.name}</strong>
-                      <span>{formatCurrency(product.price)}</span>
+          <div className="items-list grouped-items">
+            {groupedItems.map((group) => (
+              <div className="category-group" key={group.category}>
+                <h5 className="category-title">{categoryLabels[group.category]}</h5>
+                {group.items.map(({ product, reason }) => {
+                  const locked = lockedProductIds.includes(product.id);
+                  return (
+                    <div className={locked ? 'product-row locked' : 'product-row'} key={product.id}>
+                      <img src={product.image} alt="" loading="lazy" />
+                      <div className="product-info">
+                        <div className="product-title-line">
+                          <strong>{product.name}</strong>
+                          <span>{formatCurrency(product.price)}</span>
+                        </div>
+                        <div className="meta-line">
+                          <span>{product.retailer}</span>
+                          <span>★ {product.rating}</span>
+                          {product.originalPrice && <span>Akcija</span>}
+                          {!product.inStock && <span>Nema na stanju</span>}
+                          {locked && <span>Zadržano</span>}
+                        </div>
+                        <div className="product-reason-box">
+                          <span>Zašto ovo?</span>
+                          <p>{reason}</p>
+                        </div>
+                        <div className="product-actions">
+                          <button type="button" onClick={() => onToggleLock(product.id)}>
+                            {locked ? 'Ne moram zadržati' : 'Zadrži'}
+                          </button>
+                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id)} disabled={locked}>
+                            Promijeni
+                          </button>
+                          <a href={product.url} target="_blank" rel="noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
+                            Pogledaj u trgovini
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                    <div className="meta-line">
-                      <span>{product.retailer}</span>
-                      <span>★ {product.rating}</span>
-                      {product.originalPrice && <span>Akcija</span>}
-                      {!product.inStock && <span>Nema na stanju</span>}
-                      {locked && <span>Zadržano</span>}
-                    </div>
-                    <div className="product-reason-box">
-                      <span>Zašto ovo?</span>
-                      <p>{reason}</p>
-                    </div>
-                    <div className="product-actions">
-                      <button type="button" onClick={() => onToggleLock(product.id)}>
-                        {locked ? 'Ne moram zadržati' : 'Zadrži'}
-                      </button>
-                      <button type="button" onClick={() => onReplace(selectedPlan.id, product.id)} disabled={locked}>
-                        Promijeni
-                      </button>
-                      <a href={product.url} target="_blank" rel="noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
-                        Pogledaj u trgovini
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            ))}
           </div>
 
           <div className="feedback-card">
