@@ -1482,3 +1482,428 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* UX Sprint 4: clearer layout and senior-friendly wording */
+:root {
+  --shadow-soft: 0 22px 55px rgba(66, 44, 19, 0.08);
+}
+
+.planner-section {
+  padding-top: 86px;
+}
+
+.planner-heading-row {
+  margin-bottom: 24px;
+}
+
+.planner-heading-row h2 {
+  max-width: 850px;
+}
+
+.planner-layout {
+  grid-template-columns: minmax(360px, 470px) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.planner-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.friendly-form {
+  gap: 0;
+}
+
+.form-step {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.form-step:last-child {
+  border-bottom: 0;
+}
+
+.form-step h3 {
+  margin: 0;
+  letter-spacing: -0.04em;
+  font-size: 1.22rem;
+}
+
+.form-step p {
+  margin: -6px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.step-kicker {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(236, 122, 46, 0.12);
+  color: var(--orange-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.friendly-label {
+  display: block;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.prompt-first-card {
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(160deg, rgba(236, 122, 46, 0.13), rgba(255, 255, 255, 0.54));
+}
+
+.prompt-topline h3 {
+  font-size: 1.5rem;
+}
+
+.prompt-topline p {
+  margin-top: 6px;
+  max-width: 360px;
+}
+
+.ai-chip {
+  background: var(--ink);
+  color: white;
+}
+
+textarea {
+  min-height: 172px;
+  font-size: 1rem;
+}
+
+.generate-button {
+  font-size: 1rem;
+  border-radius: 20px;
+  min-height: 58px;
+}
+
+.generate-button:focus-visible,
+.pill:focus-visible,
+.choice:focus-visible,
+.template-card:focus-visible,
+.size-card:focus-visible,
+.shop-mode:focus-visible,
+.goal-card:focus-visible,
+.preset:focus-visible,
+.product-actions button:focus-visible,
+.product-actions a:focus-visible,
+.share-button:focus-visible,
+.plan-button:focus-visible {
+  outline: 4px solid rgba(236, 122, 46, 0.18);
+  outline-offset: 2px;
+}
+
+.starter-template-panel {
+  background: rgba(255, 255, 255, 0.36);
+}
+
+.template-grid {
+  grid-template-columns: 1fr;
+}
+
+.template-card {
+  padding: 15px;
+}
+
+.easy-controls {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.budget-presets,
+.shop-mode-grid {
+  display: grid;
+  gap: 9px;
+}
+
+.budget-presets {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.preset {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 10px 9px;
+  cursor: pointer;
+  font-weight: 900;
+  color: var(--muted);
+}
+
+.preset.active {
+  color: var(--orange-dark);
+  background: rgba(236, 122, 46, 0.12);
+  border-color: rgba(236, 122, 46, 0.32);
+}
+
+.friendly-rooms.choice-grid.rooms {
+  grid-template-columns: 1fr 1fr;
+}
+
+.friendly-rooms .choice {
+  align-items: start;
+  justify-items: start;
+  text-align: left;
+  padding: 14px;
+  min-height: 122px;
+}
+
+.friendly-rooms .choice > span {
+  font-size: 1.55rem;
+}
+
+.friendly-rooms .choice strong {
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.friendly-rooms .choice small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.shop-mode-grid {
+  grid-template-columns: 1fr;
+}
+
+.shop-mode {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+  padding: 15px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.shop-mode strong,
+.shop-mode span {
+  display: block;
+}
+
+.shop-mode strong {
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.shop-mode span {
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.shop-mode.active {
+  border-color: rgba(236, 122, 46, 0.34);
+  background: rgba(236, 122, 46, 0.11);
+}
+
+.friendly-pills .pill {
+  padding: 11px 13px;
+  font-size: 0.9rem;
+}
+
+.friendly-goals .goal-card {
+  min-height: 94px;
+}
+
+.sticky-generate-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding: 14px 20px;
+  background: linear-gradient(180deg, rgba(255, 252, 245, 0.82), var(--white));
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+}
+
+.sticky-generate-bar .generate-button {
+  width: 100%;
+}
+
+.results-shell {
+  display: grid;
+  gap: 16px;
+}
+
+.results-title-bar {
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.results-title-bar h3 {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+.results-title-bar small {
+  color: var(--muted);
+  line-height: 1.45;
+  text-align: right;
+  max-width: 230px;
+}
+
+.friendly-empty-state {
+  align-items: flex-start;
+}
+
+.empty-example {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(236, 122, 46, 0.08);
+  color: var(--ink);
+}
+
+.empty-example span {
+  display: block;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.plan-total-card {
+  display: grid;
+  grid-template-columns: 0.8fr 0.8fr 1.3fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.plan-total-card div {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 13px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.plan-total-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.plan-total-card strong {
+  display: block;
+  margin-top: 4px;
+  letter-spacing: -0.03em;
+}
+
+.quick-action-row button,
+.product-actions button,
+.product-actions a,
+.feedback-buttons button,
+.share-button,
+.plan-button {
+  min-height: 42px;
+}
+
+.feedback-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 22px;
+  padding: 14px;
+  margin-top: 16px;
+}
+
+.feedback-card > span {
+  display: block;
+  color: var(--ink);
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.feedback-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feedback-buttons button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--muted);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.feedback-buttons button.active {
+  color: #3f563a;
+  background: rgba(102, 120, 95, 0.12);
+  border-color: rgba(102, 120, 95, 0.3);
+}
+
+@media (max-width: 1180px) {
+  .planner-layout {
+    grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+  }
+
+  .plan-total-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 980px) {
+  .planner-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-panel {
+    position: static;
+  }
+
+  .results-title-bar small {
+    text-align: left;
+  }
+}
+
+@media (max-width: 680px) {
+  .form-step,
+  .sticky-generate-bar {
+    padding: 16px;
+  }
+
+  .prompt-topline,
+  .results-title-bar {
+    display: grid;
+  }
+
+  .friendly-rooms.choice-grid.rooms,
+  .budget-presets,
+  .size-grid,
+  .form-row.compact-row {
+    grid-template-columns: 1fr;
+  }
+
+  .generate-button {
+    display: grid;
+    justify-items: start;
+  }
+
+  .sticky-generate-bar {
+    position: static;
+  }
+}

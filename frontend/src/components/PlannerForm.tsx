@@ -8,11 +8,11 @@ interface PlannerFormProps {
   isLoading?: boolean;
 }
 
-const rooms: Array<{ value: RoomType; label: string; icon: string }> = [
-  { value: 'living-room', label: 'Dnevni boravak', icon: '🛋️' },
-  { value: 'home-office', label: 'Radni kutak', icon: '💻' },
-  { value: 'bedroom', label: 'Spavaća soba', icon: '🛏️' },
-  { value: 'home-gym', label: 'Kućna teretana', icon: '🏋️' }
+const rooms: Array<{ value: RoomType; label: string; icon: string; hint: string }> = [
+  { value: 'living-room', label: 'Dnevni boravak', icon: '🛋️', hint: 'kauč, TV komoda, tepih' },
+  { value: 'home-office', label: 'Radni kutak', icon: '💻', hint: 'stol, stolica, rasvjeta' },
+  { value: 'bedroom', label: 'Spavaća soba', icon: '🛏️', hint: 'krevet, ormar, lampe' },
+  { value: 'home-gym', label: 'Kućna teretana', icon: '🏋️', hint: 'oprema, spremanje, podloga' }
 ];
 
 const styles: Array<{ value: StyleType; label: string }> = [
@@ -24,10 +24,10 @@ const styles: Array<{ value: StyleType; label: string }> = [
 ];
 
 const optimizationGoals: Array<{ value: OptimizationGoal; label: string; description: string }> = [
-  { value: 'best-value', label: 'Najbolji izbor', description: 'dobar balans cijene, izgleda i ocjene' },
-  { value: 'lowest-price', label: 'Jeftinije', description: 'maksimalno čuva budžet' },
-  { value: 'least-stores', label: 'Manje trgovina', description: 'manje dostava i odlazaka' },
-  { value: 'style-match', label: 'Ljepši stil', description: 'prednost imaju skladniji proizvodi' }
+  { value: 'best-value', label: 'Najbolji omjer', description: 'dobar izgled bez bacanja novca' },
+  { value: 'lowest-price', label: 'Što jeftinije', description: 'čuvaj budžet koliko god možeš' },
+  { value: 'least-stores', label: 'Što manje trgovina', description: 'manje dostava i manje obilazaka' },
+  { value: 'style-match', label: 'Što ljepše', description: 'prednost imaju skladniji proizvodi' }
 ];
 
 const categoryOrder: ProductCategory[] = [
@@ -46,11 +46,13 @@ const categoryOrder: ProductCategory[] = [
 ];
 
 const sizePresets = [
-  { label: 'Ne znam', size: 20, description: 'uzmi sigurni default' },
-  { label: 'Mali', size: 12, description: 'do oko 15 m²' },
-  { label: 'Srednji', size: 20, description: '16–25 m²' },
-  { label: 'Veliki', size: 32, description: 'više od 25 m²' }
+  { label: 'Ne znam', size: 20, description: 'app uzme sigurnu procjenu' },
+  { label: 'Mala', size: 12, description: 'garsonijera ili manji kutak' },
+  { label: 'Srednja', size: 20, description: 'tipična soba u stanu' },
+  { label: 'Velika', size: 32, description: 'veći dnevni boravak' }
 ];
+
+const budgetPresets = [700, 1000, 1500, 2500];
 
 const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<PlannerInput> }> = [
   {
@@ -137,42 +139,52 @@ function applyTemplate(input: PlannerInput, template: Partial<PlannerInput>): Pl
   };
 }
 
+function selectedShopMode(input: PlannerInput) {
+  if (input.retailerMode === 'single') return 'one-store';
+  if (input.selectedRetailers.length === retailers.length) return 'best-combo';
+  return 'choose-stores';
+}
+
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
+  const shopMode = selectedShopMode(input);
+
   return (
     <form
-      className="planner-form"
+      className="planner-form friendly-form"
       onSubmit={(event) => {
         event.preventDefault();
         onGenerate();
       }}
     >
-      <div className="prompt-card prompt-first-card">
+      <div className="form-step prompt-card prompt-first-card">
+        <div className="step-kicker">1. Opiši želju</div>
         <div className="prompt-topline">
           <div>
-            <span className="field-label">Tvoj opis</span>
-            <h3>Napiši što želiš, bez razmišljanja o filterima.</h3>
+            <h3>Što želiš opremiti?</h3>
+            <p>Napiši normalno, kao da šalješ poruku prijatelju. Ne moraš znati stručne izraze.</p>
           </div>
-          <span className="ai-chip">Najbrži način</span>
+          <span className="ai-chip">Najlakše</span>
         </div>
         <label>
-          <span>Opiši što želiš</span>
+          <span>Ovdje napiši želju</span>
           <textarea
             aria-label="Opis prostora i želja"
             rows={7}
             value={input.prompt}
-            placeholder="Npr. Imam 1500 € za dnevni boravak. Želim skandinavski stil, preferiram IKEA i JYSK. Već imam TV, treba mi kauč, tepih, lampa i TV komoda."
+            placeholder="Npr. Imam 1500 € za dnevni boravak. Želim svijetli skandinavski stil, ne želim obilaziti puno trgovina i već imam TV."
             onChange={(event) => onChange({ ...input, prompt: event.target.value })}
           />
         </label>
         <button className="generate-button" type="submit" disabled={isLoading}>
-          {isLoading ? 'Generiram plan...' : 'Generiraj plan'}
-          <span>dobiješ konkretan popis za kupnju</span>
+          {isLoading ? 'Slažem plan...' : 'Složi moj plan'}
+          <span>dobiješ popis proizvoda i ukupnu cijenu</span>
         </button>
-        <p className="microcopy">Kontrole ispod su samo pomoć. Ako u opisu napišeš budžet, trgovine ili “već imam TV”, aplikacija će to pokušati sama prepoznati.</p>
       </div>
 
-      <div className="starter-template-panel">
-        <div className="field-label">Kreni od primjera</div>
+      <div className="form-step starter-template-panel">
+        <div className="step-kicker">Brzi početak</div>
+        <h3>Ne znaš što napisati?</h3>
+        <p>Odaberi primjer pa ga po želji promijeni.</p>
         <div className="template-grid">
           {starterTemplates.map((template) => (
             <button type="button" className="template-card" key={template.title} onClick={() => onChange(applyTemplate(input, template.input))}>
@@ -183,12 +195,16 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
       </div>
 
-      <div className="smart-controls">
+      <div className="form-step easy-controls">
+        <div className="step-kicker">2. Podesi ako želiš</div>
+        <h3>Osnovne stvari</h3>
+        <p>Ovo možeš preskočiti ako si sve napisao gore.</p>
+
         <div className="control-block budget-block">
-          <span className="field-label">Budžet</span>
+          <span className="friendly-label">Koliko želiš potrošiti?</span>
           <label className="budget-input-wrap">
             <input
-              aria-label="Budget"
+              aria-label="Koliko želiš potrošiti"
               type="number"
               min="100"
               step="50"
@@ -197,11 +213,35 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             />
             <span>€</span>
           </label>
-          <small>{formatCurrency(input.budget)} ukupni limit</small>
+          <div className="budget-presets" aria-label="Brzi odabir budžeta">
+            {budgetPresets.map((budget) => (
+              <button type="button" key={budget} className={input.budget === budget ? 'preset active' : 'preset'} onClick={() => onChange({ ...input, budget })}>
+                {formatCurrency(budget)}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="control-block">
-          <span className="field-label">Veličina prostora</span>
+          <span className="friendly-label">Što opremaš?</span>
+          <div className="choice-grid rooms friendly-rooms">
+            {rooms.map((room) => (
+              <button
+                type="button"
+                className={input.roomType === room.value ? 'choice active' : 'choice'}
+                key={room.value}
+                onClick={() => onChange({ ...input, roomType: room.value })}
+              >
+                <span>{room.icon}</span>
+                <strong>{room.label}</strong>
+                <small>{room.hint}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="control-block">
+          <span className="friendly-label">Koliko je velika prostorija?</span>
           <div className="size-grid">
             {sizePresets.map((preset) => (
               <button
@@ -216,9 +256,9 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             ))}
           </div>
           <label className="custom-size-input">
-            <span>Točno m²</span>
+            <span>Točno u m² ako znaš</span>
             <input
-              aria-label="Room size"
+              aria-label="Veličina prostorije"
               type="number"
               min="8"
               max="80"
@@ -227,61 +267,57 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             />
           </label>
         </div>
-      </div>
 
-      <div className="field-group compact-group">
-        <span className="field-label">Prostorija</span>
-        <div className="choice-grid rooms">
-          {rooms.map((room) => (
-            <button
-              type="button"
-              className={input.roomType === room.value ? 'choice active' : 'choice'}
-              key={room.value}
-              onClick={() => onChange({ ...input, roomType: room.value })}
-            >
-              <span>{room.icon}</span>
-              {room.label}
-            </button>
-          ))}
+        <div className="form-row compact-row">
+          <label>
+            <span>Koji stil želiš?</span>
+            <select value={input.style} onChange={(event) => onChange({ ...input, style: event.target.value as StyleType })}>
+              {styles.map((style) => (
+                <option key={style.value} value={style.value}>
+                  {style.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Grad ili država</span>
+            <input aria-label="Lokacija" value={input.location} onChange={(event) => onChange({ ...input, location: event.target.value })} />
+          </label>
         </div>
       </div>
 
-      <div className="form-row compact-row">
-        <label>
-          <span>Stil</span>
-          <select value={input.style} onChange={(event) => onChange({ ...input, style: event.target.value as StyleType })}>
-            {styles.map((style) => (
-              <option key={style.value} value={style.value}>
-                {style.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          <span>Lokacija</span>
-          <input value={input.location} onChange={(event) => onChange({ ...input, location: event.target.value })} />
-        </label>
-      </div>
-
-      <div className="field-group compact-group">
-        <span className="field-label">Trgovine</span>
-        <div className="segmented-control">
+      <div className="form-step shopping-step">
+        <div className="step-kicker">3. Kupnja</div>
+        <h3>Gdje želiš kupovati?</h3>
+        <p>Najjednostavnije je pustiti aplikaciji da kombinira, ali možeš ograničiti trgovine.</p>
+        <div className="shop-mode-grid" role="group" aria-label="Odabir trgovina">
           <button
             type="button"
-            className={input.retailerMode === 'single' ? 'segment active' : 'segment'}
-            onClick={() => onChange({ ...input, retailerMode: 'single', selectedRetailers: [input.selectedRetailers[0] ?? 'IKEA'] })}
+            className={shopMode === 'best-combo' ? 'shop-mode active' : 'shop-mode'}
+            onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: retailers, optimizationGoal: 'best-value' })}
           >
-            Jedna trgovina
+            <strong>Svejedno mi je</strong>
+            <span>Složi najbolju kombinaciju iz svih trgovina.</span>
           </button>
           <button
             type="button"
-            className={input.retailerMode === 'multi' ? 'segment active' : 'segment'}
-            onClick={() => onChange({ ...input, retailerMode: 'multi' })}
+            className={shopMode === 'one-store' ? 'shop-mode active' : 'shop-mode'}
+            onClick={() => onChange({ ...input, retailerMode: 'single', selectedRetailers: [input.selectedRetailers[0] ?? 'IKEA'], optimizationGoal: 'least-stores' })}
           >
-            Kombiniraj
+            <strong>Jedna trgovina</strong>
+            <span>Manje dostava, manje obilazaka.</span>
+          </button>
+          <button
+            type="button"
+            className={shopMode === 'choose-stores' ? 'shop-mode active' : 'shop-mode'}
+            onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: input.selectedRetailers.length ? input.selectedRetailers : ['IKEA', 'JYSK'] })}
+          >
+            <strong>Sam odabirem</strong>
+            <span>Odaberi trgovine koje ti odgovaraju.</span>
           </button>
         </div>
-        <div className="retailer-pills">
+
+        <div className="retailer-pills friendly-pills">
           {retailers.map((retailer) => {
             const active = input.selectedRetailers.includes(retailer);
             return (
@@ -293,65 +329,76 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
       </div>
 
-      <div className="field-group compact-group">
-        <span className="field-label">Prioritet</span>
-        <div className="optimization-grid">
-          {optimizationGoals.map((goal) => (
-            <button
-              type="button"
-              key={goal.value}
-              className={input.optimizationGoal === goal.value ? 'goal-card active' : 'goal-card'}
-              onClick={() => onChange({ ...input, optimizationGoal: goal.value })}
-            >
-              <strong>{goal.label}</strong>
-              <span>{goal.description}</span>
-            </button>
-          ))}
+      <div className="form-step">
+        <div className="step-kicker">4. Želje</div>
+        <h3>Što je bitno?</h3>
+        <div className="field-group compact-group">
+          <span className="friendly-label">Što obavezno trebaš?</span>
+          <div className="category-pills friendly-pills">
+            {categoryOrder.map((category) => (
+              <button
+                type="button"
+                key={category}
+                className={input.mustHaveCategories.includes(category) ? 'pill active' : 'pill'}
+                onClick={() =>
+                  onChange({
+                    ...input,
+                    mustHaveCategories: toggle(input.mustHaveCategories, category),
+                    alreadyHaveCategories: input.alreadyHaveCategories.filter((item) => item !== category)
+                  })
+                }
+              >
+                {categoryLabels[category]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field-group compact-group">
+          <span className="friendly-label">Što već imaš?</span>
+          <div className="category-pills muted-pills friendly-pills">
+            {categoryOrder.map((category) => (
+              <button
+                type="button"
+                key={category}
+                className={input.alreadyHaveCategories.includes(category) ? 'pill active muted-active' : 'pill'}
+                onClick={() =>
+                  onChange({
+                    ...input,
+                    alreadyHaveCategories: toggle(input.alreadyHaveCategories, category),
+                    mustHaveCategories: input.mustHaveCategories.filter((item) => item !== category)
+                  })
+                }
+              >
+                {categoryLabels[category]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field-group compact-group">
+          <span className="friendly-label">Što ti je najvažnije?</span>
+          <div className="optimization-grid friendly-goals">
+            {optimizationGoals.map((goal) => (
+              <button
+                type="button"
+                key={goal.value}
+                className={input.optimizationGoal === goal.value ? 'goal-card active' : 'goal-card'}
+                onClick={() => onChange({ ...input, optimizationGoal: goal.value })}
+              >
+                <strong>{goal.label}</strong>
+                <span>{goal.description}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="field-group compact-group">
-        <span className="field-label">Što obavezno trebaš?</span>
-        <div className="category-pills">
-          {categoryOrder.map((category) => (
-            <button
-              type="button"
-              key={category}
-              className={input.mustHaveCategories.includes(category) ? 'pill active' : 'pill'}
-              onClick={() =>
-                onChange({
-                  ...input,
-                  mustHaveCategories: toggle(input.mustHaveCategories, category),
-                  alreadyHaveCategories: input.alreadyHaveCategories.filter((item) => item !== category)
-                })
-              }
-            >
-              {categoryLabels[category]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="field-group compact-group">
-        <span className="field-label">Što već imaš?</span>
-        <div className="category-pills muted-pills">
-          {categoryOrder.map((category) => (
-            <button
-              type="button"
-              key={category}
-              className={input.alreadyHaveCategories.includes(category) ? 'pill active muted-active' : 'pill'}
-              onClick={() =>
-                onChange({
-                  ...input,
-                  alreadyHaveCategories: toggle(input.alreadyHaveCategories, category),
-                  mustHaveCategories: input.mustHaveCategories.filter((item) => item !== category)
-                })
-              }
-            >
-              {categoryLabels[category]}
-            </button>
-          ))}
-        </div>
+      <div className="sticky-generate-bar">
+        <button className="generate-button" type="submit" disabled={isLoading}>
+          {isLoading ? 'Slažem plan...' : 'Složi moj plan'}
+          <span>{formatCurrency(input.budget)} budžet</span>
+        </button>
       </div>
     </form>
   );

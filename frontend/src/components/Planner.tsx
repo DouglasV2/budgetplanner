@@ -52,7 +52,7 @@ export function Planner() {
       .then((savedPlan) => {
         setInput(savedPlan.input);
         setPlans([savedPlan.plan]);
-        setNotice('Učitan je spremljeni plan. Možeš ga kopirati, mijenjati ili generirati novu verziju.');
+        setNotice('Učitan je spremljeni plan. Možeš ga kopirati, mijenjati ili složiti novu verziju.');
       })
       .catch(() => setError('Nisam našao spremljeni plan. Možda je link pogrešan ili server nije pokrenut.'))
       .finally(() => setIsLoading(false));
@@ -135,7 +135,7 @@ export function Planner() {
       nextInput = {
         ...nextInput,
         optimizationGoal: 'lowest-price' as OptimizationGoal,
-        prompt: `${nextInput.prompt}\n\nNapravi jeftiniju verziju i čuvaj budžet.`
+        prompt: `${nextInput.prompt}\n\nSloži jeftiniju verziju i čuvaj budžet.`
       };
     }
 
@@ -143,7 +143,7 @@ export function Planner() {
       nextInput = {
         ...nextInput,
         optimizationGoal: 'style-match' as OptimizationGoal,
-        prompt: `${nextInput.prompt}\n\nUčini plan estetski ljepšim i skladnijim.`
+        prompt: `${nextInput.prompt}\n\nSloži ljepšu i skladniju verziju.`
       };
     }
 
@@ -175,14 +175,14 @@ export function Planner() {
       <div className="section-heading left planner-heading-row">
         <div>
           <span className="eyebrow">Planer za kupnju</span>
-          <h2>Napiši što želiš opremiti, a mi složimo konkretan popis za kupnju.</h2>
+          <h2>Prvo napišeš želju. Desno dobiješ gotov plan.</h2>
           <p>
-            Korisnik ne mora znati sve filtere unaprijed. Dovoljno je da opiše prostor, budžet i trgovine, a zatim jednim klikom traži jeftiniju, ljepšu ili jednostavniju verziju.
+            Nema komplicirane forme. Opiši prostor svojim riječima, a zatim po potrebi dotjeraj budžet, trgovine ili stvari koje već imaš.
           </p>
         </div>
         <div className="demo-status">
-          <span>Generirano</span>
-          <strong>{generationCount}×</strong>
+          <span>Složeno planova</span>
+          <strong>{generationCount}</strong>
         </div>
       </div>
 
