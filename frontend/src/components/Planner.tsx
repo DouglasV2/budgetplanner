@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { generatePlan, replaceProduct } from '../api/client';
-import type { FurnishingPlan, OptimizationGoal, PlannerInput, Retailer } from '../types';
+import { useEffect, useState } from 'react';
+import { generatePlan, getSavedPlan, replaceProduct, savePlan, sendPlanFeedback, trackProductClick } from '../api/client';
+import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, Retailer } from '../types';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
 
@@ -30,16 +30,38 @@ function mostUsedRetailer(plan?: FurnishingPlan): Retailer | undefined {
   return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] as Retailer | undefined;
 }
 
+function readSharedPlanIdFromUrl() {
+  const match = window.location.pathname.match(/^\/plan\/([^/]+)$/);
+  return match?.[1] ?? null;
+}
+
 export function Planner() {
   const [input, setInput] = useState<PlannerInput>(initialInput);
   const [plans, setPlans] = useState<FurnishingPlan[]>([]);
   const [generationCount, setGenerationCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const sharedPlanId = readSharedPlanIdFromUrl();
+    if (!sharedPlanId) return;
+
+    setIsLoading(true);
+    getSavedPlan(sharedPlanId)
+      .then((savedPlan) => {
+        setInput(savedPlan.input);
+        setPlans([savedPlan.plan]);
+        setNotice('Učitan je spremljeni plan. Možeš ga kopirati, mijenjati ili generirati novu verziju.');
+      })
+      .catch(() => setError('Nisam našao spremljeni plan. Možda je link pogrešan ili server nije pokrenut.'))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   async function runGeneration(nextInput: PlannerInput) {
     setIsLoading(true);
     setError(null);
+    setNotice(null);
 
     try {
       const response = await generatePlan(nextInput);
@@ -50,7 +72,7 @@ export function Planner() {
       setError(
         apiError instanceof Error
           ? apiError.message
-          : 'Backend API nije dostupan. Pokreni Spring Boot backend na http://localhost:8080.'
+          : 'Server aplikacija nije dostupna. Pokreni Spring Boot aplikaciju na http://localhost:8080.'
       );
     } finally {
       setIsLoading(false);
@@ -69,7 +91,7 @@ export function Planner() {
       const updatedPlan = await replaceProduct(plan, input, productId);
       setPlans((currentPlans) => currentPlans.map((currentPlan) => (currentPlan.id === planId ? updatedPlan : currentPlan)));
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : 'Nisam mogao zamijeniti proizvod preko backend API-ja.');
+      setError(apiError instanceof Error ? apiError.message : 'Nisam uspio zamijeniti proizvod. Probaj ponovno.');
     }
   }
 
@@ -80,6 +102,30 @@ export function Planner() {
         : [...currentInput.lockedProductIds, productId];
       return { ...currentInput, lockedProductIds };
     });
+  }
+
+  async function handleSavePlan(plan: FurnishingPlan, copyLink: boolean) {
+    const savedPlan = await savePlan(plan, input);
+    const url = `${window.location.origin}/plan/${savedPlan.id}`;
+
+    if (copyLink) {
+      await navigator.clipboard.writeText(url);
+      setNotice('Link za plan je kopiran. Možeš ga poslati partneru, frendu ili sebi za kasnije.');
+    } else {
+      window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
+      setNotice('Plan je spremljen. Link u adresnoj traci sada otvara baš ovaj plan.');
+    }
+
+    return url;
+  }
+
+  function handleProductClick(planId: string, product: Product) {
+    trackProductClick(planId, product);
+  }
+
+  async function handleFeedback(planId: string, feedback: PlanFeedback) {
+    await sendPlanFeedback(planId, feedback);
+    setNotice('Hvala — ova reakcija nam govori što treba popraviti u sljedećem planu.');
   }
 
   async function handleQuickAction(action: QuickPlanAction, plan?: FurnishingPlan) {
@@ -105,7 +151,7 @@ export function Planner() {
       nextInput = {
         ...nextInput,
         optimizationGoal: 'least-stores' as OptimizationGoal,
-        prompt: `${nextInput.prompt}\n\nSmanji broj trgovina i logistiku.`
+        prompt: `${nextInput.prompt}\n\nSmanji broj trgovina i dostava.`
       };
     }
 
@@ -128,17 +174,19 @@ export function Planner() {
     <section className="planner-section shell" id="planner">
       <div className="section-heading left planner-heading-row">
         <div>
-          <span className="eyebrow">UX Sprint 2</span>
-          <h2>Prompt-first planner: napiši cilj, zatim fino podešavaj rezultat.</h2>
+          <span className="eyebrow">Planer za kupnju</span>
+          <h2>Napiši što želiš opremiti, a mi složimo konkretan popis za kupnju.</h2>
           <p>
-            Forma više nije glavni proizvod. Korisnik prvo napiše što želi, a kontrole služe za korekcije: jeftinije, ljepše, jedna trgovina ili zaključani proizvodi.
+            Korisnik ne mora znati sve filtere unaprijed. Dovoljno je da opiše prostor, budžet i trgovine, a zatim jednim klikom traži jeftiniju, ljepšu ili jednostavniju verziju.
           </p>
         </div>
         <div className="demo-status">
-          <span>Generated</span>
+          <span>Generirano</span>
           <strong>{generationCount}×</strong>
         </div>
       </div>
+
+      {notice && <div className="planner-notice">{notice}</div>}
 
       <div className="planner-layout">
         <div className="planner-panel">
@@ -151,6 +199,9 @@ export function Planner() {
           onToggleLock={handleToggleLock}
           lockedProductIds={input.lockedProductIds}
           onQuickAction={handleQuickAction}
+          onSavePlan={handleSavePlan}
+          onProductClick={handleProductClick}
+          onFeedback={handleFeedback}
           isLoading={isLoading}
           error={error}
         />

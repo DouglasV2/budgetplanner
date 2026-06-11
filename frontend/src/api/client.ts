@@ -1,4 +1,4 @@
-import type { FurnishingPlan, PlannerInput, Product } from '../types';
+import type { FurnishingPlan, PlanFeedback, PlannerInput, Product, SavedPlanResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
@@ -24,6 +24,17 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+function fireAndForget(path: string, payload: unknown) {
+  void fetch(`${API_BASE_URL}${path}`, {
+    method: 'POST',
+    keepalive: true,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  }).catch(() => undefined);
+}
+
 export function generatePlan(input: PlannerInput) {
   return request<PlanGenerationResponse>('/api/plans/generate', {
     method: 'POST',
@@ -35,6 +46,33 @@ export function replaceProduct(plan: FurnishingPlan, input: PlannerInput, produc
   return request<FurnishingPlan>('/api/plans/replace', {
     method: 'POST',
     body: JSON.stringify({ plan, input, productId })
+  });
+}
+
+export function savePlan(plan: FurnishingPlan, input: PlannerInput) {
+  return request<SavedPlanResponse>('/api/saved-plans', {
+    method: 'POST',
+    body: JSON.stringify({ plan, input })
+  });
+}
+
+export function getSavedPlan(id: string) {
+  return request<SavedPlanResponse>(`/api/saved-plans/${id}`);
+}
+
+export function trackProductClick(planId: string, product: Product) {
+  fireAndForget('/api/events/product-click', {
+    planId,
+    productId: product.id,
+    retailer: product.retailer,
+    source: 'plan-card'
+  });
+}
+
+export function sendPlanFeedback(planId: string, feedback: PlanFeedback, note = '') {
+  return request<{ status: string }>('/api/events/plan-feedback', {
+    method: 'POST',
+    body: JSON.stringify({ planId, feedback, note })
   });
 }
 

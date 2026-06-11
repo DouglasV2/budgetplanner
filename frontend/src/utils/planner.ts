@@ -7,19 +7,19 @@ export const categoryLabels: Record<ProductCategory, string> = {
   chair: 'Stolica',
   table: 'Klub stolić',
   'tv-unit': 'TV komoda',
-  storage: 'Storage / polica',
+  storage: 'Polica / spremanje',
   rug: 'Tepih',
   lighting: 'Rasvjeta',
   decor: 'Dekoracije',
   desk: 'Radni stol',
   bed: 'Krevet',
   mattress: 'Madrac',
-  'gym-equipment': 'Gym oprema'
+  'gym-equipment': 'Oprema za vježbanje'
 };
 
 export const roomLabels: Record<RoomType, string> = {
   'living-room': 'dnevni boravak',
-  'home-office': 'home office',
+  'home-office': 'radni kutak',
   bedroom: 'spavaća soba',
   'home-gym': 'kućna teretana'
 };
@@ -28,7 +28,7 @@ export const styleLabels: Record<StyleType, string> = {
   scandinavian: 'skandinavski',
   modern: 'moderni',
   minimal: 'minimalistički',
-  cozy: 'cozy / ugodni',
+  cozy: 'topli i ugodni',
   industrial: 'industrijski'
 };
 
@@ -55,8 +55,8 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
   return [
     `BudgetSpace AI plan: ${plan.name}`,
     `Prostorija: ${roomLabels[input.roomType]}, stil: ${styleLabels[input.style]}, budžet: ${formatCurrency(input.budget)}`,
-    `Ukupno: ${formatCurrency(plan.total)} | Fit score: ${plan.fitScore}% | Trgovine: ${plan.retailersUsed.join(', ') || 'n/a'}`,
-    breakdown ? `Breakdown: ${breakdown}` : '',
+    `Ukupno: ${formatCurrency(plan.total)} | Poklapanje sa željama: ${plan.fitScore}% | Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
+    breakdown ? `Trošak po trgovini: ${breakdown}` : '',
     '',
     ...lines
   ].filter(Boolean).join('\n');

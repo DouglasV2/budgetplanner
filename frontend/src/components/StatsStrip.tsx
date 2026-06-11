@@ -1,9 +1,9 @@
 export function StatsStrip() {
   const stats = [
-    { value: '3', label: 'plana po upitu' },
-    { value: '5+', label: 'retailera u katalogu' },
-    { value: '€', label: 'budget-first logika' },
-    { value: 'SEO', label: 'web-first strategija' }
+    { value: '3', label: 'prijedloga po upitu' },
+    { value: '5+', label: 'trgovina u katalogu' },
+    { value: '€', label: 'budžet je uvijek vidljiv' },
+    { value: 'Link', label: 'plan se može podijeliti' }
   ];
 
   return (

@@ -1,16 +1,16 @@
 export function HowItWorks() {
   const steps = [
     {
-      title: '1. Korisnik unese cilj',
-      text: 'Budžet, prostorija, stil, veličina i grad. Nema dugog onboarding procesa.'
+      title: '1. Opišeš što želiš',
+      text: 'Napišeš prostoriju, budžet, stil i trgovine koje želiš. Nema dugog ispunjavanja forme.'
     },
     {
-      title: '2. Engine filtrira katalog',
-      text: 'Proizvodi se biraju prema cijeni, kategoriji, stilu, dostupnosti i kvaliteti.'
+      title: '2. Aplikacija složi kombinacije',
+      text: 'Proizvodi se biraju prema cijeni, kategoriji, stilu, dostupnosti i tome koliko se uklapaju u tvoje želje.'
     },
     {
-      title: '3. AI objasni plan',
-      text: 'Korisnik dobije 3 opcije: Budget, Best Value i Stretch, s jasnim razlozima.'
+      title: '3. Dobiješ popis za kupnju',
+      text: 'Vidiš ukupnu cijenu, trošak po trgovini, proizvode i linkove gdje ih možeš otvoriti.'
     }
   ];
 
@@ -18,8 +18,8 @@ export function HowItWorks() {
     <section className="section shell" id="how">
       <div className="section-heading">
         <span className="eyebrow">Kako radi</span>
-        <h2>UX je jednostavan: od namjere do shopping liste.</h2>
-        <p>Ovo je starter logika s mock proizvodima. Kasnije se spaja backend, scraperi i pravi retailer feedovi.</p>
+        <h2>Od ideje do shopping liste u par klikova.</h2>
+        <p>Ova verzija već radi s bazom proizvoda na serveru. Sljedeći korak su stvarni katalozi trgovina i pametnije preporuke.</p>
       </div>
       <div className="steps-grid">
         {steps.map((step) => (

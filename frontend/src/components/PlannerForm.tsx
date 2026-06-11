@@ -10,7 +10,7 @@ interface PlannerFormProps {
 
 const rooms: Array<{ value: RoomType; label: string; icon: string }> = [
   { value: 'living-room', label: 'Dnevni boravak', icon: '🛋️' },
-  { value: 'home-office', label: 'Home office', icon: '💻' },
+  { value: 'home-office', label: 'Radni kutak', icon: '💻' },
   { value: 'bedroom', label: 'Spavaća soba', icon: '🛏️' },
   { value: 'home-gym', label: 'Kućna teretana', icon: '🏋️' }
 ];
@@ -19,15 +19,15 @@ const styles: Array<{ value: StyleType; label: string }> = [
   { value: 'scandinavian', label: 'Skandinavski' },
   { value: 'modern', label: 'Moderni' },
   { value: 'minimal', label: 'Minimalistički' },
-  { value: 'cozy', label: 'Cozy / toplo' },
+  { value: 'cozy', label: 'Toplo i ugodno' },
   { value: 'industrial', label: 'Industrijski' }
 ];
 
 const optimizationGoals: Array<{ value: OptimizationGoal; label: string; description: string }> = [
-  { value: 'best-value', label: 'Best value', description: 'balans cijene, izgleda i ratinga' },
+  { value: 'best-value', label: 'Najbolji izbor', description: 'dobar balans cijene, izgleda i ocjene' },
   { value: 'lowest-price', label: 'Jeftinije', description: 'maksimalno čuva budžet' },
   { value: 'least-stores', label: 'Manje trgovina', description: 'manje dostava i odlazaka' },
-  { value: 'style-match', label: 'Ljepši stil', description: 'prioritet estetika' }
+  { value: 'style-match', label: 'Ljepši stil', description: 'prednost imaju skladniji proizvodi' }
 ];
 
 const categoryOrder: ProductCategory[] = [
@@ -47,9 +47,9 @@ const categoryOrder: ProductCategory[] = [
 
 const sizePresets = [
   { label: 'Ne znam', size: 20, description: 'uzmi sigurni default' },
-  { label: 'Mali', size: 12, description: 'do 15 m²' },
+  { label: 'Mali', size: 12, description: 'do oko 15 m²' },
   { label: 'Srednji', size: 20, description: '16–25 m²' },
-  { label: 'Veliki', size: 32, description: '25+ m²' }
+  { label: 'Veliki', size: 32, description: 'više od 25 m²' }
 ];
 
 const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<PlannerInput> }> = [
@@ -69,10 +69,10 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
     }
   },
   {
-    title: 'Home office do 800 €',
+    title: 'Radni kutak do 800 €',
     subtitle: 'stol, stolica, polica i rasvjeta',
     input: {
-      prompt: 'Imam 800 € za home office. Želim moderni minimalistički setup, može IKEA, JYSK i Pevex. Trebam radni stol, stolicu, policu i lampu.',
+      prompt: 'Imam 800 € za radni kutak. Želim moderan minimalistički radni prostor, može IKEA, JYSK i Pevex. Trebam radni stol, stolicu, policu i lampu.',
       budget: 800,
       roomType: 'home-office',
       style: 'minimal',
@@ -85,9 +85,9 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
   },
   {
     title: 'Kućna teretana do 1200 €',
-    subtitle: 'Decathlon + Pevex setup za start',
+    subtitle: 'Decathlon + Pevex oprema za početak',
     input: {
-      prompt: 'Imam 1200 € za kućnu teretanu. Želim praktičan setup, preferiram Decathlon i Pevex. Trebam osnovnu opremu, storage i rasvjetu.',
+      prompt: 'Imam 1200 € za kućnu teretanu. Želim praktičan prostor za vježbanje, preferiram Decathlon i Pevex. Trebam osnovnu opremu, spremanje i rasvjetu.',
       budget: 1200,
       roomType: 'home-gym',
       style: 'modern',
@@ -149,15 +149,15 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
       <div className="prompt-card prompt-first-card">
         <div className="prompt-topline">
           <div>
-            <span className="field-label">Glavni input</span>
-            <h3>Napiši kao da šalješ poruku dizajneru.</h3>
+            <span className="field-label">Tvoj opis</span>
+            <h3>Napiši što želiš, bez razmišljanja o filterima.</h3>
           </div>
-          <span className="ai-chip">Prompt-first UX</span>
+          <span className="ai-chip">Najbrži način</span>
         </div>
         <label>
           <span>Opiši što želiš</span>
           <textarea
-            aria-label="Natural language prompt"
+            aria-label="Opis prostora i želja"
             rows={7}
             value={input.prompt}
             placeholder="Npr. Imam 1500 € za dnevni boravak. Želim skandinavski stil, preferiram IKEA i JYSK. Već imam TV, treba mi kauč, tepih, lampa i TV komoda."
@@ -166,13 +166,13 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </label>
         <button className="generate-button" type="submit" disabled={isLoading}>
           {isLoading ? 'Generiram plan...' : 'Generiraj plan'}
-          <span>backend product baza + planner engine</span>
+          <span>dobiješ konkretan popis za kupnju</span>
         </button>
-        <p className="microcopy">Kontrole ispod su samo pomoć. Ako napišeš budžet, trgovine ili “već imam TV” u prompt, backend to pokušava sam izvući.</p>
+        <p className="microcopy">Kontrole ispod su samo pomoć. Ako u opisu napišeš budžet, trgovine ili “već imam TV”, aplikacija će to pokušati sama prepoznati.</p>
       </div>
 
       <div className="starter-template-panel">
-        <div className="field-label">Starter templates</div>
+        <div className="field-label">Kreni od primjera</div>
         <div className="template-grid">
           {starterTemplates.map((template) => (
             <button type="button" className="template-card" key={template.title} onClick={() => onChange(applyTemplate(input, template.input))}>

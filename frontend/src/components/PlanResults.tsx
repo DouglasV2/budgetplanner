@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { FurnishingPlan, PlannerInput, ProductCategory } from '../types';
+import type { FurnishingPlan, PlanFeedback, PlannerInput, Product, ProductCategory } from '../types';
 import { categoryLabels, formatCurrency, formatPlanForSharing, getRetailerBreakdown, roomLabels, styleLabels } from '../utils/planner';
 
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
@@ -11,15 +11,25 @@ interface PlanResultsProps {
   onToggleLock: (productId: string) => void;
   lockedProductIds: string[];
   onQuickAction: (action: QuickPlanAction, plan?: FurnishingPlan) => void;
+  onSavePlan: (plan: FurnishingPlan, copyLink: boolean) => Promise<string>;
+  onProductClick: (planId: string, product: Product) => void;
+  onFeedback: (planId: string, feedback: PlanFeedback) => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
 }
 
 const effortLabels = {
-  Low: 'Nizak effort',
-  Medium: 'Srednji effort',
-  High: 'Visok effort'
+  Low: 'Jednostavno',
+  Medium: 'Umjereno',
+  High: 'Više trgovina'
 };
+
+const feedbackOptions: Array<{ value: PlanFeedback; label: string }> = [
+  { value: 'useful', label: 'Korisno' },
+  { value: 'too-expensive', label: 'Preskupo' },
+  { value: 'wrong-style', label: 'Stil nije dobar' },
+  { value: 'too-many-stores', label: 'Previše trgovina' }
+];
 
 function labelCategories(categories: ProductCategory[]) {
   if (!categories.length) return 'nije posebno označeno';
@@ -34,8 +44,8 @@ function UnderstandingSummary({ input }: { input: PlannerInput }) {
   return (
     <div className="understood-card">
       <div className="understood-header">
-        <span>Razumjeli smo</span>
-        <strong>{formatCurrency(input.budget)} budget</strong>
+        <span>App je prepoznao</span>
+        <strong>{formatCurrency(input.budget)} budžet</strong>
       </div>
       <div className="understood-grid">
         <div>
@@ -57,8 +67,8 @@ function UnderstandingSummary({ input }: { input: PlannerInput }) {
       </div>
       <div className="understood-tags">
         <span>Treba: {labelCategories(input.mustHaveCategories)}</span>
-        <span>Već ima: {labelCategories(input.alreadyHaveCategories)}</span>
-        {input.lockedProductIds.length > 0 && <span>Zaključano: {input.lockedProductIds.length} proizvoda</span>}
+        <span>Već imaš: {labelCategories(input.alreadyHaveCategories)}</span>
+        {input.lockedProductIds.length > 0 && <span>Zadržavaš: {input.lockedProductIds.length} proizvoda</span>}
       </div>
     </div>
   );
@@ -71,10 +81,15 @@ export function PlanResults({
   onToggleLock,
   lockedProductIds,
   onQuickAction,
+  onSavePlan,
+  onProductClick,
+  onFeedback,
   isLoading = false,
   error = null
 }: PlanResultsProps) {
   const [copiedPlanId, setCopiedPlanId] = useState<string | null>(null);
+  const [savingPlanId, setSavingPlanId] = useState<string | null>(null);
+  const [feedbackByPlan, setFeedbackByPlan] = useState<Record<string, PlanFeedback>>({});
 
   async function copyPlan(plan: FurnishingPlan) {
     const text = formatPlanForSharing(plan, input);
@@ -88,15 +103,29 @@ export function PlanResults({
     }
   }
 
+  async function saveCurrentPlan(plan: FurnishingPlan, copyLink: boolean) {
+    setSavingPlanId(plan.id);
+    try {
+      await onSavePlan(plan, copyLink);
+    } finally {
+      setSavingPlanId(null);
+    }
+  }
+
+  async function sendFeedback(planId: string, feedback: PlanFeedback) {
+    setFeedbackByPlan((current) => ({ ...current, [planId]: feedback }));
+    await onFeedback(planId, feedback);
+  }
+
   if (error) {
     return (
       <div className="plans-column state-panel">
         <div className="empty-state error-state">
-          <span>API error</span>
-          <h3>Backend nije vratio plan.</h3>
+          <span>Nešto ne radi</span>
+          <h3>Nisam uspio dobiti plan.</h3>
           <p>{error}</p>
           <code>cd backend && mvn spring-boot:run</code>
-          <small>Potrebni su Java 17+ i Maven instalirani lokalno.</small>
+          <small>Provjeri da su pokrenuti server i baza.</small>
         </div>
       </div>
     );
@@ -106,9 +135,9 @@ export function PlanResults({
     return (
       <div className="plans-column state-panel">
         <div className="empty-state loading-state">
-          <span>Generating</span>
-          <h3>Slažem tri plana iz product baze...</h3>
-          <p>Backend parsira prompt, bira kategorije, filtrira trgovine i optimizira budžet.</p>
+          <span>Slažem plan</span>
+          <h3>Tražim kombinacije koje stanu u budžet...</h3>
+          <p>Provjeravam prostoriju, trgovine, cijene i stvari koje si označio da već imaš.</p>
         </div>
       </div>
     );
@@ -118,8 +147,8 @@ export function PlanResults({
     return (
       <div className="plans-column state-panel">
         <div className="empty-state">
-          <span>Ready</span>
-          <h3>Upiši prompt i generiraj prvi full-stack plan.</h3>
+          <span>Spremno</span>
+          <h3>Upiši što želiš opremiti i generiraj prvi plan.</h3>
           <p>Primjer: “Imam 1500 € za dnevni boravak, samo IKEA, već imam TV, trebam kauč i tepih.”</p>
         </div>
       </div>
@@ -134,6 +163,7 @@ export function PlanResults({
         const overBudget = plan.total > input.budget;
         const breakdown = getRetailerBreakdown(plan);
         const missing = missingCategories(plan, input);
+        const selectedFeedback = feedbackByPlan[plan.id];
 
         return (
           <article className="plan-card" key={plan.id}>
@@ -147,7 +177,7 @@ export function PlanResults({
 
             <p className="plan-description">{plan.description}</p>
 
-            <div className="quick-action-row" aria-label="Quick plan actions">
+            <div className="quick-action-row" aria-label="Brze promjene plana">
               <button type="button" onClick={() => onQuickAction('cheaper', plan)}>Učini jeftinije</button>
               <button type="button" onClick={() => onQuickAction('nicer', plan)}>Učini ljepše</button>
               <button type="button" onClick={() => onQuickAction('single-store', plan)}>Samo jedna trgovina</button>
@@ -156,15 +186,15 @@ export function PlanResults({
 
             <div className="score-row enhanced-score-row">
               <div>
-                <span>Fit score</span>
+                <span>Poklapanje sa željama</span>
                 <strong>{plan.fitScore}%</strong>
               </div>
               <div>
-                <span>Style match</span>
+                <span>Usklađen stil</span>
                 <strong>{plan.styleConsistency}%</strong>
               </div>
               <div>
-                <span>Shopping effort</span>
+                <span>Koliko je komplicirana kupnja</span>
                 <strong>{effortLabels[plan.shoppingEffort]}</strong>
               </div>
               <div>
@@ -186,7 +216,7 @@ export function PlanResults({
 
             {missing.length > 0 && (
               <div className="missing-box">
-                <strong>Nedostaje u ovom planu:</strong> {labelCategories(missing)}. Probaj Stretch plan ili povećaj budžet.
+                <strong>Nedostaje u ovom planu:</strong> {labelCategories(missing)}. Probaj kompletniji plan ili povećaj budžet.
               </div>
             )}
 
@@ -206,18 +236,18 @@ export function PlanResults({
                         <span>★ {product.rating}</span>
                         {product.originalPrice && <span>Akcija</span>}
                         {!product.inStock && <span>Nema na stanju</span>}
-                        {locked && <span>Zaključano</span>}
+                        {locked && <span>Zadržano</span>}
                       </div>
                       <p>{reason}</p>
                       <div className="product-actions">
                         <button type="button" onClick={() => onToggleLock(product.id)}>
-                          {locked ? 'Otključaj' : 'Zaključaj'}
+                          {locked ? 'Makni iz zadržanih' : 'Zadrži u planu'}
                         </button>
                         <button type="button" onClick={() => onReplace(plan.id, product.id)} disabled={locked}>
                           Zamijeni
                         </button>
-                        <a href={product.url} target="_blank" rel="noreferrer">
-                          Otvori trgovinu
+                        <a href={product.url} target="_blank" rel="noreferrer" onClick={() => onProductClick(plan.id, product)}>
+                          Pogledaj u trgovini
                         </a>
                       </div>
                     </div>
@@ -226,11 +256,30 @@ export function PlanResults({
               })}
             </div>
 
+            <div className="feedback-card">
+              <span>Je li ovaj plan dobar?</span>
+              <div className="feedback-buttons">
+                {feedbackOptions.map((option) => (
+                  <button
+                    type="button"
+                    key={option.value}
+                    className={selectedFeedback === option.value ? 'active' : ''}
+                    onClick={() => sendFeedback(plan.id, option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="plan-actions">
-              <button className="plan-button" type="button">
-                Spremi plan
+              <button className="plan-button" type="button" onClick={() => saveCurrentPlan(plan, false)} disabled={savingPlanId === plan.id}>
+                {savingPlanId === plan.id ? 'Spremam...' : 'Spremi plan'}
               </button>
-              <button className="share-button" type="button" onClick={() => copyPlan(plan)}>
+              <button className="share-button" type="button" onClick={() => saveCurrentPlan(plan, true)} disabled={savingPlanId === plan.id}>
+                Kopiraj link za dijeljenje
+              </button>
+              <button className="share-button soft" type="button" onClick={() => copyPlan(plan)}>
                 {copiedPlanId === plan.id ? 'Kopirano ✓' : 'Kopiraj shopping listu'}
               </button>
             </div>

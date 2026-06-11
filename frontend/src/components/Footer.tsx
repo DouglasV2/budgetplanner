@@ -3,7 +3,7 @@ export function Footer() {
     <footer className="footer shell">
       <div>
         <strong>BudgetSpace AI</strong>
-        <p>React starter za AI shopping planner. Sljedeći korak: pravi katalog i backend API.</p>
+        <p>AI planer koji iz budžeta i želja slaže konkretan popis za kupnju.</p>
       </div>
       <a href="#top">Natrag gore ↑</a>
     </footer>

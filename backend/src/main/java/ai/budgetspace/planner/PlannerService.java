@@ -144,9 +144,9 @@ public class PlannerService {
             default -> "Najsigurnija opcija za manji trošak";
         };
         String name = switch (mode) {
-            case "stretch" -> "Stretch plan";
-            case "value" -> "Best value plan";
-            default -> "Budget plan";
+            case "stretch" -> "Kompletniji plan";
+            case "value" -> "Preporučeni plan";
+            default -> "Štedljivi plan";
         };
 
         return calculatePlan(mode, name, label, describePlan(mode, input, total, currentRetailers), input, items);
@@ -246,8 +246,8 @@ public class PlannerService {
         String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
 
         return switch (mode) {
-            case "stretch" -> "Malo ambiciozniji setup od " + money(total) + ", koristan ako želiš bolji finalni izgled i manje kasnijih zamjena. " + storeText + ".";
-            case "value" -> "Najbalansiranija kombinacija za " + input.size() + " m²: dobra baza, usklađen stil i pametno iskorišten budžet. " + storeText + ".";
+            case "stretch" -> "Malo ambicioznija kombinacija od " + money(total) + ", koristan ako želiš bolji finalni izgled i manje naknadnih zamjena. " + storeText + ".";
+            case "value" -> "Najuravnoteženija kombinacija za " + input.size() + " m²: dobra baza, usklađen stil i pametno iskorišten budžet. " + storeText + ".";
             default -> "Složen da ostane ispod budžeta od " + money(input.budget()) + ", za " + room + " u " + input.location() + ". " + storeText + ".";
         };
     }

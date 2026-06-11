@@ -71,3 +71,13 @@ export interface FurnishingPlan {
   styleConsistency: number;
   retailersUsed: Retailer[];
 }
+
+
+export interface SavedPlanResponse {
+  id: string;
+  plan: FurnishingPlan;
+  input: PlannerInput;
+  createdAt: string;
+}
+
+export type PlanFeedback = 'useful' | 'too-expensive' | 'wrong-style' | 'too-many-stores';

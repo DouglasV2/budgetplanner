@@ -1,25 +1,25 @@
 export function Monetization() {
   const items = [
     {
-      title: 'Affiliate revenue',
-      text: 'Korisnik klikne na proizvod i kupi. Ti uzimaš proviziju kroz affiliate/partner link.'
+      title: 'Provizija od kupnje',
+      text: 'Korisnik otvori proizvod iz plana i kupi ga u trgovini. Kasnije se tu mogu ubaciti partnerski linkovi.'
     },
     {
-      title: 'Sponsored placements',
-      text: 'Retaileri mogu platiti više prikaza kada imaš dokazani promet i klikove.'
+      title: 'Plaćeni prikazi trgovina',
+      text: 'Kad planer ima dovoljno korisnika, trgovine mogu platiti da budu češće prikazane u relevantnim planovima.'
     },
     {
-      title: 'Premium planner',
-      text: 'Napredni planovi, spremanje projekata, analiza slike sobe i personalizirani stilovi.'
+      title: 'Premium opcije',
+      text: 'Naprednije spremanje planova, analiza slike sobe, više stilova i detaljnije usporedbe.'
     }
   ];
 
   return (
     <section className="section shell" id="pricing">
       <div className="section-heading">
-        <span className="eyebrow">Business model</span>
-        <h2>Monetizacija je vezana uz kupovnu namjeru.</h2>
-        <p>Starter app je napravljen tako da kasnije lako prati klikove, planove i konverzije po retaileru.</p>
+        <span className="eyebrow">Kako može zarađivati</span>
+        <h2>Vrijednost je u tome što korisnik već planira kupnju.</h2>
+        <p>Aplikacija sada prati spremljene planove, reakcije korisnika i klikove na proizvode — to su podaci koji kasnije pomažu monetizaciji.</p>
       </div>
       <div className="monetization-grid">
         {items.map((item) => (
