@@ -49,8 +49,8 @@ public class PlannerService {
     public PlanGenerationResponse generate(PlannerInputDto rawInput) {
         PlannerInputDto input = normalizePrompt(rawInput == null ? null : rawInput.normalized());
         List<FurnishingPlanDto> plans = List.of(
-                buildPlan(input, "budget"),
                 buildPlan(input, "value"),
+                buildPlan(input, "budget"),
                 buildPlan(input, "stretch")
         );
         return new PlanGenerationResponse(input, plans);
@@ -218,10 +218,10 @@ public class PlannerService {
         }
 
         double leastStoresBonus = input.optimizationGoal().equals("least-stores")
-                ? (currentRetailers.contains(product.getRetailer()) || currentRetailers.isEmpty() ? 22 : -14)
+                ? (currentRetailers.contains(product.getRetailer()) || currentRetailers.isEmpty() ? 42 : -32)
                 : 0;
         double stylePriorityBonus = input.optimizationGoal().equals("style-match") && styleMatches(product, input.style()) ? 20 : 0;
-        double singleStoreBonus = input.retailerMode().equals("single") ? 8 : 0;
+        double singleStoreBonus = input.retailerMode().equals("single") ? 14 : 0;
         double coreBonus = isCoreCategory(input.roomType(), product.getCategory()) ? 12 : 0;
 
         return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus;
@@ -396,11 +396,10 @@ public class PlannerService {
                 ? "ostaje unutar budžeta"
                 : "prelazi budžet za " + money(total - input.budget());
         String stores = retailersUsed.size() <= 1 ? "iz jedne trgovine" : "iz " + retailersUsed.size() + " trgovine";
-        String levelText = furnishingLevelText(input.furnishingLevel());
         return switch (mode) {
-            case "stretch" -> "Za " + room + " smo složili ljepšu verziju " + stores + ": " + categories + ". Plan " + budgetText + " i pokušava dovesti prostor bliže razini: " + levelText + ".";
-            case "value" -> "Za " + room + " smo složili uravnotežen plan " + stores + ": " + categories + ". Plan " + budgetText + " i novac prvo usmjerava na stvari koje nose prostor.";
-            default -> "Za " + room + " smo složili najpovoljniju razumnu bazu " + stores + ": " + categories + ". Plan " + budgetText + " i namjerno preskače manje važne detalje.";
+            case "stretch" -> "Ljepša verzija ima smisla ako želiš dovršeniji dojam odmah. Uključuje " + categories + ", " + budgetText + " i koristi " + stores + ".";
+            case "value" -> "Najisplativije je prvo riješiti " + categories + ". Plan " + budgetText + ", a novac ide na stvari koje najviše mijenjaju " + room + ".";
+            default -> "Najpovoljnija razumna baza pokriva " + categories + ". Plan " + budgetText + " i namjerno preskače detalje koji mogu čekati.";
         };
     }
 
@@ -448,6 +447,8 @@ public class PlannerService {
                 .collect(Collectors.joining(", "));
         String storeText = retailersUsed.size() <= 1
                 ? "Kupnja je jednostavna jer je sve iz jedne trgovine."
+                : input.optimizationGoal().equals("least-stores")
+                ? "Zadržao sam broj trgovina što niže, ali dodao sam još jednu samo kad plan time postaje bolji."
                 : "Kupnja je raspoređena kroz " + retailersUsed.size() + " trgovine, pa prvo provjeri gdje su najveći komadi.";
         String budgetText = total <= input.budget()
                 ? "Ostavio bih malo novca sa strane za dostavu i sitnice."

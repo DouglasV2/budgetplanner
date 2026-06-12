@@ -55,9 +55,8 @@ function labelCategories(categories: ProductCategory[]) {
   return categories.map((category) => categoryLabels[category]).join(', ');
 }
 
-// Room specific category order. This helps group products into intuitive sections per room
-// and identify which categories might still be missing from a plan. The order roughly
-// reflects a natural furnishing flow: large items first, then accessories.
+// Room specific category order. The order follows the way a person usually buys:
+// big pieces first, then comfort, then details.
 const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
   'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
   'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
@@ -65,9 +64,6 @@ const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
   'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor']
 };
 
-// Map internal plan labels to more user friendly furnishing tiers. The tiers convey how
-// complete the setup is and help users understand what to expect: "Osnovno" is a
-// minimal setup, "Udobnije" adds comfort, and "Kompletno" includes everything for the space.
 const TIER_LABELS: Record<string, string> = {
   'Najbolji izbor': 'Udobnije',
   'Najjeftinije': 'Osnovno',
@@ -79,15 +75,18 @@ const STEP_ORDER = ['buy-first', 'add-comfort', 'later'] as const;
 const STEP_TEXT = {
   'buy-first': {
     title: '1. Kupi osnovne komade',
-    description: 'Ovo su stvari bez kojih prostor ne funkcionira. Prvo provjeri dimenzije i dostupnost.'
+    shortTitle: 'Osnovni komadi',
+    description: 'Ovo prvo riješi jer bez toga prostor nema smisla.'
   },
   'add-comfort': {
     title: '2. Dodaj udobnost',
-    description: 'Kad su veliki komadi riješeni, ovo čini prostor ugodnijim i praktičnijim.'
+    shortTitle: 'Udobnost',
+    description: 'Ovo kupi nakon glavnih komada ako budžet i dalje drži.'
   },
   later: {
-    title: '3. Dodaj detalje ako ostane budžeta',
-    description: 'Ovo može pričekati. Kupi tek ako ukupna cijena i dalje ima smisla.'
+    title: '3. Detalji mogu kasnije',
+    shortTitle: 'Može kasnije',
+    description: 'Ovo je lijepo imati, ali nije problem kupiti drugi put.'
   }
 };
 
@@ -117,40 +116,6 @@ function purchaseSteps(plan: FurnishingPlan, roomType: RoomType) {
   }).filter((step) => step.items.length > 0);
 }
 
-/**
- * Groups plan items by their product category and orders them based on a
- * predefined list for the given room type. Any categories that aren't in the
- * predefined list will appear at the end in the order they were encountered.
- */
-function groupItemsByCategory(plan: FurnishingPlan, roomType: RoomType) {
-  const orderedCategories = ROOM_CATEGORY_ORDER[roomType] ?? [];
-  const itemMap = new Map<ProductCategory, PlanItem[]>();
-  plan.items.forEach((item) => {
-    const cat = item.product.category;
-    if (!itemMap.has(cat)) itemMap.set(cat, []);
-    itemMap.get(cat)!.push(item);
-  });
-  const grouped: { category: ProductCategory; items: PlanItem[] }[] = [];
-  // push in defined order
-  orderedCategories.forEach((cat) => {
-    if (itemMap.has(cat)) {
-      grouped.push({ category: cat, items: itemMap.get(cat)! });
-      itemMap.delete(cat);
-    }
-  });
-  // any remaining categories (unexpected or extras)
-  itemMap.forEach((items, cat) => {
-    grouped.push({ category: cat, items });
-  });
-  return grouped;
-}
-
-/**
- * Determines which typical room categories are missing from the plan. It ignores
- * categories the user indicated they already have. This provides a nicer
- * explanation of what could be added to make the space more complete or
- * comfortable.
- */
 function desiredCategoriesForLevel(input: PlannerInput) {
   const all = ROOM_CATEGORY_ORDER[input.roomType] ?? [];
   const core = CORE_BY_ROOM[input.roomType] ?? [];
@@ -173,23 +138,74 @@ function missingForRoom(plan: FurnishingPlan, input: PlannerInput) {
 
 function defaultSummary(plan: FurnishingPlan, input: PlannerInput) {
   const room = roomLabels[input.roomType];
-  const itemList = plan.items.slice(0, 5).map((item) => categoryLabels[item.product.category].toLowerCase()).join(', ');
-  return `Za ${formatCurrency(input.budget)} složili smo ${room}: ${itemList}. Plan koristi ${plan.retailersUsed.length === 1 ? 'jednu trgovinu' : `${plan.retailersUsed.length} trgovine`} i ostaje ${plan.total <= input.budget ? 'unutar budžeta' : 'malo iznad budžeta'}.`;
+  const firstStep = purchaseSteps(plan, input.roomType)[0];
+  const firstItems = firstStep?.items
+    .slice(0, 3)
+    .map((item) => categoryLabels[item.product.category].toLowerCase())
+    .join(', ');
+  return `Za ${formatCurrency(input.budget)} najviše smisla ima prvo riješiti ${firstItems || 'osnovne komade'} za ${room}. Plan koristi ${plan.retailersUsed.length === 1 ? 'jednu trgovinu' : `${plan.retailersUsed.length} trgovine`} i ${plan.total <= input.budget ? 'ostaje unutar budžeta' : 'treba još smanjiti da bude sigurniji'}.`;
 }
 
-function budgetSentence(plan: FurnishingPlan, input: PlannerInput) {
-  const difference = Math.abs(plan.total - input.budget);
-  if (plan.total <= input.budget) return `Ostaje ti još ${formatCurrency(difference)} za sitnice, dostavu ili zamjene.`;
-  return `Plan prelazi budžet za ${formatCurrency(difference)}, ali pokazuje što dobivaš ako malo rastegneš budžet.`;
+function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
+  if (!plans.length) return null;
+  const preferredName = input.optimizationGoal === 'lowest-price' || input.furnishingLevel === 'basic'
+    ? 'Najjeftinije'
+    : input.optimizationGoal === 'style-match' || input.furnishingLevel === 'complete'
+    ? 'Ljepša verzija'
+    : 'Najbolji izbor';
+  return plans.find((plan) => plan.name === preferredName)?.id ?? plans.find((plan) => plan.name === 'Najbolji izbor')?.id ?? plans[0].id;
+}
+
+function firstBuyText(steps: ReturnType<typeof purchaseSteps>) {
+  const first = steps.find((step) => step.priority === 'buy-first') ?? steps[0];
+  const items = first?.items
+    .slice(0, 3)
+    .map((item) => categoryLabels[item.product.category].toLowerCase())
+    .join(', ');
+  return items || 'osnovne komade';
+}
+
+function laterText(steps: ReturnType<typeof purchaseSteps>) {
+  const later = steps.find((step) => step.priority === 'later');
+  if (later?.items.length) {
+    return later.items
+      .slice(0, 2)
+      .map((item) => categoryLabels[item.product.category].toLowerCase())
+      .join(', ');
+  }
+  const comfort = steps.find((step) => step.priority === 'add-comfort');
+  return comfort?.items[0] ? categoryLabels[comfort.items[0].product.category].toLowerCase() : 'sitnice';
+}
+
+function decisionLabel(plan: FurnishingPlan, input: PlannerInput) {
+  const difference = input.budget - plan.total;
+  if (difference < 0) return 'Još nije idealno';
+  if (difference >= input.budget * 0.12) return 'Isplativo i sigurno';
+  return 'Isplativo, ali blizu budžeta';
+}
+
+function decisionHeadline(plan: FurnishingPlan, input: PlannerInput, steps: ReturnType<typeof purchaseSteps>) {
+  const first = firstBuyText(steps);
+  const later = laterText(steps);
+  if (plan.total > input.budget) {
+    return `Plan je dobar, ali još treba smanjiti ${formatCurrency(plan.total - input.budget)}.`;
+  }
+  return `Za ${formatCurrency(input.budget)} prvo se isplati kupiti ${first}; ${later} može čekati.`;
+}
+
+function shortBudgetText(plan: FurnishingPlan, input: PlannerInput) {
+  const difference = input.budget - plan.total;
+  if (difference >= 0) return `Ostaje ${formatCurrency(difference)}`;
+  return `${formatCurrency(Math.abs(difference))} iznad`;
 }
 
 function UnderstandingSummary({ input }: { input: PlannerInput }) {
   return (
-    <div className="understood-card">
-      <div className="understood-header">
-        <span>Razumjeli smo</span>
-        <strong>{formatCurrency(input.budget)} budžet</strong>
-      </div>
+    <details className="understood-card compact-understood-card">
+      <summary>
+        <span>Što smo uzeli u obzir</span>
+        <strong>{formatCurrency(input.budget)} · {roomLabels[input.roomType]} · {styleLabels[input.style]}</strong>
+      </summary>
       <div className="understood-grid">
         <div>
           <span>Prostorija</span>
@@ -217,7 +233,7 @@ function UnderstandingSummary({ input }: { input: PlannerInput }) {
         <span>Već imaš: {labelCategories(input.alreadyHaveCategories)}</span>
         {input.lockedProductIds.length > 0 && <span>Zadržavaš: {input.lockedProductIds.length} proizvoda</span>}
       </div>
-    </div>
+    </details>
   );
 }
 
@@ -229,7 +245,7 @@ function ResultShell({ children }: { children: ReactNode }) {
           <span className="step-kicker">Rezultat</span>
           <h3>Tvoj plan za kupnju</h3>
         </div>
-        <small>Ovdje vidiš gotov popis proizvoda, ukupnu cijenu i zašto smo ih odabrali.</small>
+        <small>U 10 sekundi trebaš vidjeti što se isplati, koliko košta i što može čekati.</small>
       </div>
       {children}
     </div>
@@ -253,16 +269,12 @@ export function PlanResults({
   const [savingPlanId, setSavingPlanId] = useState<string | null>(null);
   const [feedbackByPlan, setFeedbackByPlan] = useState<Record<string, PlanFeedback>>({});
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!plans.length) {
-      setSelectedPlanId(null);
-      return;
-    }
-    if (!selectedPlanId || !plans.some((plan) => plan.id === selectedPlanId)) {
-      setSelectedPlanId(plans[0].id);
-    }
-  }, [plans, selectedPlanId]);
+    setSelectedPlanId(preferredPlanId(plans, input));
+    setExpandedProductId(null);
+  }, [plans, input.optimizationGoal, input.furnishingLevel]);
 
   async function copyPlan(plan: FurnishingPlan) {
     const text = formatPlanForSharing(plan, input);
@@ -311,8 +323,8 @@ export function PlanResults({
         <div className="plans-column state-panel">
           <div className="empty-state loading-state">
             <span>Slažemo plan</span>
-            <h3>Tražimo proizvode koji imaju smisla za tvoj budžet...</h3>
-            <p>Provjeravamo prostoriju, trgovine, cijene i stvari koje si označio da već imaš.</p>
+            <h3>Tražimo što se stvarno isplati kupiti...</h3>
+            <p>Prvo gledamo glavne komade, zatim udobnost, pa detalje samo ako budžet drži.</p>
           </div>
         </div>
       </ResultShell>
@@ -323,13 +335,13 @@ export function PlanResults({
     return (
       <ResultShell>
         <div className="plans-column state-panel">
-          <div className="empty-state friendly-empty-state">
+          <div className="empty-state friendly-empty-state decision-empty-state">
             <span>Spremno</span>
-            <h3>Tvoj plan će se prikazati ovdje.</h3>
-            <p>Upiši s lijeve strane što želiš opremiti i klikni “Složi moj plan”.</p>
+            <h3>Ovdje ćeš odmah vidjeti što se isplati.</h3>
+            <p>Plan će prvo pokazati ukupnu cijenu, što kupiti prvo i što može čekati da ne potrošiš novac na krivi redoslijed.</p>
             <div className="empty-example">
-              <strong>Primjer:</strong>
-              <span>Imam 1500 € za dnevni boravak, želim svijetli izgled, samo IKEA i već imam TV.</span>
+              <strong>Dobit ćeš:</strong>
+              <span>1. glavne komade · 2. udobnost · 3. detalje samo ako ostane budžeta</span>
             </div>
           </div>
         </div>
@@ -337,149 +349,80 @@ export function PlanResults({
     );
   }
 
-  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans[0];
+  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans.find((plan) => plan.name === 'Najbolji izbor') ?? plans[0];
   const overBudget = selectedPlan.total > input.budget;
   const breakdown = getRetailerBreakdown(selectedPlan);
-  // Group items by category for a more structured presentation and determine
-  // which typical categories are missing from this plan. Also derive a
-  // human-friendly tier based on the plan label.
-  const groupedItems = groupItemsByCategory(selectedPlan, input.roomType);
   const missing = missingForRoom(selectedPlan, input);
   const steps = purchaseSteps(selectedPlan, input.roomType);
   const tier = TIER_LABELS[selectedPlan.name] ?? furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
   const selectedFeedback = feedbackByPlan[selectedPlan.id];
+  const primaryStep = steps.find((step) => step.priority === 'buy-first') ?? steps[0];
 
   return (
     <ResultShell>
-      <div className="plans-column">
-        <UnderstandingSummary input={input} />
-
-        <div className="plan-choice-panel" aria-label="Odaberi verziju plana">
-          <div>
-            <span className="step-kicker">Usporedi</span>
-            <h4>Odaberi verziju koja ti najbolje paše</h4>
-          </div>
-          <div className="plan-choice-grid">
-            {plans.map((plan) => {
-              const active = plan.id === selectedPlan.id;
-              const planOverBudget = plan.total > input.budget;
-              return (
-                <button type="button" key={plan.id} className={active ? 'plan-choice-card active' : 'plan-choice-card'} onClick={() => setSelectedPlanId(plan.id)}>
-                  <span>{plan.name}</span>
-                  <strong>{formatCurrency(plan.total)}</strong>
-                  <small>{planOverBudget ? `${formatCurrency(plan.total - input.budget)} iznad budžeta` : `${formatCurrency(input.budget - plan.total)} ostaje`}</small>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <article className="plan-card focused-plan-card" key={selectedPlan.id}>
-          <div className="plan-card-header">
-            <div>
-              <span className="plan-label">{selectedPlan.label}</span>
-              <h3>{selectedPlan.name}</h3>
-              {tier && <small className="plan-tier">{tier} oprema</small>}
+      <div className="plans-column decision-results-column">
+        <article className="plan-card focused-plan-card decision-plan-card" key={selectedPlan.id}>
+          <div className="decision-card">
+            <div className="decision-topline">
+              <span>{decisionLabel(selectedPlan, input)}</span>
+              <strong>{selectedPlan.name}</strong>
             </div>
-            <div className={overBudget ? 'total over' : 'total'}>{formatCurrency(selectedPlan.total)}</div>
-          </div>
+            <h3>{decisionHeadline(selectedPlan, input, steps)}</h3>
+            <p>{selectedPlan.advisorNote || defaultSummary(selectedPlan, input)}</p>
 
-          <div className="plan-summary-box">
-            <span>Što dobivaš za ovaj budžet</span>
-            <p>{selectedPlan.summary || defaultSummary(selectedPlan, input)}</p>
-            <small>{selectedPlan.budgetStatus || budgetSentence(selectedPlan, input)}</small>
-          </div>
+            <div className="decision-metrics" aria-label="Najvažnije o planu">
+              <div>
+                <span>Ukupno</span>
+                <strong>{formatCurrency(selectedPlan.total)}</strong>
+              </div>
+              <div>
+                <span>{overBudget ? 'Treba smanjiti' : 'Sigurnost'}</span>
+                <strong className={overBudget ? 'over-text' : ''}>{shortBudgetText(selectedPlan, input)}</strong>
+              </div>
+              <div>
+                <span>Trgovine</span>
+                <strong>{selectedPlan.retailersUsed.length || 0}</strong>
+              </div>
+            </div>
 
-          <div className="advisor-card">
-            <div>
-              <span>Naš savjet</span>
-              <p>{selectedPlan.advisorNote || 'Prvo riješi glavne komade, a sitnice dodaj tek ako budžet i dalje ima smisla.'}</p>
-            </div>
-            <strong>{selectedPlan.nextStep || 'Provjeri dimenzije prije kupnje.'}</strong>
-          </div>
+            {primaryStep && (
+              <div className="first-buy-strip">
+                <span>Prvo kupi</span>
+                <strong>{primaryStep.items.map((item) => item.product.name).join(' + ')}</strong>
+              </div>
+            )}
 
-          <div className="plan-total-card">
-            <div>
-              <span>Ukupno</span>
-              <strong>{formatCurrency(selectedPlan.total)}</strong>
-            </div>
-            <div>
-              <span>{overBudget ? 'Iznad budžeta' : 'Ostaje'}</span>
-              <strong>{overBudget ? formatCurrency(selectedPlan.total - input.budget) : formatCurrency(input.budget - selectedPlan.total)}</strong>
-            </div>
-            <div>
-              <span>Trgovine</span>
-              <strong>{selectedPlan.retailersUsed.join(' + ')}</strong>
+            <div className="decision-actions">
+              <button className="plan-button primary-copy-button" type="button" onClick={() => copyPlan(selectedPlan)}>
+                {copiedPlanId === selectedPlan.id ? 'Popis kopiran ✓' : 'Kopiraj popis za kupnju'}
+              </button>
+              <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, false)} disabled={savingPlanId === selectedPlan.id}>
+                {savingPlanId === selectedPlan.id ? 'Spremam...' : 'Spremi'}
+              </button>
+              <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, true)} disabled={savingPlanId === selectedPlan.id}>
+                Kopiraj link
+              </button>
             </div>
           </div>
 
-          <div className="plan-explainer-grid">
-            <div>
-              <span>Za koga je ovo dobro?</span>
-              <p>{selectedPlan.goodFor || 'Dobro ako želiš brz, realan plan bez previše ručnog traženja po trgovinama.'}</p>
-            </div>
-            <div>
-              <span>Na što treba paziti?</span>
-              <p>{selectedPlan.tradeoff || selectedPlan.description}</p>
-            </div>
-          </div>
-
-          <div className="tradeoff-panel" aria-label="Savjeti za budžet">
-            <div className="tradeoff-card save">
-              <span>Kako spustiti cijenu</span>
-              <ul>
-                {(selectedPlan.savingTips?.length ? selectedPlan.savingTips : ['Ako je budžet tijesan, prvo odgodi detalje i čuvaj novac za glavne komade.']).map((tip) => (
-                  <li key={tip}>{tip}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="tradeoff-card upgrade">
-              <span>Ako možeš dodati još malo</span>
-              <ul>
-                {(selectedPlan.upgradeTips?.length ? selectedPlan.upgradeTips : ['Najviše se osjeti nadogradnja rasvjete, tepiha ili glavnog komada koji koristiš svaki dan.']).map((tip) => (
-                  <li key={tip}>{tip}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="quick-action-row" aria-label="Brze promjene plana">
-            <button type="button" onClick={() => onQuickAction('cheaper', selectedPlan)}>Složi jeftinije</button>
-            <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Napravi ljepše</button>
+          <div className="quick-action-row decision-quick-actions" aria-label="Brze promjene plana">
+            <button type="button" onClick={() => onQuickAction('cheaper', selectedPlan)}>Treba jeftinije</button>
+            <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Želim ljepše</button>
             <button type="button" onClick={() => onQuickAction('single-store', selectedPlan)}>Samo jedna trgovina</button>
             <button type="button" onClick={() => onQuickAction('least-stores', selectedPlan)}>Manje trgovina</button>
           </div>
 
-          <div className="score-row enhanced-score-row">
-            <div>
-              <span>Koliko prati želje</span>
-              <strong>{selectedPlan.fitScore}%</strong>
-            </div>
-            <div>
-              <span>Usklađen izgled</span>
-              <strong>{selectedPlan.styleConsistency}%</strong>
-            </div>
-            <div>
-              <span>Kupnja</span>
-              <strong>{effortLabels[selectedPlan.shoppingEffort]}</strong>
-            </div>
-            <div>
-              <span>Broj proizvoda</span>
-              <strong>{selectedPlan.items.length}</strong>
-            </div>
-          </div>
-
-          <div className="shopping-steps-card">
+          <div className="shopping-steps-card main-shopping-steps-card">
             <div className="shopping-steps-heading">
               <span>Plan kupnje po koracima</span>
-              <p>Najlakše je kupovati ovim redom: prvo veliki komadi, zatim udobnost, pa detalji.</p>
+              <p>Ovo je redoslijed koji čuva budžet i smanjuje šansu da kupiš krive sitnice prije glavnih stvari.</p>
             </div>
             <div className="shopping-steps-list">
               {steps.map((step) => (
                 <div className="shopping-step-row" key={step.priority}>
                   <div className="step-number">{step.title.split('.')[0]}</div>
                   <div>
-                    <strong>{step.title.replace(/^\d+\.\s*/, '')}</strong>
+                    <strong>{step.shortTitle}</strong>
                     <p>{step.description}</p>
                     <small>{step.items.map((item) => item.product.name).join(' + ')}</small>
                   </div>
@@ -489,43 +432,24 @@ export function PlanResults({
             </div>
           </div>
 
-          <div className="retailer-breakdown">
-            <div className="breakdown-title">Trošak po trgovini</div>
-            {breakdown.map((entry) => (
-              <div className="breakdown-row" key={entry.retailer}>
-                <span>{entry.retailer}</span>
-                <strong>{formatCurrency(entry.total)}</strong>
-                <small>{entry.count} proizvoda</small>
-              </div>
-            ))}
-          </div>
-
-          {missing.length > 0 && (
-            <div className="missing-box improved-missing-box">
-              <strong>Preskočeno za sada</strong>
-              <p>Ovo nije ušlo jer bi moglo probiti budžet ili trenutno nema dovoljno dobru opciju u katalogu:</p>
-              <ul className="missing-list">
-                {missing.map((category) => (
-                  <li key={category}>
-                    <span>{categoryLabels[category]}</span>
-                    <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Dodaj u ljepšu verziju</button>
-                  </li>
-                ))}
-              </ul>
-              <small>Ovo ti pomaže odvojiti što kupiti sada, a što mirno može čekati kasnije.</small>
+          <div className="items-list step-items-list">
+            <div className="result-section-heading">
+              <span>Što konkretno kupiti</span>
+              <p>Otvaraj detalje samo za proizvode koje želiš promijeniti ili provjeriti u trgovini.</p>
             </div>
-          )}
-
-          <div className="items-list grouped-items">
-            {groupedItems.map((group) => (
-              <div className="category-group" key={group.category}>
-                <h5 className="category-title">{categoryLabels[group.category]}</h5>
-                {group.items.map((item) => {
+            {steps.map((step) => (
+              <section className="step-product-section" key={step.priority}>
+                <div className="step-product-section-title">
+                  <span>{step.title}</span>
+                  <strong>{formatCurrency(step.subtotal)}</strong>
+                </div>
+                {step.items.map((item) => {
                   const { product, reason } = item;
                   const locked = lockedProductIds.includes(product.id);
                   const priority = priorityForItem(item, input.roomType);
+                  const expanded = expandedProductId === product.id;
                   return (
-                    <div className={locked ? 'product-row locked' : 'product-row'} key={product.id}>
+                    <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
                       <img src={product.image} alt="" loading="lazy" />
                       <div className="product-info">
                         <div className="product-title-line">
@@ -540,39 +464,158 @@ export function PlanResults({
                           {!product.inStock && <span>Nema na stanju</span>}
                           {locked && <span>Zadržano</span>}
                         </div>
-                        <div className="product-reason-box">
+                        <div className="product-reason-box compact-reason-box">
                           <span>{item.shoppingRole || 'Zašto ovo?'}</span>
                           <p>{reason}</p>
                         </div>
-                        <div className="product-actions product-actions-grid">
+                        <div className="product-actions decision-product-actions">
                           <button type="button" onClick={() => onToggleLock(product.id)}>
                             {locked ? 'Ne moram zadržati' : 'Zadrži'}
                           </button>
-                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')} disabled={locked}>
-                            Nađi jeftinije
-                          </button>
-                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')} disabled={locked}>
-                            Nađi ljepše
-                          </button>
-                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')} disabled={locked}>
-                            Ne sviđa mi se
-                          </button>
-                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')} disabled={locked}>
-                            Ne treba mi ovo
+                          <button type="button" onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>
+                            {expanded ? 'Sakrij zamjene' : 'Promijeni'}
                           </button>
                           <a href={product.url} target="_blank" rel="noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
                             Pogledaj u trgovini
                           </a>
                         </div>
+                        {expanded && (
+                          <div className="replacement-menu" aria-label="Odaberi što želiš promijeniti">
+                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>Nađi jeftinije</button>
+                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>Nađi ljepše</button>
+                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')}>Ne sviđa mi se</button>
+                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>Ne treba mi ovo</button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
                 })}
-              </div>
+              </section>
             ))}
           </div>
 
-          <div className="feedback-card">
+          <details className="alternate-plans-panel">
+            <summary>
+              <span>Želiš drugačije?</span>
+              <strong>Usporedi jeftiniju ili ljepšu verziju</strong>
+            </summary>
+            <div className="plan-choice-grid compact-plan-choice-grid">
+              {plans.map((plan) => {
+                const active = plan.id === selectedPlan.id;
+                const planOverBudget = plan.total > input.budget;
+                return (
+                  <button type="button" key={plan.id} className={active ? 'plan-choice-card active' : 'plan-choice-card'} onClick={() => setSelectedPlanId(plan.id)}>
+                    <span>{plan.name}</span>
+                    <strong>{formatCurrency(plan.total)}</strong>
+                    <small>{planOverBudget ? `${formatCurrency(plan.total - input.budget)} iznad budžeta` : `${formatCurrency(input.budget - plan.total)} ostaje`}</small>
+                  </button>
+                );
+              })}
+            </div>
+          </details>
+
+          <details className="secondary-info-panel">
+            <summary>
+              <span>Detalji plana</span>
+              <strong>Zašto je ovo odabrano i gdje ide novac</strong>
+            </summary>
+
+            <div className="plan-summary-box">
+              <span>Što dobivaš za ovaj budžet</span>
+              <p>{selectedPlan.summary || defaultSummary(selectedPlan, input)}</p>
+              <small>{selectedPlan.budgetStatus}</small>
+            </div>
+
+            <div className="plan-card-header compact-plan-header">
+              <div>
+                <span className="plan-label">{selectedPlan.label}</span>
+                <h3>{selectedPlan.name}</h3>
+                {tier && <small className="plan-tier">{tier} oprema</small>}
+              </div>
+              <div className={overBudget ? 'total over' : 'total'}>{formatCurrency(selectedPlan.total)}</div>
+            </div>
+
+            <div className="plan-explainer-grid">
+              <div>
+                <span>Za koga je ovo dobro?</span>
+                <p>{selectedPlan.goodFor || 'Dobro ako želiš brz, realan plan bez previše ručnog traženja po trgovinama.'}</p>
+              </div>
+              <div>
+                <span>Na što treba paziti?</span>
+                <p>{selectedPlan.tradeoff || selectedPlan.description}</p>
+              </div>
+            </div>
+
+            <div className="tradeoff-panel" aria-label="Savjeti za budžet">
+              <div className="tradeoff-card save">
+                <span>Kako spustiti cijenu</span>
+                <ul>
+                  {(selectedPlan.savingTips?.length ? selectedPlan.savingTips : ['Ako je budžet tijesan, prvo odgodi detalje i čuvaj novac za glavne komade.']).map((tip) => (
+                    <li key={tip}>{tip}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="tradeoff-card upgrade">
+                <span>Ako možeš dodati još malo</span>
+                <ul>
+                  {(selectedPlan.upgradeTips?.length ? selectedPlan.upgradeTips : ['Najviše se osjeti nadogradnja rasvjete, tepiha ili glavnog komada koji koristiš svaki dan.']).map((tip) => (
+                    <li key={tip}>{tip}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="score-row enhanced-score-row">
+              <div>
+                <span>Koliko prati želje</span>
+                <strong>{selectedPlan.fitScore}%</strong>
+              </div>
+              <div>
+                <span>Usklađen izgled</span>
+                <strong>{selectedPlan.styleConsistency}%</strong>
+              </div>
+              <div>
+                <span>Kupnja</span>
+                <strong>{effortLabels[selectedPlan.shoppingEffort]}</strong>
+              </div>
+              <div>
+                <span>Broj proizvoda</span>
+                <strong>{selectedPlan.items.length}</strong>
+              </div>
+            </div>
+
+            <div className="retailer-breakdown">
+              <div className="breakdown-title">Trošak po trgovini</div>
+              {breakdown.map((entry) => (
+                <div className="breakdown-row" key={entry.retailer}>
+                  <span>{entry.retailer}</span>
+                  <strong>{formatCurrency(entry.total)}</strong>
+                  <small>{entry.count} proizvoda</small>
+                </div>
+              ))}
+            </div>
+
+            {missing.length > 0 && (
+              <div className="missing-box improved-missing-box">
+                <strong>Preskočeno za sada</strong>
+                <p>Ovo nije ušlo jer bi moglo probiti budžet ili trenutno nema dovoljno dobru opciju u katalogu:</p>
+                <ul className="missing-list">
+                  {missing.map((category) => (
+                    <li key={category}>
+                      <span>{categoryLabels[category]}</span>
+                      <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Dodaj u ljepšu verziju</button>
+                    </li>
+                  ))}
+                </ul>
+                <small>Ovo ti pomaže odvojiti što kupiti sada, a što mirno može čekati kasnije.</small>
+              </div>
+            )}
+          </details>
+
+          <UnderstandingSummary input={input} />
+
+          <div className="feedback-card compact-feedback-card">
             <span>Je li ovaj plan dobar?</span>
             <div className="feedback-buttons">
               {feedbackOptions.map((option) => (
@@ -581,18 +624,6 @@ export function PlanResults({
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="plan-actions">
-            <button className="plan-button" type="button" onClick={() => saveCurrentPlan(selectedPlan, false)} disabled={savingPlanId === selectedPlan.id}>
-              {savingPlanId === selectedPlan.id ? 'Spremam...' : 'Spremi plan'}
-            </button>
-            <button className="share-button" type="button" onClick={() => saveCurrentPlan(selectedPlan, true)} disabled={savingPlanId === selectedPlan.id}>
-              Kopiraj link
-            </button>
-            <button className="share-button soft" type="button" onClick={() => copyPlan(selectedPlan)}>
-              {copiedPlanId === selectedPlan.id ? 'Kopirano ✓' : 'Kopiraj popis za kupnju'}
-            </button>
           </div>
         </article>
       </div>
