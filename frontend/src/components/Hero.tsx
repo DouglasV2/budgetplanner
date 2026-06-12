@@ -2,10 +2,10 @@ export function Hero() {
   return (
     <section className="hero shell" id="top">
       <div className="hero-copy">
-        <div className="eyebrow">AI planer za opremanje prostora</div>
+        <div className="eyebrow">Planer kupnje za dom</div>
         <h1>Opremi dnevni boravak unutar budžeta — bez izgubljenih sati po webshopovima.</h1>
         <p>
-          Napiši što želiš opremiti, koliki ti je budžet i koje trgovine preferiraš. BudgetSpace AI složi konkretan popis za kupnju iz trgovina poput IKEA, JYSK, Pevex, Emmezeta, Decathlon, Lesnina i Lesnina.
+          Napiši što želiš opremiti, koliki ti je budžet i koje trgovine preferiraš. BudgetSpace složi konkretan popis za kupnju iz trgovina poput IKEA, JYSK, Pevex, Emmezeta, Decathlon i Lesnina.
         </p>
         <div className="hero-actions">
           <a className="primary-button" href="#planner">Isprobaj planer</a>

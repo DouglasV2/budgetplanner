@@ -24,6 +24,10 @@ export type ShoppingPriority = 'buy-first' | 'add-comfort' | 'later';
 
 export type ReplacementChoice = 'cheaper' | 'nicer' | 'different' | 'remove' | 'similar';
 
+export type AvailabilityStatus = 'in-stock' | 'limited' | 'unavailable' | 'unknown';
+
+export type PriceTier = 'budget' | 'standard' | 'premium';
+
 export type ProductCategory =
   | 'sofa'
   | 'chair'
@@ -47,10 +51,18 @@ export interface Product {
   originalPrice?: number;
   styleTags: string[];
   roomTags: RoomType[];
-  image: string;
-  url: string;
+  imageUrl?: string;
+  productUrl?: string;
+  availabilityStatus?: AvailabilityStatus | string;
+  deliveryNote?: string;
+  lastCheckedAt?: string;
+  externalId?: string;
+  retailerProductId?: string;
+  priceTier?: PriceTier | string;
+  image?: string;
+  url?: string;
   rating: number;
-  inStock: boolean;
+  inStock?: boolean;
   note: string;
 }
 

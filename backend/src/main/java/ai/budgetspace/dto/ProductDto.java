@@ -15,6 +15,13 @@ public record ProductDto(
         BigDecimal originalPrice,
         List<String> styleTags,
         List<String> roomTags,
+        String imageUrl,
+        String productUrl,
+        String availabilityStatus,
+        String deliveryNote,
+        String lastCheckedAt,
+        String externalId,
+        String priceTier,
         String image,
         String url,
         double rating,
@@ -31,6 +38,13 @@ public record ProductDto(
                 product.getOriginalPrice(),
                 splitTags(product.getStyleTags()),
                 splitTags(product.getRoomTags()),
+                firstNonBlank(product.getImageUrl(), product.getImage()),
+                firstNonBlank(product.getProductUrl(), product.getUrl()),
+                firstNonBlank(product.getAvailabilityStatus(), product.isInStock() ? "in-stock" : "unavailable"),
+                firstNonBlank(product.getDeliveryNote(), "Provjeri dostavu ili preuzimanje prije kupnje."),
+                firstNonBlank(product.getLastCheckedAt(), "2026-06-12"),
+                firstNonBlank(product.getExternalId(), product.getId()),
+                firstNonBlank(product.getPriceTier(), inferPriceTier(product.getPrice())),
                 product.getImage(),
                 product.getUrl(),
                 product.getRating(),
@@ -45,5 +59,17 @@ public record ProductDto(
                 .map(String::trim)
                 .filter(item -> !item.isBlank())
                 .toList();
+    }
+
+    private static String firstNonBlank(String preferred, String fallback) {
+        if (preferred != null && !preferred.isBlank()) return preferred;
+        return fallback;
+    }
+
+    private static String inferPriceTier(BigDecimal price) {
+        if (price == null) return "standard";
+        if (price.compareTo(BigDecimal.valueOf(120)) <= 0) return "budget";
+        if (price.compareTo(BigDecimal.valueOf(450)) <= 0) return "standard";
+        return "premium";
     }
 }

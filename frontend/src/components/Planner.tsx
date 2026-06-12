@@ -49,6 +49,16 @@ function planSearchText(savedPlan: SavedPlanResponse) {
   ].join(' ').toLowerCase();
 }
 
+function formatSavedDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'spremljeno ranije';
+  return new Intl.DateTimeFormat('hr-HR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(date);
+}
+
 function SavedPlansInbox({
   plans,
   search,
@@ -81,26 +91,34 @@ function SavedPlansInbox({
       </summary>
       <div className="saved-plans-toolbar">
         <label>
-          <span>Pretraži spremljene planove</span>
-          <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Npr. dnevni boravak, IKEA, 1500" />
+          <span>Pretraži moje planove</span>
+          <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Pretraži moje planove" />
         </label>
       </div>
       <div className="saved-plans-list">
-        {filteredPlans.map((savedPlan) => (
-          <article className={savedPlan.favorite ? 'saved-plan-card favorite' : 'saved-plan-card'} key={savedPlan.id}>
-            <div>
-              <span>{roomLabels[savedPlan.input.roomType]} · {formatCurrency(savedPlan.input.budget)}</span>
-              <strong>{savedPlan.plan.name}</strong>
-              <small>{formatCurrency(savedPlan.plan.total)} · {savedPlan.plan.items.length} proizvoda · {savedPlan.plan.retailersUsed.join(' + ')}</small>
-            </div>
-            <div className="saved-plan-actions">
-              <button type="button" onClick={() => onFavorite(savedPlan)} aria-label={savedPlan.favorite ? 'Makni iz favorita' : 'Dodaj u favorite'}>
-                {savedPlan.favorite ? '★ Favorit' : '☆ Favorit'}
-              </button>
-              <button type="button" onClick={() => onOpen(savedPlan)}>Otvori</button>
-            </div>
-          </article>
-        ))}
+        {filteredPlans.map((savedPlan) => {
+          const stores = savedPlan.plan.retailersUsed.join(' + ') || 'trgovine nisu zapisane';
+          return (
+            <article className={savedPlan.favorite ? 'saved-plan-card favorite' : 'saved-plan-card'} key={savedPlan.id}>
+              <div>
+                <span>{savedPlan.favorite ? 'Favorit' : 'Spremljeno'} · {formatSavedDate(savedPlan.createdAt)}</span>
+                <strong>{roomLabels[savedPlan.input.roomType]}</strong>
+                <small>{formatCurrency(savedPlan.plan.total)} · {savedPlan.plan.items.length} proizvoda · {stores}</small>
+              </div>
+              <div className="saved-plan-actions">
+                <button
+                  type="button"
+                  className={savedPlan.favorite ? 'favorite-toggle active' : 'favorite-toggle'}
+                  onClick={() => onFavorite(savedPlan)}
+                  aria-label={savedPlan.favorite ? 'Makni iz favorita' : 'Dodaj u favorite'}
+                >
+                  {savedPlan.favorite ? '★ Favorit' : '☆ Označi'}
+                </button>
+                <button type="button" onClick={() => onOpen(savedPlan)}>Otvori</button>
+              </div>
+            </article>
+          );
+        })}
         {!filteredPlans.length && <p className="saved-empty">Nema spremljenog plana za taj pojam.</p>}
       </div>
     </details>
@@ -159,7 +177,7 @@ export function Planner() {
       setError(
         apiError instanceof Error
           ? apiError.message
-          : 'Server aplikacija nije dostupna. Pokreni Spring Boot aplikaciju na http://localhost:8080.'
+          : 'Plan trenutno nije dostupan. Probaj ponovno za koju minutu.'
       );
     } finally {
       setIsLoading(false);
@@ -228,7 +246,7 @@ export function Planner() {
       const updatedPlan = await setSavedPlanFavorite(savedPlan.id, !savedPlan.favorite);
       setSavedPlans((currentPlans) => currentPlans.map((plan) => (plan.id === updatedPlan.id ? updatedPlan : plan)));
     } catch {
-      setNotice('Nisam uspio promijeniti favorit. Provjeri je li backend pokrenut.');
+      setNotice('Nisam uspio promijeniti favorit. Probaj ponovno za koju minutu.');
     }
   }
 

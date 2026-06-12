@@ -34,6 +34,27 @@ public class Product {
     @Column(name = "room_tags", nullable = false)
     private String roomTags;
 
+    @Column(name = "image_url", length = 700)
+    private String imageUrl;
+
+    @Column(name = "product_url", length = 700)
+    private String productUrl;
+
+    @Column(name = "availability_status", length = 80)
+    private String availabilityStatus;
+
+    @Column(name = "delivery_note", length = 300)
+    private String deliveryNote;
+
+    @Column(name = "last_checked_at", length = 40)
+    private String lastCheckedAt;
+
+    @Column(name = "external_id", length = 120)
+    private String externalId;
+
+    @Column(name = "price_tier", length = 40)
+    private String priceTier;
+
     @Column(nullable = false, length = 700)
     private String image;
 
@@ -68,6 +89,20 @@ public class Product {
     public void setStyleTags(String styleTags) { this.styleTags = styleTags; }
     public String getRoomTags() { return roomTags; }
     public void setRoomTags(String roomTags) { this.roomTags = roomTags; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public String getProductUrl() { return productUrl; }
+    public void setProductUrl(String productUrl) { this.productUrl = productUrl; }
+    public String getAvailabilityStatus() { return availabilityStatus; }
+    public void setAvailabilityStatus(String availabilityStatus) { this.availabilityStatus = availabilityStatus; }
+    public String getDeliveryNote() { return deliveryNote; }
+    public void setDeliveryNote(String deliveryNote) { this.deliveryNote = deliveryNote; }
+    public String getLastCheckedAt() { return lastCheckedAt; }
+    public void setLastCheckedAt(String lastCheckedAt) { this.lastCheckedAt = lastCheckedAt; }
+    public String getExternalId() { return externalId; }
+    public void setExternalId(String externalId) { this.externalId = externalId; }
+    public String getPriceTier() { return priceTier; }
+    public void setPriceTier(String priceTier) { this.priceTier = priceTier; }
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
     public String getUrl() { return url; }

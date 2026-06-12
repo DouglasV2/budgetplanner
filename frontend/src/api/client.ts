@@ -18,7 +18,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const message = await response.text().catch(() => '');
-    throw new Error(message || `API request failed: ${response.status}`);
+    throw new Error(message || `Zahtjev nije uspio (${response.status}).`);
   }
 
   return response.json() as Promise<T>;

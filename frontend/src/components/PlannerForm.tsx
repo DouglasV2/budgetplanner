@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { FurnishingLevel, OptimizationGoal, PlannerInput, ProductCategory, Retailer, RoomType, StyleType } from '../types';
 import { categoryLabels, formatCurrency, retailers } from '../utils/planner';
 
@@ -173,7 +174,31 @@ function visibleCategories(input: PlannerInput) {
   ]));
 }
 
+function normalizeText(value: string) {
+  return value.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+}
+
+function categoriesFromText(value: string): ProductCategory[] {
+  const text = normalizeText(value);
+  const matches: Array<[ProductCategory, RegExp]> = [
+    ['sofa', /\b(kauc|sofa|trosjed|garnitura)\b/],
+    ['tv-unit', /\b(tv komoda|tv element|komoda|tv)\b/],
+    ['table', /\b(stolic(?!a)|klub stol|coffee table)\b/],
+    ['rug', /\btepih\b/],
+    ['lighting', /\b(lampa|rasvjeta|svjetlo)\b/],
+    ['storage', /\b(polica|regal|ormar|spremanje)\b/],
+    ['decor', /\b(dekor|slika|jastuk|biljka)\b/],
+    ['desk', /\b(radni stol|desk)\b/],
+    ['chair', /\b(stolica|chair)\b/],
+    ['bed', /\b(krevet|bed)\b/],
+    ['mattress', /\b(madrac|mattress)\b/],
+    ['gym-equipment', /\b(bucice|bench|klupa|utezi|sprava)\b/]
+  ];
+  return matches.filter(([, pattern]) => pattern.test(text)).map(([category]) => category);
+}
+
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
+  const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
   const shopMode = selectedShopMode(input);
   const visibleCategoryOptions = visibleCategories(input);
   const alreadyHaveText = input.alreadyHaveCategories.map((category) => categoryLabels[category]).join(", ");
@@ -406,9 +431,28 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         <div className="field-group compact-group already-have-group">
           <span className="friendly-label">Što već imaš?</span>
           <p className="field-help inline-help">Označi samo ako stvarno ne želiš da ti to ponovno nudimo.</p>
+          <label className="already-have-text-input">
+            <span>Upiši ako je lakše</span>
+            <input
+              aria-label="Što već imaš"
+              value={alreadyHaveFreeText}
+              placeholder="npr. kauč, TV, radni stol"
+              onChange={(event) => {
+                const value = event.target.value;
+                setAlreadyHaveFreeText(value);
+                const parsed = categoriesFromText(value);
+                if (!parsed.length) return;
+                onChange({
+                  ...input,
+                  alreadyHaveCategories: Array.from(new Set([...input.alreadyHaveCategories, ...parsed])),
+                  mustHaveCategories: input.mustHaveCategories.filter((item) => !parsed.includes(item))
+                });
+              }}
+            />
+          </label>
           {input.alreadyHaveCategories.length > 0 && (
             <div className="existing-assets-note">
-              <strong>Ne nudimo ponovno:</strong> {alreadyHaveText}
+              <strong>Nećemo ponovno nuditi:</strong> {alreadyHaveText}
             </div>
           )}
           <div className="category-pills muted-pills friendly-pills">

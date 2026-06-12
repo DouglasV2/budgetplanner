@@ -5,8 +5,8 @@ export function HowItWorks() {
       text: 'Napišeš prostoriju, budžet, stil i trgovine koje želiš. Nema dugog ispunjavanja forme.'
     },
     {
-      title: '2. Aplikacija složi kombinacije',
-      text: 'Proizvodi se biraju prema cijeni, kategoriji, stilu, dostupnosti i tome koliko se uklapaju u tvoje želje.'
+      title: '2. Dobiješ konkretne proizvode',
+      text: 'Prvo vidiš najvažnije komade, ukupnu cijenu i trgovine. Detalji idu niže.'
     },
     {
       title: '3. Dobiješ popis za kupnju',
@@ -19,7 +19,7 @@ export function HowItWorks() {
       <div className="section-heading">
         <span className="eyebrow">Kako radi</span>
         <h2>Od ideje do shopping liste u par klikova.</h2>
-        <p>Ova verzija već radi s bazom proizvoda na serveru. Sljedeći korak su stvarni katalozi trgovina i pametnije preporuke.</p>
+        <p>Ne dobiješ samo lijepu ideju za sobu, nego što kupiti, gdje i koliko ukupno košta.</p>
       </div>
       <div className="steps-grid">
         {steps.map((step) => (

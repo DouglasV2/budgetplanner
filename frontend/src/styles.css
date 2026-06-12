@@ -2702,6 +2702,10 @@ textarea {
   width: min(1480px, calc(100% - 20px));
 }
 
+.planner-section {
+  padding-top: 46px;
+}
+
 .planner-layout {
   grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
   gap: 18px;
@@ -2916,6 +2920,44 @@ textarea {
   color: var(--ink);
   padding: 11px 12px;
   line-height: 1.45;
+}
+
+.already-have-text-input {
+  gap: 7px;
+}
+
+.already-have-text-input span,
+.product-delivery-note,
+.shopping-list-head small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.store-advice-strip {
+  border: 1px solid rgba(102, 120, 95, 0.22);
+  border-radius: 18px;
+  background: rgba(102, 120, 95, 0.09);
+  color: #3f563a;
+  padding: 11px 12px;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.product-delivery-note {
+  display: block;
+  margin-top: -2px;
+}
+
+.product-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.favorite-toggle.active {
+  border-color: rgba(236, 122, 46, 0.38);
+  background: rgba(236, 122, 46, 0.12);
+  color: var(--orange-dark);
 }
 
 @media (max-width: 1180px) {

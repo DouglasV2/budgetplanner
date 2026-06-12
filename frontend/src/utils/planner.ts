@@ -1,4 +1,4 @@
-import type { FurnishingLevel, FurnishingPlan, PlannerInput, ProductCategory, Retailer, RoomType, ShoppingPriority, StyleType } from '../types';
+import type { FurnishingLevel, FurnishingPlan, PlanItem, PlannerInput, ProductCategory, Retailer, RoomType, ShoppingPriority, StyleType } from '../types';
 
 export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon', 'Lesnina'];
 
@@ -50,11 +50,12 @@ export const styleLabels: Record<StyleType, string> = {
 };
 
 export function getRetailerBreakdown(plan: FurnishingPlan) {
-  const breakdown = plan.items.reduce<Record<string, { total: number; count: number }>>((acc, item) => {
+  const breakdown = plan.items.reduce<Record<string, { total: number; count: number; items: PlanItem[] }>>((acc, item) => {
     const retailer = item.product.retailer;
-    acc[retailer] ??= { total: 0, count: 0 };
+    acc[retailer] ??= { total: 0, count: 0, items: [] };
     acc[retailer].total += item.product.price;
     acc[retailer].count += 1;
+    acc[retailer].items.push(item);
     return acc;
   }, {});
 

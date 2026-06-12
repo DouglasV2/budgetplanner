@@ -200,8 +200,51 @@ function shortBudgetText(plan: FurnishingPlan, input: PlannerInput) {
 }
 
 
-function ShoppingListCard({ plan, steps }: { plan: FurnishingPlan; steps: ReturnType<typeof purchaseSteps> }) {
+function productImage(product: Product) {
+  return product.imageUrl || product.image || '';
+}
+
+function productUrl(product: Product) {
+  const url = product.productUrl || product.url || '';
+  return url.startsWith('http') ? url : '';
+}
+
+function availabilityLabel(product: Product) {
+  const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
+  if (status === 'in-stock') return 'Dostupno';
+  if (status === 'limited') return 'Provjeri dostupnost';
+  if (status === 'unavailable') return 'Trenutno nedostupno';
+  return 'Provjeri u trgovini';
+}
+
+function storeCountText(count: number) {
+  if (count === 1) return '1 stvar';
+  return `${count} stvari`;
+}
+
+function storeAdvice(plan: FurnishingPlan, input: PlannerInput) {
+  if (plan.retailersUsed.length <= 1) {
+    const retailer = plan.retailersUsed[0];
+    return retailer ? `Sve je iz ${retailer}, pa ima manje obilazaka.` : '';
+  }
+
+  if (input.retailerMode === 'single' || input.optimizationGoal === 'least-stores') {
+    const mainRetailer = getRetailerBreakdown(plan)[0]?.retailer;
+    return mainRetailer
+      ? `Najviše stvari su iz ${mainRetailer}, a ostatak je dodan jer bolje čuva budžet.`
+      : `Ovaj plan koristi ${plan.retailersUsed.length} trgovine da ne moraš tražiti svaku stvar posebno.`;
+  }
+
+  return `Ovaj plan koristi ${plan.retailersUsed.length} trgovine da ne moraš tražiti svaku stvar posebno.`;
+}
+
+function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: PlannerInput }) {
   const retailerText = plan.retailersUsed.length <= 1 ? plan.retailersUsed[0] || 'jedna trgovina' : plan.retailersUsed.join(' + ');
+  const budgetDifference = input.budget - plan.total;
+  const budgetText = budgetDifference >= 0
+    ? `Ostaje ${formatCurrency(budgetDifference)}`
+    : `${formatCurrency(Math.abs(budgetDifference))} iznad budžeta`;
+  const breakdown = getRetailerBreakdown(plan);
 
   return (
     <section className="shopping-list-card" aria-label="Popis za kupnju">
@@ -209,21 +252,22 @@ function ShoppingListCard({ plan, steps }: { plan: FurnishingPlan; steps: Return
         <div>
           <span>Popis za kupnju</span>
           <strong>{plan.items.length} proizvoda · {retailerText}</strong>
+          <small>{budgetText}</small>
         </div>
         <strong>{formatCurrency(plan.total)}</strong>
       </div>
       <div className="shopping-list-groups">
-        {steps.map((step) => (
-          <div className="shopping-list-group" key={step.priority}>
+        {breakdown.map((entry) => (
+          <div className="shopping-list-group" key={entry.retailer}>
             <div className="shopping-list-group-title">
-              <span>{step.shortTitle}</span>
-              <strong>{formatCurrency(step.subtotal)}</strong>
+              <span>{entry.retailer} — {storeCountText(entry.count)}</span>
+              <strong>{formatCurrency(entry.total)}</strong>
             </div>
             <ul>
-              {step.items.map((item) => (
+              {entry.items.map((item) => (
                 <li key={item.product.id}>
                   <span>{item.product.name}</span>
-                  <small>{item.product.retailer}</small>
+                  <small>{shoppingPriorityLabels[priorityForItem(item, input.roomType)]}</small>
                   <strong>{formatCurrency(item.product.price)}</strong>
                 </li>
               ))}
@@ -348,7 +392,7 @@ export function PlanResults({
             <span>Nešto ne radi</span>
             <h3>Nismo uspjeli složiti plan.</h3>
             <p>{error}</p>
-            <small>Probaj ponovno. Ako razvijaš lokalno, provjeri jesu li backend i baza pokrenuti.</small>
+            <small>Probaj ponovno za koju minutu ili provjeri je li aplikacija pokrenuta.</small>
           </div>
         </div>
       </ResultShell>
@@ -423,6 +467,10 @@ export function PlanResults({
               </div>
             </div>
 
+            <div className="store-advice-strip">
+              {storeAdvice(selectedPlan, input)}
+            </div>
+
             {primaryStep && (
               <div className="first-buy-strip">
                 <span>Najvažnije u planu</span>
@@ -450,27 +498,7 @@ export function PlanResults({
             <button type="button" onClick={() => onQuickAction('least-stores', selectedPlan)}>Manje trgovina</button>
           </div>
 
-          <ShoppingListCard plan={selectedPlan} steps={steps} />
-
-          <div className="shopping-steps-card main-shopping-steps-card">
-            <div className="shopping-steps-heading">
-              <span>Plan po prioritetima</span>
-              <p>Ovo pokazuje što najviše nosi plan, a što je više stvar dojma ili kasnije nadogradnje.</p>
-            </div>
-            <div className="shopping-steps-list">
-              {steps.map((step) => (
-                <div className="shopping-step-row" key={step.priority}>
-                  <div className="step-number">{step.title.split('.')[0]}</div>
-                  <div>
-                    <strong>{step.shortTitle}</strong>
-                    <p>{step.description}</p>
-                    <small>{step.items.map((item) => item.product.name).join(' + ')}</small>
-                  </div>
-                  <span>{formatCurrency(step.subtotal)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ShoppingListCard plan={selectedPlan} input={input} />
 
           <div className="items-list step-items-list">
             <div className="result-section-heading">
@@ -488,9 +516,10 @@ export function PlanResults({
                   const locked = lockedProductIds.includes(product.id);
                   const priority = priorityForItem(item, input.roomType);
                   const expanded = expandedProductId === product.id;
+                  const openUrl = productUrl(product);
                   return (
                     <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
-                      <img src={product.image} alt="" loading="lazy" />
+                      <img src={productImage(product)} alt="" loading="lazy" />
                       <div className="product-info">
                         <div className="product-title-line">
                           <strong>{product.name}</strong>
@@ -499,25 +528,31 @@ export function PlanResults({
                         <div className="meta-line">
                           <span>{product.retailer}</span>
                           <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
-                          <span>★ {product.rating}</span>
+                          <span>{availabilityLabel(product)}</span>
                           {product.originalPrice && <span>Akcija</span>}
-                          {!product.inStock && <span>Nema na stanju</span>}
                           {locked && <span>Zadržano</span>}
                         </div>
+                        {product.deliveryNote && <small className="product-delivery-note">{product.deliveryNote}</small>}
                         <div className="product-reason-box compact-reason-box">
                           <span>{item.shoppingRole || 'Zašto ovo?'}</span>
                           <p>{reason}</p>
                         </div>
                         <div className="product-actions decision-product-actions">
-                          <button type="button" onClick={() => onToggleLock(product.id)}>
-                            {locked ? 'Ne moram zadržati' : 'Zadrži'}
-                          </button>
+                          {openUrl ? (
+                            <a href={openUrl} target="_blank" rel="noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
+                              Otvori u trgovini
+                            </a>
+                          ) : (
+                            <button type="button" disabled title="Link će biti dostupan kad spojimo trgovinu">
+                              Link uskoro
+                            </button>
+                          )}
                           <button type="button" onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>
                             {expanded ? 'Sakrij zamjene' : 'Promijeni'}
                           </button>
-                          <a href={product.url} target="_blank" rel="noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
-                            Pogledaj u trgovini
-                          </a>
+                          <button type="button" onClick={() => onToggleLock(product.id)}>
+                            {locked ? 'Pusti' : 'Zadrži'}
+                          </button>
                         </div>
                         {expanded && (
                           <div className="replacement-menu" aria-label="Odaberi što želiš promijeniti">
