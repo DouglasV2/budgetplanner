@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { generatePlan, getSavedPlan, replaceProduct, savePlan, sendPlanFeedback, trackProductClick } from '../api/client';
-import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, Retailer } from '../types';
+import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, ReplacementChoice, Retailer } from '../types';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
 
@@ -13,7 +13,7 @@ const initialInput: PlannerInput = {
   location: 'Zagreb',
   size: 20,
   retailerMode: 'multi',
-  selectedRetailers: ['IKEA', 'JYSK', 'Pevex'],
+  selectedRetailers: ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon', 'Lesnina'],
   optimizationGoal: 'best-value',
   furnishingLevel: 'comfort',
   mustHaveCategories: [],
@@ -84,12 +84,12 @@ export function Planner() {
     await runGeneration(input);
   }
 
-  async function handleReplace(planId: string, productId: string) {
+  async function handleReplace(planId: string, productId: string, changeType: ReplacementChoice = 'similar') {
     const plan = plans.find((currentPlan) => currentPlan.id === planId);
     if (!plan) return;
 
     try {
-      const updatedPlan = await replaceProduct(plan, input, productId);
+      const updatedPlan = await replaceProduct(plan, input, productId, changeType);
       setPlans((currentPlans) => currentPlans.map((currentPlan) => (currentPlan.id === planId ? updatedPlan : currentPlan)));
     } catch (apiError) {
       setError(apiError instanceof Error ? apiError.message : 'Nisam uspio zamijeniti proizvod. Probaj ponovno.');

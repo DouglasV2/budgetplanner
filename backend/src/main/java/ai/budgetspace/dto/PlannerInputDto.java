@@ -26,7 +26,7 @@ public record PlannerInputDto(
                 blank(location) ? "Zagreb" : location,
                 size <= 0 ? 20 : size,
                 blank(retailerMode) ? "multi" : retailerMode,
-                selectedRetailers == null ? List.of("IKEA", "JYSK", "Pevex") : selectedRetailers,
+                selectedRetailers == null ? List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina") : selectedRetailers,
                 blank(optimizationGoal) ? "best-value" : optimizationGoal,
                 blank(furnishingLevel) ? "comfort" : furnishingLevel,
                 mustHaveCategories == null ? List.of() : mustHaveCategories,

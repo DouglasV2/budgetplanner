@@ -2266,3 +2266,106 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* Sprint 6.4: budget trade-offs and friendlier replacement choices */
+.advisor-card {
+  border: 1px solid rgba(236, 122, 46, 0.18);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(236, 122, 46, 0.12), rgba(255, 255, 255, 0.68));
+  padding: 16px;
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.advisor-card span,
+.tradeoff-card span {
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+}
+
+.advisor-card p {
+  margin: 5px 0 0;
+  color: var(--ink);
+  line-height: 1.58;
+  font-weight: 780;
+}
+
+.advisor-card strong {
+  display: block;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(31, 29, 26, 0.08);
+  padding: 11px 12px;
+  color: #3f563a;
+  line-height: 1.45;
+}
+
+.tradeoff-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.tradeoff-card {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.56);
+  padding: 15px;
+}
+
+.tradeoff-card.save {
+  border-color: rgba(102, 120, 95, 0.2);
+  background: rgba(102, 120, 95, 0.08);
+}
+
+.tradeoff-card.upgrade {
+  border-color: rgba(236, 122, 46, 0.18);
+  background: rgba(236, 122, 46, 0.08);
+}
+
+.tradeoff-card ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.55;
+  display: grid;
+  gap: 7px;
+}
+
+.product-actions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-actions-grid button,
+.product-actions-grid a {
+  min-height: 38px;
+}
+
+.product-actions-grid button:nth-of-type(2) {
+  border-color: rgba(102, 120, 95, 0.24);
+  background: rgba(102, 120, 95, 0.1);
+  color: #3f563a;
+}
+
+.product-actions-grid button:nth-of-type(3) {
+  border-color: rgba(236, 122, 46, 0.28);
+  background: rgba(236, 122, 46, 0.1);
+  color: var(--orange-dark);
+}
+
+@media (max-width: 760px) {
+  .tradeoff-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .product-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

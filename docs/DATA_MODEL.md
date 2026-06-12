@@ -7,7 +7,7 @@ The first MVP keeps the catalog intentionally simple.
 ```text
 id              string primary key
 name            string
-retailer        string: IKEA, JYSK, Pevex, Emmezeta, Decathlon
+retailer        string: IKEA, JYSK, Pevex, Emmezeta, Decathlon, Lesnina
 category        string: sofa, tv-unit, table, rug, lighting, storage, decor, desk, chair, bed, mattress, gym-equipment
 price           decimal
 originalPrice   decimal nullable

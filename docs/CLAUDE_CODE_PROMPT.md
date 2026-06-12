@@ -24,4 +24,4 @@ Tasks:
 8. Add README updates for every new command or env var.
 
 Important product principle:
-The user should feel that BudgetSpace AI saves them from manually browsing IKEA, JYSK, Pevex, Emmezeta and Decathlon for hours.
+The user should feel that BudgetSpace AI saves them from manually browsing IKEA, JYSK, Pevex, Emmezeta, Decathlon, Lesnina and Lesnina for hours.

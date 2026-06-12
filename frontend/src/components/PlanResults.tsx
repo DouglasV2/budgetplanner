@@ -7,7 +7,8 @@ import type {
   ProductCategory,
   RoomType,
   PlanItem,
-  ShoppingPriority
+  ShoppingPriority,
+  ReplacementChoice
 } from '../types';
 import {
   categoryLabels,
@@ -25,7 +26,7 @@ export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stor
 interface PlanResultsProps {
   plans: FurnishingPlan[];
   input: PlannerInput;
-  onReplace: (planId: string, productId: string) => void;
+  onReplace: (planId: string, productId: string, changeType?: ReplacementChoice) => void;
   onToggleLock: (productId: string) => void;
   lockedProductIds: string[];
   onQuickAction: (action: QuickPlanAction, plan?: FurnishingPlan) => void;
@@ -386,7 +387,15 @@ export function PlanResults({
           <div className="plan-summary-box">
             <span>Što dobivaš za ovaj budžet</span>
             <p>{selectedPlan.summary || defaultSummary(selectedPlan, input)}</p>
-            <small>{budgetSentence(selectedPlan, input)}</small>
+            <small>{selectedPlan.budgetStatus || budgetSentence(selectedPlan, input)}</small>
+          </div>
+
+          <div className="advisor-card">
+            <div>
+              <span>Naš savjet</span>
+              <p>{selectedPlan.advisorNote || 'Prvo riješi glavne komade, a sitnice dodaj tek ako budžet i dalje ima smisla.'}</p>
+            </div>
+            <strong>{selectedPlan.nextStep || 'Provjeri dimenzije prije kupnje.'}</strong>
           </div>
 
           <div className="plan-total-card">
@@ -412,6 +421,25 @@ export function PlanResults({
             <div>
               <span>Na što treba paziti?</span>
               <p>{selectedPlan.tradeoff || selectedPlan.description}</p>
+            </div>
+          </div>
+
+          <div className="tradeoff-panel" aria-label="Savjeti za budžet">
+            <div className="tradeoff-card save">
+              <span>Kako spustiti cijenu</span>
+              <ul>
+                {(selectedPlan.savingTips?.length ? selectedPlan.savingTips : ['Ako je budžet tijesan, prvo odgodi detalje i čuvaj novac za glavne komade.']).map((tip) => (
+                  <li key={tip}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="tradeoff-card upgrade">
+              <span>Ako možeš dodati još malo</span>
+              <ul>
+                {(selectedPlan.upgradeTips?.length ? selectedPlan.upgradeTips : ['Najviše se osjeti nadogradnja rasvjete, tepiha ili glavnog komada koji koristiš svaki dan.']).map((tip) => (
+                  <li key={tip}>{tip}</li>
+                ))}
+              </ul>
             </div>
           </div>
 
@@ -516,12 +544,21 @@ export function PlanResults({
                           <span>{item.shoppingRole || 'Zašto ovo?'}</span>
                           <p>{reason}</p>
                         </div>
-                        <div className="product-actions">
+                        <div className="product-actions product-actions-grid">
                           <button type="button" onClick={() => onToggleLock(product.id)}>
                             {locked ? 'Ne moram zadržati' : 'Zadrži'}
                           </button>
-                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id)} disabled={locked}>
-                            Promijeni
+                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')} disabled={locked}>
+                            Nađi jeftinije
+                          </button>
+                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')} disabled={locked}>
+                            Nađi ljepše
+                          </button>
+                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')} disabled={locked}>
+                            Ne sviđa mi se
+                          </button>
+                          <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')} disabled={locked}>
+                            Ne treba mi ovo
                           </button>
                           <a href={product.url} target="_blank" rel="noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
                             Pogledaj u trgovini

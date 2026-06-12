@@ -1,4 +1,4 @@
-export type Retailer = 'IKEA' | 'JYSK' | 'Pevex' | 'Decathlon' | 'Emmezeta';
+export type Retailer = 'IKEA' | 'JYSK' | 'Pevex' | 'Decathlon' | 'Emmezeta' | 'Lesnina';
 
 export type RoomType = 'living-room' | 'home-office' | 'bedroom' | 'home-gym';
 
@@ -21,6 +21,8 @@ export type OptimizationGoal = 'lowest-price' | 'best-value' | 'least-stores' | 
 export type FurnishingLevel = 'basic' | 'comfort' | 'complete';
 
 export type ShoppingPriority = 'buy-first' | 'add-comfort' | 'later';
+
+export type ReplacementChoice = 'cheaper' | 'nicer' | 'different' | 'remove' | 'similar';
 
 export type ProductCategory =
   | 'sofa'
@@ -84,6 +86,11 @@ export interface FurnishingPlan {
   summary: string;
   goodFor: string;
   tradeoff: string;
+  budgetStatus: string;
+  advisorNote: string;
+  nextStep: string;
+  savingTips: string[];
+  upgradeTips: string[];
   items: PlanItem[];
   total: number;
   savings: number;

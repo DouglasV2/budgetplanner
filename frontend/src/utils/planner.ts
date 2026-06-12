@@ -1,6 +1,6 @@
 import type { FurnishingLevel, FurnishingPlan, PlannerInput, ProductCategory, Retailer, RoomType, ShoppingPriority, StyleType } from '../types';
 
-export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon'];
+export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon', 'Lesnina'];
 
 export const categoryLabels: Record<ProductCategory, string> = {
   sofa: 'Sofa / kauč',
@@ -77,7 +77,11 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
     `Prostorija: ${roomLabels[input.roomType]}, izgled: ${styleLabels[input.style]}, razina: ${furnishingLevelLabels[input.furnishingLevel ?? 'comfort']}, budžet: ${formatCurrency(input.budget)}`,
     plan.summary ? `Sažetak: ${plan.summary}` : '',
     plan.goodFor ? `Za koga je dobro: ${plan.goodFor}` : '',
+    plan.budgetStatus ? `Budžet: ${plan.budgetStatus}` : '',
+    plan.advisorNote ? `Naš savjet: ${plan.advisorNote}` : '',
     `Ukupno: ${formatCurrency(plan.total)} | Poklapanje sa željama: ${plan.fitScore}% | Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
+    plan.savingTips?.length ? `Kako uštedjeti: ${plan.savingTips.join(' ')}` : '',
+    plan.upgradeTips?.length ? `Ako možeš dodati još malo: ${plan.upgradeTips.join(' ')}` : '',
     breakdown ? `Trošak po trgovini: ${breakdown}` : '',
     '',
     ...lines

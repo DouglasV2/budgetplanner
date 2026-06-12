@@ -1,4 +1,4 @@
-import type { FurnishingPlan, PlanFeedback, PlannerInput, Product, SavedPlanResponse } from '../types';
+import type { FurnishingPlan, PlanFeedback, PlannerInput, Product, ReplacementChoice, SavedPlanResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
@@ -42,10 +42,10 @@ export function generatePlan(input: PlannerInput) {
   });
 }
 
-export function replaceProduct(plan: FurnishingPlan, input: PlannerInput, productId: string) {
+export function replaceProduct(plan: FurnishingPlan, input: PlannerInput, productId: string, changeType: ReplacementChoice = 'similar') {
   return request<FurnishingPlan>('/api/plans/replace', {
     method: 'POST',
-    body: JSON.stringify({ plan, input, productId })
+    body: JSON.stringify({ plan, input, productId, changeType })
   });
 }
 
