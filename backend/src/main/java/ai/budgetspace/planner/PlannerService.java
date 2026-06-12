@@ -378,7 +378,7 @@ public class PlannerService {
                 : "podiže finalni dojam prostora";
         String categoryNote = roleForCategory(input.roomType(), product.getCategory()) + ".";
         String stepNote = switch (priorityForCategory(input.roomType(), product.getCategory())) {
-            case "buy-first" -> "Zato ga je pametno riješiti prije sitnica.";
+            case "buy-first" -> "Zato ima smisla biti u prvom fokusu, prije sitnica.";
             case "add-comfort" -> "Dodaje udobnost i pomaže da prostor ne izgleda prazno.";
             default -> "Može i kasnije ako želiš prvo čuvati budžet.";
         };
@@ -407,7 +407,7 @@ public class PlannerService {
         return switch (mode) {
             case "stretch" -> "Dobro ako želiš da prostor odmah izgleda dovršenije i spreman si dodati malo novca za bolji dojam.";
             case "value" -> "Dobro za većinu ljudi: prvo pokriva glavne komade, zatim dodaje udobnost tek kad budžet to dopušta.";
-            default -> "Dobro ako se useljavaš, imaš ograničen budžet ili želiš prvo kupiti osnovne stvari pa kasnije nadograditi.";
+            default -> "Dobro ako se useljavaš, imaš ograničen budžet ili želiš prvo riješiti osnovne stvari pa kasnije nadograditi.";
         };
     }
 
@@ -452,9 +452,12 @@ public class PlannerService {
                 : "Kupnja je raspoređena kroz " + retailersUsed.size() + " trgovine, pa prvo provjeri gdje su najveći komadi.";
         String budgetText = total <= input.budget()
                 ? "Ostavio bih malo novca sa strane za dostavu i sitnice."
-                : "Da čuvamo novac, jedan komad iz zadnjeg koraka bih kupio kasnije.";
+                : "Da čuvamo novac, jedan komad iz zadnjeg koraka može ostati za kasnije.";
+        String alreadyHaveText = input.alreadyHaveCategories().isEmpty()
+                ? ""
+                : " Ono što već imaš nisam ponovno ubacio, pa budžet ide na ono što stvarno fali.";
         if (firstItems.isBlank()) firstItems = "glavne komade";
-        return "Za " + room + " bih prvo riješio " + firstItems + ". " + budgetText + " " + storeText;
+        return "Za " + room + " najviše smisla imaju " + firstItems + ". " + budgetText + " " + storeText + alreadyHaveText;
     }
 
     private String buildNextStep(PlannerInputDto input, List<PlanItemDto> items, double total) {
@@ -511,7 +514,7 @@ public class PlannerService {
                 .filter(item -> "later".equals(priorityForCategory(input.roomType(), item.product().category())))
                 .findFirst();
         if (later.isPresent()) {
-            tips.add("Ako želiš ljepši dojam, detalje kupi tek nakon što su veliki komadi provjereni i naručeni.");
+            tips.add("Ako želiš ljepši dojam, detalje dodaj tek nakon što su veliki komadi provjereni i naručeni.");
         } else {
             Optional<PlanItemDto> comfort = items.stream()
                     .filter(item -> "add-comfort".equals(priorityForCategory(input.roomType(), item.product().category())))
@@ -599,9 +602,9 @@ public class PlannerService {
 
     private String stepForCategory(String roomType, String category) {
         return switch (priorityForCategory(roomType, category)) {
-            case "buy-first" -> "1. Kupi osnovne komade";
-            case "add-comfort" -> "2. Dodaj udobnost";
-            default -> "3. Dodaj detalje ako ostane budžeta";
+            case "buy-first" -> "1. Najvažnije za početak";
+            case "add-comfort" -> "2. Za ugodniji prostor";
+            default -> "3. Može kasnije";
         };
     }
 
@@ -677,7 +680,7 @@ public class PlannerService {
                 Map.entry("gym-equipment", Pattern.compile("bucic|bučic|bench|klupa|utezi|sprava"))
         );
 
-        String existingSegment = segmentAfter(text, "imam|vec imam|već imam", 130);
+        String existingSegment = segmentAfter(text, "vec imam|već imam|imam vec|imam već|imam doma|imam kod kuce|imam kod kuće", 130);
         String extractedNeedSegment = segmentAfter(text, "trebam|fali|dodaj|zelim|želim", 170);
         String needSegment = extractedNeedSegment.isBlank() ? text : extractedNeedSegment;
 

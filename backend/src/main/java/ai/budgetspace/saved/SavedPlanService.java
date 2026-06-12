@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -46,13 +47,27 @@ public class SavedPlanService {
                 .orElseThrow(() -> new NoSuchElementException("Saved plan not found"));
     }
 
+    public List<SavedPlanResponse> findAll() {
+        return savedPlanRepository.findAllByOrderByFavoriteDescCreatedAtDesc().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public SavedPlanResponse setFavorite(String id, boolean favorite) {
+        SavedPlan savedPlan = savedPlanRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Saved plan not found"));
+        savedPlan.setFavorite(favorite);
+        return toResponse(savedPlanRepository.save(savedPlan));
+    }
+
     private SavedPlanResponse toResponse(SavedPlan savedPlan) {
         try {
             return new SavedPlanResponse(
                     savedPlan.getId(),
                     objectMapper.readValue(savedPlan.getPlanJson(), FurnishingPlanDto.class),
                     objectMapper.readValue(savedPlan.getInputJson(), PlannerInputDto.class).normalized(),
-                    savedPlan.getCreatedAt()
+                    savedPlan.getCreatedAt(),
+                    savedPlan.isFavorite()
             );
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Could not read saved plan", exception);

@@ -105,6 +105,7 @@ export interface SavedPlanResponse {
   plan: FurnishingPlan;
   input: PlannerInput;
   createdAt: string;
+  favorite: boolean;
 }
 
 export type PlanFeedback = 'useful' | 'too-expensive' | 'wrong-style' | 'too-many-stores';

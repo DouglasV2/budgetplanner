@@ -54,6 +54,13 @@ const categoryOrder: ProductCategory[] = [
   'gym-equipment'
 ];
 
+const categoryOrderByRoom: Record<RoomType, ProductCategory[]> = {
+  'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
+  'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
+  bedroom: ['bed', 'mattress', 'storage', 'lighting', 'rug', 'decor'],
+  'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor']
+};
+
 const sizePresets = [
   { label: 'Ne znam', size: 20, description: 'aplikacija uzme sigurnu procjenu' },
   { label: 'Mala', size: 12, description: 'garsonijera ili manji kutak' },
@@ -158,8 +165,18 @@ function selectedShopMode(input: PlannerInput) {
   return 'choose-stores';
 }
 
+function visibleCategories(input: PlannerInput) {
+  return Array.from(new Set([
+    ...(categoryOrderByRoom[input.roomType] ?? categoryOrder),
+    ...input.mustHaveCategories,
+    ...input.alreadyHaveCategories
+  ]));
+}
+
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
   const shopMode = selectedShopMode(input);
+  const visibleCategoryOptions = visibleCategories(input);
+  const alreadyHaveText = input.alreadyHaveCategories.map((category) => categoryLabels[category]).join(", ");
 
   return (
     <form
@@ -367,7 +384,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         <div className="field-group compact-group">
           <span className="friendly-label">Što obavezno trebaš?</span>
           <div className="category-pills friendly-pills">
-            {categoryOrder.map((category) => (
+            {visibleCategoryOptions.map((category) => (
               <button
                 type="button"
                 key={category}
@@ -386,10 +403,16 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           </div>
         </div>
 
-        <div className="field-group compact-group">
+        <div className="field-group compact-group already-have-group">
           <span className="friendly-label">Što već imaš?</span>
+          <p className="field-help inline-help">Označi samo ako stvarno ne želiš da ti to ponovno nudimo.</p>
+          {input.alreadyHaveCategories.length > 0 && (
+            <div className="existing-assets-note">
+              <strong>Ne nudimo ponovno:</strong> {alreadyHaveText}
+            </div>
+          )}
           <div className="category-pills muted-pills friendly-pills">
-            {categoryOrder.map((category) => (
+            {visibleCategoryOptions.map((category) => (
               <button
                 type="button"
                 key={category}

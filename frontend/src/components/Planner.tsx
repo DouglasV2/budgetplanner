@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { generatePlan, getSavedPlan, replaceProduct, savePlan, sendPlanFeedback, trackProductClick } from '../api/client';
-import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, ReplacementChoice, Retailer } from '../types';
+import { useEffect, useMemo, useState } from 'react';
+import { generatePlan, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
+import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
+import { formatCurrency, roomLabels, styleLabels } from '../utils/planner';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
 
@@ -36,13 +37,98 @@ function readSharedPlanIdFromUrl() {
   return match?.[1] ?? null;
 }
 
+function planSearchText(savedPlan: SavedPlanResponse) {
+  return [
+    savedPlan.plan.name,
+    savedPlan.plan.label,
+    savedPlan.plan.summary,
+    roomLabels[savedPlan.input.roomType],
+    styleLabels[savedPlan.input.style],
+    savedPlan.plan.retailersUsed.join(' '),
+    savedPlan.plan.items.map((item) => item.product.name).join(' ')
+  ].join(' ').toLowerCase();
+}
+
+function SavedPlansInbox({
+  plans,
+  search,
+  onSearchChange,
+  onOpen,
+  onFavorite
+}: {
+  plans: SavedPlanResponse[];
+  search: string;
+  onSearchChange: (value: string) => void;
+  onOpen: (plan: SavedPlanResponse) => void;
+  onFavorite: (plan: SavedPlanResponse) => void;
+}) {
+  const filteredPlans = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return plans.slice(0, 8);
+    return plans.filter((plan) => planSearchText(plan).includes(query)).slice(0, 12);
+  }, [plans, search]);
+
+  if (!plans.length) return null;
+
+  return (
+    <details className="saved-plans-inbox">
+      <summary>
+        <div>
+          <span>Moji planovi</span>
+          <strong>{plans.length} spremljeno · {plans.filter((plan) => plan.favorite).length} favorita</strong>
+        </div>
+        <small>Otvori kad želiš nastaviti kasnije.</small>
+      </summary>
+      <div className="saved-plans-toolbar">
+        <label>
+          <span>Pretraži spremljene planove</span>
+          <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Npr. dnevni boravak, IKEA, 1500" />
+        </label>
+      </div>
+      <div className="saved-plans-list">
+        {filteredPlans.map((savedPlan) => (
+          <article className={savedPlan.favorite ? 'saved-plan-card favorite' : 'saved-plan-card'} key={savedPlan.id}>
+            <div>
+              <span>{roomLabels[savedPlan.input.roomType]} · {formatCurrency(savedPlan.input.budget)}</span>
+              <strong>{savedPlan.plan.name}</strong>
+              <small>{formatCurrency(savedPlan.plan.total)} · {savedPlan.plan.items.length} proizvoda · {savedPlan.plan.retailersUsed.join(' + ')}</small>
+            </div>
+            <div className="saved-plan-actions">
+              <button type="button" onClick={() => onFavorite(savedPlan)} aria-label={savedPlan.favorite ? 'Makni iz favorita' : 'Dodaj u favorite'}>
+                {savedPlan.favorite ? '★ Favorit' : '☆ Favorit'}
+              </button>
+              <button type="button" onClick={() => onOpen(savedPlan)}>Otvori</button>
+            </div>
+          </article>
+        ))}
+        {!filteredPlans.length && <p className="saved-empty">Nema spremljenog plana za taj pojam.</p>}
+      </div>
+    </details>
+  );
+}
+
 export function Planner() {
   const [input, setInput] = useState<PlannerInput>(initialInput);
   const [plans, setPlans] = useState<FurnishingPlan[]>([]);
+  const [savedPlans, setSavedPlans] = useState<SavedPlanResponse[]>([]);
+  const [savedSearch, setSavedSearch] = useState('');
   const [generationCount, setGenerationCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  async function refreshSavedPlans() {
+    try {
+      const nextSavedPlans = await listSavedPlans();
+      setSavedPlans(nextSavedPlans);
+    } catch {
+      // Saved plans are helpful, but the main planner should still work if this endpoint is unavailable.
+    }
+  }
+
+  useEffect(() => {
+    void refreshSavedPlans();
+  }, []);
 
   useEffect(() => {
     const sharedPlanId = readSharedPlanIdFromUrl();
@@ -108,13 +194,14 @@ export function Planner() {
   async function handleSavePlan(plan: FurnishingPlan, copyLink: boolean) {
     const savedPlan = await savePlan(plan, input);
     const url = `${window.location.origin}/plan/${savedPlan.id}`;
+    setSavedPlans((currentPlans) => [savedPlan, ...currentPlans.filter((currentPlan) => currentPlan.id !== savedPlan.id)]);
 
     if (copyLink) {
       await navigator.clipboard.writeText(url);
-      setNotice('Link za plan je kopiran. Možeš ga poslati partneru, frendu ili sebi za kasnije.');
+      setNotice('Link za plan je kopiran. Plan je spremljen i možeš ga naći u Mojim planovima.');
     } else {
       window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
-      setNotice('Plan je spremljen. Link u adresnoj traci sada otvara baš ovaj plan.');
+      setNotice('Plan je spremljen u Moje planove. Možeš ga kasnije pretražiti ili označiti kao favorit.');
     }
 
     return url;
@@ -127,6 +214,22 @@ export function Planner() {
   async function handleFeedback(planId: string, feedback: PlanFeedback) {
     await sendPlanFeedback(planId, feedback);
     setNotice('Hvala — ova reakcija nam govori što treba popraviti u sljedećem planu.');
+  }
+
+  function openSavedPlan(savedPlan: SavedPlanResponse) {
+    setInput(savedPlan.input);
+    setPlans([savedPlan.plan]);
+    window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
+    setNotice('Otvoren je spremljeni plan. Možeš ga odmah kopirati, prilagoditi ili složiti novu verziju.');
+  }
+
+  async function toggleSavedFavorite(savedPlan: SavedPlanResponse) {
+    try {
+      const updatedPlan = await setSavedPlanFavorite(savedPlan.id, !savedPlan.favorite);
+      setSavedPlans((currentPlans) => currentPlans.map((plan) => (plan.id === updatedPlan.id ? updatedPlan : plan)));
+    } catch {
+      setNotice('Nisam uspio promijeniti favorit. Provjeri je li backend pokrenut.');
+    }
   }
 
   async function handleQuickAction(action: QuickPlanAction, plan?: FurnishingPlan) {
@@ -190,6 +293,14 @@ export function Planner() {
       </div>
 
       {notice && <div className="planner-notice">{notice}</div>}
+
+      <SavedPlansInbox
+        plans={savedPlans}
+        search={savedSearch}
+        onSearchChange={setSavedSearch}
+        onOpen={openSavedPlan}
+        onFavorite={toggleSavedFavorite}
+      />
 
       <div className="planner-layout">
         <div className="planner-panel">

@@ -31,8 +31,8 @@ export const furnishingLevelLabels: Record<FurnishingLevel, string> = {
 };
 
 export const shoppingPriorityLabels: Record<ShoppingPriority, string> = {
-  'buy-first': 'Kupi prvo',
-  'add-comfort': 'Dobro dodati',
+  'buy-first': 'Najvažnije',
+  'add-comfort': 'Za ugodniji prostor',
   later: 'Može kasnije'
 };
 
@@ -67,24 +67,31 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
   const breakdown = getRetailerBreakdown(plan)
     .map((entry) => `${entry.retailer}: ${formatCurrency(entry.total)} (${entry.count} proizvoda)`)
     .join(' | ');
-  const lines = plan.items.map((item) => {
-    const priority = item.shoppingPriority ? `${shoppingPriorityLabels[item.shoppingPriority]}: ` : '';
-    return `- ${priority}${item.product.name} (${item.product.retailer}) — ${formatCurrency(item.product.price)}`;
-  });
+  const byPriority = (priority: string) => plan.items.filter((item) => item.shoppingPriority === priority);
+  const formatItems = (items: typeof plan.items) => items.map((item) => `- ${item.product.name} — ${item.product.retailer} — ${formatCurrency(item.product.price)}`);
+  const favoriteFirst = byPriority('buy-first');
+  const comfort = byPriority('add-comfort');
+  const later = byPriority('later');
+  const uncategorized = plan.items.filter((item) => !item.shoppingPriority);
 
   return [
-    `BudgetSpace AI plan: ${plan.name}`,
-    `Prostorija: ${roomLabels[input.roomType]}, izgled: ${styleLabels[input.style]}, razina: ${furnishingLevelLabels[input.furnishingLevel ?? 'comfort']}, budžet: ${formatCurrency(input.budget)}`,
-    plan.summary ? `Sažetak: ${plan.summary}` : '',
-    plan.goodFor ? `Za koga je dobro: ${plan.goodFor}` : '',
-    plan.budgetStatus ? `Budžet: ${plan.budgetStatus}` : '',
-    plan.advisorNote ? `Naš savjet: ${plan.advisorNote}` : '',
-    `Ukupno: ${formatCurrency(plan.total)} | Poklapanje sa željama: ${plan.fitScore}% | Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
-    plan.savingTips?.length ? `Kako uštedjeti: ${plan.savingTips.join(' ')}` : '',
-    plan.upgradeTips?.length ? `Ako možeš dodati još malo: ${plan.upgradeTips.join(' ')}` : '',
-    breakdown ? `Trošak po trgovini: ${breakdown}` : '',
+    `Moj BudgetSpace plan: ${roomLabels[input.roomType]}`,
+    `Budžet: ${formatCurrency(input.budget)}`,
+    `Ukupno: ${formatCurrency(plan.total)}${plan.total <= input.budget ? ` · ostaje ${formatCurrency(input.budget - plan.total)}` : ` · ${formatCurrency(plan.total - input.budget)} iznad budžeta`}`,
+    `Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
+    breakdown ? `Po trgovinama: ${breakdown}` : '',
+    plan.advisorNote ? `Kratko: ${plan.advisorNote}` : '',
     '',
-    ...lines
+    favoriteFirst.length ? 'NAJVAŽNIJE ZA PLAN' : '',
+    ...formatItems(favoriteFirst),
+    comfort.length ? '' : '',
+    comfort.length ? 'ZA UGODNIJI PROSTOR' : '',
+    ...formatItems(comfort),
+    later.length ? '' : '',
+    later.length ? 'MOŽE KASNIJE' : '',
+    ...formatItems(later),
+    uncategorized.length ? '' : '',
+    ...formatItems(uncategorized)
   ].filter(Boolean).join('\n');
 }
 

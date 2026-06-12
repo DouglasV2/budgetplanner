@@ -60,6 +60,17 @@ export function getSavedPlan(id: string) {
   return request<SavedPlanResponse>(`/api/saved-plans/${id}`);
 }
 
+export function listSavedPlans() {
+  return request<SavedPlanResponse[]>('/api/saved-plans');
+}
+
+export function setSavedPlanFavorite(id: string, favorite: boolean) {
+  return request<SavedPlanResponse>(`/api/saved-plans/${id}/favorite`, {
+    method: 'PATCH',
+    body: JSON.stringify({ favorite })
+  });
+}
+
 export function trackProductClick(planId: string, product: Product) {
   fireAndForget('/api/events/product-click', {
     planId,

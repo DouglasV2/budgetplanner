@@ -2692,3 +2692,273 @@ textarea {
     text-align: left;
   }
 }
+
+/* Sprint 6.7-6.9: practical shopping list, saved plan inbox and calmer controls */
+.shell {
+  width: min(1420px, calc(100% - 24px));
+}
+
+.planner-section.shell {
+  width: min(1480px, calc(100% - 20px));
+}
+
+.planner-layout {
+  grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.saved-plans-inbox {
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: var(--shadow-soft);
+  margin: 0 0 18px;
+  overflow: hidden;
+}
+
+.saved-plans-inbox summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.saved-plans-inbox summary::-webkit-details-marker {
+  display: none;
+}
+
+.saved-plans-inbox summary div,
+.saved-plans-toolbar label,
+.saved-plan-card > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.saved-plans-inbox summary span,
+.saved-plans-toolbar span,
+.shopping-list-head span,
+.shopping-list-group-title span,
+.existing-assets-note strong,
+.dislike-reasons span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.saved-plans-inbox summary strong {
+  letter-spacing: -0.02em;
+}
+
+.saved-plans-inbox summary small {
+  color: var(--muted);
+  text-align: right;
+}
+
+.saved-plans-toolbar {
+  padding: 0 20px 14px;
+}
+
+.saved-plans-toolbar input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: #fff;
+  font: inherit;
+}
+
+.saved-plans-list {
+  display: grid;
+  gap: 10px;
+  padding: 0 20px 20px;
+}
+
+.saved-plan-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(31, 29, 26, 0.08);
+  background: rgba(255, 253, 248, 0.86);
+}
+
+.saved-plan-card.favorite {
+  border-color: rgba(236, 122, 46, 0.35);
+  background: rgba(236, 122, 46, 0.07);
+}
+
+.saved-plan-card span,
+.saved-plan-card small,
+.saved-empty {
+  color: var(--muted);
+}
+
+.saved-plan-card strong {
+  letter-spacing: -0.02em;
+}
+
+.saved-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.saved-plan-actions button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 9px 12px;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.shopping-list-card {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(255, 253, 248, 0.86);
+  box-shadow: var(--shadow-soft);
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.shopping-list-head,
+.shopping-list-group-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.shopping-list-head > div {
+  display: grid;
+  gap: 4px;
+}
+
+.shopping-list-head strong:last-child {
+  font-size: 1.35rem;
+  letter-spacing: -0.05em;
+  color: var(--orange-dark);
+}
+
+.shopping-list-groups {
+  display: grid;
+  gap: 12px;
+}
+
+.shopping-list-group {
+  border-radius: 18px;
+  border: 1px solid rgba(31, 29, 26, 0.08);
+  background: rgba(255, 255, 255, 0.62);
+  padding: 12px;
+}
+
+.shopping-list-group ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.shopping-list-group li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  color: var(--ink);
+}
+
+.shopping-list-group li span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shopping-list-group li small {
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.dislike-reasons {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(236, 122, 46, 0.06);
+  border: 1px solid rgba(236, 122, 46, 0.16);
+}
+
+.dislike-reasons span {
+  flex-basis: 100%;
+}
+
+.inline-help {
+  margin-top: -6px;
+}
+
+.existing-assets-note {
+  border: 1px solid rgba(102, 120, 95, 0.22);
+  border-radius: 18px;
+  background: rgba(102, 120, 95, 0.09);
+  color: var(--ink);
+  padding: 11px 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  .planner-layout {
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 980px) {
+  .planner-section.shell,
+  .shell {
+    width: min(100% - 18px, 760px);
+  }
+
+  .saved-plan-card,
+  .shopping-list-group li {
+    grid-template-columns: 1fr;
+  }
+
+  .saved-plan-actions {
+    justify-content: flex-start;
+  }
+
+  .saved-plans-inbox summary {
+    display: grid;
+  }
+
+  .saved-plans-inbox summary small {
+    text-align: left;
+  }
+}
+
+@media (max-width: 680px) {
+  .planner-section.shell,
+  .shell {
+    width: min(100% - 14px, 100%);
+  }
+
+  .shopping-list-card,
+  .saved-plans-inbox summary,
+  .saved-plans-toolbar,
+  .saved-plans-list {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}

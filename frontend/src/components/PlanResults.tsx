@@ -74,19 +74,19 @@ const STEP_ORDER = ['buy-first', 'add-comfort', 'later'] as const;
 
 const STEP_TEXT = {
   'buy-first': {
-    title: '1. Kupi osnovne komade',
-    shortTitle: 'Osnovni komadi',
-    description: 'Ovo prvo riješi jer bez toga prostor nema smisla.'
+    title: '1. Najvažnije za početak',
+    shortTitle: 'Najvažnije',
+    description: 'Ovo su komadi koji najviše nose prostor i cijeli plan.'
   },
   'add-comfort': {
-    title: '2. Dodaj udobnost',
-    shortTitle: 'Udobnost',
-    description: 'Ovo kupi nakon glavnih komada ako budžet i dalje drži.'
+    title: '2. Za ugodniji prostor',
+    shortTitle: 'Ugodnije',
+    description: 'Ovo daje topliji i dovršeniji osjećaj, ali ne mora biti prva odluka.'
   },
   later: {
-    title: '3. Detalji mogu kasnije',
+    title: '3. Može kasnije',
     shortTitle: 'Može kasnije',
-    description: 'Ovo je lijepo imati, ali nije problem kupiti drugi put.'
+    description: 'Ovo je lijepo imati, ali mirno može pričekati ako želiš čuvati budžet.'
   }
 };
 
@@ -143,7 +143,7 @@ function defaultSummary(plan: FurnishingPlan, input: PlannerInput) {
     .slice(0, 3)
     .map((item) => categoryLabels[item.product.category].toLowerCase())
     .join(', ');
-  return `Za ${formatCurrency(input.budget)} najviše smisla ima prvo riješiti ${firstItems || 'osnovne komade'} za ${room}. Plan koristi ${plan.retailersUsed.length === 1 ? 'jednu trgovinu' : `${plan.retailersUsed.length} trgovine`} i ${plan.total <= input.budget ? 'ostaje unutar budžeta' : 'treba još smanjiti da bude sigurniji'}.`;
+  return `Za ${formatCurrency(input.budget)} najviše smisla imaju ${firstItems || 'osnovni komadi'} za ${room}. Plan koristi ${plan.retailersUsed.length === 1 ? 'jednu trgovinu' : `${plan.retailersUsed.length} trgovine`} i ${plan.total <= input.budget ? 'ostaje unutar budžeta' : 'treba još smanjiti da bude sigurniji'}.`;
 }
 
 function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
@@ -190,13 +190,49 @@ function decisionHeadline(plan: FurnishingPlan, input: PlannerInput, steps: Retu
   if (plan.total > input.budget) {
     return `Plan je dobar, ali još treba smanjiti ${formatCurrency(plan.total - input.budget)}.`;
   }
-  return `Za ${formatCurrency(input.budget)} prvo se isplati kupiti ${first}; ${later} može čekati.`;
+  return `Za ${formatCurrency(input.budget)} najisplativije je fokusirati se na ${first}; ${later} može čekati.`;
 }
 
 function shortBudgetText(plan: FurnishingPlan, input: PlannerInput) {
   const difference = input.budget - plan.total;
   if (difference >= 0) return `Ostaje ${formatCurrency(difference)}`;
   return `${formatCurrency(Math.abs(difference))} iznad`;
+}
+
+
+function ShoppingListCard({ plan, steps }: { plan: FurnishingPlan; steps: ReturnType<typeof purchaseSteps> }) {
+  const retailerText = plan.retailersUsed.length <= 1 ? plan.retailersUsed[0] || 'jedna trgovina' : plan.retailersUsed.join(' + ');
+
+  return (
+    <section className="shopping-list-card" aria-label="Popis za kupnju">
+      <div className="shopping-list-head">
+        <div>
+          <span>Popis za kupnju</span>
+          <strong>{plan.items.length} proizvoda · {retailerText}</strong>
+        </div>
+        <strong>{formatCurrency(plan.total)}</strong>
+      </div>
+      <div className="shopping-list-groups">
+        {steps.map((step) => (
+          <div className="shopping-list-group" key={step.priority}>
+            <div className="shopping-list-group-title">
+              <span>{step.shortTitle}</span>
+              <strong>{formatCurrency(step.subtotal)}</strong>
+            </div>
+            <ul>
+              {step.items.map((item) => (
+                <li key={item.product.id}>
+                  <span>{item.product.name}</span>
+                  <small>{item.product.retailer}</small>
+                  <strong>{formatCurrency(item.product.price)}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function UnderstandingSummary({ input }: { input: PlannerInput }) {
@@ -245,7 +281,7 @@ function ResultShell({ children }: { children: ReactNode }) {
           <span className="step-kicker">Rezultat</span>
           <h3>Tvoj plan za kupnju</h3>
         </div>
-        <small>U 10 sekundi trebaš vidjeti što se isplati, koliko košta i što može čekati.</small>
+        <small>U 10 sekundi treba biti jasno što dobivaš, koliko košta i što je najisplativije.</small>
       </div>
       {children}
     </div>
@@ -270,10 +306,12 @@ export function PlanResults({
   const [feedbackByPlan, setFeedbackByPlan] = useState<Record<string, PlanFeedback>>({});
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
+  const [dislikeProductId, setDislikeProductId] = useState<string | null>(null);
 
   useEffect(() => {
     setSelectedPlanId(preferredPlanId(plans, input));
     setExpandedProductId(null);
+    setDislikeProductId(null);
   }, [plans, input.optimizationGoal, input.furnishingLevel]);
 
   async function copyPlan(plan: FurnishingPlan) {
@@ -338,10 +376,10 @@ export function PlanResults({
           <div className="empty-state friendly-empty-state decision-empty-state">
             <span>Spremno</span>
             <h3>Ovdje ćeš odmah vidjeti što se isplati.</h3>
-            <p>Plan će prvo pokazati ukupnu cijenu, što kupiti prvo i što može čekati da ne potrošiš novac na krivi redoslijed.</p>
+            <p>Plan će prvo pokazati ukupnu cijenu, najvažnije proizvode i stvari koje mogu čekati da odmah vidiš što je isplativo.</p>
             <div className="empty-example">
               <strong>Dobit ćeš:</strong>
-              <span>1. glavne komade · 2. udobnost · 3. detalje samo ako ostane budžeta</span>
+              <span>1. najvažnije · 2. ugodniji prostor · 3. stvari koje mogu kasnije</span>
             </div>
           </div>
         </div>
@@ -387,7 +425,7 @@ export function PlanResults({
 
             {primaryStep && (
               <div className="first-buy-strip">
-                <span>Prvo kupi</span>
+                <span>Najvažnije u planu</span>
                 <strong>{primaryStep.items.map((item) => item.product.name).join(' + ')}</strong>
               </div>
             )}
@@ -397,7 +435,7 @@ export function PlanResults({
                 {copiedPlanId === selectedPlan.id ? 'Popis kopiran ✓' : 'Kopiraj popis za kupnju'}
               </button>
               <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, false)} disabled={savingPlanId === selectedPlan.id}>
-                {savingPlanId === selectedPlan.id ? 'Spremam...' : 'Spremi'}
+                {savingPlanId === selectedPlan.id ? 'Spremam...' : 'Spremi u moje planove'}
               </button>
               <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, true)} disabled={savingPlanId === selectedPlan.id}>
                 Kopiraj link
@@ -412,10 +450,12 @@ export function PlanResults({
             <button type="button" onClick={() => onQuickAction('least-stores', selectedPlan)}>Manje trgovina</button>
           </div>
 
+          <ShoppingListCard plan={selectedPlan} steps={steps} />
+
           <div className="shopping-steps-card main-shopping-steps-card">
             <div className="shopping-steps-heading">
-              <span>Plan kupnje po koracima</span>
-              <p>Ovo je redoslijed koji čuva budžet i smanjuje šansu da kupiš krive sitnice prije glavnih stvari.</p>
+              <span>Plan po prioritetima</span>
+              <p>Ovo pokazuje što najviše nosi plan, a što je više stvar dojma ili kasnije nadogradnje.</p>
             </div>
             <div className="shopping-steps-list">
               {steps.map((step) => (
@@ -434,8 +474,8 @@ export function PlanResults({
 
           <div className="items-list step-items-list">
             <div className="result-section-heading">
-              <span>Što konkretno kupiti</span>
-              <p>Otvaraj detalje samo za proizvode koje želiš promijeniti ili provjeriti u trgovini.</p>
+              <span>Proizvodi u ovom planu</span>
+              <p>Ovdje su konkretne stvari koje dobivaš. Zamjene otvori samo ako ti nešto ne odgovara.</p>
             </div>
             {steps.map((step) => (
               <section className="step-product-section" key={step.priority}>
@@ -483,8 +523,17 @@ export function PlanResults({
                           <div className="replacement-menu" aria-label="Odaberi što želiš promijeniti">
                             <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>Nađi jeftinije</button>
                             <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>Nađi ljepše</button>
-                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')}>Ne sviđa mi se</button>
+                            <button type="button" onClick={() => setDislikeProductId(dislikeProductId === product.id ? null : product.id)}>Ne sviđa mi se</button>
                             <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>Ne treba mi ovo</button>
+                            {dislikeProductId === product.id && (
+                              <div className="dislike-reasons">
+                                <span>Što ne odgovara?</span>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>Preskupo je</button>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>Želim ljepši stil</button>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')}>Pokaži drugu opciju</button>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>Ne treba mi ta stvar</button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
