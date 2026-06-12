@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode, type SyntheticEvent } from 'react';
 import type {
   FurnishingPlan,
   PlanFeedback,
@@ -95,6 +95,21 @@ const CORE_BY_ROOM: Record<RoomType, ProductCategory[]> = {
   'home-office': ['desk', 'chair'],
   bedroom: ['bed', 'mattress'],
   'home-gym': ['gym-equipment']
+};
+
+const FALLBACK_IMAGES: Record<ProductCategory, string> = {
+  sofa: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80',
+  chair: 'https://images.unsplash.com/photo-1589384267710-7a25bc5ca5f3?auto=format&fit=crop&w=900&q=80',
+  table: 'https://images.unsplash.com/photo-1532372320572-cda25653a694?auto=format&fit=crop&w=900&q=80',
+  'tv-unit': 'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=900&q=80',
+  storage: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80',
+  rug: 'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80',
+  lighting: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80',
+  decor: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=900&q=80',
+  desk: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80',
+  bed: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
+  mattress: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80',
+  'gym-equipment': 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80'
 };
 
 function priorityForItem(item: PlanItem, roomType: RoomType): ShoppingPriority {
@@ -201,7 +216,14 @@ function shortBudgetText(plan: FurnishingPlan, input: PlannerInput) {
 
 
 function productImage(product: Product) {
-  return product.imageUrl || product.image || '';
+  return product.imageUrl || product.image || FALLBACK_IMAGES[product.category];
+}
+
+function handleProductImageError(event: SyntheticEvent<HTMLImageElement>, category: ProductCategory) {
+  const fallback = FALLBACK_IMAGES[category];
+  if (event.currentTarget.src !== fallback) {
+    event.currentTarget.src = fallback;
+  }
 }
 
 function productUrl(product: Product) {
@@ -215,6 +237,18 @@ function availabilityLabel(product: Product) {
   if (status === 'limited') return 'Provjeri dostupnost';
   if (status === 'unavailable') return 'Trenutno nedostupno';
   return 'Provjeri u trgovini';
+}
+
+function priceTierLabel(product: Product) {
+  const tier = product.priceTier;
+  if (tier === 'budget') return 'Povoljnija opcija';
+  if (tier === 'premium') return 'Jača opcija';
+  return 'Standardna opcija';
+}
+
+function productCheckLabel(product: Product) {
+  if (!product.lastCheckedAt) return 'Provjeri cijenu prije kupnje';
+  return 'Cijenu provjeri u trgovini';
 }
 
 function storeCountText(count: number) {
@@ -503,7 +537,7 @@ export function PlanResults({
           <div className="items-list step-items-list">
             <div className="result-section-heading">
               <span>Proizvodi u ovom planu</span>
-              <p>Ovdje su konkretne stvari koje dobivaš. Zamjene otvori samo ako ti nešto ne odgovara.</p>
+              <p>Prvo vidiš konkretne proizvode. Zamjene otvori samo ako ti nešto ne odgovara.</p>
             </div>
             {steps.map((step) => (
               <section className="step-product-section" key={step.priority}>
@@ -519,7 +553,7 @@ export function PlanResults({
                   const openUrl = productUrl(product);
                   return (
                     <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
-                      <img src={productImage(product)} alt="" loading="lazy" />
+                      <img src={productImage(product)} alt="" loading="lazy" onError={(event) => handleProductImageError(event, product.category)} />
                       <div className="product-info">
                         <div className="product-title-line">
                           <strong>{product.name}</strong>
@@ -532,6 +566,7 @@ export function PlanResults({
                           {product.originalPrice && <span>Akcija</span>}
                           {locked && <span>Zadržano</span>}
                         </div>
+                        <small className="product-shop-note">{priceTierLabel(product)} · {productCheckLabel(product)}</small>
                         {product.deliveryNote && <small className="product-delivery-note">{product.deliveryNote}</small>}
                         <div className="product-reason-box compact-reason-box">
                           <span>{item.shoppingRole || 'Zašto ovo?'}</span>
@@ -544,7 +579,7 @@ export function PlanResults({
                             </a>
                           ) : (
                             <button type="button" disabled title="Link će biti dostupan kad spojimo trgovinu">
-                              Link uskoro
+                              Link će biti dostupan
                             </button>
                           )}
                           <button type="button" onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>

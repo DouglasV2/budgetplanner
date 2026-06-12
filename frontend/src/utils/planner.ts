@@ -65,34 +65,21 @@ export function getRetailerBreakdown(plan: FurnishingPlan) {
 }
 
 export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) {
-  const breakdown = getRetailerBreakdown(plan)
-    .map((entry) => `${entry.retailer}: ${formatCurrency(entry.total)} (${entry.count} proizvoda)`)
-    .join(' | ');
-  const byPriority = (priority: string) => plan.items.filter((item) => item.shoppingPriority === priority);
-  const formatItems = (items: typeof plan.items) => items.map((item) => `- ${item.product.name} — ${item.product.retailer} — ${formatCurrency(item.product.price)}`);
-  const favoriteFirst = byPriority('buy-first');
-  const comfort = byPriority('add-comfort');
-  const later = byPriority('later');
-  const uncategorized = plan.items.filter((item) => !item.shoppingPriority);
+  const storeSections = getRetailerBreakdown(plan).flatMap((entry) => [
+    `${entry.retailer} — ${entry.count} ${entry.count === 1 ? 'stvar' : 'stvari'} — ${formatCurrency(entry.total)}`,
+    ...entry.items.map((item) => `- ${item.product.name} — ${formatCurrency(item.product.price)} (${shoppingPriorityLabels[item.shoppingPriority ?? 'later']})`),
+    ''
+  ]);
 
   return [
     `Moj BudgetSpace plan: ${roomLabels[input.roomType]}`,
     `Budžet: ${formatCurrency(input.budget)}`,
     `Ukupno: ${formatCurrency(plan.total)}${plan.total <= input.budget ? ` · ostaje ${formatCurrency(input.budget - plan.total)}` : ` · ${formatCurrency(plan.total - input.budget)} iznad budžeta`}`,
     `Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
-    breakdown ? `Po trgovinama: ${breakdown}` : '',
     plan.advisorNote ? `Kratko: ${plan.advisorNote}` : '',
     '',
-    favoriteFirst.length ? 'NAJVAŽNIJE ZA PLAN' : '',
-    ...formatItems(favoriteFirst),
-    comfort.length ? '' : '',
-    comfort.length ? 'ZA UGODNIJI PROSTOR' : '',
-    ...formatItems(comfort),
-    later.length ? '' : '',
-    later.length ? 'MOŽE KASNIJE' : '',
-    ...formatItems(later),
-    uncategorized.length ? '' : '',
-    ...formatItems(uncategorized)
+    'POPIS PO TRGOVINAMA',
+    ...storeSections
   ].filter(Boolean).join('\n');
 }
 

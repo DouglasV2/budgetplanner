@@ -250,7 +250,7 @@ public class PlannerService {
         List<String> allowedRetailers = selectedRetailers(input);
         double currentPrice = current.price().doubleValue();
         double safeLimit = Math.max(remainingBudget, currentPrice);
-        double stretchLimit = Math.max(remainingBudget, input.budget() * 0.45);
+        double stretchLimit = Math.max(remainingBudget, Math.min(input.budget() * 0.45, currentPrice * 1.25));
 
         return productRepository.findAll().stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(current.category()))
@@ -260,7 +260,7 @@ public class PlannerService {
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
                 .filter(product -> replacementFits(product, changeType, currentPrice, safeLimit, stretchLimit))
                 .max(Comparator.comparingDouble(product -> scoreReplacement(product, current, input, mode, changeType, currentRetailers)))
-                .orElseGet(() -> pickBest(current.category(), input, safeLimit, mode, blockedIds, currentRetailers));
+                .orElse(null);
     }
 
     private boolean replacementFits(Product product, String changeType, double currentPrice, double safeLimit, double stretchLimit) {
@@ -290,8 +290,8 @@ public class PlannerService {
 
     private String replacementPrefix(String changeType, String oldName) {
         return switch (changeType) {
-            case "cheaper" -> "Jeftinija zamjena za " + oldName + ": ";
-            case "nicer" -> "Ljepša zamjena za " + oldName + ": ";
+            case "cheaper" -> "Povoljnija opcija umjesto " + oldName + ": ";
+            case "nicer" -> "Ljepša opcija umjesto " + oldName + ": ";
             case "different" -> "Druga opcija umjesto " + oldName + ": ";
             default -> "Zamjena za " + oldName + ": ";
         };
@@ -309,31 +309,32 @@ public class PlannerService {
     }
 
     private FurnishingPlanDto calculatePlan(String id, String name, String label, String description, PlannerInputDto input, List<PlanItemDto> items) {
-        double total = items.stream().mapToDouble(item -> item.product().price().doubleValue()).sum();
-        List<String> retailersUsed = items.stream()
+        List<PlanItemDto> cleanItems = cleanPlanItems(input, items);
+        double total = cleanItems.stream().mapToDouble(item -> item.product().price().doubleValue()).sum();
+        List<String> retailersUsed = cleanItems.stream()
                 .map(item -> item.product().retailer())
                 .distinct()
                 .toList();
-        long styleMatches = items.stream().filter(item -> productStyleMatches(item.product().styleTags(), input.style())).count();
-        int styleConsistency = items.isEmpty() ? 0 : Math.min(99, (int) Math.round(((double) styleMatches / items.size()) * 100 + 8));
+        long styleMatches = cleanItems.stream().filter(item -> productStyleMatches(item.product().styleTags(), input.style())).count();
+        int styleConsistency = cleanItems.isEmpty() ? 0 : Math.min(99, (int) Math.round(((double) styleMatches / cleanItems.size()) * 100 + 8));
         String shoppingEffort = retailersUsed.size() <= 1 ? "Low" : retailersUsed.size() <= 3 ? "Medium" : "High";
         int budgetFit = total <= input.budget() ? 8 : -6;
-        int fitScore = Math.min(98, Math.max(48, (int) Math.round(62 + items.size() * 4 + styleConsistency / 6.0 + budgetFit)));
+        int fitScore = Math.min(98, Math.max(48, (int) Math.round(62 + cleanItems.size() * 4 + styleConsistency / 6.0 + budgetFit)));
 
         return new FurnishingPlanDto(
                 id,
                 name,
                 label,
                 description,
-                buildSummary(id, input, items, total, retailersUsed),
+                buildSummary(id, input, cleanItems, total, retailersUsed),
                 buildGoodFor(id, input),
                 buildTradeoff(id, input, total, retailersUsed),
                 buildBudgetStatus(input, total),
-                buildAdvisorNote(id, input, items, total, retailersUsed),
-                buildNextStep(input, items, total),
-                buildSavingTips(input, items, total),
-                buildUpgradeTips(input, items, total),
-                items,
+                buildAdvisorNote(id, input, cleanItems, total, retailersUsed),
+                buildNextStep(input, cleanItems, total),
+                buildSavingTips(input, cleanItems, total),
+                buildUpgradeTips(input, cleanItems, total),
+                cleanItems,
                 money(total),
                 money(Math.max(0, input.budget() - total)),
                 fitScore,
@@ -364,6 +365,35 @@ public class PlannerService {
                 item.shoppingRole() == null ? roleForCategory(input.roomType(), category) : item.shoppingRole(),
                 item.stepTitle() == null ? stepForCategory(input.roomType(), category) : item.stepTitle()
         );
+    }
+
+    private List<PlanItemDto> cleanPlanItems(PlannerInputDto input, List<PlanItemDto> items) {
+        Set<String> lockedIds = new LinkedHashSet<>(input.lockedProductIds());
+        Set<String> alreadyHave = new LinkedHashSet<>(input.alreadyHaveCategories());
+        LinkedHashMap<String, PlanItemDto> byCategory = new LinkedHashMap<>();
+
+        for (PlanItemDto rawItem : orderItemsForShopping(input, items)) {
+            PlanItemDto item = enrichExistingItem(rawItem, input);
+            String category = item.product().category();
+            boolean locked = lockedIds.contains(item.product().id());
+
+            if (alreadyHave.contains(category) && !locked) {
+                continue;
+            }
+
+            PlanItemDto existing = byCategory.get(category);
+            if (existing == null) {
+                byCategory.put(category, item);
+                continue;
+            }
+
+            boolean existingLocked = lockedIds.contains(existing.product().id());
+            if (!existingLocked && locked) {
+                byCategory.put(category, item);
+            }
+        }
+
+        return orderItemsForShopping(input, new ArrayList<>(byCategory.values()));
     }
 
     private List<PlanItemDto> orderItemsForShopping(PlannerInputDto input, List<PlanItemDto> items) {
@@ -440,9 +470,9 @@ public class PlannerService {
             return "Stane u budžet — plan je siguran, ali nema puno prostora za veće promjene.";
         }
         if (difference <= input.budget() * 0.08) {
-            return "Na rubu budžeta — izvedivo je, ali jednu stvar možeš pomaknuti za kasnije.";
+            return "Malo prelazi budžet za " + money(difference) + " — blizu je, ali jedna stvar može pričekati.";
         }
-        return "Prelazi budžet — prvo bih maknuo detalje ili potražio jeftiniju zamjenu za skuplji komad.";
+        return "Prelazi budžet za " + money(difference) + " — prvo bih maknuo detalje ili potražio povoljniju opciju za skuplji komad.";
     }
 
     private String buildAdvisorNote(String mode, PlannerInputDto input, List<PlanItemDto> items, double total, List<String> retailersUsed) {
@@ -469,11 +499,11 @@ public class PlannerService {
                 .filter(item -> "buy-first".equals(priorityForCategory(input.roomType(), item.product().category())))
                 .findFirst();
         if (total > input.budget()) {
-            return "Prvo klikni ‘Nađi jeftinije’ na skupljim stvarima ili makni detalje koji mogu čekati.";
+            return "Najlakše je probati povoljniju opciju na skupljim stvarima ili ostaviti detalje za kasnije.";
         }
         return first
-                .map(item -> "Prvo provjeri dimenzije i dostupnost za: " + item.product().name() + ".")
-                .orElse("Prvo provjeri dimenzije prostora, pa tek onda kupuj sitnice.");
+                .map(item -> "Za početak provjeri dimenzije i dostupnost za: " + item.product().name() + ".")
+                .orElse("Prije sitnica vrijedi provjeriti dimenzije prostora.");
     }
 
     private List<String> buildSavingTips(PlannerInputDto input, List<PlanItemDto> items, double total) {

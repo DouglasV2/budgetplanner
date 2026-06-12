@@ -2927,6 +2927,7 @@ textarea {
 }
 
 .already-have-text-input span,
+.product-shop-note,
 .product-delivery-note,
 .shopping-list-head small {
   color: var(--muted);
@@ -2944,9 +2945,15 @@ textarea {
   line-height: 1.45;
 }
 
+.product-shop-note,
 .product-delivery-note {
   display: block;
   margin-top: -2px;
+}
+
+.product-shop-note {
+  margin-top: 2px;
+  font-weight: 800;
 }
 
 .product-actions button:disabled {
