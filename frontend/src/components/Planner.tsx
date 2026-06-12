@@ -15,6 +15,7 @@ const initialInput: PlannerInput = {
   retailerMode: 'multi',
   selectedRetailers: ['IKEA', 'JYSK', 'Pevex'],
   optimizationGoal: 'best-value',
+  furnishingLevel: 'comfort',
   mustHaveCategories: [],
   alreadyHaveCategories: [],
   lockedProductIds: []
@@ -135,6 +136,7 @@ export function Planner() {
       nextInput = {
         ...nextInput,
         optimizationGoal: 'lowest-price' as OptimizationGoal,
+        furnishingLevel: 'basic',
         prompt: `${nextInput.prompt}\n\nSloži jeftiniju verziju i čuvaj budžet.`
       };
     }
@@ -143,6 +145,7 @@ export function Planner() {
       nextInput = {
         ...nextInput,
         optimizationGoal: 'style-match' as OptimizationGoal,
+        furnishingLevel: 'complete',
         prompt: `${nextInput.prompt}\n\nSloži ljepšu i skladniju verziju.`
       };
     }

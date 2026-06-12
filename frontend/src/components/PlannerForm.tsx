@@ -1,4 +1,4 @@
-import type { OptimizationGoal, PlannerInput, ProductCategory, Retailer, RoomType, StyleType } from '../types';
+import type { FurnishingLevel, OptimizationGoal, PlannerInput, ProductCategory, Retailer, RoomType, StyleType } from '../types';
 import { categoryLabels, formatCurrency, retailers } from '../utils/planner';
 
 interface PlannerFormProps {
@@ -24,6 +24,12 @@ const styles: Array<{ value: StyleType; label: string; hint: string }> = [
   { value: 'classic', label: 'Klasično', hint: 'sigurno i dugoročno' },
   { value: 'industrial', label: 'Tamno / industrijski', hint: 'crni metal, drvo, jači kontrast' },
   { value: 'boho', label: 'Boho / prirodno', hint: 'drvo, tepisi, biljke, opušteno' }
+];
+
+const furnishingLevels: Array<{ value: FurnishingLevel; label: string; description: string }> = [
+  { value: 'basic', label: 'Osnovno', description: 'prvo najvažniji komadi' },
+  { value: 'comfort', label: 'Udobnije', description: 'baza + stvari koje čine prostor ugodnijim' },
+  { value: 'complete', label: 'Kompletno', description: 'dodaj i detalje ako budžet drži' }
 ];
 
 const optimizationGoals: Array<{ value: OptimizationGoal; label: string; description: string }> = [
@@ -69,6 +75,7 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
       size: 20,
       selectedRetailers: ['IKEA', 'JYSK'],
       retailerMode: 'multi',
+      furnishingLevel: 'comfort',
       mustHaveCategories: ['sofa', 'tv-unit', 'table', 'rug', 'lighting'],
       alreadyHaveCategories: []
     }
@@ -84,6 +91,7 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
       size: 12,
       selectedRetailers: ['IKEA', 'JYSK', 'Pevex'],
       retailerMode: 'multi',
+      furnishingLevel: 'comfort',
       mustHaveCategories: ['desk', 'chair', 'storage', 'lighting'],
       alreadyHaveCategories: []
     }
@@ -99,6 +107,7 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
       size: 16,
       selectedRetailers: ['Decathlon', 'Pevex'],
       retailerMode: 'multi',
+      furnishingLevel: 'basic',
       mustHaveCategories: ['gym-equipment', 'storage', 'lighting'],
       alreadyHaveCategories: []
     }
@@ -115,6 +124,7 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
       selectedRetailers: ['IKEA'],
       retailerMode: 'single',
       optimizationGoal: 'least-stores',
+      furnishingLevel: 'complete',
       mustHaveCategories: ['sofa', 'tv-unit', 'table', 'rug', 'lighting'],
       alreadyHaveCategories: []
     }
@@ -269,6 +279,23 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
               onChange={(event) => onChange({ ...input, size: Number(event.target.value || 0) })}
             />
           </label>
+        </div>
+
+        <div className="control-block">
+          <span className="friendly-label">Koliko kompletno želiš opremiti?</span>
+          <div className="furnishing-level-grid" role="group" aria-label="Razina opremanja">
+            {furnishingLevels.map((level) => (
+              <button
+                type="button"
+                key={level.value}
+                className={input.furnishingLevel === level.value ? 'level-card active' : 'level-card'}
+                onClick={() => onChange({ ...input, furnishingLevel: level.value })}
+              >
+                <strong>{level.label}</strong>
+                <span>{level.description}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="form-row compact-row">

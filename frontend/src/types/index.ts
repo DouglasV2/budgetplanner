@@ -18,6 +18,10 @@ export type RetailerMode = 'single' | 'multi';
 
 export type OptimizationGoal = 'lowest-price' | 'best-value' | 'least-stores' | 'style-match';
 
+export type FurnishingLevel = 'basic' | 'comfort' | 'complete';
+
+export type ShoppingPriority = 'buy-first' | 'add-comfort' | 'later';
+
 export type ProductCategory =
   | 'sofa'
   | 'chair'
@@ -58,6 +62,7 @@ export interface PlannerInput {
   retailerMode: RetailerMode;
   selectedRetailers: Retailer[];
   optimizationGoal: OptimizationGoal;
+  furnishingLevel: FurnishingLevel;
   mustHaveCategories: ProductCategory[];
   alreadyHaveCategories: ProductCategory[];
   lockedProductIds: string[];
@@ -66,6 +71,9 @@ export interface PlannerInput {
 export interface PlanItem {
   product: Product;
   reason: string;
+  shoppingPriority?: ShoppingPriority;
+  shoppingRole?: string;
+  stepTitle?: string;
 }
 
 export interface FurnishingPlan {

@@ -15,12 +15,24 @@ import java.util.stream.Collectors;
 @Service
 public class PlannerService {
     private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon");
-    private static final Map<String, List<String>> ESSENTIALS_BY_ROOM = Map.of(
-            "living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting"),
-            "home-office", List.of("desk", "chair", "storage", "lighting"),
-            "bedroom", List.of("bed", "mattress", "rug", "lighting", "storage"),
-            "home-gym", List.of("gym-equipment", "storage", "lighting")
+
+    private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.of(
+            "living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor"),
+            "home-office", List.of("desk", "chair", "storage", "lighting", "decor"),
+            "bedroom", List.of("bed", "mattress", "storage", "lighting", "rug", "decor"),
+            "home-gym", List.of("gym-equipment", "storage", "lighting", "decor")
     );
+
+    private static final Map<String, Set<String>> CORE_CATEGORIES_BY_ROOM = Map.of(
+            "living-room", Set.of("sofa", "tv-unit", "table"),
+            "home-office", Set.of("desk", "chair"),
+            "bedroom", Set.of("bed", "mattress"),
+            "home-gym", Set.of("gym-equipment")
+    );
+
+    private static final Set<String> COMFORT_CATEGORIES = Set.of("rug", "lighting", "storage");
+    private static final Set<String> DETAIL_CATEGORIES = Set.of("decor");
+
     private static final Map<String, String> ROOM_LABELS = Map.of(
             "living-room", "dnevni boravak",
             "home-office", "radni kutak",
@@ -88,11 +100,11 @@ public class PlannerService {
 
         List<PlanItemDto> nextItems = plan.items().stream()
                 .map(item -> item.product().id().equals(request.productId())
-                        ? new PlanItemDto(ProductDto.from(alternative), "Zamjena za " + item.product().name() + ": " + buildReason(alternative, input, mode))
-                        : item)
+                        ? createPlanItem(alternative, input, mode, "Zamjena za " + item.product().name() + ": ")
+                        : enrichExistingItem(item, input))
                 .toList();
 
-        return recalculate(plan, input, nextItems);
+        return recalculate(plan, input, orderItemsForShopping(input, nextItems));
     }
 
     private FurnishingPlanDto buildPlan(PlannerInputDto input, String mode) {
@@ -110,11 +122,12 @@ public class PlannerService {
 
         Set<String> lockedIds = new LinkedHashSet<>(input.lockedProductIds());
         if (!lockedIds.isEmpty()) {
+            List<String> lockedOrder = new ArrayList<>(lockedIds);
             List<Product> lockedProducts = productRepository.findAll().stream()
                     .filter(product -> lockedIds.contains(product.getId()))
                     .filter(Product::isInStock)
                     .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
-                    .sorted(Comparator.comparingInt(product -> new ArrayList<>(lockedIds).indexOf(product.getId())))
+                    .sorted(Comparator.comparingInt(product -> lockedOrder.indexOf(product.getId())))
                     .toList();
 
             for (Product lockedProduct : lockedProducts) {
@@ -123,7 +136,13 @@ public class PlannerService {
                 currentRetailers.add(lockedProduct.getRetailer());
                 total += lockedProduct.getPrice().doubleValue();
                 categories.removeIf(category -> category.equalsIgnoreCase(lockedProduct.getCategory()));
-                items.add(new PlanItemDto(ProductDto.from(lockedProduct), "Zadržano iz prethodnog plana — ovaj proizvod ostaje, a ostatak plana slažemo oko njega."));
+                items.add(new PlanItemDto(
+                        ProductDto.from(lockedProduct),
+                        "Zadržano iz prethodnog plana — ovaj proizvod ostaje, a ostatak plana slažemo oko njega.",
+                        priorityForCategory(input.roomType(), lockedProduct.getCategory()),
+                        roleForCategory(input.roomType(), lockedProduct.getCategory()),
+                        stepForCategory(input.roomType(), lockedProduct.getCategory())
+                ));
             }
         }
 
@@ -135,7 +154,7 @@ public class PlannerService {
             picked.add(product.getId());
             currentRetailers.add(product.getRetailer());
             total += product.getPrice().doubleValue();
-            items.add(new PlanItemDto(ProductDto.from(product), buildReason(product, input, mode)));
+            items.add(createPlanItem(product, input, mode, ""));
         }
 
         String label = switch (mode) {
@@ -149,18 +168,23 @@ public class PlannerService {
             default -> "Najjeftinije";
         };
 
-        return calculatePlan(mode, name, label, describePlan(mode, input, total, currentRetailers), input, items);
+        return calculatePlan(mode, name, label, describePlan(mode, input, total, currentRetailers), input, orderItemsForShopping(input, items));
     }
 
     private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers) {
         List<String> allowedRetailers = selectedRetailers(input);
+        boolean coreCategory = isCoreCategory(input.roomType(), category);
+        double realisticLimit = coreCategory && !mode.equals("budget")
+                ? Math.max(remainingBudget, input.budget() * 0.28)
+                : remainingBudget;
+
         return productRepository.findAll().stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
                 .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
                 .filter(Product::isInStock)
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
-                .filter(product -> product.getPrice().doubleValue() <= remainingBudget || mode.equals("stretch"))
+                .filter(product -> product.getPrice().doubleValue() <= realisticLimit || mode.equals("stretch"))
                 .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers)))
                 .orElse(null);
     }
@@ -187,8 +211,9 @@ public class PlannerService {
                 : 0;
         double stylePriorityBonus = input.optimizationGoal().equals("style-match") && styleMatches(product, input.style()) ? 20 : 0;
         double singleStoreBonus = input.retailerMode().equals("single") ? 8 : 0;
+        double coreBonus = isCoreCategory(input.roomType(), product.getCategory()) ? 12 : 0;
 
-        return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias + leastStoresBonus + stylePriorityBonus + singleStoreBonus;
+        return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus;
     }
 
     private FurnishingPlanDto recalculate(FurnishingPlanDto originalPlan, PlannerInputDto input, List<PlanItemDto> items) {
@@ -232,6 +257,38 @@ public class PlannerService {
         );
     }
 
+    private PlanItemDto createPlanItem(Product product, PlannerInputDto input, String mode, String prefix) {
+        String category = product.getCategory();
+        return new PlanItemDto(
+                ProductDto.from(product),
+                prefix + buildReason(product, input, mode),
+                priorityForCategory(input.roomType(), category),
+                roleForCategory(input.roomType(), category),
+                stepForCategory(input.roomType(), category)
+        );
+    }
+
+    private PlanItemDto enrichExistingItem(PlanItemDto item, PlannerInputDto input) {
+        if (item.shoppingPriority() != null && item.shoppingRole() != null && item.stepTitle() != null) return item;
+        String category = item.product().category();
+        return new PlanItemDto(
+                item.product(),
+                item.reason(),
+                item.shoppingPriority() == null ? priorityForCategory(input.roomType(), category) : item.shoppingPriority(),
+                item.shoppingRole() == null ? roleForCategory(input.roomType(), category) : item.shoppingRole(),
+                item.stepTitle() == null ? stepForCategory(input.roomType(), category) : item.stepTitle()
+        );
+    }
+
+    private List<PlanItemDto> orderItemsForShopping(PlannerInputDto input, List<PlanItemDto> items) {
+        return items.stream()
+                .map(item -> enrichExistingItem(item, input))
+                .sorted(Comparator
+                        .comparingInt((PlanItemDto item) -> categoryOrder(input.roomType(), item.product().category()))
+                        .thenComparing(item -> item.product().price(), Comparator.reverseOrder()))
+                .toList();
+    }
+
     private String buildReason(Product product, PlannerInputDto input, String mode) {
         String styleMatch = styleMatches(product, input.style())
                 ? "izgledom ide uz ono što si tražio"
@@ -241,12 +298,14 @@ public class PlannerService {
                 : mode.equals("value")
                 ? "daje dobar omjer cijene, izgleda i korisnosti"
                 : "podiže finalni dojam prostora";
-        String categoryNote = mainPieceCategories().contains(product.getCategory())
-                ? "Ovo je jedan od glavnih komada pa ima smisla da ovdje ode veći dio novca."
-                : "Dobar je dodatak jer za manji iznos čini prostor dovršenijim.";
-        return categoryNote + " " + styleMatch + " i " + priceNote + ". " + product.getNote();
+        String categoryNote = roleForCategory(input.roomType(), product.getCategory()) + ".";
+        String stepNote = switch (priorityForCategory(input.roomType(), product.getCategory())) {
+            case "buy-first" -> "Zato ga je pametno riješiti prije sitnica.";
+            case "add-comfort" -> "Dodaje udobnost i pomaže da prostor ne izgleda prazno.";
+            default -> "Može i kasnije ako želiš prvo čuvati budžet.";
+        };
+        return categoryNote + " " + stepNote + " " + styleMatch + " i " + priceNote + ". " + product.getNote();
     }
-
 
     private String buildSummary(String mode, PlannerInputDto input, List<PlanItemDto> items, double total, List<String> retailersUsed) {
         String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
@@ -259,26 +318,30 @@ public class PlannerService {
                 ? "ostaje unutar budžeta"
                 : "prelazi budžet za " + money(total - input.budget());
         String stores = retailersUsed.size() <= 1 ? "iz jedne trgovine" : "iz " + retailersUsed.size() + " trgovine";
+        String levelText = furnishingLevelText(input.furnishingLevel());
         return switch (mode) {
-            case "stretch" -> "Za " + room + " smo složili ljepšu verziju " + stores + ": " + categories + ". Plan " + budgetText + ", ali daje dovršeniji izgled.";
-            case "value" -> "Za " + room + " smo složili uravnotežen plan " + stores + ": " + categories + ". Plan " + budgetText + " i pokušava izbjeći nepotrebno skupe komade.";
-            default -> "Za " + room + " smo složili najpovoljniju razumnu bazu " + stores + ": " + categories + ". Plan " + budgetText + ".";
+            case "stretch" -> "Za " + room + " smo složili ljepšu verziju " + stores + ": " + categories + ". Plan " + budgetText + " i pokušava dovesti prostor bliže razini: " + levelText + ".";
+            case "value" -> "Za " + room + " smo složili uravnotežen plan " + stores + ": " + categories + ". Plan " + budgetText + " i novac prvo usmjerava na stvari koje nose prostor.";
+            default -> "Za " + room + " smo složili najpovoljniju razumnu bazu " + stores + ": " + categories + ". Plan " + budgetText + " i namjerno preskače manje važne detalje.";
         };
     }
 
     private String buildGoodFor(String mode, PlannerInputDto input) {
         return switch (mode) {
             case "stretch" -> "Dobro ako želiš da prostor odmah izgleda dovršenije i spreman si dodati malo novca za bolji dojam.";
-            case "value" -> "Dobro za većinu ljudi: ne ide na najjeftinije po svaku cijenu, ali pazi da novac ode na važne komade.";
+            case "value" -> "Dobro za većinu ljudi: prvo pokriva glavne komade, zatim dodaje udobnost tek kad budžet to dopušta.";
             default -> "Dobro ako se useljavaš, imaš ograničen budžet ili želiš prvo kupiti osnovne stvari pa kasnije nadograditi.";
         };
     }
 
     private String buildTradeoff(String mode, PlannerInputDto input, double total, List<String> retailersUsed) {
         String storeWarning = retailersUsed.size() > 2 ? " Ima više trgovina, pa će kupnja tražiti malo više organizacije." : "";
+        String levelWarning = "complete".equals(input.furnishingLevel()) && total <= input.budget()
+                ? " Ako želiš baš kompletan izgled, možda će još trebati sitnice koje mock katalog trenutno nema."
+                : "";
         return switch (mode) {
-            case "stretch" -> "Može prijeći budžet jer daje prednost boljem izgledu i potpunijem prostoru." + storeWarning;
-            case "value" -> "Neki proizvodi neće biti najjeftiniji, ali su odabrani jer bolje nose cijeli prostor." + storeWarning;
+            case "stretch" -> "Može prijeći budžet jer daje prednost boljem izgledu i potpunijem prostoru." + storeWarning + levelWarning;
+            case "value" -> "Neki proizvodi neće biti najjeftiniji, ali su odabrani jer bolje nose cijeli prostor." + storeWarning + levelWarning;
             default -> "Može izgledati jednostavnije jer izbacuje skuplje detalje i dekoracije da bi ostao povoljan." + storeWarning;
         };
     }
@@ -301,29 +364,76 @@ public class PlannerService {
         };
     }
 
-    private Set<String> mainPieceCategories() {
-        return Set.of("sofa", "bed", "mattress", "desk", "chair", "gym-equipment", "tv-unit");
-    }
-
     private String describePlan(String mode, PlannerInputDto input, double total, Set<String> retailersUsed) {
         String storeText = retailersUsed.size() == 1
                 ? "sve iz " + retailersUsed.iterator().next()
                 : "kombinacija: " + String.join(", ", retailersUsed);
         String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
+        String level = furnishingLevelText(input.furnishingLevel());
 
         return switch (mode) {
-            case "stretch" -> "Ova verzija bira malo ljepše i kompletnije komade, čak i ako treba rastegnuti budžet. " + storeText + ".";
-            case "value" -> "Ovo je najuravnoteženija verzija za " + input.size() + " m²: dobra baza, usklađen izgled i razuman trošak. " + storeText + ".";
-            default -> "Ova verzija prvo čuva budžet za " + room + " u " + input.location() + ", ali i dalje pokriva osnovne stvari. " + storeText + ".";
+            case "stretch" -> "Ova verzija bira malo ljepše i kompletnije komade za razinu: " + level + ". " + storeText + ".";
+            case "value" -> "Ovo je najuravnoteženija verzija za " + input.size() + " m²: prvo glavni komadi, zatim udobnost, pa detalji ako stanu. " + storeText + ".";
+            default -> "Ova verzija prvo čuva budžet za " + room + " u " + input.location() + ", pa kupnju slaže redom važnosti. " + storeText + ".";
         };
     }
 
     private List<String> desiredCategories(PlannerInputDto input) {
         LinkedHashSet<String> categories = new LinkedHashSet<>();
-        categories.addAll(ESSENTIALS_BY_ROOM.getOrDefault(input.roomType(), ESSENTIALS_BY_ROOM.get("living-room")));
+        List<String> roomFlow = CATEGORY_FLOW_BY_ROOM.getOrDefault(input.roomType(), CATEGORY_FLOW_BY_ROOM.get("living-room"));
+        Set<String> core = CORE_CATEGORIES_BY_ROOM.getOrDefault(input.roomType(), CORE_CATEGORIES_BY_ROOM.get("living-room"));
+        String level = input.furnishingLevel() == null ? "comfort" : input.furnishingLevel();
+
+        for (String category : roomFlow) {
+            boolean include = core.contains(category)
+                    || (COMFORT_CATEGORIES.contains(category) && (level.equals("comfort") || level.equals("complete")))
+                    || (DETAIL_CATEGORIES.contains(category) && level.equals("complete"));
+            if (include) categories.add(category);
+        }
+
         categories.addAll(input.mustHaveCategories());
         categories.removeAll(input.alreadyHaveCategories());
-        return new ArrayList<>(categories);
+        return categories.stream()
+                .sorted(Comparator.comparingInt(category -> categoryOrder(input.roomType(), category)))
+                .toList();
+    }
+
+    private int categoryOrder(String roomType, String category) {
+        List<String> roomFlow = CATEGORY_FLOW_BY_ROOM.getOrDefault(roomType, CATEGORY_FLOW_BY_ROOM.get("living-room"));
+        int index = roomFlow.indexOf(category);
+        return index >= 0 ? index : 99;
+    }
+
+    private boolean isCoreCategory(String roomType, String category) {
+        return CORE_CATEGORIES_BY_ROOM.getOrDefault(roomType, Set.of()).contains(category);
+    }
+
+    private String priorityForCategory(String roomType, String category) {
+        if (isCoreCategory(roomType, category)) return "buy-first";
+        if (COMFORT_CATEGORIES.contains(category)) return "add-comfort";
+        return "later";
+    }
+
+    private String roleForCategory(String roomType, String category) {
+        if (isCoreCategory(roomType, category)) return "Ovo je glavni komad";
+        if (COMFORT_CATEGORIES.contains(category)) return "Ovo zaokružuje prostor";
+        return "Ovo je detalj za kasnije";
+    }
+
+    private String stepForCategory(String roomType, String category) {
+        return switch (priorityForCategory(roomType, category)) {
+            case "buy-first" -> "1. Kupi osnovne komade";
+            case "add-comfort" -> "2. Dodaj udobnost";
+            default -> "3. Dodaj detalje ako ostane budžeta";
+        };
+    }
+
+    private String furnishingLevelText(String level) {
+        return switch (level == null ? "comfort" : level) {
+            case "basic" -> "osnovno";
+            case "complete" -> "kompletno";
+            default -> "udobnije";
+        };
     }
 
     private List<String> selectedRetailers(PlannerInputDto input) {
@@ -333,7 +443,7 @@ public class PlannerService {
     }
 
     private PlannerInputDto normalizePrompt(PlannerInputDto rawInput) {
-        PlannerInputDto input = rawInput == null ? new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi", List.of("IKEA", "JYSK", "Pevex"), "best-value", List.of(), List.of(), List.of()) : rawInput.normalized();
+        PlannerInputDto input = rawInput == null ? new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi", List.of("IKEA", "JYSK", "Pevex"), "best-value", "comfort", List.of(), List.of(), List.of()) : rawInput.normalized();
         String text = normalize(input.prompt());
         if (text.isBlank()) return input;
 
@@ -356,6 +466,10 @@ public class PlannerService {
         if (matches(text, "classic|klasic|klasič")) input = input.withStyle("classic");
         if (matches(text, "industrial|industrij|tamno|crno|metal")) input = input.withStyle("industrial");
         if (matches(text, "boho|prirodn|biljk|ratan")) input = input.withStyle("boho");
+
+        if (matches(text, "osnovno|samo osnov|minimalno oprem")) input = input.withFurnishingLevel("basic");
+        if (matches(text, "udobnij|normalno|dovoljno komplet")) input = input.withFurnishingLevel("comfort");
+        if (matches(text, "kompletno|sve oprem|dovrsen|dovršen|odmah gotovo")) input = input.withFurnishingLevel("complete");
 
         List<String> mentionedRetailers = RETAILERS.stream()
                 .filter(retailer -> text.contains(normalize(retailer)))
@@ -426,7 +540,6 @@ public class PlannerService {
                 .replaceAll("\\p{M}", "");
         return normalized;
     }
-
 
     private boolean styleMatches(Product product, String requestedStyle) {
         return productStyleMatches(splitCsv(product.getStyleTags()), requestedStyle);

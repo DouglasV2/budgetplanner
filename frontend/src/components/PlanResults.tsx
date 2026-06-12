@@ -6,14 +6,17 @@ import type {
   Product,
   ProductCategory,
   RoomType,
-  PlanItem
+  PlanItem,
+  ShoppingPriority
 } from '../types';
 import {
   categoryLabels,
   formatCurrency,
   formatPlanForSharing,
+  furnishingLevelLabels,
   getRetailerBreakdown,
   roomLabels,
+  shoppingPriorityLabels,
   styleLabels
 } from '../utils/planner';
 
@@ -51,15 +54,11 @@ function labelCategories(categories: ProductCategory[]) {
   return categories.map((category) => categoryLabels[category]).join(', ');
 }
 
-function missingCategories(plan: FurnishingPlan, input: PlannerInput) {
-  return input.mustHaveCategories.filter((category) => !plan.items.some((item) => item.product.category === category));
-}
-
 // Room specific category order. This helps group products into intuitive sections per room
 // and identify which categories might still be missing from a plan. The order roughly
 // reflects a natural furnishing flow: large items first, then accessories.
 const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
-  'living-room': ['sofa', 'chair', 'table', 'tv-unit', 'rug', 'lighting', 'storage', 'decor'],
+  'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
   'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
   bedroom: ['bed', 'mattress', 'storage', 'lighting', 'decor'],
   'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor']
@@ -73,6 +72,49 @@ const TIER_LABELS: Record<string, string> = {
   'Najjeftinije': 'Osnovno',
   'Ljepša verzija': 'Kompletno'
 };
+
+const STEP_ORDER = ['buy-first', 'add-comfort', 'later'] as const;
+
+const STEP_TEXT = {
+  'buy-first': {
+    title: '1. Kupi osnovne komade',
+    description: 'Ovo su stvari bez kojih prostor ne funkcionira. Prvo provjeri dimenzije i dostupnost.'
+  },
+  'add-comfort': {
+    title: '2. Dodaj udobnost',
+    description: 'Kad su veliki komadi riješeni, ovo čini prostor ugodnijim i praktičnijim.'
+  },
+  later: {
+    title: '3. Dodaj detalje ako ostane budžeta',
+    description: 'Ovo može pričekati. Kupi tek ako ukupna cijena i dalje ima smisla.'
+  }
+};
+
+const CORE_BY_ROOM: Record<RoomType, ProductCategory[]> = {
+  'living-room': ['sofa', 'tv-unit', 'table'],
+  'home-office': ['desk', 'chair'],
+  bedroom: ['bed', 'mattress'],
+  'home-gym': ['gym-equipment']
+};
+
+function priorityForItem(item: PlanItem, roomType: RoomType): ShoppingPriority {
+  if (item.shoppingPriority) return item.shoppingPriority;
+  if (CORE_BY_ROOM[roomType]?.includes(item.product.category)) return 'buy-first';
+  if (['rug', 'lighting', 'storage'].includes(item.product.category)) return 'add-comfort';
+  return 'later';
+}
+
+function purchaseSteps(plan: FurnishingPlan, roomType: RoomType) {
+  return STEP_ORDER.map((priority) => {
+    const items = plan.items.filter((item) => priorityForItem(item, roomType) === priority);
+    return {
+      priority,
+      items,
+      subtotal: items.reduce((sum, item) => sum + item.product.price, 0),
+      ...STEP_TEXT[priority]
+    };
+  }).filter((step) => step.items.length > 0);
+}
 
 /**
  * Groups plan items by their product category and orders them based on a
@@ -108,9 +150,20 @@ function groupItemsByCategory(plan: FurnishingPlan, roomType: RoomType) {
  * explanation of what could be added to make the space more complete or
  * comfortable.
  */
+function desiredCategoriesForLevel(input: PlannerInput) {
+  const all = ROOM_CATEGORY_ORDER[input.roomType] ?? [];
+  const core = CORE_BY_ROOM[input.roomType] ?? [];
+  const level = input.furnishingLevel ?? 'comfort';
+  const desired = all.filter((category) => {
+    if (core.includes(category)) return true;
+    if (['rug', 'lighting', 'storage'].includes(category)) return level === 'comfort' || level === 'complete';
+    return level === 'complete';
+  });
+  return Array.from(new Set([...desired, ...input.mustHaveCategories]));
+}
+
 function missingForRoom(plan: FurnishingPlan, input: PlannerInput) {
-  const typical = ROOM_CATEGORY_ORDER[input.roomType] ?? [];
-  return typical.filter(
+  return desiredCategoriesForLevel(input).filter(
     (category) =>
       !plan.items.some((item) => item.product.category === category) &&
       !input.alreadyHaveCategories.includes(category)
@@ -148,6 +201,10 @@ function UnderstandingSummary({ input }: { input: PlannerInput }) {
         <div>
           <span>Veličina</span>
           <strong>{input.size} m²</strong>
+        </div>
+        <div>
+          <span>Razina</span>
+          <strong>{furnishingLevelLabels[input.furnishingLevel ?? 'comfort']}</strong>
         </div>
         <div>
           <span>Trgovine</span>
@@ -287,7 +344,8 @@ export function PlanResults({
   // human-friendly tier based on the plan label.
   const groupedItems = groupItemsByCategory(selectedPlan, input.roomType);
   const missing = missingForRoom(selectedPlan, input);
-  const tier = TIER_LABELS[selectedPlan.label] ?? '';
+  const steps = purchaseSteps(selectedPlan, input.roomType);
+  const tier = TIER_LABELS[selectedPlan.name] ?? furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
   const selectedFeedback = feedbackByPlan[selectedPlan.id];
 
   return (
@@ -383,6 +441,26 @@ export function PlanResults({
             </div>
           </div>
 
+          <div className="shopping-steps-card">
+            <div className="shopping-steps-heading">
+              <span>Plan kupnje po koracima</span>
+              <p>Najlakše je kupovati ovim redom: prvo veliki komadi, zatim udobnost, pa detalji.</p>
+            </div>
+            <div className="shopping-steps-list">
+              {steps.map((step) => (
+                <div className="shopping-step-row" key={step.priority}>
+                  <div className="step-number">{step.title.split('.')[0]}</div>
+                  <div>
+                    <strong>{step.title.replace(/^\d+\.\s*/, '')}</strong>
+                    <p>{step.description}</p>
+                    <small>{step.items.map((item) => item.product.name).join(' + ')}</small>
+                  </div>
+                  <span>{formatCurrency(step.subtotal)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="retailer-breakdown">
             <div className="breakdown-title">Trošak po trgovini</div>
             {breakdown.map((entry) => (
@@ -396,17 +474,17 @@ export function PlanResults({
 
           {missing.length > 0 && (
             <div className="missing-box improved-missing-box">
-              <strong>Nedostaju još neke stvari</strong>
-              <p>Za {roomLabels[input.roomType]} obično treba i:</p>
+              <strong>Preskočeno za sada</strong>
+              <p>Ovo nije ušlo jer bi moglo probiti budžet ili trenutno nema dovoljno dobru opciju u katalogu:</p>
               <ul className="missing-list">
                 {missing.map((category) => (
                   <li key={category}>
-                    {categoryLabels[category]}{' '}
-                    <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Dodaj</button>
+                    <span>{categoryLabels[category]}</span>
+                    <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Dodaj u ljepšu verziju</button>
                   </li>
                 ))}
               </ul>
-              <small>Ako ih uključiš, cijena može porasti ili nema dovoljno dobrih opcija u tvojim trgovinama.</small>
+              <small>Ovo ti pomaže odvojiti što kupiti sada, a što mirno može čekati kasnije.</small>
             </div>
           )}
 
@@ -414,8 +492,10 @@ export function PlanResults({
             {groupedItems.map((group) => (
               <div className="category-group" key={group.category}>
                 <h5 className="category-title">{categoryLabels[group.category]}</h5>
-                {group.items.map(({ product, reason }) => {
+                {group.items.map((item) => {
+                  const { product, reason } = item;
                   const locked = lockedProductIds.includes(product.id);
+                  const priority = priorityForItem(item, input.roomType);
                   return (
                     <div className={locked ? 'product-row locked' : 'product-row'} key={product.id}>
                       <img src={product.image} alt="" loading="lazy" />
@@ -426,13 +506,14 @@ export function PlanResults({
                         </div>
                         <div className="meta-line">
                           <span>{product.retailer}</span>
+                          <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
                           <span>★ {product.rating}</span>
                           {product.originalPrice && <span>Akcija</span>}
                           {!product.inStock && <span>Nema na stanju</span>}
                           {locked && <span>Zadržano</span>}
                         </div>
                         <div className="product-reason-box">
-                          <span>Zašto ovo?</span>
+                          <span>{item.shoppingRole || 'Zašto ovo?'}</span>
                           <p>{reason}</p>
                         </div>
                         <div className="product-actions">

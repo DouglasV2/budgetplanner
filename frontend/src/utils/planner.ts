@@ -1,4 +1,4 @@
-import type { FurnishingPlan, PlannerInput, ProductCategory, Retailer, RoomType, StyleType } from '../types';
+import type { FurnishingLevel, FurnishingPlan, PlannerInput, ProductCategory, Retailer, RoomType, ShoppingPriority, StyleType } from '../types';
 
 export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon'];
 
@@ -22,6 +22,18 @@ export const roomLabels: Record<RoomType, string> = {
   'home-office': 'radni kutak',
   bedroom: 'spavaća soba',
   'home-gym': 'kućna teretana'
+};
+
+export const furnishingLevelLabels: Record<FurnishingLevel, string> = {
+  basic: 'osnovno',
+  comfort: 'udobnije',
+  complete: 'kompletno'
+};
+
+export const shoppingPriorityLabels: Record<ShoppingPriority, string> = {
+  'buy-first': 'Kupi prvo',
+  'add-comfort': 'Dobro dodati',
+  later: 'Može kasnije'
 };
 
 export const styleLabels: Record<StyleType, string> = {
@@ -55,11 +67,14 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
   const breakdown = getRetailerBreakdown(plan)
     .map((entry) => `${entry.retailer}: ${formatCurrency(entry.total)} (${entry.count} proizvoda)`)
     .join(' | ');
-  const lines = plan.items.map((item) => `- ${item.product.name} (${item.product.retailer}) — ${formatCurrency(item.product.price)}`);
+  const lines = plan.items.map((item) => {
+    const priority = item.shoppingPriority ? `${shoppingPriorityLabels[item.shoppingPriority]}: ` : '';
+    return `- ${priority}${item.product.name} (${item.product.retailer}) — ${formatCurrency(item.product.price)}`;
+  });
 
   return [
     `BudgetSpace AI plan: ${plan.name}`,
-    `Prostorija: ${roomLabels[input.roomType]}, izgled: ${styleLabels[input.style]}, budžet: ${formatCurrency(input.budget)}`,
+    `Prostorija: ${roomLabels[input.roomType]}, izgled: ${styleLabels[input.style]}, razina: ${furnishingLevelLabels[input.furnishingLevel ?? 'comfort']}, budžet: ${formatCurrency(input.budget)}`,
     plan.summary ? `Sažetak: ${plan.summary}` : '',
     plan.goodFor ? `Za koga je dobro: ${plan.goodFor}` : '',
     `Ukupno: ${formatCurrency(plan.total)} | Poklapanje sa željama: ${plan.fitScore}% | Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
