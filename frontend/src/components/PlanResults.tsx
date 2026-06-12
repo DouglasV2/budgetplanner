@@ -454,10 +454,10 @@ export function PlanResults({
           <div className="empty-state friendly-empty-state decision-empty-state">
             <span>Spremno</span>
             <h3>Ovdje ćeš odmah vidjeti što se isplati.</h3>
-            <p>Plan će prvo pokazati ukupnu cijenu, najvažnije proizvode i stvari koje mogu čekati da odmah vidiš što je isplativo.</p>
+            <p>Ovdje će se pojaviti tvoj plan za kupnju: proizvodi, cijene i popis po trgovinama.</p>
             <div className="empty-example">
               <strong>Dobit ćeš:</strong>
-              <span>1. najvažnije · 2. ugodniji prostor · 3. stvari koje mogu kasnije</span>
+              <span>konkretne proizvode · ukupnu cijenu · popis za kupnju</span>
             </div>
           </div>
         </div>
@@ -525,17 +525,6 @@ export function PlanResults({
             </div>
           </div>
 
-          {/*
-            Decision quick actions: expose only the most common adjustments to avoid
-            overwhelming the user. Single-store and least-store actions are still
-            available via the planner form but are hidden here.
-          */}
-          <div className="quick-action-row decision-quick-actions" aria-label="Brze promjene plana">
-            <button type="button" onClick={() => onQuickAction('cheaper', selectedPlan)}>Pokaži povoljnije</button>
-            <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Pokaži ljepšu verziju</button>
-          </div>
-
-          <ShoppingListCard plan={selectedPlan} input={input} />
 
           <div className="items-list step-items-list">
             <div className="result-section-heading">
@@ -616,6 +605,8 @@ export function PlanResults({
               </section>
             ))}
           </div>
+
+          <ShoppingListCard plan={selectedPlan} input={input} />
 
           <details className="alternate-plans-panel">
             <summary>
