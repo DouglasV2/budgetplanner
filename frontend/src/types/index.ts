@@ -24,7 +24,7 @@ export type ShoppingPriority = 'buy-first' | 'add-comfort' | 'later';
 
 export type ReplacementChoice = 'cheaper' | 'nicer' | 'different' | 'remove' | 'similar';
 
-export type AvailabilityStatus = 'in-stock' | 'limited' | 'unavailable' | 'unknown';
+export type AvailabilityStatus = 'in-stock' | 'limited' | 'unavailable' | 'check-store' | 'unknown';
 
 export type PriceTier = 'budget' | 'standard' | 'premium';
 

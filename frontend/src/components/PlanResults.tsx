@@ -234,8 +234,8 @@ function productUrl(product: Product) {
 function availabilityLabel(product: Product) {
   const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
   if (status === 'in-stock') return 'Dostupno';
-  if (status === 'limited') return 'Provjeri dostupnost';
   if (status === 'unavailable') return 'Trenutno nedostupno';
+  if (status === 'limited' || status === 'check-store') return 'Provjeri u trgovini';
   return 'Provjeri u trgovini';
 }
 
@@ -247,6 +247,8 @@ function priceTierLabel(product: Product) {
 }
 
 function productCheckLabel(product: Product) {
+  const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
+  if (status === 'limited' || status === 'check-store') return 'Provjeri u trgovini prije kupnje';
   if (!product.lastCheckedAt) return 'Provjeri cijenu prije kupnje';
   return 'Cijenu provjeri u trgovini';
 }

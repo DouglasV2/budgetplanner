@@ -1,422 +1,414 @@
 [
   {
-    "externalId": "ikea-klippan-2-seat-sofa",
-    "name": "KLIPPAN dvosjed",
+    "externalId": "sample-ikea-living-sofa-light-textile",
+    "name": "Dvosjed svijetli tekstil",
     "retailer": "IKEA",
     "category": "sofa",
-    "price": 249,
+    "price": 249.0,
     "styleTags": [
       "modern",
-      "minimal",
+      "minimal"
+    ],
+    "roomTags": [
+      "living-room"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-ikea-living-sofa-light-textile",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "standard",
+    "note": "Glavni komad koji brzo definira dnevni boravak bez probijanja budžeta."
+  },
+  {
+    "externalId": "sample-emmezeta-living-sofa-warm-fabric",
+    "name": "Trosjed topli tekstil",
+    "retailer": "Emmezeta",
+    "category": "sofa",
+    "price": 549.0,
+    "styleTags": [
+      "cozy",
       "classic"
     ],
     "roomTags": [
       "living-room"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-klippan-2-seat-sofa",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "productUrl": "https://example.com/products/sample-emmezeta-living-sofa-warm-fabric",
+    "availabilityStatus": "limited",
+    "deliveryNote": "Provjeri u trgovini prije kupnje.",
     "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Glavni komad koji najviše određuje dojam prostora."
+    "priceTier": "premium",
+    "note": "Udobnija opcija kad korisnik želi mekši, dovršeniji dnevni boravak."
   },
   {
-    "externalId": "ikea-besta-tv-bench",
-    "name": "BESTÅ TV klupa",
-    "retailer": "IKEA",
+    "externalId": "sample-lesnina-living-tv-unit-oak",
+    "name": "TV komoda hrast efekt",
+    "retailer": "Lesnina",
     "category": "tv-unit",
-    "price": 129,
+    "price": 169.0,
     "styleTags": [
       "modern",
-      "minimal"
+      "cozy"
     ],
     "roomTags": [
       "living-room"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-besta-tv-bench",
+    "productUrl": "https://example.com/products/sample-lesnina-living-tv-unit-oak",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "standard",
-    "note": "Pomaže da dnevni boravak izgleda urednije."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "ikea-lack-coffee-table",
-    "name": "LACK stolić",
-    "retailer": "IKEA",
+    "externalId": "sample-jysk-living-coffee-table-black",
+    "name": "Stolić crni metal",
+    "retailer": "JYSK",
     "category": "table",
-    "price": 29.99,
-    "styleTags": [
-      "modern",
-      "minimal"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1499933374294-4584851497cc?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-lack-coffee-table",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Praktičan komad koji ne mora pojesti budžet."
-  },
-  {
-    "externalId": "ikea-hektar-floor-lamp",
-    "name": "HEKTAR podna lampa",
-    "retailer": "IKEA",
-    "category": "lighting",
-    "price": 69.99,
+    "price": 79.99,
     "styleTags": [
       "industrial",
       "modern"
     ],
     "roomTags": [
-      "living-room",
-      "bedroom",
-      "home-office"
+      "living-room"
     ],
-    "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-hektar-floor-lamp",
+    "imageUrl": "https://images.unsplash.com/photo-1499933374294-4584851497cc?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-jysk-living-coffee-table-black",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Rasvjeta brzo podigne osjećaj prostora."
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "ikea-kallax-shelf",
-    "name": "KALLAX regal",
-    "retailer": "IKEA",
-    "category": "storage",
-    "price": 59.99,
-    "styleTags": [
-      "modern",
-      "minimal",
-      "classic"
-    ],
-    "roomTags": [
-      "living-room",
-      "home-office",
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-kallax-shelf",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Daje više reda bez velikog troška."
-  },
-  {
-    "externalId": "ikea-vindum-rug",
-    "name": "VINDUM tepih",
+    "externalId": "sample-ikea-living-rug-natural",
+    "name": "Tepih prirodni ton",
     "retailer": "IKEA",
     "category": "rug",
     "price": 89.99,
     "styleTags": [
-      "cozy",
       "boho",
-      "natural"
+      "cozy"
     ],
     "roomTags": [
       "living-room",
       "bedroom"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-vindum-rug",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Zaokružuje prostor i čini ga toplijim."
-  },
-  {
-    "externalId": "ikea-malm-bed-frame",
-    "name": "MALM okvir kreveta",
-    "retailer": "IKEA",
-    "category": "bed",
-    "price": 199,
-    "styleTags": [
-      "modern",
-      "minimal",
-      "classic"
-    ],
-    "roomTags": [
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-malm-bed-frame",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Osnovni komad za spavaću sobu."
-  },
-  {
-    "externalId": "ikea-vesteroey-mattress",
-    "name": "VESTERÖY madrac",
-    "retailer": "IKEA",
-    "category": "mattress",
-    "price": 249,
-    "styleTags": [
-      "minimal",
-      "classic"
-    ],
-    "roomTags": [
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-vesteroey-mattress",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Bitno za udobnost svaki dan."
-  },
-  {
-    "externalId": "jysk-egebjerg-sofa",
-    "name": "EGEBJERG trosjed",
-    "retailer": "JYSK",
-    "category": "sofa",
-    "price": 399,
-    "styleTags": [
-      "cozy",
-      "classic"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-egebjerg-sofa",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Glavni komad koji najviše određuje dojam prostora."
-  },
-  {
-    "externalId": "jysk-gistrup-tv-table",
-    "name": "GISTRUP TV element",
-    "retailer": "JYSK",
-    "category": "tv-unit",
-    "price": 99.99,
-    "styleTags": [
-      "modern",
-      "minimal"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-gistrup-tv-table",
+    "productUrl": "https://example.com/products/sample-ikea-living-rug-natural",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "budget",
-    "note": "Pomaže da dnevni boravak izgleda urednije."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "jysk-ronne-table",
-    "name": "RØNNE stolić",
-    "retailer": "JYSK",
-    "category": "table",
-    "price": 59.99,
+    "externalId": "sample-pevex-living-floor-lamp-black",
+    "name": "Podna lampa crna",
+    "retailer": "Pevex",
+    "category": "lighting",
+    "price": 39.99,
+    "styleTags": [
+      "industrial",
+      "minimal"
+    ],
+    "roomTags": [
+      "living-room",
+      "home-office",
+      "bedroom"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-pevex-living-floor-lamp-black",
+    "availabilityStatus": "check-store",
+    "deliveryNote": "Provjeri u trgovini prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-lesnina-living-storage-low",
+    "name": "Niska komoda za spremanje",
+    "retailer": "Lesnina",
+    "category": "storage",
+    "price": 229.0,
     "styleTags": [
       "classic",
       "cozy"
     ],
     "roomTags": [
-      "living-room"
+      "living-room",
+      "bedroom"
     ],
-    "imageUrl": "https://images.unsplash.com/photo-1499933374294-4584851497cc?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-ronne-table",
+    "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-lesnina-living-storage-low",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Praktičan komad koji ne mora pojesti budžet."
+    "priceTier": "standard",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "jysk-kongstrup-rug",
-    "name": "KONGSTRUP tepih",
-    "retailer": "JYSK",
-    "category": "rug",
-    "price": 79.99,
+    "externalId": "sample-emmezeta-living-cushion-set",
+    "name": "Set jastuka topli tonovi",
+    "retailer": "Emmezeta",
+    "category": "decor",
+    "price": 34.99,
     "styleTags": [
       "cozy",
-      "natural",
       "boho"
     ],
     "roomTags": [
       "living-room",
       "bedroom"
     ],
-    "imageUrl": "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-kongstrup-rug",
+    "imageUrl": "https://images.unsplash.com/photo-1532372576444-dda954194ad0?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-emmezeta-living-cushion-set",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "budget",
-    "note": "Zaokružuje prostor i čini ga toplijim."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "jysk-viborg-floor-lamp",
-    "name": "VIBORG podna lampa",
+    "externalId": "sample-jysk-bedroom-bed-frame-white",
+    "name": "Okvir kreveta bijeli",
     "retailer": "JYSK",
-    "category": "lighting",
-    "price": 44.99,
+    "category": "bed",
+    "price": 219.0,
     "styleTags": [
-      "modern",
-      "classic"
+      "minimal",
+      "modern"
     ],
     "roomTags": [
-      "living-room",
       "bedroom"
     ],
-    "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-viborg-floor-lamp",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Rasvjeta brzo podigne osjećaj prostora."
-  },
-  {
-    "externalId": "jysk-agger-chair",
-    "name": "AGGER uredska stolica",
-    "retailer": "JYSK",
-    "category": "chair",
-    "price": 89.99,
-    "styleTags": [
-      "modern",
-      "minimal"
-    ],
-    "roomTags": [
-      "home-office"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-agger-chair",
+    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-jysk-bedroom-bed-frame-white",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "standard",
-    "note": "Udobnost koja se osjeti ako radiš dulje."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "jysk-beder-desk",
-    "name": "BEDER radni stol",
-    "retailer": "JYSK",
-    "category": "desk",
-    "price": 119,
-    "styleTags": [
-      "modern",
-      "minimal"
-    ],
-    "roomTags": [
-      "home-office"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-beder-desk",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Osnova za radni kutak."
-  },
-  {
-    "externalId": "lesnina-luna-sofa",
-    "name": "Luna kutna garnitura",
+    "externalId": "sample-lesnina-bedroom-bed-upholstered",
+    "name": "Tapecirani krevet bež",
     "retailer": "Lesnina",
-    "category": "sofa",
-    "price": 599,
-    "styleTags": [
-      "modern",
-      "cozy"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/lesnina-luna-sofa",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "premium",
-    "note": "Glavni komad koji najviše određuje dojam prostora."
-  },
-  {
-    "externalId": "lesnina-nordic-tv-unit",
-    "name": "Nordic TV komoda",
-    "retailer": "Lesnina",
-    "category": "tv-unit",
-    "price": 189,
-    "styleTags": [
-      "modern",
-      "natural"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/lesnina-nordic-tv-unit",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Pomaže da dnevni boravak izgleda urednije."
-  },
-  {
-    "externalId": "lesnina-soft-rug",
-    "name": "Softline tepih",
-    "retailer": "Lesnina",
-    "category": "rug",
-    "price": 149,
+    "category": "bed",
+    "price": 499.0,
     "styleTags": [
       "cozy",
       "classic"
     ],
     "roomTags": [
-      "living-room",
       "bedroom"
     ],
-    "imageUrl": "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/lesnina-soft-rug",
+    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-lesnina-bedroom-bed-upholstered",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "premium",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-ikea-bedroom-mattress-basic",
+    "name": "Madrac osnovna udobnost",
+    "retailer": "IKEA",
+    "category": "mattress",
+    "price": 179.0,
+    "styleTags": [
+      "minimal",
+      "classic"
+    ],
+    "roomTags": [
+      "bedroom"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-ikea-bedroom-mattress-basic",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "standard",
-    "note": "Zaokružuje prostor i čini ga toplijim."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "lesnina-oak-desk",
-    "name": "Oak radni stol",
-    "retailer": "Lesnina",
-    "category": "desk",
-    "price": 229,
+    "externalId": "sample-emmezeta-bedroom-mattress-pocket",
+    "name": "Madrac pocket udobni",
+    "retailer": "Emmezeta",
+    "category": "mattress",
+    "price": 329.0,
     "styleTags": [
       "classic",
-      "natural"
+      "cozy"
+    ],
+    "roomTags": [
+      "bedroom"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-emmezeta-bedroom-mattress-pocket",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "standard",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-lesnina-bedroom-wardrobe-oak",
+    "name": "Ormar hrast efekt",
+    "retailer": "Lesnina",
+    "category": "storage",
+    "price": 399.0,
+    "styleTags": [
+      "modern",
+      "cozy"
+    ],
+    "roomTags": [
+      "bedroom"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-lesnina-bedroom-wardrobe-oak",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "standard",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-jysk-bedroom-night-lamp",
+    "name": "Noćna lampa tekstil",
+    "retailer": "JYSK",
+    "category": "lighting",
+    "price": 29.99,
+    "styleTags": [
+      "cozy",
+      "classic"
+    ],
+    "roomTags": [
+      "bedroom"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-jysk-bedroom-night-lamp",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-ikea-bedroom-rug-soft",
+    "name": "Mekani tepih uz krevet",
+    "retailer": "IKEA",
+    "category": "rug",
+    "price": 69.99,
+    "styleTags": [
+      "cozy",
+      "boho"
+    ],
+    "roomTags": [
+      "bedroom"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-ikea-bedroom-rug-soft",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-emmezeta-bedroom-wall-decor",
+    "name": "Zidni dekor mirni tonovi",
+    "retailer": "Emmezeta",
+    "category": "decor",
+    "price": 44.99,
+    "styleTags": [
+      "minimal",
+      "boho"
+    ],
+    "roomTags": [
+      "bedroom"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1532372576444-dda954194ad0?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-emmezeta-bedroom-wall-decor",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-ikea-office-desk-white",
+    "name": "Radni stol bijeli",
+    "retailer": "IKEA",
+    "category": "desk",
+    "price": 89.99,
+    "styleTags": [
+      "minimal",
+      "modern"
     ],
     "roomTags": [
       "home-office"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/lesnina-oak-desk",
+    "productUrl": "https://example.com/products/sample-ikea-office-desk-white",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-lesnina-office-desk-oak",
+    "name": "Radni stol hrast efekt",
+    "retailer": "Lesnina",
+    "category": "desk",
+    "price": 189.0,
+    "styleTags": [
+      "cozy",
+      "classic"
+    ],
+    "roomTags": [
+      "home-office"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-lesnina-office-desk-oak",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "standard",
-    "note": "Osnova za radni kutak."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "lesnina-comfort-chair",
-    "name": "Comfort uredska stolica",
-    "retailer": "Lesnina",
+    "externalId": "sample-jysk-office-chair-basic",
+    "name": "Uredska stolica osnovna",
+    "retailer": "JYSK",
     "category": "chair",
-    "price": 159,
+    "price": 79.99,
+    "styleTags": [
+      "minimal",
+      "modern"
+    ],
+    "roomTags": [
+      "home-office"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-jysk-office-chair-basic",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-emmezeta-office-chair-comfort",
+    "name": "Uredska stolica udobna",
+    "retailer": "Emmezeta",
+    "category": "chair",
+    "price": 179.0,
     "styleTags": [
       "modern",
       "classic"
@@ -425,338 +417,43 @@
       "home-office"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/lesnina-comfort-chair",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "productUrl": "https://example.com/products/sample-emmezeta-office-chair-comfort",
+    "availabilityStatus": "limited",
+    "deliveryNote": "Provjeri u trgovini prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "standard",
-    "note": "Udobnost koja se osjeti ako radiš dulje."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "emmezeta-milo-sofa",
-    "name": "Milo trosjed",
-    "retailer": "Emmezeta",
-    "category": "sofa",
-    "price": 459,
-    "styleTags": [
-      "modern",
-      "cozy"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/emmezeta-milo-sofa",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Glavni komad koji najviše određuje dojam prostora."
-  },
-  {
-    "externalId": "emmezeta-roma-table",
-    "name": "Roma klub stolić",
-    "retailer": "Emmezeta",
-    "category": "table",
-    "price": 89.99,
-    "styleTags": [
-      "classic",
-      "cozy"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1499933374294-4584851497cc?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/emmezeta-roma-table",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Praktičan komad koji ne mora pojesti budžet."
-  },
-  {
-    "externalId": "emmezeta-line-tv-unit",
-    "name": "Line TV komoda",
-    "retailer": "Emmezeta",
-    "category": "tv-unit",
-    "price": 159,
-    "styleTags": [
-      "modern",
-      "minimal"
-    ],
-    "roomTags": [
-      "living-room"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/emmezeta-line-tv-unit",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Pomaže da dnevni boravak izgleda urednije."
-  },
-  {
-    "externalId": "emmezeta-mia-bed",
-    "name": "Mia krevet",
-    "retailer": "Emmezeta",
-    "category": "bed",
-    "price": 329,
-    "styleTags": [
-      "modern",
-      "classic"
-    ],
-    "roomTags": [
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/emmezeta-mia-bed",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Osnovni komad za spavaću sobu."
-  },
-  {
-    "externalId": "emmezeta-basic-mattress",
-    "name": "Basic madrac",
-    "retailer": "Emmezeta",
-    "category": "mattress",
-    "price": 219,
-    "styleTags": [
-      "classic",
-      "minimal"
-    ],
-    "roomTags": [
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/emmezeta-basic-mattress",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Bitno za udobnost svaki dan."
-  },
-  {
-    "externalId": "pevex-led-floor-lamp",
-    "name": "LED podna svjetiljka",
+    "externalId": "sample-pevex-office-shelf-metal",
+    "name": "Metalna polica za ured",
     "retailer": "Pevex",
-    "category": "lighting",
-    "price": 39.99,
+    "category": "storage",
+    "price": 59.99,
     "styleTags": [
-      "modern",
+      "industrial",
       "minimal"
     ],
     "roomTags": [
-      "living-room",
       "home-office",
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/pevex-led-floor-lamp",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Rasvjeta brzo podigne osjećaj prostora."
-  },
-  {
-    "externalId": "pevex-storage-box-set",
-    "name": "Set kutija za pohranu",
-    "retailer": "Pevex",
-    "category": "storage",
-    "price": 24.99,
-    "styleTags": [
-      "minimal",
-      "classic"
-    ],
-    "roomTags": [
-      "living-room",
-      "home-office",
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/pevex-storage-box-set",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Daje više reda bez velikog troška."
-  },
-  {
-    "externalId": "pevex-wall-shelves",
-    "name": "Zidne police set",
-    "retailer": "Pevex",
-    "category": "storage",
-    "price": 34.99,
-    "styleTags": [
-      "modern",
-      "minimal"
-    ],
-    "roomTags": [
-      "living-room",
-      "home-office"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/pevex-wall-shelves",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Daje više reda bez velikog troška."
-  },
-  {
-    "externalId": "pevex-decor-vase-set",
-    "name": "Set dekor vaza",
-    "retailer": "Pevex",
-    "category": "decor",
-    "price": 19.99,
-    "styleTags": [
-      "boho",
-      "natural",
-      "classic"
-    ],
-    "roomTags": [
-      "living-room",
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1532372320572-cda25653a26f?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/pevex-decor-vase-set",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Lijep detalj koji može i kasnije."
-  },
-  {
-    "externalId": "pevex-work-lamp",
-    "name": "Radna lampa",
-    "retailer": "Pevex",
-    "category": "lighting",
-    "price": 29.99,
-    "styleTags": [
-      "modern",
-      "minimal"
-    ],
-    "roomTags": [
-      "home-office"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/pevex-work-lamp",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Rasvjeta brzo podigne osjećaj prostora."
-  },
-  {
-    "externalId": "decathlon-dumbbell-kit",
-    "name": "Set bučica 20 kg",
-    "retailer": "Decathlon",
-    "category": "gym-equipment",
-    "price": 69.99,
-    "styleTags": [
-      "minimal"
-    ],
-    "roomTags": [
-      "home-gym"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/decathlon-dumbbell-kit",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Dobar početak za kućni trening."
-  },
-  {
-    "externalId": "decathlon-yoga-mat",
-    "name": "Podloga za vježbanje",
-    "retailer": "Decathlon",
-    "category": "gym-equipment",
-    "price": 19.99,
-    "styleTags": [
-      "minimal"
-    ],
-    "roomTags": [
-      "home-gym"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/decathlon-yoga-mat",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Dobar početak za kućni trening."
-  },
-  {
-    "externalId": "decathlon-weight-bench",
-    "name": "Sklopiva klupa",
-    "retailer": "Decathlon",
-    "category": "gym-equipment",
-    "price": 129.99,
-    "styleTags": [
-      "minimal"
-    ],
-    "roomTags": [
-      "home-gym"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/decathlon-weight-bench",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Dobar početak za kućni trening."
-  },
-  {
-    "externalId": "decathlon-storage-rack",
-    "name": "Stalak za opremu",
-    "retailer": "Decathlon",
-    "category": "storage",
-    "price": 49.99,
-    "styleTags": [
-      "minimal"
-    ],
-    "roomTags": [
       "home-gym"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/decathlon-storage-rack",
+    "productUrl": "https://example.com/products/sample-pevex-office-shelf-metal",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "budget",
-    "note": "Daje više reda bez velikog troška."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "decathlon-resistance-bands",
-    "name": "Elastične trake set",
-    "retailer": "Decathlon",
-    "category": "gym-equipment",
-    "price": 14.99,
-    "styleTags": [
-      "minimal"
-    ],
-    "roomTags": [
-      "home-gym"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/decathlon-resistance-bands",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "budget",
-    "note": "Dobar početak za kućni trening."
-  },
-  {
-    "externalId": "ikea-forsa-desk-lamp",
-    "name": "FORSÅ stolna lampa",
+    "externalId": "sample-ikea-office-table-lamp",
+    "name": "Stolna lampa crna",
     "retailer": "IKEA",
     "category": "lighting",
-    "price": 24.99,
+    "price": 34.99,
     "styleTags": [
-      "classic",
+      "industrial",
       "modern"
     ],
     "roomTags": [
@@ -764,99 +461,179 @@
       "bedroom"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-forsa-desk-lamp",
+    "productUrl": "https://example.com/products/sample-ikea-office-table-lamp",
+    "availabilityStatus": "check-store",
+    "deliveryNote": "Provjeri u trgovini prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-lesnina-office-board-decor",
+    "name": "Zidna ploča za bilješke",
+    "retailer": "Lesnina",
+    "category": "decor",
+    "price": 24.99,
+    "styleTags": [
+      "minimal",
+      "modern"
+    ],
+    "roomTags": [
+      "home-office"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1532372576444-dda954194ad0?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-lesnina-office-board-decor",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "budget",
-    "note": "Rasvjeta brzo podigne osjećaj prostora."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "ikea-alex-drawers",
-    "name": "ALEX ladičar",
-    "retailer": "IKEA",
-    "category": "storage",
-    "price": 89.99,
+    "externalId": "sample-jysk-office-small-rug",
+    "name": "Mali tepih ispod stolice",
+    "retailer": "JYSK",
+    "category": "rug",
+    "price": 49.99,
+    "styleTags": [
+      "cozy",
+      "minimal"
+    ],
+    "roomTags": [
+      "home-office"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-jysk-office-small-rug",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-decathlon-gym-dumbbell-set",
+    "name": "Set bučica za početak",
+    "retailer": "Decathlon",
+    "category": "gym-equipment",
+    "price": 49.99,
+    "styleTags": [
+      "minimal",
+      "industrial"
+    ],
+    "roomTags": [
+      "home-gym"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-decathlon-gym-dumbbell-set",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Najkorisniji prvi komad za kućni trening uz mali budžet."
+  },
+  {
+    "externalId": "sample-decathlon-gym-adjustable-bench",
+    "name": "Sklopiva klupa za vježbanje",
+    "retailer": "Decathlon",
+    "category": "gym-equipment",
+    "price": 129.0,
+    "styleTags": [
+      "industrial",
+      "modern"
+    ],
+    "roomTags": [
+      "home-gym"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-decathlon-gym-adjustable-bench",
+    "availabilityStatus": "limited",
+    "deliveryNote": "Provjeri u trgovini prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "standard",
+    "note": "Daje više mogućnosti treninga ako ima dovoljno mjesta."
+  },
+  {
+    "externalId": "sample-decathlon-gym-bike-unavailable",
+    "name": "Sobni bicikl kompaktni",
+    "retailer": "Decathlon",
+    "category": "gym-equipment",
+    "price": 249.0,
     "styleTags": [
       "modern",
       "minimal"
     ],
     "roomTags": [
-      "home-office",
-      "bedroom"
+      "home-gym"
     ],
-    "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/ikea-alex-drawers",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "imageUrl": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-decathlon-gym-bike-unavailable",
+    "availabilityStatus": "unavailable",
+    "deliveryNote": "Provjeri u trgovini prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "standard",
-    "note": "Daje više reda bez velikog troška."
+    "note": "Namjerno nedostupan primjer za provjeru da planner ne bira takav proizvod."
   },
   {
-    "externalId": "jysk-vedde-wardrobe",
-    "name": "VEDDE ormar",
-    "retailer": "JYSK",
+    "externalId": "sample-pevex-gym-storage-rack",
+    "name": "Stalak za opremu crni",
+    "retailer": "Pevex",
     "category": "storage",
-    "price": 179,
+    "price": 69.99,
     "styleTags": [
-      "classic",
+      "industrial",
       "minimal"
     ],
     "roomTags": [
-      "bedroom"
+      "home-gym"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/jysk-vedde-wardrobe",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-12",
-    "priceTier": "standard",
-    "note": "Daje više reda bez velikog troška."
-  },
-  {
-    "externalId": "lesnina-bloom-decor-set",
-    "name": "Bloom dekor set",
-    "retailer": "Lesnina",
-    "category": "decor",
-    "price": 39.99,
-    "styleTags": [
-      "boho",
-      "natural",
-      "cozy"
-    ],
-    "roomTags": [
-      "living-room",
-      "bedroom"
-    ],
-    "imageUrl": "https://images.unsplash.com/photo-1532372320572-cda25653a26f?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/lesnina-bloom-decor-set",
+    "productUrl": "https://example.com/products/sample-pevex-gym-storage-rack",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "budget",
-    "note": "Lijep detalj koji može i kasnije."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   },
   {
-    "externalId": "emmezeta-cozy-pillows",
-    "name": "Cozy jastuci set",
-    "retailer": "Emmezeta",
-    "category": "decor",
+    "externalId": "sample-pevex-gym-led-light",
+    "name": "LED rasvjeta za trening",
+    "retailer": "Pevex",
+    "category": "lighting",
     "price": 29.99,
     "styleTags": [
-      "cozy",
-      "classic"
+      "modern",
+      "minimal"
     ],
     "roomTags": [
-      "living-room",
-      "bedroom"
+      "home-gym"
     ],
-    "imageUrl": "https://images.unsplash.com/photo-1532372320572-cda25653a26f?auto=format&fit=crop&w=900&q=80",
-    "productUrl": "https://example.com/products/emmezeta-cozy-pillows",
+    "imageUrl": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-pevex-gym-led-light",
+    "availabilityStatus": "check-store",
+    "deliveryNote": "Provjeri u trgovini prije kupnje.",
+    "lastCheckedAt": "2026-06-12",
+    "priceTier": "budget",
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
+  },
+  {
+    "externalId": "sample-jysk-gym-floor-mat",
+    "name": "Podna prostirka za trening",
+    "retailer": "JYSK",
+    "category": "rug",
+    "price": 39.99,
+    "styleTags": [
+      "minimal",
+      "industrial"
+    ],
+    "roomTags": [
+      "home-gym"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80",
+    "productUrl": "https://example.com/products/sample-jysk-gym-floor-mat",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-12",
     "priceTier": "budget",
-    "note": "Lijep detalj koji može i kasnije."
+    "note": "Realističan generički proizvod za testiranje planera i import pipelinea."
   }
 ]

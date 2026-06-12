@@ -1,21 +1,36 @@
 package ai.budgetspace.product;
 
+import ai.budgetspace.dto.ImportErrorDto;
 import ai.budgetspace.dto.ImportProductDto;
 import ai.budgetspace.dto.ImportSummaryDto;
 import ai.budgetspace.dto.ProductDto;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductImportService {
+    private static final List<String> REQUIRED_HEADERS = List.of(
+            "externalId",
+            "name",
+            "retailer",
+            "category",
+            "price",
+            "styleTags",
+            "roomTags"
+    );
+
     private final ProductRepository productRepository;
 
     public ProductImportService(ProductRepository productRepository) {
@@ -23,31 +38,97 @@ public class ProductImportService {
     }
 
     public ImportSummaryDto importProducts(List<ImportProductDto> imports) {
-        List<String> errors = new ArrayList<>();
+        if (imports == null || imports.isEmpty()) {
+            return summary(0, 0, 0, 0, List.of(), List.of(error(0, null, "Nema proizvoda za import.")));
+        }
+
+        List<ImportCandidate> candidates = new ArrayList<>();
+        for (int index = 0; index < imports.size(); index++) {
+            candidates.add(new ImportCandidate(index + 1, imports.get(index)));
+        }
+        return importCandidates(candidates, List.of(), imports.size());
+    }
+
+    public ImportSummaryDto importCsv(String csv) {
+        if (!hasText(csv)) {
+            return summary(0, 0, 0, 0, List.of(), List.of(error(0, null, "CSV je prazan.")));
+        }
+
+        String[] lines = csv.replace("\r\n", "\n").replace('\r', '\n').split("\n", -1);
+        Optional<Integer> headerLine = firstNonBlankLine(lines);
+        if (headerLine.isEmpty()) {
+            return summary(0, 0, 0, 0, List.of(), List.of(error(0, null, "CSV mora imati header i barem jedan proizvod.")));
+        }
+
+        List<String> headers = parseCsvLine(lines[headerLine.get()]).stream()
+                .map(String::trim)
+                .map(this::normalizeHeader)
+                .toList();
+
+        List<String> missingHeaders = missingRequiredHeaders(headers);
+        if (!missingHeaders.isEmpty()) {
+            String message = "CSV header nedostaje: " + String.join(", ", missingHeaders) + ".";
+            return summary(0, 0, 0, 0, List.of(), List.of(error(headerLine.get() + 1, null, message)));
+        }
+
+        List<ImportCandidate> candidates = new ArrayList<>();
+        List<ImportErrorDto> parseErrors = new ArrayList<>();
+        int receivedRows = 0;
+
+        for (int i = headerLine.get() + 1; i < lines.length; i++) {
+            if (!hasText(lines[i])) continue;
+            receivedRows++;
+            List<String> values = parseCsvLine(lines[i]);
+            Map<String, String> row = toCsvRow(headers, values);
+            try {
+                candidates.add(new ImportCandidate(i + 1, fromCsvRow(row)));
+            } catch (IllegalArgumentException exception) {
+                parseErrors.add(error(i + 1, value(row, "externalid", "external_id", "external"), exception.getMessage()));
+            }
+        }
+
+        if (receivedRows == 0) {
+            return summary(0, 0, 0, 0, List.of(), List.of(error(headerLine.get() + 1, null, "CSV nema nijedan proizvod nakon headera.")));
+        }
+
+        return importCandidates(candidates, parseErrors, receivedRows);
+    }
+
+    public ImportSummaryDto importIkeaStarterCatalog() {
+        return importProducts(List.of(
+                product("ikea-starter-sofa-light-textile", "IKEA", "Dvosjed svijetli tekstil", "sofa", "249.00", "modern,minimal", "living-room", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80", "Dobar osnovni kauč za manji dnevni boravak."),
+                product("ikea-starter-coffee-table-oak", "IKEA", "Stolić hrast efekt", "stolić", "39.99", "minimal,modern", "living-room", "budget", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1499933374294-4584851497cc?auto=format&fit=crop&w=900&q=80", "Povoljan stolić koji ne pojede budžet."),
+                product("ikea-starter-tv-unit-white", "IKEA", "TV komoda bijela", "tv komoda", "129.00", "modern,minimal", "living-room", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=900&q=80", "Jednostavna TV komoda za uredan prostor."),
+                product("ikea-starter-floor-lamp-black", "IKEA", "Podna lampa crna", "rasvjeta", "69.99", "industrial,modern", "living-room,bedroom,home-office", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80", "Rasvjeta koja brzo mijenja dojam prostora."),
+                product("ikea-starter-shelf-white", "IKEA", "Otvorena polica bijela", "polica", "59.99", "minimal,modern,classic", "living-room,home-office,bedroom", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80", "Praktična pohrana za stvari koje ne želiš gledati po sobi."),
+                product("ikea-starter-bed-frame-oak", "IKEA", "Okvir kreveta hrast efekt", "krevet", "199.00", "minimal,modern,classic", "bedroom", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80", "Siguran osnovni komad za spavaću sobu."),
+                product("ikea-starter-lounge-chair", "IKEA", "Fotelja mekani tekstil", "stolica", "89.99", "classic,cozy", "living-room,home-office,bedroom", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80", "Udoban dodatak ako ostane prostora i budžeta."),
+                product("ikea-starter-desk-white", "IKEA", "Radni stol bijeli", "stol", "49.99", "minimal,modern", "home-office", "budget", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80", "Povoljan stol za osnovni radni kutak.")
+        ));
+    }
+
+    private ImportSummaryDto importCandidates(List<ImportCandidate> candidates, List<ImportErrorDto> initialErrors, int totalReceived) {
+        List<ImportErrorDto> errors = new ArrayList<>(initialErrors);
         List<ProductDto> importedProducts = new ArrayList<>();
         int created = 0;
         int updated = 0;
-        int skipped = 0;
+        int skipped = initialErrors.size();
 
-        if (imports == null || imports.isEmpty()) {
-            return new ImportSummaryDto(0, 0, 0, List.of("Nema proizvoda za import."), List.of());
-        }
-
-        for (int index = 0; index < imports.size(); index++) {
-            ImportProductDto dto = imports.get(index);
-            List<String> validationErrors = validate(dto, index + 1);
+        for (ImportCandidate candidate : candidates) {
+            ImportProductDto dto = candidate.dto();
+            List<ImportErrorDto> validationErrors = validate(dto, candidate.row());
             if (!validationErrors.isEmpty()) {
                 errors.addAll(validationErrors);
                 skipped++;
                 continue;
             }
 
-            Product entity = productRepository.findByExternalId(dto.externalId()).orElse(null);
+            String externalId = dto.externalId().trim();
+            Product entity = productRepository.findByExternalId(externalId).orElse(null);
             boolean isNew = entity == null;
             if (isNew) {
                 entity = new Product();
                 entity.setId(hasText(dto.id()) ? dto.id().trim() : UUID.randomUUID().toString());
-                entity.setExternalId(dto.externalId().trim());
                 entity.setRating(0);
                 entity.setInStock(true);
             }
@@ -60,60 +141,7 @@ public class ProductImportService {
             if (isNew) created++; else updated++;
         }
 
-        return new ImportSummaryDto(created, updated, skipped, errors, importedProducts);
-    }
-
-    public ImportSummaryDto importCsv(String csv) {
-        if (!hasText(csv)) {
-            return new ImportSummaryDto(0, 0, 0, List.of("CSV je prazan."), List.of());
-        }
-
-        String[] lines = csv.replace("\r\n", "\n").replace('\r', '\n').split("\n");
-        if (lines.length < 2) {
-            return new ImportSummaryDto(0, 0, 0, List.of("CSV mora imati header i barem jedan proizvod."), List.of());
-        }
-
-        List<String> headers = parseCsvLine(lines[0]).stream().map(this::normalizeHeader).toList();
-        List<ImportProductDto> products = new ArrayList<>();
-        List<String> errors = new ArrayList<>();
-
-        for (int i = 1; i < lines.length; i++) {
-            if (!hasText(lines[i])) continue;
-            List<String> values = parseCsvLine(lines[i]);
-            Map<String, String> row = new LinkedHashMap<>();
-            for (int j = 0; j < headers.size(); j++) {
-                row.put(headers.get(j), j < values.size() ? values.get(j).trim() : "");
-            }
-            try {
-                products.add(fromCsvRow(row));
-            } catch (IllegalArgumentException exception) {
-                errors.add("Red " + (i + 1) + ": " + exception.getMessage());
-            }
-        }
-
-        ImportSummaryDto summary = importProducts(products);
-        List<String> allErrors = new ArrayList<>(errors);
-        allErrors.addAll(summary.errors());
-        return new ImportSummaryDto(
-                summary.created(),
-                summary.updated(),
-                summary.skipped() + errors.size(),
-                allErrors,
-                summary.products()
-        );
-    }
-
-    public ImportSummaryDto importIkeaStarterCatalog() {
-        return importProducts(List.of(
-                product("ikea-klippan-2-seat-sofa", "IKEA", "KLIPPAN dvosjed", "sofa", "249.00", "modern,minimal,classic", "living-room", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80", "Dobar osnovni kauč za manji dnevni boravak."),
-                product("ikea-lack-coffee-table", "IKEA", "LACK stolić", "table", "29.99", "minimal,modern", "living-room", "budget", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1499933374294-4584851497cc?auto=format&fit=crop&w=900&q=80", "Povoljan stolić koji ne pojede budžet."),
-                product("ikea-besta-tv-bench", "IKEA", "BESTÅ TV klupa", "tv-unit", "129.00", "modern,minimal", "living-room", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=900&q=80", "Jednostavna TV komoda za uredan prostor."),
-                product("ikea-hektar-floor-lamp", "IKEA", "HEKTAR podna lampa", "lighting", "69.99", "industrial,modern", "living-room,bedroom,home-office", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80", "Rasvjeta koja brzo mijenja dojam prostora."),
-                product("ikea-kallax-shelf", "IKEA", "KALLAX regal", "storage", "59.99", "minimal,modern,classic", "living-room,home-office,bedroom", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80", "Praktična pohrana za stvari koje ne želiš gledati po sobi."),
-                product("ikea-malm-bed-frame", "IKEA", "MALM okvir kreveta", "bed", "199.00", "minimal,modern,classic", "bedroom", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80", "Siguran osnovni komad za spavaću sobu."),
-                product("ikea-poang-chair", "IKEA", "POÄNG fotelja", "chair", "89.99", "classic,cozy", "living-room,home-office,bedroom", "standard", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80", "Udoban dodatak ako ostane prostora i budžeta."),
-                product("ikea-linnmon-desk", "IKEA", "LINNMON radni stol", "desk", "49.99", "minimal,modern", "home-office", "budget", "https://www.ikea.com/hr/hr/", "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80", "Povoljan stol za osnovni radni kutak.")
-        ));
+        return summary(created, updated, skipped, totalReceived, importedProducts, errors);
     }
 
     private ImportProductDto fromCsvRow(Map<String, String> row) {
@@ -142,12 +170,12 @@ public class ProductImportService {
     private void apply(ImportProductDto dto, Product entity) {
         entity.setExternalId(dto.externalId().trim());
         entity.setName(dto.name().trim());
-        entity.setRetailer(dto.retailer().trim());
-        entity.setCategory(mapCategory(dto.category()));
+        entity.setRetailer(ProductTaxonomy.normalizeRetailer(dto.retailer()).orElse(dto.retailer().trim()));
+        entity.setCategory(ProductTaxonomy.normalizeCategory(dto.category()).orElse(dto.category().trim()));
         entity.setPrice(dto.price());
         if (dto.originalPrice() != null) entity.setOriginalPrice(dto.originalPrice());
-        if (dto.styleTags() != null) entity.setStyleTags(joinTags(dto.styleTags()));
-        if (dto.roomTags() != null) entity.setRoomTags(joinTags(dto.roomTags()));
+        entity.setStyleTags(joinCanonicalStyles(dto.styleTags()));
+        entity.setRoomTags(joinCanonicalRooms(dto.roomTags()));
         if (hasText(dto.imageUrl())) {
             entity.setImageUrl(dto.imageUrl().trim());
             entity.setImage(dto.imageUrl().trim());
@@ -157,8 +185,14 @@ public class ProductImportService {
             entity.setUrl(dto.productUrl().trim());
         }
         if (hasText(dto.availabilityStatus())) {
-            entity.setAvailabilityStatus(dto.availabilityStatus().trim());
-            entity.setInStock(!"unavailable".equalsIgnoreCase(dto.availabilityStatus().trim()));
+            String availability = ProductTaxonomy.normalizeAvailability(dto.availabilityStatus());
+            entity.setAvailabilityStatus(availability);
+            entity.setInStock(!"unavailable".equals(availability));
+        } else if (!hasText(entity.getAvailabilityStatus())) {
+            entity.setAvailabilityStatus("in-stock");
+            entity.setInStock(true);
+        } else {
+            entity.setInStock(!"unavailable".equals(ProductTaxonomy.normalizeAvailability(entity.getAvailabilityStatus())));
         }
         if (hasText(dto.deliveryNote())) entity.setDeliveryNote(dto.deliveryNote().trim());
         if (hasText(dto.lastCheckedAt())) {
@@ -185,38 +219,111 @@ public class ProductImportService {
         if (entity.getNote() == null) entity.setNote("");
     }
 
-    private List<String> validate(ImportProductDto dto, int rowNumber) {
-        List<String> errors = new ArrayList<>();
-        String prefix = "Proizvod " + rowNumber + ": ";
+    private List<ImportErrorDto> validate(ImportProductDto dto, int rowNumber) {
+        List<ImportErrorDto> errors = new ArrayList<>();
+        String externalId = dto == null ? null : emptyToNull(dto.externalId());
         if (dto == null) {
-            errors.add(prefix + "prazan zapis.");
+            errors.add(error(rowNumber, null, "Prazan zapis."));
             return errors;
         }
-        if (!hasText(dto.externalId())) errors.add(prefix + "nedostaje externalId.");
-        if (!hasText(dto.name())) errors.add(prefix + "nedostaje naziv.");
-        if (!hasText(dto.retailer())) errors.add(prefix + "nedostaje trgovina.");
-        if (!hasText(dto.category())) errors.add(prefix + "nedostaje kategorija.");
-        if (dto.price() == null || dto.price().compareTo(BigDecimal.ZERO) <= 0) errors.add(prefix + "cijena mora biti veća od 0.");
+
+        if (!hasText(dto.externalId())) errors.add(error(rowNumber, null, "Nedostaje externalId."));
+        if (!hasText(dto.name())) errors.add(error(rowNumber, externalId, "Nedostaje naziv proizvoda."));
+        if (!hasText(dto.retailer())) {
+            errors.add(error(rowNumber, externalId, "Nedostaje trgovina."));
+        } else if (ProductTaxonomy.normalizeRetailer(dto.retailer()).isEmpty()) {
+            errors.add(error(rowNumber, externalId, "Trgovina nije podržana: " + dto.retailer().trim() + "."));
+        }
+
+        if (!hasText(dto.category())) {
+            errors.add(error(rowNumber, externalId, "Nedostaje kategorija."));
+        } else if (ProductTaxonomy.normalizeCategory(dto.category()).isEmpty()) {
+            errors.add(error(rowNumber, externalId, "Nepoznata kategorija: " + dto.category().trim() + "."));
+        }
+
+        if (dto.price() == null || dto.price().compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add(error(rowNumber, externalId, "Cijena mora biti veća od 0."));
+        }
+
+        if (dto.styleTags() == null || dto.styleTags().stream().noneMatch(this::hasText)) {
+            errors.add(error(rowNumber, externalId, "styleTags ne smije biti prazan."));
+        } else {
+            dto.styleTags().stream()
+                    .filter(this::hasText)
+                    .filter(style -> ProductTaxonomy.normalizeStyle(style).isEmpty())
+                    .forEach(style -> errors.add(error(rowNumber, externalId, "Nepoznat stil: " + style.trim() + ".")));
+        }
+
+        if (dto.roomTags() == null || dto.roomTags().stream().noneMatch(this::hasText)) {
+            errors.add(error(rowNumber, externalId, "roomTags ne smije biti prazan."));
+        } else {
+            dto.roomTags().stream()
+                    .filter(this::hasText)
+                    .filter(room -> ProductTaxonomy.normalizeRoom(room).isEmpty())
+                    .forEach(room -> errors.add(error(rowNumber, externalId, "Nepoznata prostorija: " + room.trim() + ".")));
+        }
+
+        if (hasText(dto.productUrl()) && !looksLikeUrl(dto.productUrl())) {
+            errors.add(error(rowNumber, externalId, "productUrl mora izgledati kao URL."));
+        }
+        if (hasText(dto.imageUrl()) && !looksLikeUrl(dto.imageUrl())) {
+            errors.add(error(rowNumber, externalId, "imageUrl mora izgledati kao URL."));
+        }
+        if (hasText(dto.availabilityStatus()) && !ProductTaxonomy.isSupportedAvailability(dto.availabilityStatus())) {
+            errors.add(error(rowNumber, externalId, "availabilityStatus mora biti jedan od: in-stock, limited, unavailable, check-store."));
+        }
+
         return errors;
     }
 
-    private String mapCategory(String category) {
-        if (category == null) return null;
-        String normalised = normalize(category);
-        return switch (normalised) {
-            case "kauc", "kauč", "sofa", "couch" -> "sofa";
-            case "tv stand", "tv-stand", "tv unit", "tv-unit", "komoda", "tv komoda" -> "tv-unit";
-            case "stolic", "stolic za kavu", "stolić", "table", "coffee table" -> "table";
-            case "tepih", "rug", "carpet" -> "rug";
-            case "rasvjeta", "lighting", "lamp", "lampa" -> "lighting";
-            case "dekor", "dekoracije", "decor", "decoration" -> "decor";
-            case "pohrana", "storage", "orman", "ormar", "ladice", "regal" -> "storage";
-            case "krevet", "bed" -> "bed";
-            case "madrac", "mattress" -> "mattress";
-            case "stolica", "chair" -> "chair";
-            case "radni stol", "pisaci stol", "pisaći stol", "desk" -> "desk";
-            case "gym equipment", "gym-equipment", "oprema", "sprava" -> "gym-equipment";
-            default -> normalised;
+    private Map<String, String> toCsvRow(List<String> headers, List<String> values) {
+        Map<String, String> row = new LinkedHashMap<>();
+        int valueIndex = 0;
+
+        for (int headerIndex = 0; headerIndex < headers.size(); headerIndex++) {
+            String header = headers.get(headerIndex);
+            int remainingHeaders = headers.size() - headerIndex - 1;
+            List<String> parts = new ArrayList<>();
+            if (valueIndex < values.size()) {
+                parts.add(values.get(valueIndex).trim());
+                valueIndex++;
+            }
+
+            if (isTagHeader(header)) {
+                while (valueIndex < values.size() && values.size() - valueIndex > remainingHeaders) {
+                    String next = values.get(valueIndex).trim();
+                    boolean consume = isStyleHeader(header)
+                            ? ProductTaxonomy.isKnownStyle(next)
+                            : ProductTaxonomy.isKnownRoom(next);
+                    if (!consume) break;
+                    parts.add(next);
+                    valueIndex++;
+                }
+            }
+
+            row.put(header, String.join(",", parts).trim());
+        }
+        return row;
+    }
+
+    private List<String> missingRequiredHeaders(List<String> headers) {
+        return REQUIRED_HEADERS.stream()
+                .filter(required -> !headersContain(headers, required))
+                .toList();
+    }
+
+    private boolean headersContain(List<String> headers, String expected) {
+        String normalizedExpected = normalizeHeader(expected);
+        if (headers.contains(normalizedExpected)) return true;
+        return switch (normalizedExpected) {
+            case "externalid" -> headers.contains("external");
+            case "name" -> headers.contains("naziv");
+            case "retailer" -> headers.contains("trgovina");
+            case "category" -> headers.contains("kategorija");
+            case "price" -> headers.contains("cijena");
+            case "styletags" -> headers.contains("stilovi");
+            case "roomtags" -> headers.contains("prostorije");
+            default -> false;
         };
     }
 
@@ -244,9 +351,9 @@ public class ProductImportService {
     private BigDecimal parsePrice(String value) {
         if (!hasText(value)) return null;
         try {
-            return new BigDecimal(value.replace("€", "").replace(",", ".").trim());
+            return new BigDecimal(value.replace("€", "").replace(',', '.').trim());
         } catch (NumberFormatException exception) {
-            throw new IllegalArgumentException("cijena nije ispravna: " + value);
+            throw new IllegalArgumentException("Cijena nije ispravna: " + value + ".");
         }
     }
 
@@ -263,13 +370,16 @@ public class ProductImportService {
     }
 
     private String normalizeHeader(String value) {
-        return normalize(value).replace(" ", "").replace("-", "").replace("_", "");
+        if (value == null) return "";
+        String trimmed = value.trim().toLowerCase(Locale.ROOT);
+        return trimmed.replace(" ", "").replace("-", "").replace("_", "");
     }
 
-    private String normalize(String value) {
-        if (value == null) return "";
-        return java.text.Normalizer.normalize(value.trim().toLowerCase(), java.text.Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
+    private Optional<Integer> firstNonBlankLine(String[] lines) {
+        for (int index = 0; index < lines.length; index++) {
+            if (hasText(lines[index])) return Optional.of(index);
+        }
+        return Optional.empty();
     }
 
     private List<String> splitTags(String value) {
@@ -280,9 +390,24 @@ public class ProductImportService {
                 .toList();
     }
 
-    private String joinTags(List<String> tags) {
+    private String joinCanonicalStyles(List<String> tags) {
         if (tags == null) return "";
-        return tags.stream().filter(this::hasText).map(String::trim).distinct().collect(java.util.stream.Collectors.joining(","));
+        return tags.stream()
+                .filter(this::hasText)
+                .map(ProductTaxonomy::normalizeStyle)
+                .flatMap(Optional::stream)
+                .distinct()
+                .collect(Collectors.joining(","));
+    }
+
+    private String joinCanonicalRooms(List<String> tags) {
+        if (tags == null) return "";
+        return tags.stream()
+                .filter(this::hasText)
+                .map(ProductTaxonomy::normalizeRoom)
+                .flatMap(Optional::stream)
+                .distinct()
+                .collect(Collectors.joining(","));
     }
 
     private List<String> parseCsvLine(String line) {
@@ -316,7 +441,40 @@ public class ProductImportService {
         return "premium";
     }
 
+    private boolean looksLikeUrl(String value) {
+        try {
+            URI uri = URI.create(value.trim());
+            String scheme = uri.getScheme();
+            return ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) && hasText(uri.getHost());
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+    private boolean isTagHeader(String header) {
+        return isStyleHeader(header) || "roomtags".equals(header);
+    }
+
+    private boolean isStyleHeader(String header) {
+        return "styletags".equals(header);
+    }
+
+    private ImportErrorDto error(int row, String externalId, String message) {
+        return new ImportErrorDto(row, emptyToNull(externalId), message);
+    }
+
+    private ImportSummaryDto summary(int created, int updated, int skipped, int totalReceived, List<ProductDto> products, List<ImportErrorDto> errors) {
+        return new ImportSummaryDto(created, updated, skipped, totalReceived, products, errors);
+    }
+
+    private String emptyToNull(String value) {
+        return hasText(value) ? value.trim() : null;
+    }
+
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private record ImportCandidate(int row, ImportProductDto dto) {
     }
 }

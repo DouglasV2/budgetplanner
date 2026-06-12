@@ -6,7 +6,8 @@ public record ImportSummaryDto(
         int created,
         int updated,
         int skipped,
-        List<String> errors,
-        List<ProductDto> products
+        int totalReceived,
+        List<ProductDto> products,
+        List<ImportErrorDto> errors
 ) {
 }

@@ -107,6 +107,31 @@ class PlannerServiceTest {
         assertThat(replaced.items().get(0).product().price()).isLessThan(BigDecimal.valueOf(900));
     }
 
+
+
+    @Test
+    void plannerSkipsUnavailableAndProductsWithoutRoomTags() {
+        Product unavailableSofa = product("sofa-unavailable", "Nedostupan kauč", "IKEA", "sofa", 300, 5.0);
+        unavailableSofa.setAvailabilityStatus("unavailable");
+        unavailableSofa.setInStock(false);
+
+        Product sofaWithoutRoom = product("sofa-no-room", "Kauč bez prostorije", "IKEA", "sofa", 280, 4.9);
+        sofaWithoutRoom.setRoomTags("");
+
+        Product limitedSofa = product("sofa-limited", "Provjeri kauč", "JYSK", "sofa", 420, 4.1);
+        limitedSofa.setAvailabilityStatus("limited");
+        limitedSofa.setInStock(true);
+
+        PlannerService service = serviceWithProducts(List.of(unavailableSofa, sofaWithoutRoom, limitedSofa));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak."))
+                .plans()
+                .get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-limited");
+        assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-unavailable", "sofa-no-room");
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);

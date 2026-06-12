@@ -3,6 +3,7 @@ package ai.budgetspace.planner;
 import ai.budgetspace.dto.*;
 import ai.budgetspace.product.Product;
 import ai.budgetspace.product.ProductRepository;
+import ai.budgetspace.product.ProductTaxonomy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -136,7 +137,7 @@ public class PlannerService {
             List<String> lockedOrder = new ArrayList<>(lockedIds);
             List<Product> lockedProducts = productRepository.findAll().stream()
                     .filter(product -> lockedIds.contains(product.getId()))
-                    .filter(Product::isInStock)
+                    .filter(ProductTaxonomy::canEnterPlanner)
                     .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
                     .sorted(Comparator.comparingInt(product -> lockedOrder.indexOf(product.getId())))
                     .toList();
@@ -200,7 +201,7 @@ public class PlannerService {
         return productRepository.findAll().stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
                 .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
-                .filter(Product::isInStock)
+                .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
                 .filter(product -> product.getPrice().doubleValue() <= realisticLimit || mode.equals("stretch"))
@@ -255,7 +256,7 @@ public class PlannerService {
         return productRepository.findAll().stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(current.category()))
                 .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
-                .filter(Product::isInStock)
+                .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> !blockedIds.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
                 .filter(product -> replacementFits(product, changeType, currentPrice, safeLimit, stretchLimit))
@@ -676,7 +677,7 @@ public class PlannerService {
                     .filter(product -> product.getRetailer().equals(retailer))
                     .filter(product -> product.getCategory().equalsIgnoreCase(category))
                     .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
-                    .filter(Product::isInStock)
+                    .filter(ProductTaxonomy::canEnterPlanner)
                     .min(Comparator.comparing(Product::getPrice));
             if (cheapest.isPresent()) {
                 Product product = cheapest.get();

@@ -31,7 +31,9 @@ public class ProductController {
     ) {
         return productRepository.findAll().stream()
                 .filter(product -> retailer == null || product.getRetailer().equalsIgnoreCase(retailer))
-                .filter(product -> category == null || product.getCategory().equalsIgnoreCase(category))
+                .filter(product -> category == null || ProductTaxonomy.normalizeCategory(category)
+                        .map(normalized -> product.getCategory().equalsIgnoreCase(normalized))
+                        .orElse(product.getCategory().equalsIgnoreCase(category)))
                 .filter(product -> roomType == null || hasTag(product.getRoomTags(), roomType))
                 .filter(product -> maxPrice == null || product.getPrice().compareTo(maxPrice) <= 0)
                 .map(ProductDto::from)
