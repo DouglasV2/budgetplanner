@@ -65,6 +65,9 @@ a {
   top: 0;
   z-index: 20;
   backdrop-filter: blur(18px);
+  /* Add a subtle background and border so the header remains clear on scroll */
+  background: rgba(255, 253, 248, 0.85);
+  border-bottom: 1px solid var(--line);
 }
 
 .brand {

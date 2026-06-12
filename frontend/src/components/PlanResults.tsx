@@ -525,11 +525,14 @@ export function PlanResults({
             </div>
           </div>
 
+          {/*
+            Decision quick actions: expose only the most common adjustments to avoid
+            overwhelming the user. Single-store and least-store actions are still
+            available via the planner form but are hidden here.
+          */}
           <div className="quick-action-row decision-quick-actions" aria-label="Brze promjene plana">
-            <button type="button" onClick={() => onQuickAction('cheaper', selectedPlan)}>Treba jeftinije</button>
-            <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Želim ljepše</button>
-            <button type="button" onClick={() => onQuickAction('single-store', selectedPlan)}>Samo jedna trgovina</button>
-            <button type="button" onClick={() => onQuickAction('least-stores', selectedPlan)}>Manje trgovina</button>
+            <button type="button" onClick={() => onQuickAction('cheaper', selectedPlan)}>Pokaži povoljnije</button>
+            <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Pokaži ljepšu verziju</button>
           </div>
 
           <ShoppingListCard plan={selectedPlan} input={input} />
