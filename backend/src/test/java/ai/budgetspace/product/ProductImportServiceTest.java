@@ -178,6 +178,25 @@ class ProductImportServiceTest {
         assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("sourceName"));
     }
 
+    @Test
+    void futureScraperProductWithoutProductUrlIsRejected() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        ImportProductDto dto = new ImportProductDto(
+                null, "fs-1", "Prikupljeni kauč", "IKEA", "sofa", BigDecimal.valueOf(299), null,
+                List.of("modern"), List.of("living-room"), "https://example.com/i.jpg", null, "in-stock",
+                null, "2026-06-10", "standard", null, "future-scraper", "IKEA", null, "partial", null);
+
+        ImportSummaryDto summary = service.importProducts(List.of(dto));
+
+        assertThat(summary.created()).isZero();
+        assertThat(summary.skipped()).isEqualTo(1);
+        assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("productUrl"));
+    }
+
     private ImportProductDto product(String externalId, String name, String retailer, String category, BigDecimal price, List<String> styleTags, List<String> roomTags) {
         return new ImportProductDto(
                 null,

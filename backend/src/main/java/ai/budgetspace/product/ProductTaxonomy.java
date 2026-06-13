@@ -178,7 +178,13 @@ public final class ProductTaxonomy {
         if (!product.isInStock()) return false;
         String availability = normalizeAvailability(product.getAvailabilityStatus());
         if ("unavailable".equals(availability)) return false;
-        return product.getRoomTags() != null && !product.getRoomTags().isBlank();
+        // Sprint 9.2: products still marked for review (e.g. collected with weak data) must
+        // not be used by the planner until they are fixed into a usable product.
+        String quality = product.getDataQuality();
+        if (quality != null && "needs-review".equalsIgnoreCase(quality.trim())) return false;
+        if (product.getRoomTags() == null || product.getRoomTags().isBlank()) return false;
+        // Style matching expects a style, so a product without one cannot enter a plan.
+        return product.getStyleTags() != null && !product.getStyleTags().isBlank();
     }
 
     private static Map<String, String> categoryAliases() {

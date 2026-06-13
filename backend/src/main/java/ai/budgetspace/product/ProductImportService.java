@@ -315,8 +315,17 @@ public class ProductImportService {
         if (hasText(dto.sourceType()) && !hasText(dto.sourceName())) {
             errors.add(error(rowNumber, externalId, "sourceName je obavezan kad je sourceType postavljen."));
         }
+        // Sprint 9.2: a collected (future-scraper) product must carry a real link, otherwise the
+        // user could not open or verify it. Manual / retailer-snapshot products may omit it.
+        if ("future-scraper".equalsIgnoreCase(trimmed(dto.sourceType())) && !hasText(dto.productUrl())) {
+            errors.add(error(rowNumber, externalId, "productUrl je obavezan za prikupljene proizvode."));
+        }
 
         return errors;
+    }
+
+    private String trimmed(String value) {
+        return value == null ? "" : value.trim();
     }
 
     private Map<String, String> toCsvRow(List<String> headers, List<String> values) {

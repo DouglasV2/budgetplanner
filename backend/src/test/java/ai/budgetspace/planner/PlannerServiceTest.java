@@ -267,6 +267,22 @@ class PlannerServiceTest {
         assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-old");
     }
 
+    @Test
+    void needsReviewProductDoesNotEnterPlan() {
+        Product good = product("sofa-good", "Kauč dobar", "IKEA", "sofa", 500, 4.5);
+        Product review = product("sofa-review", "Kauč za pregled", "IKEA", "sofa", 400, 4.6);
+        review.setDataQuality("needs-review");
+
+        PlannerService service = serviceWithProducts(List.of(review, good));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak."))
+                .plans()
+                .get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-good");
+        assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-review");
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);

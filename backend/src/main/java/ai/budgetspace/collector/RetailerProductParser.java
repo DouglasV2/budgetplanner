@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -41,22 +42,27 @@ public class RetailerProductParser {
         this.objectMapper = objectMapper;
     }
 
-    public CollectedProductDto parse(String html, String url, String retailer, CollectorDefaultsDto defaults) {
+    public ParsedProduct parse(String html, String url, String retailer, CollectorDefaultsDto defaults) {
         String pageHtml = html == null ? "" : html;
+        List<String> warnings = new ArrayList<>();
+
         String name = null;
         BigDecimal price = null;
         String image = null;
         String availability = null;
         String externalId = null;
-        String method = "title";
+        String nameSource = null;
+        String priceSource = null;
 
         JsonNode product = findJsonLdProduct(pageHtml);
-        if (product != null) {
-            method = "json-ld";
+        boolean hasJsonLd = product != null;
+        if (hasJsonLd) {
             name = blankToNull(text(product, "name"));
+            if (name != null) nameSource = "json-ld";
             externalId = firstText(product, "sku", "productID", "mpn", "gtin13", "gtin");
             image = imageFrom(product.get("image"));
             price = priceFromOffers(product.get("offers"));
+            if (price != null) priceSource = "json-ld";
             availability = availabilityFromOffers(product.get("offers"));
         }
 
@@ -64,7 +70,7 @@ public class RetailerProductParser {
             String ogTitle = metaContent(pageHtml, "og:title");
             if (notBlank(ogTitle)) {
                 name = ogTitle;
-                if (method.equals("title")) method = "opengraph";
+                nameSource = "opengraph";
             }
         }
         if (image == null) image = metaContent(pageHtml, "og:image");
@@ -74,7 +80,7 @@ public class RetailerProductParser {
                     metaContent(pageHtml, "og:price:amount")));
             if (ogPrice != null) {
                 price = ogPrice;
-                if (method.equals("title")) method = "opengraph";
+                priceSource = "opengraph";
             }
         }
         if (availability == null) {
@@ -82,21 +88,54 @@ public class RetailerProductParser {
                     metaContent(pageHtml, "product:availability"),
                     metaContent(pageHtml, "og:availability")));
         }
-        if (name == null) name = blankToNull(cleanText(extractTitle(pageHtml)));
+        if (name == null) {
+            name = blankToNull(cleanText(extractTitle(pageHtml)));
+            if (name != null) nameSource = "title";
+        }
 
-        if ("IKEA".equalsIgnoreCase(retailer)) {
+        // Retailer-specific v1 (IKEA): clean the name and prefer a stable article-number id.
+        if (ikeaProductParser.handles(retailer, url)) {
             name = ikeaProductParser.refineName(name);
+            if (!notBlank(externalId)) {
+                String article = ikeaProductParser.articleNumberExternalId(url);
+                if (notBlank(article)) {
+                    externalId = article;
+                } else {
+                    warnings.add("Specifični podaci trgovine nisu pronađeni, korišten je izvedeni identifikator.");
+                }
+            }
+        }
+
+        boolean availabilityCertain = availability != null;
+        if (availability == null) {
+            availability = "check-store";
+            warnings.add("Dostupnost nije pronađena, postavljena na provjeru u trgovini.");
         }
 
         String category = defaults == null ? null : blankToNull(defaults.category());
-        List<String> roomTags = defaults == null ? null : defaults.roomTags();
-        List<String> styleTags = defaults == null ? null : defaults.styleTags();
+        List<String> roomTags = defaults == null ? null : nonEmpty(defaults.roomTags());
+        List<String> styleTags = defaults == null ? null : nonEmpty(defaults.styleTags());
+        if (category != null || roomTags != null || styleTags != null) {
+            warnings.add("Korišteni su zadani podaci za kategoriju/prostorije/stil iz zahtjeva.");
+        }
+
+        if ("opengraph".equals(nameSource) || "title".equals(nameSource) || "opengraph".equals(priceSource)) {
+            warnings.add("Korišten je fallback (OpenGraph/naslov) jer strukturirani podaci nisu potpuni.");
+        }
+        if ("title".equals(nameSource)) warnings.add("Naziv je uzet iz naslova stranice.");
+        if (image == null) warnings.add("Slika nije pronađena.");
+        if ("opengraph".equals(priceSource)) warnings.add("Cijena je parsirana iz fallback izvora.");
+
+        String dataQuality = computeDataQuality(name, price, url, image, category, roomTags, styleTags, hasJsonLd, availabilityCertain);
+        if (!"complete".equals(dataQuality)) {
+            warnings.add("Kvaliteta podataka nije potpuna (" + dataQuality + ").");
+        }
+
         String sourceReference = defaults != null && notBlank(defaults.sourceReference())
                 ? defaults.sourceReference().trim()
                 : "collector-" + LocalDate.now();
-        String dataQuality = method.equals("json-ld") ? "partial" : "needs-review";
 
-        return new CollectedProductDto(
+        CollectedProductDto collected = new CollectedProductDto(
                 notBlank(externalId) ? externalId.trim() : deriveExternalId(retailer, url),
                 name,
                 retailer,
@@ -104,7 +143,7 @@ public class RetailerProductParser {
                 price,
                 url,
                 blankToNull(image),
-                availability == null ? "check-store" : availability,
+                availability,
                 "Prikupljeno automatski — provjeri cijenu i dostupnost u trgovini.",
                 LocalDate.now().toString(),
                 roomTags,
@@ -114,8 +153,30 @@ public class RetailerProductParser {
                 retailer,
                 sourceReference,
                 dataQuality,
-                "Prikupljeno automatski (" + method + ") — podatke prije kupnje provjeri u trgovini."
+                "Prikupljeno automatski — podatke prije kupnje provjeri u trgovini."
         );
+        return new ParsedProduct(collected, warnings);
+    }
+
+    private String computeDataQuality(String name, BigDecimal price, String url, String image,
+                                      String category, List<String> roomTags, List<String> styleTags,
+                                      boolean hasJsonLd, boolean availabilityCertain) {
+        if (price == null || !notBlank(name)) return "needs-review";
+        boolean allFields = notBlank(image) && notBlank(category) && notBlank(url)
+                && roomTags != null && !roomTags.isEmpty()
+                && styleTags != null && !styleTags.isEmpty();
+        if (hasJsonLd && allFields && availabilityCertain) return "complete";
+        return "partial";
+    }
+
+    private List<String> nonEmpty(List<String> values) {
+        if (values == null) return null;
+        List<String> filtered = values.stream().filter(this::notBlank).toList();
+        return filtered.isEmpty() ? null : filtered;
+    }
+
+    /** The collected product plus any warnings the parser produced while reading the page. */
+    public record ParsedProduct(CollectedProductDto product, List<String> warnings) {
     }
 
     // --- JSON-LD ---------------------------------------------------------------
