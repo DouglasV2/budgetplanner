@@ -2,6 +2,8 @@
 
 Sprint 8.3 učvršćuje import proizvoda tako da katalog može stvarno pomoći planneru. Ovo nije korisnički ekran i nije zamjena za buduće scrapere. Služi za ručni/dev unos stvarnijih proizvoda dok ne spojimo trgovine.
 
+> Za import proizvoda u formatu koji izgleda kao izvoz iz trgovine vidi [retailer-snapshot-import.md](retailer-snapshot-import.md). Taj import koristi isti pipeline i istu validaciju opisanu ovdje.
+
 ## JSON import
 
 Pokreni backend, zatim iz root foldera projekta:

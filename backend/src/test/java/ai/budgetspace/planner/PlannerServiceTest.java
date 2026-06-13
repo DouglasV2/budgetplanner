@@ -5,6 +5,8 @@ import ai.budgetspace.dto.PlanItemDto;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.ProductDto;
 import ai.budgetspace.dto.ReplaceProductRequest;
+import ai.budgetspace.dto.StoreTotalDto;
+import ai.budgetspace.dto.StoreTripDto;
 import ai.budgetspace.product.Product;
 import ai.budgetspace.product.ProductRepository;
 import org.junit.jupiter.api.Test;
@@ -63,7 +65,8 @@ class PlannerServiceTest {
                 80,
                 "Low",
                 80,
-                List.of("IKEA", "JYSK")
+                List.of("IKEA", "JYSK"),
+                null
         );
 
         FurnishingPlanDto cleaned = service.replaceProduct(new ReplaceProductRequest(dirty, input, "table-1", "remove"));
@@ -97,7 +100,8 @@ class PlannerServiceTest {
                 80,
                 "Low",
                 80,
-                List.of("IKEA")
+                List.of("IKEA"),
+                null
         );
 
         FurnishingPlanDto replaced = service.replaceProduct(new ReplaceProductRequest(plan, input, "sofa-expensive", "cheaper"));
@@ -130,6 +134,29 @@ class PlannerServiceTest {
 
         assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-limited");
         assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-unavailable", "sofa-no-room");
+    }
+
+    @Test
+    void storeTripSummarisesStoresAndItemsToCheckInStore() {
+        Product sofa = product("sofa-ikea", "Kauč svijetli", "IKEA", "sofa", 650, 4.6);
+        Product tv = product("tv-ikea", "TV komoda", "IKEA", "tv-unit", 180, 4.4);
+        Product table = product("table-jysk", "Stolić", "JYSK", "table", 90, 4.2);
+        table.setAvailabilityStatus("limited");
+
+        PlannerService service = serviceWithProducts(List.of(sofa, tv, table));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak."))
+                .plans()
+                .get(0);
+
+        StoreTripDto trip = plan.storeTrip();
+        assertThat(trip).isNotNull();
+        assertThat(trip.storeCount()).isEqualTo(plan.retailersUsed().size());
+        assertThat(trip.stores()).extracting(StoreTotalDto::retailer)
+                .containsExactlyInAnyOrderElementsOf(plan.retailersUsed());
+        assertThat(trip.mainRetailer()).isEqualTo("IKEA");
+        assertThat(trip.checkInStoreCount()).isEqualTo(1);
+        assertThat(trip.recommendation()).contains("provjeri u trgovini");
     }
 
     private PlannerService serviceWithProducts(List<Product> products) {

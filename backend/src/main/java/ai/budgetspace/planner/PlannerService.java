@@ -341,8 +341,61 @@ public class PlannerService {
                 fitScore,
                 shoppingEffort,
                 styleConsistency,
-                retailersUsed
+                retailersUsed,
+                buildStoreTrip(cleanItems)
         );
+    }
+
+    private StoreTripDto buildStoreTrip(List<PlanItemDto> items) {
+        Map<String, List<PlanItemDto>> grouped = items.stream()
+                .collect(Collectors.groupingBy(item -> item.product().retailer(), LinkedHashMap::new, Collectors.toList()));
+
+        List<StoreTotalDto> stores = grouped.entrySet().stream()
+                .map(entry -> new StoreTotalDto(
+                        entry.getKey(),
+                        money(entry.getValue().stream().mapToDouble(item -> item.product().price().doubleValue()).sum()),
+                        entry.getValue().size()))
+                .sorted(Comparator.comparing(StoreTotalDto::total).reversed())
+                .toList();
+
+        int storeCount = stores.size();
+        String mainRetailer = stores.isEmpty() ? null : stores.get(0).retailer();
+        BigDecimal mainRetailerTotal = stores.isEmpty() ? money(0) : stores.get(0).total();
+        int checkInStoreCount = (int) items.stream().filter(this::needsStoreCheck).count();
+        String recommendation = buildStoreTripRecommendation(storeCount, mainRetailer, checkInStoreCount);
+
+        return new StoreTripDto(storeCount, mainRetailer, mainRetailerTotal, checkInStoreCount, recommendation, stores);
+    }
+
+    private boolean needsStoreCheck(PlanItemDto item) {
+        String status = item.product().availabilityStatus();
+        if (status == null) return false;
+        String normalized = status.trim().toLowerCase(Locale.ROOT);
+        return normalized.equals("limited") || normalized.equals("check-store");
+    }
+
+    private String buildStoreTripRecommendation(int storeCount, String mainRetailer, int checkInStoreCount) {
+        String base;
+        if (storeCount <= 0 || mainRetailer == null) {
+            base = "Plan je još prazan, dodaj barem jedan glavni komad.";
+        } else if (storeCount == 1) {
+            base = "Sve kupuješ u " + mainRetailer + ", pa je manje obilazaka.";
+        } else {
+            base = "Većinu kupuješ u " + mainRetailer + ", a plan koristi " + storeCount + " " + storesWord(storeCount) + ".";
+        }
+        if (checkInStoreCount > 0) {
+            base += checkInStoreCount == 1
+                    ? " Jednu stvar prvo provjeri u trgovini."
+                    : " Neke stvari prvo provjeri u trgovini.";
+        }
+        return base;
+    }
+
+    private String storesWord(int count) {
+        int mod100 = count % 100;
+        int mod10 = count % 10;
+        if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "trgovine";
+        return "trgovina";
     }
 
     private PlanItemDto createPlanItem(Product product, PlannerInputDto input, String mode, String prefix) {

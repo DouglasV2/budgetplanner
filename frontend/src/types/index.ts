@@ -90,6 +90,21 @@ export interface PlanItem {
   stepTitle?: string;
 }
 
+export interface StoreTotal {
+  retailer: Retailer;
+  total: number;
+  itemCount: number;
+}
+
+export interface StoreTrip {
+  storeCount: number;
+  mainRetailer?: Retailer | null;
+  mainRetailerTotal: number;
+  checkInStoreCount: number;
+  recommendation: string;
+  stores: StoreTotal[];
+}
+
 export interface FurnishingPlan {
   id: string;
   name: string;
@@ -110,6 +125,7 @@ export interface FurnishingPlan {
   shoppingEffort: 'Low' | 'Medium' | 'High';
   styleConsistency: number;
   retailersUsed: Retailer[];
+  storeTrip?: StoreTrip | null;
 }
 
 export interface SavedPlanResponse {

@@ -3,6 +3,7 @@ package ai.budgetspace.product;
 import ai.budgetspace.dto.ImportProductDto;
 import ai.budgetspace.dto.ImportSummaryDto;
 import ai.budgetspace.dto.ProductDto;
+import ai.budgetspace.dto.RetailerProductSnapshotDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,10 +17,12 @@ import java.util.List;
 public class ProductController {
     private final ProductRepository productRepository;
     private final ProductImportService productImportService;
+    private final RetailerSnapshotImportService retailerSnapshotImportService;
 
-    public ProductController(ProductRepository productRepository, ProductImportService productImportService) {
+    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService) {
         this.productRepository = productRepository;
         this.productImportService = productImportService;
+        this.retailerSnapshotImportService = retailerSnapshotImportService;
     }
 
     @GetMapping("/api/products")
@@ -53,6 +56,11 @@ public class ProductController {
     @PostMapping("/api/products/import/ikea-starter")
     public ImportSummaryDto importIkeaStarterCatalog() {
         return productImportService.importIkeaStarterCatalog();
+    }
+
+    @PostMapping("/api/products/import/retailer-snapshot")
+    public ImportSummaryDto importRetailerSnapshot(@RequestBody List<RetailerProductSnapshotDto> snapshot) {
+        return retailerSnapshotImportService.importSnapshot(snapshot);
     }
 
     private boolean hasTag(String csv, String value) {

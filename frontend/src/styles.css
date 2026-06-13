@@ -2966,6 +2966,38 @@ textarea {
   line-height: 1.45;
 }
 
+.budget-pressure-strip {
+  display: grid;
+  gap: 3px;
+  border: 1px solid rgba(236, 122, 46, 0.22);
+  border-radius: 18px;
+  background: rgba(236, 122, 46, 0.08);
+  padding: 11px 12px;
+  line-height: 1.45;
+}
+
+.budget-pressure-strip strong {
+  color: var(--orange-dark);
+  font-weight: 900;
+}
+
+.budget-pressure-strip span {
+  color: var(--ink);
+}
+
+.shopping-list-lead {
+  margin: 0;
+  color: #3f563a;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.shopping-list-group li small.check-store-tag {
+  color: var(--orange-dark);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
 .product-shop-note,
 .product-delivery-note {
   display: block;

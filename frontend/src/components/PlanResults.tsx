@@ -16,8 +16,11 @@ import {
   formatPlanForSharing,
   furnishingLevelLabels,
   getRetailerBreakdown,
+  isCheckInStore,
+  resolveStoreTrip,
   roomLabels,
   shoppingPriorityLabels,
+  storeCountText,
   styleLabels
 } from '../utils/planner';
 
@@ -253,57 +256,47 @@ function productCheckLabel(product: Product) {
   return 'Cijenu provjeri u trgovini';
 }
 
-function storeCountText(count: number) {
+function itemsCountText(count: number) {
   if (count === 1) return '1 stvar';
   return `${count} stvari`;
 }
 
-function storeAdvice(plan: FurnishingPlan, input: PlannerInput) {
-  if (plan.retailersUsed.length <= 1) {
-    const retailer = plan.retailersUsed[0];
-    return retailer ? `Sve je iz ${retailer}, pa ima manje obilazaka.` : '';
-  }
-
-  if (input.retailerMode === 'single' || input.optimizationGoal === 'least-stores') {
-    const mainRetailer = getRetailerBreakdown(plan)[0]?.retailer;
-    return mainRetailer
-      ? `Najviše stvari su iz ${mainRetailer}, a ostatak je dodan jer bolje čuva budžet.`
-      : `Ovaj plan koristi ${plan.retailersUsed.length} trgovine da ne moraš tražiti svaku stvar posebno.`;
-  }
-
-  return `Ovaj plan koristi ${plan.retailersUsed.length} trgovine da ne moraš tražiti svaku stvar posebno.`;
-}
-
 function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: PlannerInput }) {
-  const retailerText = plan.retailersUsed.length <= 1 ? plan.retailersUsed[0] || 'jedna trgovina' : plan.retailersUsed.join(' + ');
+  const trip = resolveStoreTrip(plan);
   const budgetDifference = input.budget - plan.total;
   const budgetText = budgetDifference >= 0
     ? `Ostaje ${formatCurrency(budgetDifference)}`
     : `${formatCurrency(Math.abs(budgetDifference))} iznad budžeta`;
   const breakdown = getRetailerBreakdown(plan);
+  const leadText = trip.storeCount > 0
+    ? `Sve bitno možeš kupiti u ${storeCountText(trip.storeCount)} za ${formatCurrency(plan.total)}.`
+    : 'Dodaj barem jedan glavni komad da složimo popis.';
 
   return (
     <section className="shopping-list-card" aria-label="Popis za kupnju">
       <div className="shopping-list-head">
         <div>
           <span>Popis za kupnju</span>
-          <strong>{plan.items.length} proizvoda · {retailerText}</strong>
+          <strong>{plan.items.length} proizvoda · {storeCountText(trip.storeCount)}</strong>
           <small>{budgetText}</small>
         </div>
         <strong>{formatCurrency(plan.total)}</strong>
       </div>
+      <p className="shopping-list-lead">{leadText}</p>
       <div className="shopping-list-groups">
         {breakdown.map((entry) => (
           <div className="shopping-list-group" key={entry.retailer}>
             <div className="shopping-list-group-title">
-              <span>{entry.retailer} — {storeCountText(entry.count)}</span>
+              <span>{entry.retailer} — {itemsCountText(entry.count)}</span>
               <strong>{formatCurrency(entry.total)}</strong>
             </div>
             <ul>
               {entry.items.map((item) => (
                 <li key={item.product.id}>
                   <span>{item.product.name}</span>
-                  <small>{shoppingPriorityLabels[priorityForItem(item, input.roomType)]}</small>
+                  {isCheckInStore(item.product)
+                    ? <small className="check-store-tag">Provjeri u trgovini</small>
+                    : <small>{shoppingPriorityLabels[priorityForItem(item, input.roomType)]}</small>}
                   <strong>{formatCurrency(item.product.price)}</strong>
                 </li>
               ))}
@@ -470,6 +463,8 @@ export function PlanResults({
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans.find((plan) => plan.name === 'Najbolji izbor') ?? plans[0];
   const overBudget = selectedPlan.total > input.budget;
   const breakdown = getRetailerBreakdown(selectedPlan);
+  const trip = resolveStoreTrip(selectedPlan);
+  const budgetTight = selectedPlan.total >= input.budget * 0.92;
   const missing = missingForRoom(selectedPlan, input);
   const steps = purchaseSteps(selectedPlan, input.roomType);
   const tier = TIER_LABELS[selectedPlan.name] ?? furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
@@ -503,8 +498,19 @@ export function PlanResults({
               </div>
             </div>
 
+            {budgetTight && (
+              <div className="budget-pressure-strip">
+                <strong>Budžet je tijesan</strong>
+                <span>
+                  {overBudget
+                    ? 'Prvo preskoči stvari iz “Može kasnije”, pa provjeri ima li jeftinija opcija za najskuplji komad.'
+                    : 'Ostaje malo prostora — kreni s najvažnijim stvarima, detalji mogu kasnije.'}
+                </span>
+              </div>
+            )}
+
             <div className="store-advice-strip">
-              {storeAdvice(selectedPlan, input)}
+              {trip.recommendation}
             </div>
 
             {primaryStep && (

@@ -22,6 +22,7 @@ public record FurnishingPlanDto(
         int fitScore,
         String shoppingEffort,
         int styleConsistency,
-        List<String> retailersUsed
+        List<String> retailersUsed,
+        StoreTripDto storeTrip
 ) {
 }

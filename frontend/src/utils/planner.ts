@@ -1,4 +1,4 @@
-import type { FurnishingLevel, FurnishingPlan, PlanItem, PlannerInput, ProductCategory, Retailer, RoomType, ShoppingPriority, StyleType } from '../types';
+import type { FurnishingLevel, FurnishingPlan, PlanItem, PlannerInput, Product, ProductCategory, Retailer, RoomType, ShoppingPriority, StoreTotal, StoreTrip, StyleType } from '../types';
 
 export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon', 'Lesnina'];
 
@@ -62,6 +62,61 @@ export function getRetailerBreakdown(plan: FurnishingPlan) {
   return Object.entries(breakdown)
     .map(([retailer, value]) => ({ retailer: retailer as Retailer, ...value }))
     .sort((a, b) => b.total - a.total);
+}
+
+export function isCheckInStore(product: Product) {
+  const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
+  return status === 'limited' || status === 'check-store';
+}
+
+function storesWord(count: number) {
+  const mod100 = count % 100;
+  const mod10 = count % 10;
+  if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'trgovine';
+  return 'trgovina';
+}
+
+export function storeCountText(count: number) {
+  return `${count} ${storesWord(count)}`;
+}
+
+function buildStoreTripRecommendation(storeCount: number, mainRetailer: Retailer | null, checkInStoreCount: number) {
+  let base: string;
+  if (storeCount <= 0 || !mainRetailer) {
+    base = 'Plan je još prazan, dodaj barem jedan glavni komad.';
+  } else if (storeCount === 1) {
+    base = `Sve kupuješ u ${mainRetailer}, pa je manje obilazaka.`;
+  } else {
+    base = `Većinu kupuješ u ${mainRetailer}, a plan koristi ${storeCount} ${storesWord(storeCount)}.`;
+  }
+  if (checkInStoreCount > 0) {
+    base += checkInStoreCount === 1 ? ' Jednu stvar prvo provjeri u trgovini.' : ' Neke stvari prvo provjeri u trgovini.';
+  }
+  return base;
+}
+
+// Prefer the store trip the backend already computed. Older saved plans were
+// created before Sprint 8.4, so fall back to rebuilding it from the items.
+export function resolveStoreTrip(plan: FurnishingPlan): StoreTrip {
+  if (plan.storeTrip && plan.storeTrip.stores?.length) {
+    return plan.storeTrip;
+  }
+  const stores: StoreTotal[] = getRetailerBreakdown(plan).map((entry) => ({
+    retailer: entry.retailer,
+    total: entry.total,
+    itemCount: entry.count
+  }));
+  const storeCount = stores.length;
+  const mainRetailer = stores[0]?.retailer ?? null;
+  const checkInStoreCount = plan.items.filter((item) => isCheckInStore(item.product)).length;
+  return {
+    storeCount,
+    mainRetailer,
+    mainRetailerTotal: stores[0]?.total ?? 0,
+    checkInStoreCount,
+    recommendation: buildStoreTripRecommendation(storeCount, mainRetailer, checkInStoreCount),
+    stores
+  };
 }
 
 export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) {
