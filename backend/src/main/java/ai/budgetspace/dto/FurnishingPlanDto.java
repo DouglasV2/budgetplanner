@@ -23,6 +23,10 @@ public record FurnishingPlanDto(
         String shoppingEffort,
         int styleConsistency,
         List<String> retailersUsed,
-        StoreTripDto storeTrip
+        StoreTripDto storeTrip,
+        List<String> purchaseSummary,
+        List<String> budgetRepairSuggestions,
+        BigDecimal overBudgetAmount,
+        String storeLimitNote
 ) {
 }

@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.Normalizer;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,20 +17,26 @@ public class PlannerService {
 
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.of(
             "living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor"),
-            "home-office", List.of("desk", "chair", "storage", "lighting", "decor"),
+            "home-office", List.of("desk", "chair", "lighting", "storage", "decor", "rug"),
             "bedroom", List.of("bed", "mattress", "storage", "lighting", "rug", "decor"),
-            "home-gym", List.of("gym-equipment", "storage", "lighting", "decor")
+            "home-gym", List.of("gym-equipment", "storage", "lighting", "decor", "rug")
     );
 
+    // Najvažnije (buy-first) po prostoru.
     private static final Map<String, Set<String>> CORE_CATEGORIES_BY_ROOM = Map.of(
-            "living-room", Set.of("sofa", "tv-unit", "table"),
+            "living-room", Set.of("sofa", "tv-unit"),
             "home-office", Set.of("desk", "chair"),
             "bedroom", Set.of("bed", "mattress"),
             "home-gym", Set.of("gym-equipment")
     );
 
-    private static final Set<String> COMFORT_CATEGORIES = Set.of("rug", "lighting", "storage");
-    private static final Set<String> DETAIL_CATEGORIES = Set.of("decor");
+    // Za ugodniji prostor (add-comfort) po prostoru. Sve ostalo u flowu je "može kasnije".
+    private static final Map<String, Set<String>> COMFORT_CATEGORIES_BY_ROOM = Map.of(
+            "living-room", Set.of("table", "rug", "lighting", "storage"),
+            "home-office", Set.of("lighting", "storage"),
+            "bedroom", Set.of("storage", "lighting", "rug"),
+            "home-gym", Set.of("storage", "lighting")
+    );
 
     private static final Map<String, String> ROOM_LABELS = Map.of(
             "living-room", "dnevni boravak",
@@ -42,13 +46,14 @@ public class PlannerService {
     );
 
     private final ProductRepository productRepository;
+    private final PlannerIntentExtractor intentExtractor = new PlannerIntentExtractor();
 
     public PlannerService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
     public PlanGenerationResponse generate(PlannerInputDto rawInput) {
-        PlannerInputDto input = normalizePrompt(rawInput == null ? null : rawInput.normalized());
+        PlannerInputDto input = intentExtractor.enrich(rawInput == null ? null : rawInput.normalized());
         List<FurnishingPlanDto> plans = List.of(
                 buildPlan(input, "value"),
                 buildPlan(input, "budget"),
@@ -184,11 +189,14 @@ public class PlannerService {
             default -> "Najjeftinije";
         };
 
-        Set<String> retailersInPlan = items.stream()
+        List<PlanItemDto> repairedItems = repairBudget(input, items, mode);
+
+        Set<String> retailersInPlan = repairedItems.stream()
                 .map(item -> item.product().retailer())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        return calculatePlan(mode, name, label, describePlan(mode, input, total, retailersInPlan), input, orderItemsForShopping(input, items));
+        double repairedTotal = sumPrice(repairedItems);
+        return calculatePlan(mode, name, label, describePlan(mode, input, repairedTotal, retailersInPlan), input, orderItemsForShopping(input, repairedItems));
     }
 
     private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers) {
@@ -232,8 +240,26 @@ public class PlannerService {
         double stylePriorityBonus = input.optimizationGoal().equals("style-match") && styleMatches(product, input.style()) ? 20 : 0;
         double singleStoreBonus = input.retailerMode().equals("single") ? 14 : 0;
         double coreBonus = isCoreCategory(input.roomType(), product.getCategory()) ? 12 : 0;
+        double preferredRetailerBonus = input.preferredRetailers() != null && input.preferredRetailers().contains(product.getRetailer()) ? 30 : 0;
+        double requestedBonus = input.mustHaveCategories() != null && input.mustHaveCategories().contains(product.getCategory()) ? 18 : 0;
+        double storeCapBonus = storeCapBonus(input, product, currentRetailers);
 
-        return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus;
+        return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias
+                + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus
+                + preferredRetailerBonus + requestedBonus + storeCapBonus;
+    }
+
+    // Store limit v1: when the user asked for at most N stores, reward staying inside the
+    // stores already in the plan and strongly penalise opening a new one past the limit.
+    // The penalty is soft: if a category only exists in a new store, that product can still
+    // be the best available option and gets picked, which is the "allow another store if
+    // really needed" behaviour.
+    private double storeCapBonus(PlannerInputDto input, Product product, Set<String> currentRetailers) {
+        int cap = input.maxStores();
+        if (cap <= 0) return 0;
+        boolean newStore = !currentRetailers.contains(product.getRetailer());
+        if (!newStore) return 22;
+        return currentRetailers.size() >= cap ? -160 : -10;
     }
 
     private Product pickReplacement(
@@ -321,6 +347,8 @@ public class PlannerService {
         String shoppingEffort = retailersUsed.size() <= 1 ? "Low" : retailersUsed.size() <= 3 ? "Medium" : "High";
         int budgetFit = total <= input.budget() ? 8 : -6;
         int fitScore = Math.min(98, Math.max(48, (int) Math.round(62 + cleanItems.size() * 4 + styleConsistency / 6.0 + budgetFit)));
+        StoreTripDto storeTrip = buildStoreTrip(cleanItems);
+        double overBudget = Math.max(0, total - input.budget());
 
         return new FurnishingPlanDto(
                 id,
@@ -342,7 +370,11 @@ public class PlannerService {
                 shoppingEffort,
                 styleConsistency,
                 retailersUsed,
-                buildStoreTrip(cleanItems)
+                storeTrip,
+                buildPurchaseSummary(input, cleanItems, total, storeTrip),
+                buildBudgetRepairSuggestions(input, cleanItems, total),
+                money(overBudget),
+                buildStoreLimitNote(input, retailersUsed)
         );
     }
 
@@ -396,6 +428,151 @@ public class PlannerService {
         int mod10 = count % 10;
         if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "trgovine";
         return "trgovina";
+    }
+
+    // Budget repair v1. Only runs while building a fresh plan (not on manual replace).
+    // Order: keep the most important pieces, make optional pieces cheaper, then move the
+    // least important optional pieces out of the main buy. Core and explicitly requested
+    // categories are never dropped.
+    private List<PlanItemDto> repairBudget(PlannerInputDto input, List<PlanItemDto> items, String mode) {
+        List<PlanItemDto> working = new ArrayList<>(items);
+        double budget = input.budget();
+        if (sumPrice(working) <= budget) return working;
+
+        Set<String> protectedCats = new LinkedHashSet<>(CORE_CATEGORIES_BY_ROOM.getOrDefault(input.roomType(), Set.of()));
+        protectedCats.addAll(input.mustHaveCategories());
+
+        List<String> optionalIds = working.stream()
+                .filter(item -> !protectedCats.contains(item.product().category()))
+                .sorted(Comparator.comparing((PlanItemDto item) -> item.product().price()).reversed())
+                .map(item -> item.product().id())
+                .toList();
+        for (String id : optionalIds) {
+            if (sumPrice(working) <= budget) break;
+            int pos = indexOfId(working, id);
+            if (pos < 0) continue;
+            PlanItemDto item = working.get(pos);
+            Set<String> usedIds = working.stream().map(other -> other.product().id()).collect(Collectors.toCollection(LinkedHashSet::new));
+            usedIds.remove(id);
+            Product cheaper = cheapestInCategory(item.product().category(), input, usedIds, item.product().price().doubleValue());
+            if (cheaper != null) {
+                working.set(pos, createPlanItem(cheaper, input, mode, "Povoljnija opcija da plan ostane bliže budžetu: "));
+            }
+        }
+
+        for (String priority : List.of("later", "add-comfort")) {
+            while (sumPrice(working) > budget) {
+                PlanItemDto target = working.stream()
+                        .filter(item -> !protectedCats.contains(item.product().category()))
+                        .filter(item -> priority.equals(priorityForCategory(input.roomType(), item.product().category())))
+                        .max(Comparator.comparing(item -> item.product().price()))
+                        .orElse(null);
+                if (target == null) break;
+                working.removeIf(item -> item.product().id().equals(target.product().id()));
+            }
+        }
+
+        return working;
+    }
+
+    private double sumPrice(List<PlanItemDto> items) {
+        return items.stream().mapToDouble(item -> item.product().price().doubleValue()).sum();
+    }
+
+    private int indexOfId(List<PlanItemDto> items, String id) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).product().id().equals(id)) return i;
+        }
+        return -1;
+    }
+
+    private Product cheapestInCategory(String category, PlannerInputDto input, Set<String> excludeIds, double maxPriceExclusive) {
+        List<String> allowed = selectedRetailers(input);
+        return productRepository.findAll().stream()
+                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> allowed.contains(product.getRetailer()))
+                .filter(product -> !excludeIds.contains(product.getId()))
+                .filter(product -> product.getPrice().doubleValue() < maxPriceExclusive)
+                .min(Comparator.comparing(Product::getPrice))
+                .orElse(null);
+    }
+
+    private List<String> buildPurchaseSummary(PlannerInputDto input, List<PlanItemDto> items, double total, StoreTripDto storeTrip) {
+        List<String> summary = new ArrayList<>();
+        int storeCount = storeTrip == null ? 0 : storeTrip.storeCount();
+        if (total <= input.budget()) {
+            summary.add("Ova kombinacija drži budžet i koristi " + storeCount + " " + storesWord(storeCount) + ".");
+        } else {
+            summary.add("Plan je " + money(total - input.budget()) + " iznad budžeta — pogledaj kako ga spustiti.");
+        }
+        if (!input.alreadyHaveCategories().isEmpty()) {
+            String labels = input.alreadyHaveCategories().stream()
+                    .map(this::categoryLabel)
+                    .distinct()
+                    .limit(3)
+                    .collect(Collectors.joining(", "));
+            summary.add(capitalize(labels) + " ne dodajem jer si rekao da već imaš.");
+        }
+        if (!input.mustHaveCategories().isEmpty()) {
+            String first = categoryLabel(input.mustHaveCategories().get(0));
+            summary.add(capitalize(first) + " je ostao prioritet jer si ga posebno tražio.");
+        }
+        if (storeCount > 1 && storeTrip.mainRetailer() != null) {
+            summary.add("Većinu kupuješ u " + storeTrip.mainRetailer() + ".");
+        }
+        return summary.stream().limit(4).toList();
+    }
+
+    private List<String> buildBudgetRepairSuggestions(PlannerInputDto input, List<PlanItemDto> items, double total) {
+        double budget = input.budget();
+        boolean tight = total >= budget * 0.92;
+        if (!tight) return List.of();
+
+        Set<String> protectedCats = new LinkedHashSet<>(CORE_CATEGORIES_BY_ROOM.getOrDefault(input.roomType(), Set.of()));
+        protectedCats.addAll(input.mustHaveCategories());
+
+        List<String> tips = new ArrayList<>();
+        items.stream()
+                .filter(item -> "later".equals(priorityForCategory(input.roomType(), item.product().category())))
+                .filter(item -> !protectedCats.contains(item.product().category()))
+                .max(Comparator.comparing(item -> item.product().price()))
+                .ifPresent(item -> tips.add("Preskoči " + categoryLabel(item.product().category()).toLowerCase(Locale.ROOT) + " i štedi " + money(item.product().price().doubleValue()) + "."));
+
+        items.stream()
+                .filter(item -> !protectedCats.contains(item.product().category()))
+                .sorted(Comparator.comparing((PlanItemDto item) -> item.product().price()).reversed())
+                .map(item -> swapSuggestion(input, item))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(tips::add);
+
+        tips.add(total > budget
+                ? "Kreni s najvažnijim stvarima, a ostalo dodaj kad ostane budžeta."
+                : "Možeš sve uzeti odmah, ali kreni od najvažnijih stvari.");
+        return tips.stream().distinct().limit(3).toList();
+    }
+
+    private String swapSuggestion(PlannerInputDto input, PlanItemDto item) {
+        Product cheaper = cheapestInCategory(item.product().category(), input, Set.of(item.product().id()), item.product().price().doubleValue());
+        if (cheaper == null) return null;
+        double diff = item.product().price().doubleValue() - cheaper.getPrice().doubleValue();
+        if (diff < 1) return null;
+        return "Povoljnija " + categoryLabel(item.product().category()).toLowerCase(Locale.ROOT) + " spušta plan za " + money(diff) + ".";
+    }
+
+    private String buildStoreLimitNote(PlannerInputDto input, List<String> retailersUsed) {
+        int cap = input.maxStores();
+        if (cap <= 0) return null;
+        int used = retailersUsed.size();
+        if (used <= cap) return null;
+        return "Za bolju cijenu plan koristi " + used + " " + storesWord(used) + ". Ako želiš manje obilazaka, preskoči stvari iz „Može kasnije”.";
+    }
+
+    private String capitalize(String value) {
+        if (value == null || value.isEmpty()) return value;
+        return Character.toUpperCase(value.charAt(0)) + value.substring(1);
     }
 
     private PlanItemDto createPlanItem(Product product, PlannerInputDto input, String mode, String prefix) {
@@ -652,10 +829,14 @@ public class PlannerService {
         Set<String> core = CORE_CATEGORIES_BY_ROOM.getOrDefault(input.roomType(), CORE_CATEGORIES_BY_ROOM.get("living-room"));
         String level = input.furnishingLevel() == null ? "comfort" : input.furnishingLevel();
 
+        Set<String> comfort = COMFORT_CATEGORIES_BY_ROOM.getOrDefault(input.roomType(), Set.of());
         for (String category : roomFlow) {
-            boolean include = core.contains(category)
-                    || (COMFORT_CATEGORIES.contains(category) && (level.equals("comfort") || level.equals("complete")))
-                    || (DETAIL_CATEGORIES.contains(category) && level.equals("complete"));
+            boolean isCore = core.contains(category);
+            boolean isComfort = comfort.contains(category);
+            boolean isLater = !isCore && !isComfort;
+            boolean include = isCore
+                    || (isComfort && (level.equals("comfort") || level.equals("complete")))
+                    || (isLater && level.equals("complete"));
             if (include) categories.add(category);
         }
 
@@ -676,15 +857,19 @@ public class PlannerService {
         return CORE_CATEGORIES_BY_ROOM.getOrDefault(roomType, Set.of()).contains(category);
     }
 
+    private boolean isComfortCategory(String roomType, String category) {
+        return COMFORT_CATEGORIES_BY_ROOM.getOrDefault(roomType, Set.of()).contains(category);
+    }
+
     private String priorityForCategory(String roomType, String category) {
         if (isCoreCategory(roomType, category)) return "buy-first";
-        if (COMFORT_CATEGORIES.contains(category)) return "add-comfort";
+        if (isComfortCategory(roomType, category)) return "add-comfort";
         return "later";
     }
 
     private String roleForCategory(String roomType, String category) {
         if (isCoreCategory(roomType, category)) return "Ovo je glavni komad";
-        if (COMFORT_CATEGORIES.contains(category)) return "Ovo zaokružuje prostor";
+        if (isComfortCategory(roomType, category)) return "Ovo zaokružuje prostor";
         return "Ovo je detalj za kasnije";
     }
 
@@ -711,7 +896,7 @@ public class PlannerService {
     }
 
     private boolean prefersFewStores(PlannerInputDto input) {
-        return "single".equals(input.retailerMode()) || "least-stores".equals(input.optimizationGoal());
+        return "single".equals(input.retailerMode()) || "least-stores".equals(input.optimizationGoal()) || input.maxStores() > 0;
     }
 
     private Optional<String> preferredRetailerForFewStores(PlannerInputDto input, List<String> categories, String mode) {
@@ -741,7 +926,8 @@ public class PlannerService {
         }
 
         double budgetFit = total <= input.budget() * ("stretch".equals(mode) ? 1.12 : 1.0) ? 80 : -80;
-        return covered * 1000 + styleHits * 50 + budgetFit - total / 10;
+        double preferredBonus = input.preferredRetailers() != null && input.preferredRetailers().contains(retailer) ? 600 : 0;
+        return covered * 1000 + styleHits * 50 + budgetFit + preferredBonus - total / 10;
     }
 
     private String storeAdvice(PlannerInputDto input, List<PlanItemDto> items, List<String> retailersUsed) {
@@ -762,105 +948,6 @@ public class PlannerService {
         }
 
         return "Plan koristi " + retailersUsed.size() + " trgovine da ne moraš tražiti svaku stvar posebno.";
-    }
-
-    private PlannerInputDto normalizePrompt(PlannerInputDto rawInput) {
-        PlannerInputDto input = rawInput == null ? new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi", List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina"), "best-value", "comfort", List.of(), List.of(), List.of()) : rawInput.normalized();
-        String text = normalize(input.prompt());
-        if (text.isBlank()) return input;
-
-        Optional<Integer> budget = firstNumber(text, Pattern.compile("(\\d{3,5})\\s*(€|eur|eura|euro)"));
-        if (budget.isPresent()) input = input.withBudget(clamp(budget.get(), 500, 5000));
-
-        Optional<Integer> size = firstNumber(text, Pattern.compile("(\\d{1,2})\\s*(m2|m²|kvadrata)"));
-        if (size.isPresent()) input = input.withSize(clamp(size.get(), 8, 45));
-
-        if (matches(text, "dnevni|boravak|living")) input = input.withRoomType("living-room");
-        if (matches(text, "ured|office|radni|posao")) input = input.withRoomType("home-office");
-        if (matches(text, "spava|bedroom|krevet")) input = input.withRoomType("bedroom");
-        if (matches(text, "teretan|gym|trening|fitness")) input = input.withRoomType("home-gym");
-
-        if (matches(text, "ne znam|svejedno|predlozi|predloži")) input = input.withStyle("surprise");
-        if (matches(text, "svijetl|prozrac|prozrač|skandi|scandi|nordic|skandinav")) input = input.withStyle("bright");
-        if (matches(text, "toplo|ugodno|mekano|domac|domać|cozy")) input = input.withStyle("warm");
-        if (matches(text, "modern|uredno")) input = input.withStyle("modern");
-        if (matches(text, "minimal|jednostavn|cisto|čisto")) input = input.withStyle("minimal");
-        if (matches(text, "classic|klasic|klasič")) input = input.withStyle("classic");
-        if (matches(text, "industrial|industrij|tamno|crno|metal")) input = input.withStyle("industrial");
-        if (matches(text, "boho|prirodn|biljk|ratan")) input = input.withStyle("boho");
-
-        if (matches(text, "osnovno|samo osnov|minimalno oprem")) input = input.withFurnishingLevel("basic");
-        if (matches(text, "udobnij|normalno|dovoljno komplet")) input = input.withFurnishingLevel("comfort");
-        if (matches(text, "kompletno|sve oprem|dovrsen|dovršen|odmah gotovo")) input = input.withFurnishingLevel("complete");
-
-        List<String> mentionedRetailers = RETAILERS.stream()
-                .filter(retailer -> text.contains(normalize(retailer)))
-                .toList();
-        if (mentionedRetailers.size() == 1 && matches(text, "samo|iskljucivo|jedna trgovina|sve iz")) {
-            input = input.withRetailers("single", mentionedRetailers);
-        } else if (!mentionedRetailers.isEmpty()) {
-            input = input.withRetailers("multi", mentionedRetailers);
-        }
-
-        if (matches(text, "najjeftin|sto jeftin|low cost|budget")) input = input.withOptimizationGoal("lowest-price");
-        if (matches(text, "best value|omjer|balans|vrijednost")) input = input.withOptimizationGoal("best-value");
-        if (matches(text, "jedna trgovina|manje trgovina|sto manje trgovina|jedan odlazak")) input = input.withOptimizationGoal("least-stores");
-        if (matches(text, "najljep|estetsk|stil")) input = input.withOptimizationGoal("style-match");
-
-        Map<String, Pattern> categoryKeywords = Map.ofEntries(
-                Map.entry("sofa", Pattern.compile("kauc|kauč|sofa|trosjed|garnitura")),
-                Map.entry("tv-unit", Pattern.compile("tv komod|tv element|komod")),
-                Map.entry("table", Pattern.compile("stolic(?!a)|stolić|klub stol|coffee table")),
-                Map.entry("rug", Pattern.compile("tepih")),
-                Map.entry("lighting", Pattern.compile("lampa|rasvjet|svjetl")),
-                Map.entry("storage", Pattern.compile("polic|regal|ormar|storage")),
-                Map.entry("decor", Pattern.compile("dekor|slika|jastuk|biljk")),
-                Map.entry("desk", Pattern.compile("radni stol|desk")),
-                Map.entry("chair", Pattern.compile("stolica|chair")),
-                Map.entry("bed", Pattern.compile("krevet|bed")),
-                Map.entry("mattress", Pattern.compile("madrac|mattress")),
-                Map.entry("gym-equipment", Pattern.compile("bucic|bučic|bench|klupa|utezi|sprava"))
-        );
-
-        String existingSegment = segmentAfter(text, "vec imam|već imam|imam vec|imam već|imam doma|imam kod kuce|imam kod kuće", 130);
-        String extractedNeedSegment = segmentAfter(text, "trebam|fali|dodaj|zelim|želim", 170);
-        String needSegment = extractedNeedSegment.isBlank() ? text : extractedNeedSegment;
-
-        LinkedHashSet<String> alreadyHave = new LinkedHashSet<>(input.alreadyHaveCategories());
-        LinkedHashSet<String> mustHave = new LinkedHashSet<>(input.mustHaveCategories());
-
-        categoryKeywords.forEach((category, pattern) -> {
-            if (pattern.matcher(existingSegment).find()) alreadyHave.add(category);
-            if (pattern.matcher(needSegment).find()) mustHave.add(category);
-        });
-        mustHave.removeAll(alreadyHave);
-        input = input.withCategories(new ArrayList<>(mustHave), new ArrayList<>(alreadyHave));
-
-        return input;
-    }
-
-    private Optional<Integer> firstNumber(String text, Pattern pattern) {
-        var matcher = pattern.matcher(text);
-        if (matcher.find()) {
-            return Optional.of(Integer.parseInt(matcher.group(1)));
-        }
-        return Optional.empty();
-    }
-
-    private String segmentAfter(String text, String keywordRegex, int maxChars) {
-        var matcher = Pattern.compile("(" + keywordRegex + ")(.{0," + maxChars + "})").matcher(text);
-        return matcher.find() ? matcher.group(2) : "";
-    }
-
-    private boolean matches(String text, String regex) {
-        return Pattern.compile(regex).matcher(text).find();
-    }
-
-    private String normalize(String value) {
-        if (value == null) return "";
-        String normalized = Normalizer.normalize(value.toLowerCase(Locale.ROOT), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
-        return normalized;
     }
 
     private boolean styleMatches(Product product, String requestedStyle) {
@@ -905,10 +992,6 @@ public class PlannerService {
 
     private BigDecimal money(double value) {
         return BigDecimal.valueOf(value).setScale(0, RoundingMode.HALF_UP);
-    }
-
-    private int clamp(int value, int min, int max) {
-        return Math.max(min, Math.min(max, value));
     }
 
     private String normalizeChangeType(String changeType) {

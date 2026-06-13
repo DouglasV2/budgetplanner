@@ -2985,6 +2985,49 @@ textarea {
   color: var(--ink);
 }
 
+.budget-pressure-strip ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.budget-pressure-strip li {
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.purchase-summary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.purchase-summary li {
+  position: relative;
+  padding-left: 16px;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.purchase-summary li::before {
+  content: '•';
+  position: absolute;
+  left: 2px;
+  color: var(--orange);
+  font-weight: 900;
+}
+
+.store-limit-note {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  padding: 0 2px;
+}
+
 .shopping-list-lead {
   margin: 0;
   color: #3f563a;

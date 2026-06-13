@@ -15,7 +15,10 @@ public record PlannerInputDto(
         String furnishingLevel,
         List<String> mustHaveCategories,
         List<String> alreadyHaveCategories,
-        List<String> lockedProductIds
+        List<String> lockedProductIds,
+        List<String> preferredRetailers,
+        List<String> excludedRetailers,
+        int maxStores
 ) {
     public PlannerInputDto normalized() {
         return new PlannerInputDto(
@@ -31,47 +34,129 @@ public record PlannerInputDto(
                 blank(furnishingLevel) ? "comfort" : furnishingLevel,
                 mustHaveCategories == null ? List.of() : mustHaveCategories,
                 alreadyHaveCategories == null ? List.of() : alreadyHaveCategories,
-                lockedProductIds == null ? List.of() : lockedProductIds
+                lockedProductIds == null ? List.of() : lockedProductIds,
+                preferredRetailers == null ? List.of() : preferredRetailers,
+                excludedRetailers == null ? List.of() : excludedRetailers,
+                Math.max(0, maxStores)
         );
     }
 
     public PlannerInputDto withBudget(int nextBudget) {
-        return new PlannerInputDto(prompt, nextBudget, roomType, style, location, size, retailerMode, selectedRetailers, optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds).normalized();
+        return copy().budget(nextBudget).build();
     }
 
     public PlannerInputDto withSize(int nextSize) {
-        return new PlannerInputDto(prompt, budget, roomType, style, location, nextSize, retailerMode, selectedRetailers, optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds).normalized();
+        return copy().size(nextSize).build();
     }
 
     public PlannerInputDto withRoomType(String nextRoomType) {
-        return new PlannerInputDto(prompt, budget, nextRoomType, style, location, size, retailerMode, selectedRetailers, optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds).normalized();
+        return copy().roomType(nextRoomType).build();
     }
 
     public PlannerInputDto withStyle(String nextStyle) {
-        return new PlannerInputDto(prompt, budget, roomType, nextStyle, location, size, retailerMode, selectedRetailers, optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds).normalized();
+        return copy().style(nextStyle).build();
     }
 
     public PlannerInputDto withRetailers(String nextRetailerMode, List<String> nextRetailers) {
-        return new PlannerInputDto(prompt, budget, roomType, style, location, size, nextRetailerMode, nextRetailers, optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds).normalized();
+        return copy().retailerMode(nextRetailerMode).selectedRetailers(nextRetailers).build();
+    }
+
+    public PlannerInputDto withRetailerIntent(String nextRetailerMode, List<String> nextRetailers, List<String> nextPreferred, List<String> nextExcluded, int nextMaxStores) {
+        return copy()
+                .retailerMode(nextRetailerMode)
+                .selectedRetailers(nextRetailers)
+                .preferredRetailers(nextPreferred)
+                .excludedRetailers(nextExcluded)
+                .maxStores(nextMaxStores)
+                .build();
     }
 
     public PlannerInputDto withOptimizationGoal(String nextGoal) {
-        return new PlannerInputDto(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers, nextGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds).normalized();
+        return copy().optimizationGoal(nextGoal).build();
     }
 
     public PlannerInputDto withFurnishingLevel(String nextFurnishingLevel) {
-        return new PlannerInputDto(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers, optimizationGoal, nextFurnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds).normalized();
+        return copy().furnishingLevel(nextFurnishingLevel).build();
     }
 
     public PlannerInputDto withCategories(List<String> nextMustHave, List<String> nextAlreadyHave) {
-        return new PlannerInputDto(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers, optimizationGoal, furnishingLevel, nextMustHave, nextAlreadyHave, lockedProductIds).normalized();
+        return copy().mustHaveCategories(nextMustHave).alreadyHaveCategories(nextAlreadyHave).build();
     }
 
     public PlannerInputDto withLockedProductIds(List<String> nextLockedProductIds) {
-        return new PlannerInputDto(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers, optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, nextLockedProductIds).normalized();
+        return copy().lockedProductIds(nextLockedProductIds).build();
     }
 
     private boolean blank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private Builder copy() {
+        return new Builder(this);
+    }
+
+    /**
+     * Small mutable builder so the {@code with*} helpers stay readable now that the
+     * record has more fields. Always runs {@link #normalized()} on build.
+     */
+    private static final class Builder {
+        private String prompt;
+        private int budget;
+        private String roomType;
+        private String style;
+        private String location;
+        private int size;
+        private String retailerMode;
+        private List<String> selectedRetailers;
+        private String optimizationGoal;
+        private String furnishingLevel;
+        private List<String> mustHaveCategories;
+        private List<String> alreadyHaveCategories;
+        private List<String> lockedProductIds;
+        private List<String> preferredRetailers;
+        private List<String> excludedRetailers;
+        private int maxStores;
+
+        private Builder(PlannerInputDto source) {
+            this.prompt = source.prompt();
+            this.budget = source.budget();
+            this.roomType = source.roomType();
+            this.style = source.style();
+            this.location = source.location();
+            this.size = source.size();
+            this.retailerMode = source.retailerMode();
+            this.selectedRetailers = source.selectedRetailers();
+            this.optimizationGoal = source.optimizationGoal();
+            this.furnishingLevel = source.furnishingLevel();
+            this.mustHaveCategories = source.mustHaveCategories();
+            this.alreadyHaveCategories = source.alreadyHaveCategories();
+            this.lockedProductIds = source.lockedProductIds();
+            this.preferredRetailers = source.preferredRetailers();
+            this.excludedRetailers = source.excludedRetailers();
+            this.maxStores = source.maxStores();
+        }
+
+        private Builder budget(int value) { this.budget = value; return this; }
+        private Builder size(int value) { this.size = value; return this; }
+        private Builder roomType(String value) { this.roomType = value; return this; }
+        private Builder style(String value) { this.style = value; return this; }
+        private Builder retailerMode(String value) { this.retailerMode = value; return this; }
+        private Builder selectedRetailers(List<String> value) { this.selectedRetailers = value; return this; }
+        private Builder optimizationGoal(String value) { this.optimizationGoal = value; return this; }
+        private Builder furnishingLevel(String value) { this.furnishingLevel = value; return this; }
+        private Builder mustHaveCategories(List<String> value) { this.mustHaveCategories = value; return this; }
+        private Builder alreadyHaveCategories(List<String> value) { this.alreadyHaveCategories = value; return this; }
+        private Builder lockedProductIds(List<String> value) { this.lockedProductIds = value; return this; }
+        private Builder preferredRetailers(List<String> value) { this.preferredRetailers = value; return this; }
+        private Builder excludedRetailers(List<String> value) { this.excludedRetailers = value; return this; }
+        private Builder maxStores(int value) { this.maxStores = value; return this; }
+
+        private PlannerInputDto build() {
+            return new PlannerInputDto(
+                    prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
+                    optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds,
+                    preferredRetailers, excludedRetailers, maxStores
+            ).normalized();
+        }
     }
 }

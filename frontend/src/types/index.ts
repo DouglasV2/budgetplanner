@@ -80,6 +80,9 @@ export interface PlannerInput {
   mustHaveCategories: ProductCategory[];
   alreadyHaveCategories: ProductCategory[];
   lockedProductIds: string[];
+  preferredRetailers?: Retailer[];
+  excludedRetailers?: Retailer[];
+  maxStores?: number;
 }
 
 export interface PlanItem {
@@ -126,6 +129,10 @@ export interface FurnishingPlan {
   styleConsistency: number;
   retailersUsed: Retailer[];
   storeTrip?: StoreTrip | null;
+  purchaseSummary?: string[] | null;
+  budgetRepairSuggestions?: string[] | null;
+  overBudgetAmount?: number | null;
+  storeLimitNote?: string | null;
 }
 
 export interface SavedPlanResponse {

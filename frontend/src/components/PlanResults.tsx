@@ -465,6 +465,9 @@ export function PlanResults({
   const breakdown = getRetailerBreakdown(selectedPlan);
   const trip = resolveStoreTrip(selectedPlan);
   const budgetTight = selectedPlan.total >= input.budget * 0.92;
+  const summaryBullets = selectedPlan.purchaseSummary ?? [];
+  const repairTips = selectedPlan.budgetRepairSuggestions ?? [];
+  const showBudgetBlock = repairTips.length > 0 || budgetTight;
   const missing = missingForRoom(selectedPlan, input);
   const steps = purchaseSteps(selectedPlan, input.roomType);
   const tier = TIER_LABELS[selectedPlan.name] ?? furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
@@ -481,7 +484,15 @@ export function PlanResults({
               <strong>{selectedPlan.name}</strong>
             </div>
             <h3>{decisionHeadline(selectedPlan, input, steps)}</h3>
-            <p>{selectedPlan.advisorNote || defaultSummary(selectedPlan, input)}</p>
+            {summaryBullets.length > 0 ? (
+              <ul className="purchase-summary">
+                {summaryBullets.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>{selectedPlan.advisorNote || defaultSummary(selectedPlan, input)}</p>
+            )}
 
             <div className="decision-metrics" aria-label="Najvažnije o planu">
               <div>
@@ -498,20 +509,32 @@ export function PlanResults({
               </div>
             </div>
 
-            {budgetTight && (
+            {showBudgetBlock && (
               <div className="budget-pressure-strip">
                 <strong>Budžet je tijesan</strong>
-                <span>
-                  {overBudget
-                    ? 'Prvo preskoči stvari iz “Može kasnije”, pa provjeri ima li jeftinija opcija za najskuplji komad.'
-                    : 'Ostaje malo prostora — kreni s najvažnijim stvarima, detalji mogu kasnije.'}
-                </span>
+                {repairTips.length > 0 ? (
+                  <ul>
+                    {repairTips.map((tip) => (
+                      <li key={tip}>{tip}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span>
+                    {overBudget
+                      ? 'Prvo preskoči stvari iz “Može kasnije”, pa provjeri ima li jeftinija opcija za najskuplji komad.'
+                      : 'Ostaje malo prostora — kreni s najvažnijim stvarima, detalji mogu kasnije.'}
+                  </span>
+                )}
               </div>
             )}
 
             <div className="store-advice-strip">
               {trip.recommendation}
             </div>
+
+            {selectedPlan.storeLimitNote && (
+              <div className="store-limit-note">{selectedPlan.storeLimitNote}</div>
+            )}
 
             {primaryStep && (
               <div className="first-buy-strip">

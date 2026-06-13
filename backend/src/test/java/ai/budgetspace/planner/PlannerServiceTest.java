@@ -66,6 +66,10 @@ class PlannerServiceTest {
                 "Low",
                 80,
                 List.of("IKEA", "JYSK"),
+                null,
+                null,
+                null,
+                null,
                 null
         );
 
@@ -101,6 +105,10 @@ class PlannerServiceTest {
                 "Low",
                 80,
                 List.of("IKEA"),
+                null,
+                null,
+                null,
+                null,
                 null
         );
 
@@ -159,6 +167,67 @@ class PlannerServiceTest {
         assertThat(trip.recommendation()).contains("provjeri u trgovini");
     }
 
+    @Test
+    void excludedCategoryIsSkippedAndRequestedCategoryStaysInPlan() {
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 600, 4.6);
+        Product tv = product("tv-1", "TV komoda", "IKEA", "tv-unit", 300, 4.4);
+        Product rug = product("rug-1", "Tepih", "IKEA", "rug", 120, 4.3);
+        PlannerService service = serviceWithProducts(List.of(sofa, tv, rug));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak, bez tepiha, treba mi kauč."))
+                .plans()
+                .get(0);
+
+        assertThat(categories(plan)).contains("sofa");
+        assertThat(categories(plan)).doesNotContain("rug");
+    }
+
+    @Test
+    void storeLimitKeepsPlanInFewerStoresWhenThereIsAReasonableAlternative() {
+        Product sofaIkea = product("sofa-ikea", "Kauč", "IKEA", "sofa", 600, 4.6);
+        Product tvIkea = product("tv-ikea", "TV komoda IKEA", "IKEA", "tv-unit", 300, 4.3);
+        Product tvJysk = product("tv-jysk", "TV komoda JYSK", "JYSK", "tv-unit", 250, 4.7);
+        PlannerService service = serviceWithProducts(List.of(sofaIkea, tvIkea, tvJysk));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak, jedna trgovina ako može."))
+                .plans()
+                .get(0);
+
+        assertThat(plan.retailersUsed()).containsExactly("IKEA");
+        assertThat(plan.storeTrip().storeCount()).isEqualTo(1);
+    }
+
+    @Test
+    void budgetRepairKeepsCoreEvenWhenItExceedsBudget() {
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 600, 4.6);
+        Product tv = product("tv-1", "TV komoda", "IKEA", "tv-unit", 300, 4.4);
+        PlannerService service = serviceWithProducts(List.of(sofa, tv));
+
+        FurnishingPlanDto stretch = service.generate(input("Imam 700 € za dnevni boravak."))
+                .plans()
+                .get(2);
+
+        assertThat(categories(stretch)).contains("sofa", "tv-unit");
+        assertThat(stretch.overBudgetAmount()).isEqualByComparingTo(BigDecimal.valueOf(200));
+        assertThat(stretch.budgetRepairSuggestions()).isNotEmpty();
+    }
+
+    @Test
+    void budgetRepairMovesOptionalOutOfTheMainBuy() {
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 600, 4.6);
+        Product tv = product("tv-1", "TV komoda", "IKEA", "tv-unit", 250, 4.4);
+        Product decor = product("decor-1", "Dekoracije", "IKEA", "decor", 300, 4.0);
+        PlannerService service = serviceWithProducts(List.of(sofa, tv, decor));
+
+        FurnishingPlanDto stretch = service.generate(input("Imam 1000 € za dnevni boravak, kompletno."))
+                .plans()
+                .get(2);
+
+        assertThat(categories(stretch)).contains("sofa", "tv-unit");
+        assertThat(categories(stretch)).doesNotContain("decor");
+        assertThat(stretch.total().doubleValue()).isLessThanOrEqualTo(1000);
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);
@@ -179,7 +248,10 @@ class PlannerServiceTest {
                 "comfort",
                 List.of(),
                 List.of(),
-                List.of()
+                List.of(),
+                List.of(),
+                List.of(),
+                0
         );
     }
 
