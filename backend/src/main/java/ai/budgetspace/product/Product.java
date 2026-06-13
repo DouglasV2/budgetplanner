@@ -55,6 +55,25 @@ public class Product {
     @Column(name = "price_tier", length = 40)
     private String priceTier;
 
+    // Catalog source metadata (Sprint 9.0). Backend/dev/docs only — not shown to the user.
+    @Column(name = "source_type", length = 40)
+    private String sourceType;
+
+    @Column(name = "source_name", length = 80)
+    private String sourceName;
+
+    @Column(name = "source_reference", length = 300)
+    private String sourceReference;
+
+    @Column(name = "imported_at", length = 40)
+    private String importedAt;
+
+    @Column(name = "data_quality", length = 40)
+    private String dataQuality;
+
+    @Column(name = "data_quality_notes", length = 500)
+    private String dataQualityNotes;
+
     @Column(nullable = false, length = 700)
     private String image;
 
@@ -103,6 +122,18 @@ public class Product {
     public void setExternalId(String externalId) { this.externalId = externalId; }
     public String getPriceTier() { return priceTier; }
     public void setPriceTier(String priceTier) { this.priceTier = priceTier; }
+    public String getSourceType() { return sourceType; }
+    public void setSourceType(String sourceType) { this.sourceType = sourceType; }
+    public String getSourceName() { return sourceName; }
+    public void setSourceName(String sourceName) { this.sourceName = sourceName; }
+    public String getSourceReference() { return sourceReference; }
+    public void setSourceReference(String sourceReference) { this.sourceReference = sourceReference; }
+    public String getImportedAt() { return importedAt; }
+    public void setImportedAt(String importedAt) { this.importedAt = importedAt; }
+    public String getDataQuality() { return dataQuality; }
+    public void setDataQuality(String dataQuality) { this.dataQuality = dataQuality; }
+    public String getDataQualityNotes() { return dataQualityNotes; }
+    public void setDataQualityNotes(String dataQualityNotes) { this.dataQualityNotes = dataQualityNotes; }
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
     public String getUrl() { return url; }

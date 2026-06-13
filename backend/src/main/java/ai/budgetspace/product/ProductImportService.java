@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,7 +164,12 @@ public class ProductImportService {
                 value(row, "deliverynote", "delivery_note", "dostava"),
                 value(row, "lastcheckedat", "last_checked_at", "provjereno"),
                 value(row, "pricetier", "price_tier", "razina"),
-                value(row, "note", "napomena")
+                value(row, "note", "napomena"),
+                value(row, "sourcetype", "source_type", "izvor_tip"),
+                value(row, "sourcename", "source_name", "izvor"),
+                value(row, "sourcereference", "source_reference", "izvor_ref"),
+                value(row, "dataquality", "data_quality", "kvaliteta"),
+                value(row, "dataqualitynotes", "data_quality_notes", "kvaliteta_napomena")
         );
     }
 
@@ -202,6 +208,16 @@ public class ProductImportService {
         }
         if (hasText(dto.priceTier())) entity.setPriceTier(dto.priceTier().trim());
         if (hasText(dto.note())) entity.setNote(dto.note().trim());
+        if (hasText(dto.sourceType())) {
+            entity.setSourceType(ProductTaxonomy.normalizeSourceType(dto.sourceType()).orElse(dto.sourceType().trim().toLowerCase(Locale.ROOT)));
+        }
+        if (hasText(dto.sourceName())) entity.setSourceName(dto.sourceName().trim());
+        if (hasText(dto.sourceReference())) entity.setSourceReference(dto.sourceReference().trim());
+        if (hasText(dto.dataQuality())) {
+            entity.setDataQuality(ProductTaxonomy.normalizeDataQuality(dto.dataQuality()).orElse(dto.dataQuality().trim().toLowerCase(Locale.ROOT)));
+        }
+        if (hasText(dto.dataQualityNotes())) entity.setDataQualityNotes(dto.dataQualityNotes().trim());
+        entity.setImportedAt(Instant.now().toString());
     }
 
     private void applyDefaults(Product entity) {
@@ -217,6 +233,21 @@ public class ProductImportService {
         if (entity.getImage() == null) entity.setImage(entity.getImageUrl());
         if (entity.getUrl() == null) entity.setUrl(entity.getProductUrl());
         if (entity.getNote() == null) entity.setNote("");
+        if (entity.getSourceType() == null) entity.setSourceType("manual");
+        if (entity.getSourceName() == null) entity.setSourceName(entity.getRetailer());
+        if (entity.getSourceReference() == null) entity.setSourceReference("");
+        if (entity.getImportedAt() == null) entity.setImportedAt(Instant.now().toString());
+        if (entity.getDataQuality() == null) entity.setDataQuality(inferDataQuality(entity));
+        if (entity.getDataQualityNotes() == null) entity.setDataQualityNotes("");
+    }
+
+    // When the source did not declare a quality, infer it: a product with a real link, image
+    // and a recent check is "complete"; otherwise "partial".
+    private String inferDataQuality(Product entity) {
+        boolean hasUrl = hasText(entity.getProductUrl());
+        boolean hasImage = hasText(entity.getImageUrl());
+        boolean fresh = !ProductTaxonomy.isStale(entity.getLastCheckedAt());
+        return hasUrl && hasImage && fresh ? "complete" : "partial";
     }
 
     private List<ImportErrorDto> validate(ImportProductDto dto, int rowNumber) {
@@ -271,6 +302,18 @@ public class ProductImportService {
         }
         if (hasText(dto.availabilityStatus()) && !ProductTaxonomy.isSupportedAvailability(dto.availabilityStatus())) {
             errors.add(error(rowNumber, externalId, "availabilityStatus mora biti jedan od: in-stock, limited, unavailable, check-store."));
+        }
+        if (hasText(dto.lastCheckedAt()) && !ProductTaxonomy.isParseableDate(dto.lastCheckedAt())) {
+            errors.add(error(rowNumber, externalId, "lastCheckedAt mora biti datum, npr. 2026-06-01 ili ISO vrijeme."));
+        }
+        if (hasText(dto.sourceType()) && ProductTaxonomy.normalizeSourceType(dto.sourceType()).isEmpty()) {
+            errors.add(error(rowNumber, externalId, "sourceType mora biti jedan od: manual, retailer-snapshot, future-scraper."));
+        }
+        if (hasText(dto.dataQuality()) && ProductTaxonomy.normalizeDataQuality(dto.dataQuality()).isEmpty()) {
+            errors.add(error(rowNumber, externalId, "dataQuality mora biti jedan od: complete, partial, needs-review."));
+        }
+        if (hasText(dto.sourceType()) && !hasText(dto.sourceName())) {
+            errors.add(error(rowNumber, externalId, "sourceName je obavezan kad je sourceType postavljen."));
         }
 
         return errors;
@@ -344,7 +387,12 @@ public class ProductImportService {
                 "Provjeri dostavu ili preuzimanje prije kupnje.",
                 LocalDate.now().toString(),
                 tier,
-                note
+                note,
+                "manual",
+                retailer,
+                null,
+                null,
+                null
         );
     }
 

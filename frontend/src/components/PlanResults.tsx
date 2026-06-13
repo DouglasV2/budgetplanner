@@ -234,11 +234,24 @@ function productUrl(product: Product) {
   return url.startsWith('http') ? url : '';
 }
 
+const STALE_AFTER_DAYS = 14;
+
+// Freshness v0: if we last checked this product too long ago (or never), the price and
+// availability might have changed, so we nudge the user to confirm in the store.
+function isStaleProduct(product: Product) {
+  const raw = product.lastCheckedAt;
+  if (!raw) return true;
+  const parsed = new Date(raw.length >= 10 ? raw.slice(0, 10) : raw);
+  if (Number.isNaN(parsed.getTime())) return true;
+  const ageDays = (Date.now() - parsed.getTime()) / (1000 * 60 * 60 * 24);
+  return ageDays > STALE_AFTER_DAYS;
+}
+
 function availabilityLabel(product: Product) {
   const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
-  if (status === 'in-stock') return 'Dostupno';
   if (status === 'unavailable') return 'Trenutno nedostupno';
   if (status === 'limited' || status === 'check-store') return 'Provjeri u trgovini';
+  if (status === 'in-stock') return isStaleProduct(product) ? 'Provjeri u trgovini' : 'Dostupno';
   return 'Provjeri u trgovini';
 }
 
@@ -252,7 +265,7 @@ function priceTierLabel(product: Product) {
 function productCheckLabel(product: Product) {
   const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
   if (status === 'limited' || status === 'check-store') return 'Provjeri u trgovini prije kupnje';
-  if (!product.lastCheckedAt) return 'Provjeri cijenu prije kupnje';
+  if (isStaleProduct(product)) return 'Provjeri cijenu i dostupnost u trgovini.';
   return 'Cijenu provjeri u trgovini';
 }
 

@@ -36,9 +36,24 @@ public class RetailerCatalogAdapter {
                 snapshot.productUrl(),
                 snapshot.availabilityStatus(),
                 snapshot.deliveryNote(),
-                null,
+                snapshot.lastCheckedAt(),
                 snapshot.priceTier(),
-                null
+                null,
+                defaultSourceType(snapshot.sourceType()),
+                defaultSourceName(snapshot.sourceName(), snapshot.retailer()),
+                snapshot.sourceReference(),
+                snapshot.dataQuality(),
+                snapshot.dataQualityNotes()
         );
+    }
+
+    // A snapshot that does not say where it came from is, by definition, a retailer snapshot.
+    private String defaultSourceType(String sourceType) {
+        return sourceType == null || sourceType.isBlank() ? "retailer-snapshot" : sourceType;
+    }
+
+    // Source name defaults to the retailer so a snapshot always has a sensible source.
+    private String defaultSourceName(String sourceName, String retailer) {
+        return sourceName == null || sourceName.isBlank() ? retailer : sourceName;
     }
 }

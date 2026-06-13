@@ -28,8 +28,14 @@ public record RetailerProductSnapshotDto(
         String imageUrl,
         String availabilityStatus,
         String deliveryNote,
+        String lastCheckedAt,
         List<String> roomTags,
         List<String> styleTags,
-        String priceTier
+        String priceTier,
+        String sourceType,
+        String sourceName,
+        String sourceReference,
+        String dataQuality,
+        String dataQualityNotes
 ) {
 }

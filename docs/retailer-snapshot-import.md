@@ -2,6 +2,11 @@
 
 Sprint 8.4. Ovo je prvi korak prema stvarnijim proizvodima iz trgovina.
 
+> Sprint 9.0: ovaj isti import sada podržava i `lastCheckedAt` te source metadata
+> (`sourceType`, `sourceName`, `sourceReference`, `dataQuality`, `dataQualityNotes`). Za
+> realniji izvor s URL-ovima, slikama, dostupnošću i svježinom vidi
+> [real-catalog-source.md](real-catalog-source.md).
+
 **Ovo nije pravi scraper.** Nema Playwrighta, Seleniuma, HTML parsiranja ni živih poziva na IKEA / JYSK / Lesnina / Emmezeta / Pevex / Decathlon stranice. Umjesto toga radimo s **kontroliranim snapshotom**: ručno pripremljenom JSON listom proizvoda koja izgleda kao izvoz iz trgovine. To je priprema za buduće stvarne trgovine i kasnije adaptere, bez da sada radimo scraping.
 
 Snapshot ulazi kroz isti import pipeline kao i obični JSON/CSV import iz Sprinta 8.3: ista validacija, isto mapiranje kategorija/stilova/prostorija i ista deduplikacija po `externalId`.

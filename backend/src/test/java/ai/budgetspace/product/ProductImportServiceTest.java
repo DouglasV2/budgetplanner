@@ -101,6 +101,83 @@ class ProductImportServiceTest {
         );
     }
 
+    @Test
+    void storesSourceMetadataAndStampsImportedAt() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        ImportProductDto dto = new ImportProductDto(
+                null, "src-1", "Dvosjed svijetli tekstil", "IKEA", "sofa",
+                BigDecimal.valueOf(299), null, List.of("modern"), List.of("living-room"),
+                "https://example.com/image.jpg", "https://example.com/product", "in-stock",
+                "Dostava 3-5 radnih dana.", "2026-06-10", "standard", "Opis proizvoda.",
+                "retailer-snapshot", "IKEA", "real-catalog-2026-06", "complete", "Provjereno ručno.");
+
+        ImportSummaryDto summary = service.importProducts(List.of(dto));
+
+        assertThat(summary.created()).isEqualTo(1);
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(repository).save(captor.capture());
+        Product saved = captor.getValue();
+        assertThat(saved.getSourceType()).isEqualTo("retailer-snapshot");
+        assertThat(saved.getSourceName()).isEqualTo("IKEA");
+        assertThat(saved.getDataQuality()).isEqualTo("complete");
+        assertThat(saved.getImportedAt()).isNotBlank();
+    }
+
+    @Test
+    void inferredDataQualityIsCompleteWhenLinkImageAndRecentCheckExist() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        ImportProductDto dto = new ImportProductDto(
+                null, "infer-1", "TV komoda hrast efekt", "JYSK", "tv-unit",
+                BigDecimal.valueOf(159), null, List.of("modern"), List.of("living-room"),
+                "https://example.com/image.jpg", "https://example.com/product", "in-stock",
+                null, java.time.LocalDate.now().toString(), "standard", null,
+                null, null, null, null, null);
+
+        service.importProducts(List.of(dto));
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue().getDataQuality()).isEqualTo("complete");
+        assertThat(captor.getValue().getSourceType()).isEqualTo("manual");
+    }
+
+    @Test
+    void rejectsInvalidSourceAndDateFields() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        ImportProductDto badSource = new ImportProductDto(
+                null, "bad-source", "Loš izvor", "IKEA", "sofa", BigDecimal.valueOf(199), null,
+                List.of("modern"), List.of("living-room"), null, null, "in-stock", null,
+                "2026-06-10", "standard", null, "live-scraper", "IKEA", null, "complete", null);
+        ImportProductDto badDate = new ImportProductDto(
+                null, "bad-date", "Loš datum", "IKEA", "sofa", BigDecimal.valueOf(199), null,
+                List.of("modern"), List.of("living-room"), null, null, "in-stock", null,
+                "jučer", "standard", null, "manual", "IKEA", null, "partial", null);
+        ImportProductDto missingSourceName = new ImportProductDto(
+                null, "missing-name", "Bez imena izvora", "IKEA", "sofa", BigDecimal.valueOf(199), null,
+                List.of("modern"), List.of("living-room"), null, null, "in-stock", null,
+                "2026-06-10", "standard", null, "manual", null, null, "partial", null);
+
+        ImportSummaryDto summary = service.importProducts(List.of(badSource, badDate, missingSourceName));
+
+        assertThat(summary.created()).isZero();
+        assertThat(summary.skipped()).isEqualTo(3);
+        assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("sourceType"));
+        assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("lastCheckedAt"));
+        assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("sourceName"));
+    }
+
     private ImportProductDto product(String externalId, String name, String retailer, String category, BigDecimal price, List<String> styleTags, List<String> roomTags) {
         return new ImportProductDto(
                 null,
@@ -118,7 +195,12 @@ class ProductImportServiceTest {
                 null,
                 "2026-06-12",
                 "standard",
-                "Dobar omjer cijene i korisnosti."
+                "Dobar omjer cijene i korisnosti.",
+                null,
+                null,
+                null,
+                null,
+                null
         );
     }
 

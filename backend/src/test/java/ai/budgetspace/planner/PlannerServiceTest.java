@@ -228,6 +228,45 @@ class PlannerServiceTest {
         assertThat(stretch.total().doubleValue()).isLessThanOrEqualTo(1000);
     }
 
+    @Test
+    void plannerPrefersFresherCompleteProductOverStalePartialWhenSimilar() {
+        Product fresh = product("sofa-fresh", "Kauč svjež", "IKEA", "sofa", 600, 4.5);
+        fresh.setDataQuality("complete");
+        fresh.setLastCheckedAt(java.time.LocalDate.now().toString());
+
+        Product stale = product("sofa-stale", "Kauč star", "IKEA", "sofa", 600, 4.5);
+        stale.setDataQuality("partial");
+        stale.setProductUrl("");
+        stale.setUrl("");
+        stale.setImageUrl("");
+        stale.setImage("");
+        stale.setLastCheckedAt("2020-01-01");
+
+        PlannerService service = serviceWithProducts(List.of(stale, fresh));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak."))
+                .plans()
+                .get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-fresh");
+        assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-stale");
+    }
+
+    @Test
+    void staleProductStillEntersPlan() {
+        Product stale = product("sofa-old", "Kauč stariji", "IKEA", "sofa", 500, 4.4);
+        stale.setLastCheckedAt("2020-01-01");
+        stale.setDataQuality("partial");
+
+        PlannerService service = serviceWithProducts(List.of(stale));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak."))
+                .plans()
+                .get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-old");
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);

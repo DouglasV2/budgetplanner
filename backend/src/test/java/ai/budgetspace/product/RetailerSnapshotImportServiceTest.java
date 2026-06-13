@@ -81,6 +81,26 @@ class RetailerSnapshotImportServiceTest {
         assertThat(summary.errors()).isNotEmpty();
     }
 
+    @Test
+    void snapshotImportSetsSourceMetadata() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        RetailerSnapshotImportService service = serviceWith(repository);
+
+        service.importSnapshot(List.of(
+                snapshot("snap-src", "Tepih prirodni ton", "JYSK", "rug", BigDecimal.valueOf(84.99), List.of("living-room"), List.of("boho"), "in-stock")
+        ));
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(repository).save(captor.capture());
+        Product saved = captor.getValue();
+        assertThat(saved.getSourceType()).isEqualTo("retailer-snapshot");
+        assertThat(saved.getSourceName()).isEqualTo("JYSK");
+        assertThat(saved.getDataQuality()).isEqualTo("complete");
+        assertThat(saved.getImportedAt()).isNotBlank();
+    }
+
     private RetailerProductSnapshotDto snapshot(String externalId, String name, String retailer, String category, BigDecimal price, List<String> roomTags, List<String> styleTags, String availability) {
         return new RetailerProductSnapshotDto(
                 externalId,
@@ -92,9 +112,15 @@ class RetailerSnapshotImportServiceTest {
                 "https://example.com/i/" + externalId + ".jpg",
                 availability,
                 "Provjeri dostavu ili preuzimanje prije kupnje.",
+                "2026-06-12",
                 roomTags,
                 styleTags,
-                "standard"
+                "standard",
+                "retailer-snapshot",
+                retailer,
+                null,
+                "complete",
+                null
         );
     }
 

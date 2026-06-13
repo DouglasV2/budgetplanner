@@ -31,6 +31,11 @@ public record ImportProductDto(
         String deliveryNote,
         String lastCheckedAt,
         String priceTier,
-        String note
+        String note,
+        String sourceType,
+        String sourceName,
+        String sourceReference,
+        String dataQuality,
+        String dataQualityNotes
 ) {
 }

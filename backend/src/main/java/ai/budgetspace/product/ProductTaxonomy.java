@@ -1,6 +1,8 @@
 package ai.budgetspace.product;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -8,6 +10,21 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class ProductTaxonomy {
+    /** A product whose last check is older than this is shown as "provjeri u trgovini". */
+    public static final int STALE_AFTER_DAYS = 14;
+
+    public static final Set<String> SOURCE_TYPES = Set.of(
+            "manual",
+            "retailer-snapshot",
+            "future-scraper"
+    );
+
+    public static final Set<String> DATA_QUALITIES = Set.of(
+            "complete",
+            "partial",
+            "needs-review"
+    );
+
     public static final Set<String> SUPPORTED_RETAILERS = Set.of(
             "IKEA",
             "JYSK",
@@ -104,6 +121,56 @@ public final class ProductTaxonomy {
     public static String normalizeAvailability(String status) {
         if (status == null || status.isBlank()) return "in-stock";
         return status.trim().toLowerCase(Locale.ROOT);
+    }
+
+    public static Optional<String> normalizeSourceType(String sourceType) {
+        if (sourceType == null || sourceType.isBlank()) return Optional.empty();
+        String key = sourceType.trim().toLowerCase(Locale.ROOT);
+        return SOURCE_TYPES.contains(key) ? Optional.of(key) : Optional.empty();
+    }
+
+    public static boolean isSupportedSourceType(String sourceType) {
+        return normalizeSourceType(sourceType).isPresent();
+    }
+
+    public static Optional<String> normalizeDataQuality(String dataQuality) {
+        if (dataQuality == null || dataQuality.isBlank()) return Optional.empty();
+        String key = dataQuality.trim().toLowerCase(Locale.ROOT);
+        return DATA_QUALITIES.contains(key) ? Optional.of(key) : Optional.empty();
+    }
+
+    public static boolean isSupportedDataQuality(String dataQuality) {
+        return normalizeDataQuality(dataQuality).isPresent();
+    }
+
+    /** True if the value can be read as a date (yyyy-MM-dd or an ISO date-time). */
+    public static boolean isParseableDate(String value) {
+        return parseDate(value) != null;
+    }
+
+    /**
+     * Freshness v0: a product is "stale" when its last check is missing, unreadable, or
+     * older than {@link #STALE_AFTER_DAYS}. Stale products still enter the plan, but the UI
+     * tells the user to check price and availability in the store.
+     */
+    public static boolean isStale(String lastCheckedAt) {
+        LocalDate checked = parseDate(lastCheckedAt);
+        if (checked == null) return true;
+        return checked.isBefore(LocalDate.now().minusDays(STALE_AFTER_DAYS));
+    }
+
+    private static LocalDate parseDate(String value) {
+        if (value == null || value.isBlank()) return null;
+        String trimmed = value.trim();
+        try {
+            return LocalDate.parse(trimmed.length() >= 10 ? trimmed.substring(0, 10) : trimmed);
+        } catch (RuntimeException ignored) {
+            try {
+                return OffsetDateTime.parse(trimmed).toLocalDate();
+            } catch (RuntimeException alsoIgnored) {
+                return null;
+            }
+        }
     }
 
     public static boolean canEnterPlanner(Product product) {

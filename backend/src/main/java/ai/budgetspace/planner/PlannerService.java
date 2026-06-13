@@ -243,10 +243,29 @@ public class PlannerService {
         double preferredRetailerBonus = input.preferredRetailers() != null && input.preferredRetailers().contains(product.getRetailer()) ? 30 : 0;
         double requestedBonus = input.mustHaveCategories() != null && input.mustHaveCategories().contains(product.getCategory()) ? 18 : 0;
         double storeCapBonus = storeCapBonus(input, product, currentRetailers);
+        double dataQualityBonus = dataQualityBonus(product);
 
         return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias
                 + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus
-                + preferredRetailerBonus + requestedBonus + storeCapBonus;
+                + preferredRetailerBonus + requestedBonus + storeCapBonus + dataQualityBonus;
+    }
+
+    // Sprint 9.0: gently prefer products with better data (real link, image, recent check,
+    // complete quality). Small tie-breaker bonuses — never enough to override style/room/price,
+    // and never shown to the user as a "score".
+    private double dataQualityBonus(Product product) {
+        double bonus = 0;
+        if (hasContent(product.getProductUrl())) bonus += 6;
+        if (hasContent(product.getImageUrl())) bonus += 4;
+        if (!ProductTaxonomy.isStale(product.getLastCheckedAt())) bonus += 6;
+        String quality = product.getDataQuality();
+        if ("complete".equalsIgnoreCase(quality)) bonus += 6;
+        else if ("needs-review".equalsIgnoreCase(quality)) bonus -= 6;
+        return bonus;
+    }
+
+    private boolean hasContent(String value) {
+        return value != null && !value.isBlank();
     }
 
     // Store limit v1: when the user asked for at most N stores, reward staying inside the
