@@ -1,5 +1,8 @@
 package ai.budgetspace.product;
 
+import ai.budgetspace.collector.RetailerCollectorService;
+import ai.budgetspace.dto.CollectorRequestDto;
+import ai.budgetspace.dto.CollectorRunSummaryDto;
 import ai.budgetspace.dto.ImportProductDto;
 import ai.budgetspace.dto.ImportSummaryDto;
 import ai.budgetspace.dto.ProductDto;
@@ -18,11 +21,13 @@ public class ProductController {
     private final ProductRepository productRepository;
     private final ProductImportService productImportService;
     private final RetailerSnapshotImportService retailerSnapshotImportService;
+    private final RetailerCollectorService retailerCollectorService;
 
-    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService) {
+    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService, RetailerCollectorService retailerCollectorService) {
         this.productRepository = productRepository;
         this.productImportService = productImportService;
         this.retailerSnapshotImportService = retailerSnapshotImportService;
+        this.retailerCollectorService = retailerCollectorService;
     }
 
     @GetMapping("/api/products")
@@ -61,6 +66,12 @@ public class ProductController {
     @PostMapping("/api/products/import/retailer-snapshot")
     public ImportSummaryDto importRetailerSnapshot(@RequestBody List<RetailerProductSnapshotDto> snapshot) {
         return retailerSnapshotImportService.importSnapshot(snapshot);
+    }
+
+    // Dev-only: collect a small, explicit list of product URLs into the catalog. No UI.
+    @PostMapping("/api/products/collect/retailer-urls")
+    public CollectorRunSummaryDto collectRetailerUrls(@RequestBody CollectorRequestDto request) {
+        return retailerCollectorService.collect(request);
     }
 
     private boolean hasTag(String csv, String value) {
