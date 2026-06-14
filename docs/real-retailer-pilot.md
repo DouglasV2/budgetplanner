@@ -11,21 +11,35 @@ collector → review → import → catalog health → planner smoke test.
 ## Koraci
 
 ### 1. Odaberi jedan pack
-[pilot-packs/ikea-living-room.json](pilot-packs/ikea-living-room.json),
-[pilot-packs/ikea-bedroom.json](pilot-packs/ikea-bedroom.json) ili
-[pilot-packs/ikea-home-office.json](pilot-packs/ikea-home-office.json). Svaki koristi `items`
-oblik gdje svaki URL ima svoj `category` / `roomTags` / `styleTags`.
+- **Spreman stvarni pilot (IKEA HR, dnevni boravak):**
+  [pilot-packs/real-ikea-hr-living-room-pilot.json](pilot-packs/real-ikea-hr-living-room-pilot.json)
+  — 12 stvarnih `www.ikea.com/hr/hr` product URL-ova (kauč, TV komoda, stolić, tepih,
+  rasvjeta, spremanje), svaki s vlastitim `category` / `roomTags` / `styleTags` /
+  `sourceReference`. Ovaj se može poslati odmah.
+- **Placeholder packovi (zamijeni URL-ove):**
+  [pilot-packs/ikea-living-room.json](pilot-packs/ikea-living-room.json),
+  [pilot-packs/ikea-bedroom.json](pilot-packs/ikea-bedroom.json),
+  [pilot-packs/ikea-home-office.json](pilot-packs/ikea-home-office.json).
 
-### 2. Zamijeni placeholder URL-ove
-Zamijeni `example-ikea.com` URL-ove **stvarnim product URL-ovima koje smiješ testirati**. Ne
-testiraj URL-ove za koje nisi siguran da se smiju automatizirano dohvaćati.
+### 2. Zamijeni placeholder URL-ove (samo placeholder packovi)
+Za placeholder packove zamijeni `example-ikea.com` URL-ove **stvarnim product URL-ovima koje
+smiješ dohvaćati**.
+
+**Odgovorno korištenje (obavezno):**
+- ovo je dev-only alat, **ne** za masovno skidanje stranica,
+- ne koristi ga ako stranica zabranjuje automatizirano dohvaćanje; poštuj `robots.txt` i ToS,
+- za produkciju preferiraj službene feedove / API-je / partnerstva,
+- **prvo probaj s 5–6 URL-ova**, pa tek onda pošalji ostatak,
+- ako requestovi budu blokirani (403/429), **ne pokušavaj bypass** — stani i koristi drugi izvor.
 
 ### 3. Pokreni collector
+Stvarni IKEA HR pilot pack:
 ```bash
 curl -X POST http://localhost:8080/api/products/collect/retailer-urls \
   -H "Content-Type: application/json" \
-  --data-binary @docs/pilot-packs/ikea-living-room.json
+  --data-binary @docs/pilot-packs/real-ikea-hr-living-room-pilot.json
 ```
+(Za placeholder packove zamijeni naziv datoteke, npr. `ikea-living-room.json`.)
 
 Collector v10 donosi dodatne sigurnosne mjere:
 
@@ -56,10 +70,12 @@ Provjeri `plannerReadiness` za sobu — je li `ready: true` i koje su `weakCateg
 [catalog-health.md](catalog-health.md).
 
 ### 8. Složi plan u aplikaciji
-Pokreni frontend (`npm --prefix frontend run dev`) i upiši:
+Pokreni frontend (`npm --prefix frontend run dev`) i upiši (prompt za stvarni IKEA HR pilot):
 ```text
-Imam 1500 € za dnevni boravak, moderno, ne želim više od dvije trgovine.
+Imam 1500 € za dnevni boravak, moderno, najviše IKEA, već imam TV i tepih.
 ```
+Očekivano: planner preferira IKEA, ne dodaje TV komodu ni tepih (jer si rekao da ih već imaš),
+a kauč i ostalo dolaze iz prikupljenih proizvoda.
 
 ### 9. Ručno provjeri
 - proizvodi imaju cijene,

@@ -29,8 +29,15 @@ Pošalji pack backendu preko `/api/products/collect/retailer-urls`:
 ```bash
 curl -X POST http://localhost:8080/api/products/collect/retailer-urls \
   -H "Content-Type: application/json" \
-  --data-binary @docs/pilot-packs/real-ikea-living-room-pilot.json
+  --data-binary @docs/pilot-packs/real-ikea-hr-living-room-pilot.json
 ```
+
+Spreman stvarni IKEA HR pilot pack je
+[pilot-packs/real-ikea-hr-living-room-pilot.json](pilot-packs/real-ikea-hr-living-room-pilot.json)
+(12 stvarnih `www.ikea.com/hr/hr` URL-ova). **Prvo probaj s 5–6 URL-ova**, pa ostatak. Ovo je
+dev-only; ne koristi za masovno skidanje, poštuj `robots.txt`/ToS, i ako te stranica blokira
+(403/429) **ne pokušavaj bypass**. U `products` sažetku čitaj status po URL-u: `imported`,
+`updated`, `skipped`, `needs-review`.
 
 Response sadrži sažetak: koliko URL-ova je dohvaćeno, koliko je uvezeno, koliko treba
 pregledati (`needs-review`) te eventualne greške. Ako je neki URL loš (nema cijenu,
@@ -59,11 +66,13 @@ bez kritičnih `weakCategories`. Ako katalog nije spreman, dodaj još proizvoda 
 Pokreni frontend (`npm --prefix frontend run dev`) i upiši prompt, npr.:
 
 ```text
-Imam 1500 € za dnevni boravak, moderno, ne želim više od dvije trgovine.
+Imam 1500 € za dnevni boravak, moderno, najviše IKEA, već imam TV i tepih.
 ```
 
 Provjeri da proizvodi iz tvojeg URL packa ulaze u plan. Cijena mora biti ispravna,
-link „Otvori u trgovini“ vodi na pravi proizvod, a nedostupni proizvodi ne ulaze.
+link „Otvori u trgovini“ vodi na pravi proizvod, a nedostupni proizvodi ne ulaze. Kako si
+rekao da već imaš TV i tepih, planner ne smije dodati TV komodu ni tepih, a „najviše IKEA”
+znači da preferira IKEA proizvode.
 
 ## 6. Nema crawlera
 
