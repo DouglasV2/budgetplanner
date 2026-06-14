@@ -936,9 +936,26 @@ public class PlannerService {
     }
 
     private List<String> selectedRetailers(PlannerInputDto input) {
-        if (input.selectedRetailers() == null || input.selectedRetailers().isEmpty()) return RETAILERS;
-        if (input.retailerMode().equals("single")) return List.of(input.selectedRetailers().get(0));
-        return input.selectedRetailers();
+        List<String> base = input.selectedRetailers() == null || input.selectedRetailers().isEmpty()
+                ? RETAILERS
+                : input.selectedRetailers();
+        if ("single".equals(input.retailerMode()) && !base.isEmpty()) {
+            base = List.of(base.get(0));
+        }
+
+        Set<String> excluded = input.excludedRetailers() == null
+                ? Set.of()
+                : input.excludedRetailers().stream()
+                .filter(Objects::nonNull)
+                .map(value -> value.trim().toLowerCase(Locale.ROOT))
+                .filter(value -> !value.isBlank())
+                .collect(Collectors.toSet());
+
+        if (excluded.isEmpty()) return base;
+        return base.stream()
+                .filter(Objects::nonNull)
+                .filter(retailer -> !excluded.contains(retailer.trim().toLowerCase(Locale.ROOT)))
+                .toList();
     }
 
     private boolean prefersFewStores(PlannerInputDto input) {

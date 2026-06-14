@@ -176,6 +176,7 @@ public final class ProductTaxonomy {
     public static boolean canEnterPlanner(Product product) {
         if (product == null) return false;
         if (!product.isInStock()) return false;
+        if (product.getPrice() == null || product.getPrice().signum() <= 0) return false;
         String availability = normalizeAvailability(product.getAvailabilityStatus());
         if ("unavailable".equals(availability)) return false;
         // Sprint 9.2: products still marked for review (e.g. collected with weak data) must

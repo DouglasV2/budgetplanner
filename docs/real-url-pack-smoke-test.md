@@ -81,3 +81,18 @@ znači da preferira IKEA proizvode.
 
 Ovaj smoke test koristi **ručni pack**. Discovery endpoint može pomoći da pronađeš
 linkove s jedne listing stranice, ali za ozbiljnije importove koristi službene feedove.
+
+## 7. Production-pilot scenario matrix
+
+Kad IKEA i JYSK packovi prođu osnovni smoke test, nemoj odmah širiti broj retailera.
+Za Sprint 10.3 koristi širi offline snapshot i scenario matrix:
+
+```bash
+cd backend
+mvn test -Dtest=LivingRoomProductionScenarioMatrixTest,ProductTaxonomyTest
+```
+
+Matrix provjerava 32 stvarna korisnička slučaja: samo IKEA, samo JYSK, mix, preferirani
+retailer, isključeni retailer, različiti budžeti/stilovi, already-owned kategorije, locked
+product i guardrail da proizvod bez pozitivne cijene ili `unavailable` ne uđe u plan.
+Vidi [production-pilot/living-room-production-pilot.md](production-pilot/living-room-production-pilot.md).

@@ -20,7 +20,7 @@
       }
     },
     {
-      "url": "https://jysk.hr/dnevni-boravak/pohranjivanje/stalak-za-tv/tv-stalak-favrbo-boja-svijetli-hrast-bijela",
+      "url": "https://jysk.hr/dnevni-boravak/stalci-za-tv/tv-stalak-favrbo-boja-svijetli-hrast-bijela",
       "defaults": {
         "category": "tv-unit",
         "roomTags": ["living-room"],
@@ -29,7 +29,7 @@
       }
     },
     {
-      "url": "https://jysk.hr/dnevni-boravak/stolici-za-kavu-i-pomocni-stolici/stolic-agerby-60x100-staklonatur-hrast",
+      "url": "https://jysk.hr/dnevni-boravak/stolici-za-kavu-i-pomocni-stolici/stolic-agerby-60x100-staklo-natur-hrast",
       "defaults": {
         "category": "table",
         "roomTags": ["living-room"],
@@ -38,7 +38,7 @@
       }
     },
     {
-      "url": "https://jysk.hr/tepisi/tepisi/tepih-lingon-140x200-natur",
+      "url": "https://jysk.hr/kucanstvo/tepisi/veliki-tepisi/tepih-lingon-140x200-natur",
       "defaults": {
         "category": "rug",
         "roomTags": ["living-room"],
@@ -47,7 +47,7 @@
       }
     },
     {
-      "url": "https://jysk.hr/rasvjeta/podne-lampe/podna-lampa-kristof-o35xv145-cm-celik",
+      "url": "https://jysk.hr/kucanstvo/rasvjeta/svjetiljke/podna-lampa-kristof-o35xv145-cm-celik",
       "defaults": {
         "category": "lighting",
         "roomTags": ["living-room"],
@@ -56,7 +56,7 @@
       }
     },
     {
-      "url": "https://jysk.hr/pohranjivanje/knjiznice-i-regali/zidni-modul-skals-polica-za-knjige-divlji-natur-hrast-boja",
+      "url": "https://jysk.hr/pohranjivanje/police-za-knjige/zidni-modul-skals-polica-za-knjige-divlji-natur-hrast-boja",
       "defaults": {
         "category": "storage",
         "roomTags": ["living-room"],

@@ -47,6 +47,17 @@ stavki). Runovi se best-effort spremaju i čitaju preko dev endpointa
 dovoljno dobar za planner provjeri preko `GET /api/products/catalog-health`
 ([catalog-health.md](catalog-health.md)).
 
+
+## Sprint 10.3: od collectora do production-pilot matrice
+
+Collector i dalje ostaje mali, ručni/dev alat. Za produkcijski smjer nakon IKEA/JYSK URL
+packova koristi se offline production-pilot snapshot + scenario matrix, a ne masovno
+skidanje stranica. Snapshot se može osvježiti collectorom ili službenim feedom, zatim se
+prije deploya vrte catalog health i `LivingRoomProductionScenarioMatrixTest`.
+
+Ključno pravilo: parsiran proizvod bez pozitivne cijene može završiti kao `needs-review` ili
+`skipped`, ali ne smije postati planner-usable.
+
 ## Zahtjev — dva oblika
 
 **A) `urls` + globalni `defaults`:**

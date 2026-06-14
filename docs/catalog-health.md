@@ -11,8 +11,10 @@ curl http://localhost:8080/api/products/catalog-health
 
 ## Što "usable" znači
 
-Proizvod je *usable* ako ga planner smije koristiti (`canEnterPlanner`): na zalihi, nije
-`unavailable`, nije `needs-review`, ima `roomTags` i `styleTags`. Sve ostalo je *blocked*.
+Proizvod je *usable* ako ga planner smije koristiti (`canEnterPlanner`): na zalihi, ima
+pozitivnu cijenu, nije `unavailable`, nije `needs-review`, ima `roomTags` i `styleTags`.
+Sve ostalo je *blocked*. Sprint 10.3 dodatno zaključava pravilo da proizvod bez cijene ili
+s cijenom `0` ne smije ući u planner ni kada je označen kao `in-stock`.
 
 ## Response
 
@@ -58,3 +60,15 @@ Kad korisnik traži sobu kojoj fali required kategorija, plan response ima `part
 i `catalogWarning` (ljudski tekst). Planner **ne** izmišlja proizvode da popuni rupu —
 prikaže najbolju dostupnu kombinaciju i jasno kaže da je djelomična. U korisničkom UI-u se
 ne koriste riječi „catalog”, „health”, „coverage”, „usable”.
+
+## Sprint 10.3 production-pilot gate
+
+Za IKEA + JYSK living-room pilot postoji širi offline snapshot i scenario matrix:
+
+- `docs/catalog-snapshots/real-ikea-jysk-hr-living-room-production-snapshot.json`
+- `docs/production-pilot/living-room-scenario-matrix.json`
+
+Minimalni production-pilot prag za `living-room` nije samo `ready: true`, nego i dovoljan
+izbor po kategorijama: sofa/TV unit/table/rug/lighting barem 8 usable proizvoda, storage
+barem 6, decor barem 4 i chair barem 3. To testira
+`LivingRoomProductionScenarioMatrixTest` bez live interneta.

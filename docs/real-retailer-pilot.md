@@ -111,6 +111,28 @@ a kauč i ostalo dolaze iz prikupljenih proizvoda.
 - „već imam TV i tepih” stvarno makne TV komodu i tepih,
 - „najviše IKEA” stvarno preferira IKEA.
 
+
+## Sprint 10.3: production-pilot coverage
+
+Nakon IKEA/JYSK URL packova, produkcijski pilot se ne širi odmah na treću trgovinu.
+Prvo se koristi jedan širi living-room snapshot i realistična scenario matrica:
+
+- `docs/catalog-snapshots/real-ikea-jysk-hr-living-room-production-snapshot.json`
+- `docs/production-pilot/living-room-scenario-matrix.json`
+- `backend/src/test/java/ai/budgetspace/planner/LivingRoomProductionScenarioMatrixTest.java`
+
+Ovaj sloj je offline QA/dev fixture: služi da planner prođe IKEA-only, JYSK-only,
+IKEA+JYSK mix, exclusion/preference, budžet, already-owned i locked-product scenarije bez
+live dohvaćanja stranica. Prije javne produkcije cijene, slike i zalihe ponovno osvježi
+collectorom ili službenim feedom.
+
+```bash
+cd backend
+mvn test -Dtest=LivingRoomProductionScenarioMatrixTest,ProductTaxonomyTest
+```
+
+Detalji su u [production-pilot/living-room-production-pilot.md](production-pilot/living-room-production-pilot.md).
+
 ## Pregled prošlih runova (dev)
 
 ```bash
