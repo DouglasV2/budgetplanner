@@ -46,13 +46,16 @@ public class RetailerCollectorService {
     private final RetailerProductParser parser;
     private final RetailerSnapshotImportService snapshotImportService;
     private final ProductRepository productRepository;
+    private final CollectorRunStore runStore;
 
     public RetailerCollectorService(ProductPageFetcher fetcher, RetailerProductParser parser,
-                                    RetailerSnapshotImportService snapshotImportService, ProductRepository productRepository) {
+                                    RetailerSnapshotImportService snapshotImportService, ProductRepository productRepository,
+                                    CollectorRunStore runStore) {
         this.fetcher = fetcher;
         this.parser = parser;
         this.snapshotImportService = snapshotImportService;
         this.productRepository = productRepository;
+        this.runStore = runStore;
     }
 
     public CollectorRunSummaryDto collect(CollectorRequestDto request) {
@@ -64,6 +67,11 @@ public class RetailerCollectorService {
         }
         Optional<String> retailerOpt = ProductTaxonomy.normalizeRetailer(request.retailer());
         String retailer = retailerOpt.orElse(request.retailer());
+
+        if (request.items() != null && request.items().stream().anyMatch(item -> item == null || isBlank(item.url()))) {
+            return rejected(runId, startedAt, retailer, request.items().size(), "Svaki item mora imati url.");
+        }
+
         List<WorkItem> workItems = resolveWorkItems(request);
         int totalReceived = workItems.size();
 
@@ -83,6 +91,7 @@ public class RetailerCollectorService {
         LinkedHashSet<String> warnings = new LinkedHashSet<>();
         List<RetailerProductSnapshotDto> candidateSnapshots = new ArrayList<>();
         List<Candidate> candidates = new ArrayList<>();
+        List<CollectorItemDto> retryItems = new ArrayList<>();
 
         int fetched = 0;
         int parsed = 0;
@@ -99,6 +108,7 @@ public class RetailerCollectorService {
             if (!result.ok()) {
                 errors.add(new CollectorErrorDto(url, result.error()));
                 reports.add(new CollectorProductReportDto(url, null, null, "skipped", result.error(), null, List.of()));
+                retryItems.add(new CollectorItemDto(url, item.defaults()));
                 continue;
             }
             fetched++;
@@ -109,6 +119,7 @@ public class RetailerCollectorService {
             } catch (RuntimeException exception) {
                 errors.add(new CollectorErrorDto(url, "Stranicu nije bilo moguće pročitati."));
                 reports.add(new CollectorProductReportDto(url, null, null, "skipped", "Stranicu nije bilo moguće pročitati.", null, List.of()));
+                retryItems.add(new CollectorItemDto(url, item.defaults()));
                 continue;
             }
             parsed++;
@@ -123,12 +134,13 @@ public class RetailerCollectorService {
                 String message = "Nedostaje: " + String.join(", ", missing) + ". Dopuni defaults i ponovi zahtjev.";
                 reviewItems.add(new CollectorReviewItemDto(url, collected.externalId(), collected.name(), missing, item.defaults(), message));
                 reports.add(new CollectorProductReportDto(url, collected.externalId(), collected.name(), "needs-review", message, collected.dataQuality(), itemWarnings));
+                retryItems.add(new CollectorItemDto(url, item.defaults()));
                 continue;
             }
 
             boolean existed = notBlank(collected.externalId())
                     && productRepository.findByExternalId(collected.externalId().trim()).isPresent();
-            candidates.add(new Candidate(collected, itemWarnings, existed));
+            candidates.add(new Candidate(collected, itemWarnings, existed, item.defaults()));
             candidateSnapshots.add(collected.toSnapshot());
         }
 
@@ -149,6 +161,7 @@ public class RetailerCollectorService {
                         .orElse("Preskočeno u importu.");
                 errors.add(new CollectorErrorDto(product.productUrl(), message));
                 reports.add(new CollectorProductReportDto(product.productUrl(), externalId, product.name(), "skipped", message, product.dataQuality(), candidate.warnings()));
+                retryItems.add(new CollectorItemDto(product.productUrl(), candidate.defaults()));
             } else {
                 String status = candidate.existed() ? "updated" : "imported";
                 reports.add(new CollectorProductReportDto(product.productUrl(), externalId, product.name(), status, "OK", product.dataQuality(), candidate.warnings()));
@@ -160,9 +173,23 @@ public class RetailerCollectorService {
         int skipped = Math.max(0, totalReceived - imported - updated - needsReview);
         String finishedAt = Instant.now().toString();
 
-        return new CollectorRunSummaryDto(runId, startedAt, finishedAt, retailer, totalReceived,
+        CollectorRequestDto retryRequest = retryItems.isEmpty()
+                ? null
+                : new CollectorRequestDto(retailer, null, null, retryItems);
+
+        CollectorRunSummaryDto summary = new CollectorRunSummaryDto(runId, startedAt, finishedAt, retailer, totalReceived,
                 fetched, parsed, imported, updated, skipped, needsReview,
-                errors, new ArrayList<>(warnings), importSummary, reports, reviewItems);
+                errors, new ArrayList<>(warnings), importSummary, reports, reviewItems, retryRequest);
+        runStore.save(summary, requestSummary(request, retailer));
+        return summary;
+    }
+
+    private String requestSummary(CollectorRequestDto request, String retailer) {
+        if (request.items() != null && !request.items().isEmpty()) {
+            return "retailer=" + retailer + ", items=" + request.items().size();
+        }
+        int urlCount = request.urls() == null ? 0 : request.urls().size();
+        return "retailer=" + retailer + ", urls=" + urlCount;
     }
 
     private List<WorkItem> resolveWorkItems(CollectorRequestDto request) {
@@ -211,7 +238,7 @@ public class RetailerCollectorService {
         return new CollectorRunSummaryDto(runId, startedAt, now, retailer, totalReceived,
                 0, 0, 0, 0, totalReceived, 0,
                 List.of(new CollectorErrorDto(null, message)), List.of(),
-                new ImportSummaryDto(0, 0, 0, 0, List.of(), List.of()), List.of(), List.of());
+                new ImportSummaryDto(0, 0, 0, 0, List.of(), List.of()), List.of(), List.of(), null);
     }
 
     private boolean looksLikeUrl(String value) {
@@ -244,6 +271,6 @@ public class RetailerCollectorService {
     private record WorkItem(String url, CollectorDefaultsDto defaults) {
     }
 
-    private record Candidate(CollectedProductDto product, List<String> warnings, boolean existed) {
+    private record Candidate(CollectedProductDto product, List<String> warnings, boolean existed, CollectorDefaultsDto defaults) {
     }
 }

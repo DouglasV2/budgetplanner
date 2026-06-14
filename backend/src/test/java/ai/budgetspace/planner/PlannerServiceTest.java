@@ -1,6 +1,7 @@
 package ai.budgetspace.planner;
 
 import ai.budgetspace.dto.FurnishingPlanDto;
+import ai.budgetspace.dto.PlanGenerationResponse;
 import ai.budgetspace.dto.PlanItemDto;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.ProductDto;
@@ -281,6 +282,21 @@ class PlannerServiceTest {
 
         assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-good");
         assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-review");
+    }
+
+    @Test
+    void planIsPartialAndDoesNotInventProductsWhenRequiredCategoryMissing() {
+        Product tv = product("tv-1", "TV komoda", "IKEA", "tv-unit", 200, 4.5);
+        PlannerService service = serviceWithProducts(List.of(tv));
+
+        PlanGenerationResponse response = service.generate(input("Imam 1500 € za dnevni boravak."));
+
+        assertThat(response.partialPlan()).isTrue();
+        assertThat(response.missingImportantCategories()).contains("sofa");
+        assertThat(response.catalogWarning()).contains("kombinacija").doesNotContain("catalog");
+        assertThat(response.plans().get(0).items())
+                .extracting(item -> item.product().category())
+                .doesNotContain("sofa");
     }
 
     private PlannerService serviceWithProducts(List<Product> products) {

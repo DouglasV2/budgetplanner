@@ -38,6 +38,7 @@ interface PlanResultsProps {
   onFeedback: (planId: string, feedback: PlanFeedback) => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
+  partialNotice?: string | null;
 }
 
 const effortLabels = {
@@ -385,7 +386,8 @@ export function PlanResults({
   onProductClick,
   onFeedback,
   isLoading = false,
-  error = null
+  error = null,
+  partialNotice = null
 }: PlanResultsProps) {
   const [copiedPlanId, setCopiedPlanId] = useState<string | null>(null);
   const [savingPlanId, setSavingPlanId] = useState<string | null>(null);
@@ -489,6 +491,12 @@ export function PlanResults({
 
   return (
     <ResultShell>
+      {partialNotice && (
+        <div className="partial-plan-note" role="status">
+          <strong>Plan je djelomičan</strong>
+          <span>{partialNotice}</span>
+        </div>
+      )}
       <div className="plans-column decision-results-column">
         <article className="plan-card focused-plan-card decision-plan-card" key={selectedPlan.id}>
           <div className="decision-card">

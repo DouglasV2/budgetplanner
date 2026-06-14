@@ -4,6 +4,8 @@ import ai.budgetspace.dto.CollectorDefaultsDto;
 import ai.budgetspace.dto.CollectorItemDto;
 import ai.budgetspace.dto.CollectorRequestDto;
 import ai.budgetspace.dto.CollectorRunSummaryDto;
+import ai.budgetspace.product.CollectorRunItemRepository;
+import ai.budgetspace.product.CollectorRunRepository;
 import ai.budgetspace.product.Product;
 import ai.budgetspace.product.ProductImportService;
 import ai.budgetspace.product.ProductRepository;
@@ -140,10 +142,43 @@ class RetailerCollectorServiceTest {
         assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("Trgovina nije podržana"));
     }
 
+    @Test
+    void retryRequestContainsOnlyNeedsReviewItems() throws Exception {
+        String okUrl = "https://example.com/p/sofa-123";
+        String noPriceUrl = "https://example.com/p/rug";
+        ProductPageFetcher fetcher = new FakeFetcher(Map.of(
+                okUrl, ProductPageFetcher.FetchResult.ok(fixture("generic-product-jsonld.html")),
+                noPriceUrl, ProductPageFetcher.FetchResult.ok(fixture("missing-price.html"))));
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        RetailerCollectorService service = service(fetcher, repository);
+
+        CollectorRunSummaryDto summary = service.collect(
+                new CollectorRequestDto("JYSK", List.of(okUrl, noPriceUrl), defaults, null));
+
+        assertThat(summary.retryRequest()).isNotNull();
+        assertThat(summary.retryRequest().items()).extracting(CollectorItemDto::url).containsExactly(noPriceUrl);
+    }
+
+    @Test
+    void itemWithoutUrlIsRejected() {
+        ProductRepository repository = mock(ProductRepository.class);
+        RetailerCollectorService service = service(new FakeFetcher(Map.of()), repository);
+
+        CollectorRunSummaryDto summary = service.collect(new CollectorRequestDto("IKEA", null, defaults, List.of(
+                new CollectorItemDto("https://example.com/p/ok", new CollectorDefaultsDto("sofa", null, null, null)),
+                new CollectorItemDto("   ", new CollectorDefaultsDto("rug", null, null, null)))));
+
+        assertThat(summary.imported()).isZero();
+        assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("Svaki item mora imati url"));
+    }
+
     private RetailerCollectorService service(ProductPageFetcher fetcher, ProductRepository repository) {
         RetailerSnapshotImportService snapshotImportService =
                 new RetailerSnapshotImportService(new ProductImportService(repository), new RetailerCatalogAdapter());
-        return new RetailerCollectorService(fetcher, new RetailerProductParser(new ObjectMapper()), snapshotImportService, repository);
+        CollectorRunStore runStore = new CollectorRunStore(mock(CollectorRunRepository.class), mock(CollectorRunItemRepository.class));
+        return new RetailerCollectorService(fetcher, new RetailerProductParser(new ObjectMapper()), snapshotImportService, repository, runStore);
     }
 
     private String fixture(String name) throws Exception {

@@ -134,6 +134,7 @@ export function Planner() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [partialNotice, setPartialNotice] = useState<string | null>(null);
 
   async function refreshSavedPlans() {
     try {
@@ -167,11 +168,13 @@ export function Planner() {
     setIsLoading(true);
     setError(null);
     setNotice(null);
+    setPartialNotice(null);
 
     try {
       const response = await generatePlan(nextInput);
       setInput({ ...response.input, lockedProductIds: response.input.lockedProductIds ?? nextInput.lockedProductIds ?? [] });
       setPlans(response.plans);
+      setPartialNotice(response.partialPlan ? (response.catalogWarning ?? 'Nemamo još dovoljno proizvoda za kompletan plan. Ovo je najbolja dostupna kombinacija.') : null);
       setGenerationCount((count) => count + 1);
     } catch (apiError) {
       setError(
@@ -237,6 +240,7 @@ export function Planner() {
   function openSavedPlan(savedPlan: SavedPlanResponse) {
     setInput(savedPlan.input);
     setPlans([savedPlan.plan]);
+    setPartialNotice(null);
     window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
     setNotice('Otvoren je spremljeni plan. Možeš ga odmah kopirati, prilagoditi ili složiti novu verziju.');
   }
@@ -336,6 +340,7 @@ export function Planner() {
           onFeedback={handleFeedback}
           isLoading={isLoading}
           error={error}
+          partialNotice={partialNotice}
         />
       </div>
     </section>

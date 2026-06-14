@@ -24,6 +24,7 @@ public record CollectorRunSummaryDto(
         List<String> warnings,
         ImportSummaryDto importSummary,
         List<CollectorProductReportDto> products,
-        List<CollectorReviewItemDto> reviewItems
+        List<CollectorReviewItemDto> reviewItems,
+        CollectorRequestDto retryRequest
 ) {
 }

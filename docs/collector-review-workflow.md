@@ -40,9 +40,13 @@ workflow — nema frontend UI-a, nema schedulera, nema crawlera.
 
 ## Kako popraviti i ponoviti
 
+Summary vraća i **`retryRequest`** (Sprint 9.5): gotov collector zahtjev koji sadrži **samo**
+URL-ove koje treba ponoviti (needs-review i skipped), svaki sa svojim `defaults`. Kopiraj ga,
+dopuni `defaults` prema `reviewItems` i pošalji ponovno — ne treba ručno slagati novi zahtjev.
+
 1. Pogledaj `reviewItems`. Svaka stavka ima `url`, `missingFields` i `message`.
 2. Ako fali `category` / `roomTags` / `styleTags` → dopuni `defaults` (ili per-item `defaults`
-   u `items` obliku) i **ponovi zahtjev** s tim URL-om.
+   u `items` obliku) i **ponovi zahtjev** s tim URL-om (najlakše kroz `retryRequest`).
 3. Ako fali `price` → stranica vjerojatno ne izlaže cijenu strukturirano (JS-heavy ili druga
    shema). Ne forsiraj browser automatizaciju. Provjeri je li to pravi product URL; ako nema
    čitljive cijene, preskoči taj proizvod.

@@ -3028,6 +3028,26 @@ textarea {
   padding: 0 2px;
 }
 
+.partial-plan-note {
+  display: grid;
+  gap: 3px;
+  border: 1px solid rgba(236, 122, 46, 0.24);
+  border-radius: 18px;
+  background: rgba(236, 122, 46, 0.08);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  line-height: 1.45;
+}
+
+.partial-plan-note strong {
+  color: var(--orange-dark);
+  font-weight: 900;
+}
+
+.partial-plan-note span {
+  color: var(--ink);
+}
+
 .shopping-list-lead {
   margin: 0;
   color: #3f563a;

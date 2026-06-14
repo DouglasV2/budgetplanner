@@ -1,13 +1,18 @@
 package ai.budgetspace.product;
 
+import ai.budgetspace.collector.CollectorRunStore;
 import ai.budgetspace.collector.RetailerCollectorService;
+import ai.budgetspace.dto.CatalogHealthDto;
 import ai.budgetspace.dto.CollectorRequestDto;
+import ai.budgetspace.dto.CollectorRunDetailDto;
+import ai.budgetspace.dto.CollectorRunDto;
 import ai.budgetspace.dto.CollectorRunSummaryDto;
 import ai.budgetspace.dto.ImportProductDto;
 import ai.budgetspace.dto.ImportSummaryDto;
 import ai.budgetspace.dto.ProductDto;
 import ai.budgetspace.dto.RetailerProductSnapshotDto;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,12 +27,16 @@ public class ProductController {
     private final ProductImportService productImportService;
     private final RetailerSnapshotImportService retailerSnapshotImportService;
     private final RetailerCollectorService retailerCollectorService;
+    private final CatalogHealthService catalogHealthService;
+    private final CollectorRunStore collectorRunStore;
 
-    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService, RetailerCollectorService retailerCollectorService) {
+    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService, RetailerCollectorService retailerCollectorService, CatalogHealthService catalogHealthService, CollectorRunStore collectorRunStore) {
         this.productRepository = productRepository;
         this.productImportService = productImportService;
         this.retailerSnapshotImportService = retailerSnapshotImportService;
         this.retailerCollectorService = retailerCollectorService;
+        this.catalogHealthService = catalogHealthService;
+        this.collectorRunStore = collectorRunStore;
     }
 
     @GetMapping("/api/products")
@@ -72,6 +81,23 @@ public class ProductController {
     @PostMapping("/api/products/collect/retailer-urls")
     public CollectorRunSummaryDto collectRetailerUrls(@RequestBody CollectorRequestDto request) {
         return retailerCollectorService.collect(request);
+    }
+
+    // Dev-only: is the catalog good enough for the planner? No UI.
+    @GetMapping("/api/products/catalog-health")
+    public CatalogHealthDto catalogHealth() {
+        return catalogHealthService.compute();
+    }
+
+    // Dev-only: read past collector runs. No UI.
+    @GetMapping("/api/products/collect/runs")
+    public List<CollectorRunDto> collectorRuns() {
+        return collectorRunStore.listRecent();
+    }
+
+    @GetMapping("/api/products/collect/runs/{runId}")
+    public CollectorRunDetailDto collectorRunDetail(@PathVariable String runId) {
+        return collectorRunStore.detail(runId).orElse(null);
     }
 
     private boolean hasTag(String csv, String value) {

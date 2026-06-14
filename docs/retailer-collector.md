@@ -38,7 +38,14 @@ Product (planner katalog)
 
 Retailer-specific parser v1 (IKEA) opisan je u [retailer-parser-v1.md](retailer-parser-v1.md).
 Kako čitati rezultat i popraviti `needs-review` opisano je u
-[collector-review-workflow.md](collector-review-workflow.md).
+[collector-review-workflow.md](collector-review-workflow.md). Cijeli pilot workflow (pack →
+collector → catalog health → planner) je u [real-retailer-pilot.md](real-retailer-pilot.md).
+
+Summary vraća i `retryRequest` (gotov zahtjev za ponavljanje samo needs-review/skipped
+stavki). Runovi se best-effort spremaju i čitaju preko dev endpointa
+`GET /api/products/collect/runs` i `GET /api/products/collect/runs/{runId}`. Je li katalog
+dovoljno dobar za planner provjeri preko `GET /api/products/catalog-health`
+([catalog-health.md](catalog-health.md)).
 
 ## Zahtjev — dva oblika
 

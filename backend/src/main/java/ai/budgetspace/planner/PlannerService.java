@@ -59,7 +59,34 @@ public class PlannerService {
                 buildPlan(input, "budget"),
                 buildPlan(input, "stretch")
         );
-        return new PlanGenerationResponse(input, plans);
+        List<String> missingImportant = missingImportantCategories(input);
+        boolean partial = !missingImportant.isEmpty();
+        String catalogWarning = partial ? buildCatalogWarning(missingImportant) : null;
+        return new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning);
+    }
+
+    // Required categories for the room that the catalog cannot supply (and the user did not
+    // already have). The planner never invents products to fill the gap — it surfaces it.
+    private List<String> missingImportantCategories(PlannerInputDto input) {
+        Set<String> usableCategories = productRepository.findAll().stream()
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                .map(product -> product.getCategory() == null ? "" : product.getCategory().toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+        Set<String> alreadyHave = new LinkedHashSet<>(input.alreadyHaveCategories());
+        return PlannerReadiness.requiredCategories(input.roomType()).stream()
+                .filter(category -> !alreadyHave.contains(category))
+                .filter(category -> !usableCategories.contains(category))
+                .toList();
+    }
+
+    private String buildCatalogWarning(List<String> missingImportant) {
+        String base = "Nemamo još dovoljno proizvoda za kompletan plan, ali ovo je najbolja dostupna kombinacija.";
+        if (missingImportant.isEmpty()) return base;
+        String labels = missingImportant.stream()
+                .map(PlannerReadiness::categoryLabel)
+                .collect(Collectors.joining(", "));
+        return base + " Još nedostaje dobar izbor za: " + labels + ".";
     }
 
     public FurnishingPlanDto replaceProduct(ReplaceProductRequest request) {
