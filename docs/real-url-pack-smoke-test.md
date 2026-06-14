@@ -32,12 +32,15 @@ curl -X POST http://localhost:8080/api/products/collect/retailer-urls \
   --data-binary @docs/pilot-packs/real-ikea-hr-living-room-pilot.json
 ```
 
-Spreman stvarni IKEA HR pilot pack je
-[pilot-packs/real-ikea-hr-living-room-pilot.json](pilot-packs/real-ikea-hr-living-room-pilot.json)
-(12 stvarnih `www.ikea.com/hr/hr` URL-ova). **Prvo probaj s 5–6 URL-ova**, pa ostatak. Ovo je
-dev-only; ne koristi za masovno skidanje, poštuj `robots.txt`/ToS, i ako te stranica blokira
-(403/429) **ne pokušavaj bypass**. U `products` sažetku čitaj status po URL-u: `imported`,
-`updated`, `skipped`, `needs-review`.
+Ovaj primjer koristi **spremni IKEA HR pilot pack**
+([pilot-packs/real-ikea-hr-living-room-pilot.json](pilot-packs/real-ikea-hr-living-room-pilot.json) –
+12 stvarnih `www.ikea.com/hr/hr` URL-ova). Za dnevni boravak imamo i **spremni JYSK HR
+pilot pack** ([pilot-packs/real-jysk-hr-living-room-pilot.json](pilot-packs/real-jysk-hr-living-room-pilot.json)
+– 10–14 stvarnih `jysk.hr` URL-ova). Pošalji ga na isti način zamijenivši
+naziv datoteke u `--data-binary`. **Prvo probaj s 5–6 URL-ova**, pa ostatak. Ovo je dev-only;
+ne koristi za masovno skidanje, poštuj `robots.txt`/ToS i ako te stranica blokira (403/429)
+**ne pokušavaj bypass**. U `products` sažetku čitaj status po URL-u: `imported`, `updated`,
+`skipped`, `needs-review`.
 
 Response sadrži sažetak: koliko URL-ova je dohvaćeno, koliko je uvezeno, koliko treba
 pregledati (`needs-review`) te eventualne greške. Ako je neki URL loš (nema cijenu,

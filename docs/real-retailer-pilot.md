@@ -11,12 +11,24 @@ collector → review → import → catalog health → planner smoke test.
 ## Koraci
 
 ### 1. Odaberi jedan pack
-- **Spreman stvarni pilot (IKEA HR, dnevni boravak):**
+Ovisno o trgovini koju želiš testirati, odaberi pripremljen pack s pravim URL-ovima ili
+placeholder pack i zamijeni URL-ove. Za dnevni boravak trenutno postoje dva stvarna
+pilota (IKEA i JYSK) te nekoliko placeholdera:
+
+* **Spreman stvarni pilot (IKEA HR, dnevni boravak):**
   [pilot-packs/real-ikea-hr-living-room-pilot.json](pilot-packs/real-ikea-hr-living-room-pilot.json)
   — 12 stvarnih `www.ikea.com/hr/hr` product URL-ova (kauč, TV komoda, stolić, tepih,
-  rasvjeta, spremanje), svaki s vlastitim `category` / `roomTags` / `styleTags` /
+  rasvjeta, spremanje), svaki s vlastitim `category`, `roomTags`, `styleTags` i
   `sourceReference`. Ovaj se može poslati odmah.
-- **Placeholder packovi (zamijeni URL-ove):**
+
+* **Spreman stvarni pilot (JYSK HR, dnevni boravak):**
+  [pilot-packs/real-jysk-hr-living-room-pilot.json](pilot-packs/real-jysk-hr-living-room-pilot.json)
+  — 10–14 stvarnih `jysk.hr` product URL-ova za dnevni boravak (kauči, stol, tepih,
+  rasvjeta, spremanje, dekoracije, fotelja). Svaki item ima vlastiti `category`,
+  `roomTags`, `styleTags` i `sourceReference`. Nakon što je IKEA katalog provučen,
+  ovaj pack omogućuje planneru da kombinira IKEA i JYSK proizvode.
+
+* **Placeholder packovi (zamijeni URL-ove):**
   [pilot-packs/ikea-living-room.json](pilot-packs/ikea-living-room.json),
   [pilot-packs/ikea-bedroom.json](pilot-packs/ikea-bedroom.json),
   [pilot-packs/ikea-home-office.json](pilot-packs/ikea-home-office.json).
@@ -40,6 +52,19 @@ curl -X POST http://localhost:8080/api/products/collect/retailer-urls \
   --data-binary @docs/pilot-packs/real-ikea-hr-living-room-pilot.json
 ```
 (Za placeholder packove zamijeni naziv datoteke, npr. `ikea-living-room.json`.)
+
+Za JYSK pilot koristi datoteku `real-jysk-hr-living-room-pilot.json` na isti način.
+Primjer:
+
+```bash
+curl -X POST http://localhost:8080/api/products/collect/retailer-urls \
+  -H "Content-Type: application/json" \
+  --data-binary @docs/pilot-packs/real-jysk-hr-living-room-pilot.json
+```
+
+Savjet: ako planiraš kombinirati IKEA i JYSK proizvode, prvo pokreni IKEA pack i pričekaj
+da se proizvodi importaju. Nakon toga pošalji JYSK pack. Planner može preferirati jednu
+trgovinu (npr. „najviše IKEA i JYSK”), ali mora imati dovoljan izbor proizvoda iz obje.
 
 Collector v10 donosi dodatne sigurnosne mjere:
 
