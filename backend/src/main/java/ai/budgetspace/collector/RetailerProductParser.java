@@ -287,20 +287,54 @@ public class RetailerProductParser {
 
     private String mapAvailability(String raw) {
         if (raw == null || raw.isBlank()) return null;
-        String value = raw.toLowerCase(Locale.ROOT);
-        if (value.contains("instock") || value.contains("in_stock") || value.contains("in stock")) return "in-stock";
-        if (value.contains("outofstock") || value.contains("out_of_stock") || value.contains("soldout") || value.contains("discontinued")) return "unavailable";
-        if (value.contains("limited")) return "limited";
-        if (value.contains("preorder") || value.contains("backorder") || value.contains("instoreonly")) return "check-store";
+        String value = raw.toLowerCase(java.util.Locale.ROOT);
+        // In stock / available
+        if (value.contains("instock") || value.contains("in_stock") || value.contains("in stock") || value.contains("available")) {
+            return "in-stock";
+        }
+        // Out of stock / unavailable / discontinued
+        if (value.contains("outofstock") || value.contains("out_of_stock") || value.contains("out of stock")
+                || value.contains("soldout") || value.contains("discontinued") || value.contains("unavailable")) {
+            return "unavailable";
+        }
+        // Limited availability
+        if (value.contains("limited")) {
+            return "limited";
+        }
+        // Preorder / backorder / store-only or unknown
+        if (value.contains("preorder") || value.contains("backorder") || value.contains("instoreonly") || value.contains("in store only") || value.contains("unknown")) {
+            return "check-store";
+        }
         return null;
     }
 
     private BigDecimal parsePrice(String raw) {
         if (raw == null || raw.isBlank()) return null;
-        Matcher matcher = PRICE_NUMBER.matcher(raw.trim());
-        if (!matcher.find()) return null;
+        // Remove currency symbols and whitespace, keep only digits and common separators.
+        String cleaned = raw.replaceAll("[^0-9.,]", "");
+        if (cleaned.isBlank()) return null;
+        // Determine which character acts as the decimal separator: choose the rightmost
+        // occurrence of '.' or ','. Everything before it may include thousand separators.
+        int lastDot = cleaned.lastIndexOf('.');
+        int lastComma = cleaned.lastIndexOf(',');
+        int sepIndex = Math.max(lastDot, lastComma);
+        String normalized;
+        if (sepIndex >= 0) {
+            // Integer part: strip all separators; Fractional part: keep digits only.
+            String intPart = cleaned.substring(0, sepIndex).replaceAll("[.,]", "");
+            String fracPart = cleaned.substring(sepIndex + 1).replaceAll("[^0-9]", "");
+            if (fracPart.isEmpty()) {
+                normalized = intPart;
+            } else {
+                normalized = intPart + "." + fracPart;
+            }
+        } else {
+            // No obvious decimal separator; remove any stray separators.
+            normalized = cleaned.replaceAll("[.,]", "");
+        }
         try {
-            BigDecimal price = new BigDecimal(matcher.group(1).replace(',', '.'));
+            if (normalized.isBlank()) return null;
+            BigDecimal price = new BigDecimal(normalized);
             return price.compareTo(BigDecimal.ZERO) > 0 ? price : null;
         } catch (NumberFormatException exception) {
             return null;

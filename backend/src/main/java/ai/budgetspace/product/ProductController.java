@@ -1,6 +1,7 @@
 package ai.budgetspace.product;
 
 import ai.budgetspace.collector.CollectorRunStore;
+import ai.budgetspace.collector.CategoryDiscoveryService;
 import ai.budgetspace.collector.RetailerCollectorService;
 import ai.budgetspace.dto.CatalogHealthDto;
 import ai.budgetspace.dto.CollectorRequestDto;
@@ -29,14 +30,16 @@ public class ProductController {
     private final RetailerCollectorService retailerCollectorService;
     private final CatalogHealthService catalogHealthService;
     private final CollectorRunStore collectorRunStore;
+    private final CategoryDiscoveryService categoryDiscoveryService;
 
-    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService, RetailerCollectorService retailerCollectorService, CatalogHealthService catalogHealthService, CollectorRunStore collectorRunStore) {
+    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService, RetailerCollectorService retailerCollectorService, CatalogHealthService catalogHealthService, CollectorRunStore collectorRunStore, CategoryDiscoveryService categoryDiscoveryService) {
         this.productRepository = productRepository;
         this.productImportService = productImportService;
         this.retailerSnapshotImportService = retailerSnapshotImportService;
         this.retailerCollectorService = retailerCollectorService;
         this.catalogHealthService = catalogHealthService;
         this.collectorRunStore = collectorRunStore;
+        this.categoryDiscoveryService = categoryDiscoveryService;
     }
 
     @GetMapping("/api/products")
@@ -98,6 +101,12 @@ public class ProductController {
     @GetMapping("/api/products/collect/runs/{runId}")
     public CollectorRunDetailDto collectorRunDetail(@PathVariable String runId) {
         return collectorRunStore.detail(runId).orElse(null);
+    }
+
+    // Dev-only: discover product URLs from a single category/listing page. No UI.
+    @PostMapping("/api/products/collect/discover-product-urls")
+    public ai.budgetspace.dto.DiscoveryResponseDto discoverProductUrls(@RequestBody ai.budgetspace.dto.DiscoveryRequestDto request) {
+        return categoryDiscoveryService.discover(request);
     }
 
     private boolean hasTag(String csv, String value) {

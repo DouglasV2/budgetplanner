@@ -27,6 +27,15 @@ curl -X POST http://localhost:8080/api/products/collect/retailer-urls \
   --data-binary @docs/pilot-packs/ikea-living-room.json
 ```
 
+Collector v10 donosi dodatne sigurnosne mjere:
+
+- **Allowlist domena** – URL-ovi moraju biti na dopuštenoj domeni za odabranu trgovinu
+  (npr. `ikea.com`, `ikea.hr`). Linkovi na druge domene se preskaču s jasnom porukom.
+- **Delay između requestova** – između svakog dohvaćanja stranice čeka se pola
+  sekunde kako bi se serveri poštedjeli naglog opterećenja.
+- **Jasne greške za HTTP 4xx/5xx** – statusi 403, 404 i slični prikazuju se u
+  sažetku, a run se nastavlja za ostale URL-ove.
+
 ### 4. Pročitaj summary
 Pogledaj `imported`, `updated`, `skipped`, `needsReview`, `warnings` i `products` (status po
 URL-u). Vidi [collector-review-workflow.md](collector-review-workflow.md).

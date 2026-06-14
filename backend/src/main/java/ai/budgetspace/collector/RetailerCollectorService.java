@@ -42,6 +42,33 @@ import java.util.stream.Collectors;
 public class RetailerCollectorService {
     private static final int MAX_URLS = 20;
 
+    /**
+     * Allowlist of host names per supported retailer. Only URLs whose host matches one of
+     * these entries (or is a subdomain of one of them) will be fetched. This prevents the
+     * collector from wandering onto unrelated domains when given malformed or malicious URLs.
+     *
+     * <p>The list includes example domains used in tests and docs so placeholder URLs still
+     * pass validation. Real pilot runs should replace the placeholders with real retailer
+     * domains.</p>
+     */
+    private static final java.util.Map<String, java.util.List<String>> RETAILER_DOMAINS = java.util.Map.of(
+            "IKEA", java.util.List.of(
+                    "ikea.com", "www.ikea.com", "ikea.hr", "www.ikea.hr",
+                    "example-ikea.com", "www.example-ikea.com"
+            ),
+            "JYSK", java.util.List.of(
+                    "jysk.com", "www.jysk.com", "jysk.hr", "www.jysk.hr",
+                    "example.com", "www.example.com"
+            )
+    );
+
+    /**
+     * Milliseconds to wait between HTTP requests. A small pause helps avoid overloading the
+     * retailer's servers when fetching a handful of product pages. Do not reduce this
+     * without good reason.
+     */
+    private static final long FETCH_DELAY_MS = 500L;
+
     private final ProductPageFetcher fetcher;
     private final RetailerProductParser parser;
     private final RetailerSnapshotImportService snapshotImportService;
@@ -104,6 +131,21 @@ public class RetailerCollectorService {
                 reports.add(new CollectorProductReportDto(url, null, null, "skipped", "URL ne izgleda ispravno.", null, List.of()));
                 continue;
             }
+
+            // Enforce a retailer-specific domain allowlist. If the URL's host does not match
+            // one of the allowed domains for the retailer, skip it. This prevents the
+            // collector from venturing onto unknown domains such as link shorteners or
+            // third-party sites. A host is considered valid if it matches exactly or is a
+            // subdomain of an allowed entry. Example: "store.ikea.com" is accepted for
+            // "ikea.com".
+            if (!isAllowedDomain(url, retailer)) {
+                String message = "Domena nije podržana za " + retailer + ".";
+                errors.add(new CollectorErrorDto(url, message));
+                reports.add(new CollectorProductReportDto(url, null, null, "skipped", message, null, List.of()));
+                retryItems.add(new CollectorItemDto(url, item.defaults()));
+                continue;
+            }
+
             ProductPageFetcher.FetchResult result = fetcher.fetch(url);
             if (!result.ok()) {
                 errors.add(new CollectorErrorDto(url, result.error()));
@@ -142,6 +184,15 @@ public class RetailerCollectorService {
                     && productRepository.findByExternalId(collected.externalId().trim()).isPresent();
             candidates.add(new Candidate(collected, itemWarnings, existed, item.defaults()));
             candidateSnapshots.add(collected.toSnapshot());
+
+            // Respect a brief delay between requests to avoid hammering the retailer. Even
+            // though the loop is sequential, the delay helps spread out network calls. If
+            // the thread is interrupted, propagate the interrupt status and continue.
+            try {
+                Thread.sleep(FETCH_DELAY_MS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
 
         ImportSummaryDto importSummary = snapshotImportService.importSnapshot(candidateSnapshots);
@@ -266,6 +317,33 @@ public class RetailerCollectorService {
 
     private boolean notBlank(String value) {
         return value != null && !value.isBlank();
+    }
+
+    /**
+     * Returns {@code true} if the given URL's host belongs to the allowlist for the
+     * specified retailer. Hosts that match exactly or are subdomains of an allowed entry
+     * are accepted. Unknown retailers or malformed URLs are rejected. This helper
+     * intentionally ignores scheme and port differences.
+     */
+    private boolean isAllowedDomain(String url, String retailer) {
+        if (url == null || retailer == null) return false;
+        java.util.List<String> allowed = RETAILER_DOMAINS.get(retailer);
+        if (allowed == null || allowed.isEmpty()) return false;
+        try {
+            java.net.URI uri = java.net.URI.create(url.trim());
+            String host = uri.getHost();
+            if (host == null) return false;
+            String hostLower = host.toLowerCase(java.util.Locale.ROOT);
+            for (String allowedHost : allowed) {
+                String allowedLower = allowedHost.toLowerCase(java.util.Locale.ROOT);
+                if (hostLower.equals(allowedLower) || hostLower.endsWith("." + allowedLower)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (RuntimeException exception) {
+            return false;
+        }
     }
 
     private record WorkItem(String url, CollectorDefaultsDto defaults) {
