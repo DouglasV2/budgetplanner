@@ -43,3 +43,17 @@ budgetspace:
     model: ${BUDGETSPACE_DESIGN_ASSISTANT_MODEL:claude-opus-4-8}
     # Resolves from BUDGETSPACE_DESIGN_ASSISTANT_API_KEY, then ANTHROPIC_API_KEY.
     api-key: ${BUDGETSPACE_DESIGN_ASSISTANT_API_KEY:${ANTHROPIC_API_KEY:}}
+  ai:
+    # Sprint 10.10: AI prompt-understanding layer. Off by default → deterministic rule-based parsing.
+    # API keys are backend-only and never exposed to the frontend.
+    enabled: ${BUDGETSPACE_AI_ENABLED:false}
+    provider: ${BUDGETSPACE_LLM_PROVIDER:off}            # off | openai | anthropic
+    openai-api-key: ${OPENAI_API_KEY:}
+    anthropic-api-key: ${ANTHROPIC_API_KEY:}
+    model: ${BUDGETSPACE_LLM_MODEL:}                     # blank → cheap mini model per provider
+    timeout-seconds: ${BUDGETSPACE_LLM_TIMEOUT_SECONDS:15}
+    max-output-tokens: ${BUDGETSPACE_LLM_MAX_OUTPUT_TOKENS:700}
+    # Cost / rate guardrails — on breach the app falls back to rule-based (never errors).
+    monthly-budget-usd: ${BUDGETSPACE_AI_MONTHLY_BUDGET_USD:20}
+    max-requests-per-day: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY:100}
+    max-requests-per-session: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_SESSION:10}

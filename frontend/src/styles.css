@@ -3166,3 +3166,91 @@ textarea {
   gap: 4px;
   color: var(--ink);
 }
+
+/* Sprint 10.10: AI intent insight (what the model understood) + low-confidence note. */
+.ai-insight-card {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(60, 120, 90, 0.22);
+  border-radius: 18px;
+  background: rgba(60, 120, 90, 0.06);
+  padding: 14px 16px;
+  margin-top: 18px;
+  line-height: 1.5;
+}
+
+.ai-insight-head span {
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.ai-insight-summary {
+  margin: 0;
+  color: var(--ink);
+}
+
+.ai-insight-unsure {
+  margin: 0;
+  color: var(--orange-dark);
+  font-weight: 700;
+}
+
+/* Sprint 10.10: discreet, value-first pricing. */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.pricing-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  border: 1px solid rgba(20, 20, 30, 0.1);
+  border-radius: 20px;
+  background: #fff;
+  padding: 20px;
+}
+
+.pricing-card.featured {
+  border-color: rgba(236, 122, 46, 0.4);
+  box-shadow: 0 10px 30px rgba(236, 122, 46, 0.12);
+}
+
+.pricing-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pricing-card-head h3 {
+  margin: 0;
+}
+
+.pricing-price {
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.pricing-tagline {
+  margin: 0;
+  color: #5b6472;
+}
+
+.pricing-features {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.pricing-note {
+  color: #5b6472;
+}
+
+.pricing-footnote {
+  margin-top: 16px;
+  color: #5b6472;
+  font-size: 0.9rem;
+}

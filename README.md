@@ -2,18 +2,46 @@
 
 AI-powered furnishing planner for users who want to equip a room inside a budget using retailers such as IKEA, JYSK, Pevex, Emmezeta and Decathlon.
 
-The current MVP is deterministic, not LLM-based yet:
+The planner core is deterministic; an optional AI layer (Sprint 10.10) understands the user's
+free-text prompt before planning. AI is **off by default** — with it off the app is fully
+deterministic and makes no external calls. See "AI / LLM configuration" below.
 
 - React + Vite + TypeScript frontend
 - Spring Boot REST API
 - PostgreSQL product catalog
-- Seeded catalog with 150 products
+- Seeded catalog with real IKEA/JYSK HR products
 - Prompt-first planner flow
+- Optional AI prompt understanding (OpenAI or Anthropic), rule-based fallback
 - Retailer filters
 - Must-have categories
 - Already-have categories
 - Replace product action
 - Share/copy plan action
+
+## AI / LLM configuration
+
+**AI keys are backend-only. Never commit API keys. Never expose them in React.** The frontend bundle
+is public — anything in a `VITE_*` variable ships to the browser, so LLM keys live only in backend
+environment variables (`OPENAI_API_KEY` / `ANTHROPIC_API_KEY`), are read in `LlmProperties`, and are
+never logged or returned in any response. Copy `backend/.env.example` and set real values in your
+secret store (real `.env` files are git-ignored).
+
+The AI layer is a **parser/reasoning layer**: it turns a free-text prompt into a structured
+`PlannerIntentAnalysisDto`; the deterministic planner still selects the real catalog products (the
+LLM never invents products, prices or URLs). It is **off by default** and falls back to the
+rule-based parser when disabled, when no key is set, on any error, or when usage limits are hit.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `BUDGETSPACE_AI_ENABLED` | `false` | master switch for the AI layer |
+| `BUDGETSPACE_LLM_PROVIDER` | `off` | `off` \| `openai` \| `anthropic` |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | (none) | backend-only provider keys |
+| `BUDGETSPACE_LLM_MODEL` | cheap mini per provider | model override |
+| `BUDGETSPACE_LLM_TIMEOUT_SECONDS` | `15` | per-call timeout |
+| `BUDGETSPACE_LLM_MAX_OUTPUT_TOKENS` | `700` | output cap |
+| `BUDGETSPACE_AI_MONTHLY_BUDGET_USD` | `20` | monthly cost guardrail → fallback when exceeded |
+| `BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY` | `100` | daily request guardrail |
+| `BUDGETSPACE_AI_MAX_REQUESTS_PER_SESSION` | `10` | per-session guardrail |
 
 ## Project structure
 

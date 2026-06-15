@@ -76,7 +76,20 @@ public class PlannerService {
     }
 
     public PlanGenerationResponse generate(PlannerInputDto rawInput) {
-        PlannerInputDto input = intentExtractor.enrich(rawInput == null ? null : rawInput.normalized());
+        // Rule-based path: parse the prompt with the deterministic extractor, then plan.
+        return buildResponse(intentExtractor.enrich(rawInput == null ? null : rawInput.normalized()));
+    }
+
+    /**
+     * Sprint 10.10: the input has already been resolved by the AI prompt-intelligence layer, so the
+     * rule-based extractor is NOT re-run here — the resolved fields are authoritative. The planner
+     * still picks only real products from the catalog.
+     */
+    public PlanGenerationResponse generateResolved(PlannerInputDto resolvedInput) {
+        return buildResponse(resolvedInput == null ? intentExtractor.enrich(null) : resolvedInput.normalized());
+    }
+
+    private PlanGenerationResponse buildResponse(PlannerInputDto input) {
         List<FurnishingPlanDto> plans = List.of(
                 buildPlan(input, "value"),
                 buildPlan(input, "budget"),

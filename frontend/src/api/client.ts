@@ -1,4 +1,4 @@
-import type { DesignAssistant, FurnishingPlan, PlanFeedback, PlannerInput, Product, ReplacementChoice, SavedPlanResponse } from '../types';
+import type { DesignAssistant, FurnishingPlan, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, SavedPlanResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
@@ -8,6 +8,23 @@ export interface PlanGenerationResponse {
   partialPlan?: boolean;
   missingImportantCategories?: string[];
   catalogWarning?: string | null;
+  // Sprint 10.10: how the prompt was understood (AI or rule-based).
+  intentAnalysis?: PlannerIntentAnalysis | null;
+}
+
+// Stable per-browser id so the backend can apply per-session AI usage limits. No PII.
+function sessionId(): string {
+  try {
+    const key = 'bs-session-id';
+    let value = localStorage.getItem(key);
+    if (!value) {
+      value = crypto?.randomUUID?.() ?? `s-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(key, value);
+    }
+    return value;
+  } catch {
+    return 'anonymous';
+  }
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -47,6 +64,7 @@ function fireAndForget(path: string, payload: unknown) {
 export function generatePlan(input: PlannerInput) {
   return request<PlanGenerationResponse>('/api/plans/generate', {
     method: 'POST',
+    headers: { 'X-BudgetSpace-Session': sessionId() },
     body: JSON.stringify(input)
   });
 }

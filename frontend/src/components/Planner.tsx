@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
-import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
+import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, roomLabels, styleLabels } from '../utils/planner';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
@@ -136,6 +136,7 @@ export function Planner() {
   const [notice, setNotice] = useState<string | null>(null);
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
   const [design, setDesign] = useState<DesignAssistant | null>(null);
+  const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
 
   async function refreshSavedPlans() {
     try {
@@ -171,11 +172,13 @@ export function Planner() {
     setNotice(null);
     setPartialNotice(null);
     setDesign(null);
+    setAnalysis(null);
 
     try {
       const response = await generatePlan(nextInput);
       setInput({ ...response.input, lockedProductIds: response.input.lockedProductIds ?? nextInput.lockedProductIds ?? [] });
       setPlans(response.plans);
+      setAnalysis(response.intentAnalysis ?? null);
       const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
       if (!hasAnyItems) {
         setPartialNotice('Nema dovoljno proizvoda za ovaj zahtjev. Pokušaj povećati budžet ili ukloniti ograničenje trgovine.');
@@ -253,6 +256,7 @@ export function Planner() {
     setPlans([savedPlan.plan]);
     setPartialNotice(null);
     setDesign(null);
+    setAnalysis(null);
     window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
     setNotice('Otvoren je spremljeni plan. Možeš ga odmah kopirati, prilagoditi ili složiti novu verziju.');
   }
@@ -355,6 +359,20 @@ export function Planner() {
           partialNotice={partialNotice}
         />
       </div>
+
+      {analysis && plans.length > 0 && (analysis.userGoalSummary || (analysis.missingImportantInfo?.length ?? 0) > 0) && (
+        <section className="ai-insight-card" aria-label="Što je AI razumio">
+          <div className="ai-insight-head">
+            <span>{analysis.aiUsed ? 'AI je razumio tvoju želju' : 'Što smo razumjeli iz opisa'}</span>
+          </div>
+          {analysis.userGoalSummary && <p className="ai-insight-summary">{analysis.userGoalSummary}</p>}
+          {(analysis.missingImportantInfo?.length ?? 0) > 0 && (
+            <p className="ai-insight-unsure">
+              Nismo sigurni oko: {analysis.missingImportantInfo!.join(', ')}. Možeš doraditi opis ili podesiti polja lijevo.
+            </p>
+          )}
+        </section>
+      )}
 
       {design && plans.length > 0 && (
         <section className="design-assistant-card" aria-label="Dizajn asistent">

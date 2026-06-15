@@ -102,6 +102,19 @@ public class Product {
     @Column(name = "material_tags", length = 200)
     private String materialTags;
 
+    // --- Sprint 10.10: affiliate / sponsored groundwork (no UI ad treatment yet) ---
+    // The plain retailer product page, kept separate from any affiliate redirect.
+    @Column(name = "original_product_url", length = 700)
+    private String originalProductUrl;
+    // Optional affiliate/partner redirect URL; when present the UI may use it for the outbound link.
+    @Column(name = "affiliate_url", length = 700)
+    private String affiliateUrl;
+    // A sponsored product must be clearly labelled and never replace the best organic recommendation.
+    @Column(name = "is_sponsored", nullable = false)
+    private boolean sponsored;
+    @Column(name = "sponsor_label", length = 120)
+    private String sponsorLabel;
+
     public Product() {
     }
 
@@ -161,4 +174,12 @@ public class Product {
     public void setColorTags(String colorTags) { this.colorTags = colorTags; }
     public String getMaterialTags() { return materialTags; }
     public void setMaterialTags(String materialTags) { this.materialTags = materialTags; }
+    public String getOriginalProductUrl() { return originalProductUrl; }
+    public void setOriginalProductUrl(String originalProductUrl) { this.originalProductUrl = originalProductUrl; }
+    public String getAffiliateUrl() { return affiliateUrl; }
+    public void setAffiliateUrl(String affiliateUrl) { this.affiliateUrl = affiliateUrl; }
+    public boolean isSponsored() { return sponsored; }
+    public void setSponsored(boolean sponsored) { this.sponsored = sponsored; }
+    public String getSponsorLabel() { return sponsorLabel; }
+    public void setSponsorLabel(String sponsorLabel) { this.sponsorLabel = sponsorLabel; }
 }

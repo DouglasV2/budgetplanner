@@ -82,6 +82,35 @@ export interface Product {
   // Sprint 10.7: optional colour/material tags used for smarter matching.
   colorTags?: string[];
   materialTags?: string[];
+  // Sprint 10.10: affiliate/sponsored groundwork (sponsored is always clearly labelled in the UI).
+  originalProductUrl?: string;
+  affiliateUrl?: string;
+  sponsored?: boolean;
+  sponsorLabel?: string;
+}
+
+// Sprint 10.10: structured understanding of the user's prompt (AI or rule-based).
+export interface PlannerIntentAnalysis {
+  roomType?: string;
+  budget?: number;
+  currency?: string;
+  roomSize?: number;
+  style?: string;
+  preferredRetailers?: string[];
+  mustHaveCategories?: string[];
+  alreadyHaveCategories?: string[];
+  avoidCategories?: string[];
+  colorPreferences?: string[];
+  materialPreferences?: string[];
+  qualityPreference?: 'budget' | 'balanced' | 'premium' | string;
+  urgency?: string;
+  confidence?: number;
+  missingImportantInfo?: string[];
+  userGoalSummary?: string;
+  normalizedPrompt?: string;
+  warnings?: string[];
+  aiUsed: boolean;
+  source?: string;
 }
 
 export interface PlannerInput {

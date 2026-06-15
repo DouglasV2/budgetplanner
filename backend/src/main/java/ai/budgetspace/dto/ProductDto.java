@@ -28,7 +28,13 @@ public record ProductDto(
         boolean inStock,
         String note,
         List<String> colorTags,
-        List<String> materialTags
+        List<String> materialTags,
+        // Sprint 10.10: affiliate/sponsored groundwork. originalProductUrl is the plain retailer page;
+        // affiliateUrl is an optional partner redirect; sponsored products are clearly labelled.
+        String originalProductUrl,
+        String affiliateUrl,
+        boolean sponsored,
+        String sponsorLabel
 ) {
     public static ProductDto from(Product product) {
         return new ProductDto(
@@ -53,7 +59,11 @@ public record ProductDto(
                 product.isInStock(),
                 product.getNote(),
                 splitTags(product.getColorTags()),
-                splitTags(product.getMaterialTags())
+                splitTags(product.getMaterialTags()),
+                firstNonBlank(product.getOriginalProductUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),
+                product.getAffiliateUrl(),
+                product.isSponsored(),
+                product.getSponsorLabel()
         );
     }
 
