@@ -3127,3 +3127,42 @@ textarea {
     padding-right: 14px;
   }
 }
+
+/* Sprint 10.8: design assistant block, shown below the plans. */
+.design-assistant-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(60, 80, 120, 0.18);
+  border-radius: 18px;
+  background: rgba(60, 80, 120, 0.06);
+  padding: 16px 18px;
+  margin-top: 18px;
+  line-height: 1.5;
+}
+
+.design-assistant-head {
+  display: grid;
+  gap: 2px;
+}
+
+.design-assistant-head span {
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.design-assistant-head small {
+  color: #5b6472;
+}
+
+.design-assistant-summary {
+  margin: 0;
+  color: var(--ink);
+}
+
+.design-assistant-highlights {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: var(--ink);
+}

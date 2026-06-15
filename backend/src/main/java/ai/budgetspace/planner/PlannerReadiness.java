@@ -13,21 +13,33 @@ import java.util.Map;
  */
 public final class PlannerReadiness {
 
-    public static final Map<String, List<String>> REQUIRED_BY_ROOM = Map.of(
-            "living-room", List.of("sofa", "tv-unit"),
-            "bedroom", List.of("bed", "mattress"),
-            "home-office", List.of("desk", "chair"),
-            "home-gym", List.of("gym-equipment")
+    public static final Map<String, List<String>> REQUIRED_BY_ROOM = Map.ofEntries(
+            Map.entry("living-room", List.of("sofa", "tv-unit")),
+            Map.entry("bedroom", List.of("bed", "mattress")),
+            Map.entry("home-office", List.of("desk", "chair")),
+            Map.entry("home-gym", List.of("gym-equipment")),
+            // Sprint 10.7: new rooms.
+            Map.entry("kitchen", List.of("kitchen-storage")),
+            Map.entry("dining-room", List.of("dining-table", "dining-chair")),
+            Map.entry("hallway", List.of("storage")),
+            Map.entry("bathroom", List.of("storage"))
     );
 
-    public static final Map<String, List<String>> RECOMMENDED_BY_ROOM = Map.of(
-            "living-room", List.of("table", "rug", "lighting"),
-            "bedroom", List.of("storage", "lighting", "rug"),
-            "home-office", List.of("lighting", "storage"),
-            "home-gym", List.of("storage", "lighting")
+    public static final Map<String, List<String>> RECOMMENDED_BY_ROOM = Map.ofEntries(
+            Map.entry("living-room", List.of("table", "rug", "lighting")),
+            Map.entry("bedroom", List.of("storage", "lighting", "rug", "nightstand", "wardrobe")),
+            Map.entry("home-office", List.of("lighting", "storage")),
+            Map.entry("home-gym", List.of("storage", "lighting")),
+            // Sprint 10.7: new rooms.
+            Map.entry("kitchen", List.of("kitchen-cart", "lighting", "storage")),
+            Map.entry("dining-room", List.of("lighting", "rug", "storage")),
+            Map.entry("hallway", List.of("lighting", "decor", "rug")),
+            Map.entry("bathroom", List.of("lighting", "decor"))
     );
 
-    public static final List<String> ROOMS = List.of("living-room", "bedroom", "home-office", "home-gym");
+    public static final List<String> ROOMS = List.of(
+            "living-room", "bedroom", "home-office", "home-gym",
+            "kitchen", "dining-room", "hallway", "bathroom");
 
     private PlannerReadiness() {
     }
@@ -55,6 +67,13 @@ public final class PlannerReadiness {
             case "bed" -> "krevet";
             case "mattress" -> "madrac";
             case "gym-equipment" -> "oprema za vježbanje";
+            case "dining-table" -> "blagovaonski stol";
+            case "dining-chair" -> "blagovaonska stolica";
+            case "kitchen-storage" -> "kuhinjsko spremanje";
+            case "kitchen-cart" -> "kuhinjska kolica";
+            case "nightstand" -> "noćni ormarić";
+            case "wardrobe" -> "ormar za odjeću";
+            case "dresser" -> "komoda s ladicama";
             default -> category;
         };
     }

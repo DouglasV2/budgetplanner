@@ -3,9 +3,13 @@ package ai.budgetspace.product;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,7 +57,15 @@ public final class ProductTaxonomy {
             "mattress",
             "desk",
             "chair",
-            "gym-equipment"
+            "gym-equipment",
+            // Sprint 10.7: new-room categories.
+            "dining-table",
+            "dining-chair",
+            "kitchen-storage",
+            "kitchen-cart",
+            "nightstand",
+            "wardrobe",
+            "dresser"
     );
 
     public static final Set<String> KNOWN_STYLES = Set.of(
@@ -69,12 +81,19 @@ public final class ProductTaxonomy {
             "living-room",
             "bedroom",
             "home-office",
-            "home-gym"
+            "home-gym",
+            // Sprint 10.7: new rooms.
+            "kitchen",
+            "dining-room",
+            "hallway",
+            "bathroom"
     );
 
     private static final Map<String, String> CATEGORY_ALIASES = categoryAliases();
     private static final Map<String, String> STYLE_ALIASES = styleAliases();
     private static final Map<String, String> ROOM_ALIASES = roomAliases();
+    private static final Map<String, List<String>> COLOR_KEYWORDS = colorKeywords();
+    private static final Map<String, List<String>> MATERIAL_KEYWORDS = materialKeywords();
 
     private ProductTaxonomy() {
     }
@@ -202,6 +221,14 @@ public final class ProductTaxonomy {
         alias(aliases, "desk", "desk", "stol", "radni stol", "pisaći stol", "pisaci stol", "office desk");
         alias(aliases, "chair", "chair", "stolica", "uredska stolica");
         alias(aliases, "gym-equipment", "gym-equipment", "gym equipment", "oprema za vježbanje", "oprema za vjezbanje", "fitness equipment");
+        // Sprint 10.7: new-room categories.
+        alias(aliases, "dining-table", "dining-table", "dining table", "blagovaonski stol", "trpezarijski stol", "stol za blagovanje");
+        alias(aliases, "dining-chair", "dining-chair", "dining chair", "blagovaonska stolica", "trpezarijska stolica", "stolica za blagovanje");
+        alias(aliases, "kitchen-storage", "kitchen-storage", "kitchen storage", "kuhinjski ormarić", "kuhinjski ormaric", "kuhinjska polica", "kuhinjsko spremanje");
+        alias(aliases, "kitchen-cart", "kitchen-cart", "kitchen cart", "kuhinjska kolica", "servirna kolica");
+        alias(aliases, "nightstand", "nightstand", "noćni ormarić", "nocni ormaric", "noćni ormar");
+        alias(aliases, "wardrobe", "wardrobe", "ormar za odjeću", "ormar za odjecu", "garderobni ormar", "plakar");
+        alias(aliases, "dresser", "dresser", "komoda s ladicama", "ladičar", "ladicar");
         return Map.copyOf(aliases);
     }
 
@@ -222,7 +249,81 @@ public final class ProductTaxonomy {
         alias(aliases, "bedroom", "bedroom", "spavaća soba", "spavaca soba", "spavaća", "spavaca");
         alias(aliases, "home-office", "home-office", "home office", "radni kutak", "ured", "office");
         alias(aliases, "home-gym", "home-gym", "home gym", "kućna teretana", "kucna teretana", "teretana", "gym");
+        // Sprint 10.7: new rooms.
+        alias(aliases, "kitchen", "kitchen", "kuhinja", "kuhinju", "kuhinji");
+        alias(aliases, "dining-room", "dining-room", "dining room", "blagovaonica", "blagovaonicu", "trpezarija");
+        alias(aliases, "hallway", "hallway", "hodnik", "predsoblje", "ulazni prostor");
+        alias(aliases, "bathroom", "bathroom", "kupaonica", "kupaonicu", "kupaona", "kupatilo");
         return Map.copyOf(aliases);
+    }
+
+    /**
+     * Sprint 10.7: maps a canonical colour tag to accent-free Croatian/English substrings that,
+     * when found in a product name/description, imply that colour. Used to populate
+     * {@code Product.colorTags} at import time when a snapshot does not declare it.
+     */
+    private static Map<String, List<String>> colorKeywords() {
+        LinkedHashMap<String, List<String>> map = new LinkedHashMap<>();
+        map.put("white", List.of("bijel", "white"));
+        map.put("black", List.of("crn", "black"));
+        map.put("grey", List.of("siv", "grey", "gray", "antracit"));
+        map.put("beige", List.of("bezboj", "krem", "cream", "bjelokost", "ivory"));
+        map.put("brown", List.of("smed", "braon", "brown"));
+        map.put("green", List.of("zelen", "green", "maslinast"));
+        map.put("blue", List.of("plav", "blue", "teget", "navy"));
+        map.put("yellow", List.of("zut", "yellow", "oker"));
+        map.put("red", List.of("crven", "red", "bordo"));
+        map.put("pink", List.of("roza", "roze", "pink"));
+        map.put("natural", List.of("natur", "prirodn", "hrast", "oak", "orah"));
+        map.put("gold", List.of("zlatn", "gold", "mjed", "brass"));
+        return Map.copyOf(map);
+    }
+
+    /** Sprint 10.7: canonical material tag → substrings implying that material (see {@link #colorKeywords()}). */
+    private static Map<String, List<String>> materialKeywords() {
+        LinkedHashMap<String, List<String>> map = new LinkedHashMap<>();
+        map.put("wood", List.of("drv", "hrast", "oak", "orah", "wood", "bambus", "bamboo", "iverica", "furnir"));
+        map.put("metal", List.of("metal", "celik", "aluminij", "krom", "zeljezo"));
+        map.put("glass", List.of("stakl", "glass"));
+        map.put("fabric", List.of("tkanin", "tekstil", "pamuk", "platno", "fabric", "lan"));
+        map.put("leather", List.of("koza", "kozn", "leather"));
+        map.put("rattan", List.of("ratan", "rattan", "pleten"));
+        map.put("marble", List.of("mramor", "marble"));
+        map.put("velvet", List.of("barsun", "samt", "velvet", "plis"));
+        return Map.copyOf(map);
+    }
+
+    /** Derives canonical colour tags from one or more free-text fields (e.g. product name). */
+    public static List<String> deriveColorTags(String... texts) {
+        return deriveTags(COLOR_KEYWORDS, texts);
+    }
+
+    /** Derives canonical material tags from one or more free-text fields (e.g. product name). */
+    public static List<String> deriveMaterialTags(String... texts) {
+        return deriveTags(MATERIAL_KEYWORDS, texts);
+    }
+
+    private static List<String> deriveTags(Map<String, List<String>> vocabulary, String... texts) {
+        String haystack = normalizeText(Arrays.stream(texts)
+                .filter(Objects::nonNull)
+                .reduce("", (a, b) -> a + " " + b));
+        if (haystack.isBlank()) return List.of();
+        List<String> found = new ArrayList<>();
+        vocabulary.forEach((tag, keywords) -> {
+            for (String keyword : keywords) {
+                if (haystack.contains(keyword)) {
+                    found.add(tag);
+                    break;
+                }
+            }
+        });
+        return List.copyOf(found);
+    }
+
+    private static String normalizeText(String value) {
+        if (value == null) return "";
+        return Normalizer.normalize(value.toLowerCase(Locale.ROOT), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
     }
 
     private static void alias(Map<String, String> aliases, String canonical, String... values) {

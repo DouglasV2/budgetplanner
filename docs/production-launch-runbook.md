@@ -1,14 +1,19 @@
-# Production launch runbook (Sprint 10.5)
+# Production launch runbook (Sprint 10.5 → 10.9)
 
 Practical steps to run BudgetSpace AI and hand it to the first real users. Scope of the pilot:
-**living-room only**, real **IKEA HR** and **JYSK HR** products.
+**living-room first** with real **IKEA HR** and **JYSK HR** products. Sprints 10.7–10.9 add smarter
+query understanding (colour/material + new rooms), a first design-assistant stub, and the deployment
+guards described below.
 
 ## 1. Apply the patch
 
 ```bash
-git checkout -b sprint-10.5
-git apply sprint-10.5-production-launch-and-catalog-expansion.patch
+git checkout -b sprint-10.7-10.9
+git apply sprint-10.7_to_10.9.patch
 ```
+
+> Earlier sprints shipped their own patches (e.g. `sprint-10.5-production-launch-and-catalog-expansion.patch`).
+> Apply them in order if you are starting from a clean 10.x checkout.
 
 ## 2. Environment variables
 
@@ -21,8 +26,9 @@ git apply sprint-10.5-production-launch-and-catalog-expansion.patch
 | `SERVER_PORT` | no | `8080` | |
 | `CORS_ALLOWED_ORIGINS` | **prod (required)** | `http://localhost:5173,http://127.0.0.1:5173` | comma-separated frontend origin(s). In the `prod` profile there is no localhost fallback — the app fails fast if it is unset. |
 | `SPRING_PROFILES_ACTIVE` | prod | (none) | set to `prod` to lock down admin endpoints + enforce CORS |
-| `BUDGETSPACE_REAL_CATALOG_SEED_ENABLED` | no | `true` | seed the real IKEA/JYSK catalog on startup |
+| `BUDGETSPACE_REAL_CATALOG_SEED_ENABLED` | no | `true` | seed the real IKEA/JYSK catalog on startup (idempotent: dedupes by `externalId`, never touches saved plans) |
 | `BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED` | no | `true` dev / `false` prod | dev collector/import/admin endpoints |
+| `HIBERNATE_DDL_AUTO` | no | `create` | schema strategy; keep `create` for the pilot (rebuild + reseed each start) |
 
 ### Frontend (Vite)
 | Variable | Required | Default | Notes |
@@ -88,12 +94,42 @@ Catalog size today (honestly web-verified, not fabricated): **76 products — IK
 
 | Situation | Message |
 |---|---|
-| Catalog empty / no match | "Nema dovoljno proizvoda za ovaj zahtjev. Pokušaj povećati budžet ili ukloniti ograničenje trgovine." |
-| Backend unreachable | "Backend trenutno nije dostupan. Provjeri je li server pokrenut i pokušaj ponovno." |
+| Catalog empty / not seeded / no match | "Nema dovoljno proizvoda za ovaj zahtjev. Pokušaj povećati budžet ili ukloniti ograničenje trgovine." |
+| Backend unreachable / CORS blocked | "Backend trenutno nije dostupan. Provjeri je li server pokrenut i pokušaj ponovno." |
+| Plan generation failed | "Nismo uspjeli složiti plan." + the server message |
 | Product has no link | "Link proizvoda nije dostupan" (disabled button) |
 | Partial plan | catalog warning from the planner (best available combination) |
+| Unexpected server error | `GlobalExceptionHandler` returns `{"error": "Dogodila se neočekivana greška. Pokušaj ponovno za koju minutu."}` and logs the cause |
+| Design assistant unavailable | the plan still renders; the design block is simply hidden (non-blocking call) |
 
-## 9. Known limitations (intentionally out of scope)
+## 9. Sprint 10.7–10.9 additions
+
+### Smarter query understanding (10.7)
+`PlannerIntentExtractor` now also parses **colours** ("zelene zidove" → `green`), **materials**
+("drvo, crni detalji" → `wood` + `black`) and **new rooms** (`kitchen`, `dining-room`, `hallway`,
+`bathroom`). Colour/material matches give a product a small scoring bonus (capped, never overrides
+style/room/price). Products get `colorTags`/`materialTags` at import — declared in the snapshot or
+derived from the product name (e.g. "Kauč sivi, hrast" → grey + wood).
+
+### Design assistant stub (10.8)
+After `POST /api/plans/generate`, the frontend calls `POST /api/plans/design` with the generation
+result and shows a short description below the plans. It is a deterministic rule-based stub today;
+the LLM integration point is marked with a `TODO` in `DesignAssistantService.describe(...)`.
+
+### Admin lockdown + CORS (10.9)
+With `SPRING_PROFILES_ACTIVE=prod`:
+- `/api/products/import`, `/api/products/collect*`, `/api/products/catalog-health` answer **404**
+  (`AdminEndpointGuardFilter`, `BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED=false`).
+- CORS allows only `CORS_ALLOWED_ORIGINS` (no localhost fallback; the app fails fast if unset).
+- DB URL/credentials, port and DDL strategy all come from env vars (see the table above).
+
+Verify the lockdown:
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -X POST https://your-backend.example/api/products/import   # expect 404 in prod
+curl -s -o /dev/null -w "%{http_code}\n" https://your-backend.example/api/products?roomType=living-room  # expect 200
+```
+
+## 10. Known limitations (intentionally out of scope)
 
 - **Catalog size:** target was ~200 (IKEA ~100 / JYSK ~100). Only products whose name, price and live
   product URL could be verified are included — no fabricated data. Reaching ~200 needs an official

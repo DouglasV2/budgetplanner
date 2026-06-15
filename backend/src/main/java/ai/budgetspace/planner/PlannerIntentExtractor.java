@@ -49,8 +49,23 @@ public class PlannerIntentExtractor {
             Map.entry("chair", Pattern.compile("\\bstolica\\b|\\bstolice\\b|\\bstolicu\\b|\\bstolicom\\b|fotelj|\\bchair\\b")),
             Map.entry("bed", Pattern.compile("krevet|\\bbed\\b")),
             Map.entry("mattress", Pattern.compile("madrac|mattress")),
-            Map.entry("gym-equipment", Pattern.compile("bucic|utez|girja|klup|bench|sprava|traka za trcanje|bicikl|oprema za vjezb"))
+            Map.entry("gym-equipment", Pattern.compile("bucic|utez|girja|klup|bench|sprava|traka za trcanje|bicikl|oprema za vjezb")),
+            // Sprint 10.7: new-room categories. These are precise multi-word phrases so they do not
+            // collide with the single-word kitchen/bedroom synonyms above.
+            Map.entry("dining-table", Pattern.compile("blagovaonski stol|trpezarijski stol|stol za blagovanje|dining table")),
+            Map.entry("dining-chair", Pattern.compile("blagovaonsk[ae] stolic|trpezarijsk[ae] stolic|dining chair")),
+            Map.entry("kitchen-storage", Pattern.compile("kuhinjski ormar|kuhinjska polic|kuhinjsko spreman|kitchen storage")),
+            Map.entry("kitchen-cart", Pattern.compile("kuhinjska kolica|servirna kolica|kitchen cart")),
+            Map.entry("nightstand", Pattern.compile("nocni ormar|nightstand")),
+            Map.entry("wardrobe", Pattern.compile("ormar za odjec|garderobni ormar|plakar|wardrobe")),
+            Map.entry("dresser", Pattern.compile("komoda s ladic|ladicar|dresser"))
     );
+
+    // Sprint 10.7: colour and material preferences. Keys are the canonical tags shared with
+    // ProductTaxonomy.deriveColorTags / deriveMaterialTags, so a parsed preference can be matched
+    // directly against a product's colorTags / materialTags. Patterns run over accent-free text.
+    private static final Map<String, Pattern> COLOR_PATTERNS = colorPatterns();
+    private static final Map<String, Pattern> MATERIAL_PATTERNS = materialPatterns();
 
     // Group 1 marks an "already have / exclude" clause, group 2 marks a "need" clause.
     // Longer and negated phrases come first so "ne treba mi" wins over "treba".
@@ -77,6 +92,7 @@ public class PlannerIntentExtractor {
         input = applyOptimizationGoal(text, input);
         input = applyRetailerIntent(text, input);
         input = applyCategories(text, input);
+        input = applyColorAndMaterialPreferences(text, input);
 
         return input;
     }
@@ -86,6 +102,11 @@ public class PlannerIntentExtractor {
         if (matches(text, "radni kutak|radni prostor|home office|\\bured\\b|office|posao")) input = input.withRoomType("home-office");
         if (matches(text, "spava|bedroom|spavac")) input = input.withRoomType("bedroom");
         if (matches(text, "teretan|gym|trening|fitness")) input = input.withRoomType("home-gym");
+        // Sprint 10.7: new rooms. Checked after the originals, so the last room mentioned wins.
+        if (matches(text, "kuhinj|kitchen")) input = input.withRoomType("kitchen");
+        if (matches(text, "blagovaon|trpezarij|dining")) input = input.withRoomType("dining-room");
+        if (matches(text, "hodnik|predsoblje|hallway")) input = input.withRoomType("hallway");
+        if (matches(text, "kupaon|kupatil|bathroom")) input = input.withRoomType("bathroom");
         return input;
     }
 
@@ -217,6 +238,53 @@ public class PlannerIntentExtractor {
             if (pattern.matcher(segment).find()) found.add(category);
         });
         return found;
+    }
+
+    // Colour/material preferences are read from the whole sentence (not from need/have clauses):
+    // "zidovi u zelenoj boji, drvo i crni detalji" -> colors {green, black}, materials {wood}.
+    private PlannerInputDto applyColorAndMaterialPreferences(String text, PlannerInputDto input) {
+        List<String> colors = matchKeys(text, COLOR_PATTERNS);
+        List<String> materials = matchKeys(text, MATERIAL_PATTERNS);
+        if (colors.isEmpty() && materials.isEmpty()) return input;
+        return input.withColorAndMaterialPreferences(colors, materials);
+    }
+
+    private List<String> matchKeys(String text, Map<String, Pattern> patterns) {
+        List<String> found = new ArrayList<>();
+        patterns.forEach((key, pattern) -> {
+            if (pattern.matcher(text).find()) found.add(key);
+        });
+        return found;
+    }
+
+    private static Map<String, Pattern> colorPatterns() {
+        LinkedHashMap<String, Pattern> patterns = new LinkedHashMap<>();
+        patterns.put("white", Pattern.compile("bijel|white"));
+        patterns.put("black", Pattern.compile("crn|black"));
+        patterns.put("grey", Pattern.compile("siv|grey|gray|antracit"));
+        patterns.put("beige", Pattern.compile("krem|cream|bjelokost|ivory"));
+        patterns.put("brown", Pattern.compile("smed|braon|brown"));
+        patterns.put("green", Pattern.compile("zelen|green|maslinast"));
+        patterns.put("blue", Pattern.compile("plav|blue|teget|navy"));
+        patterns.put("yellow", Pattern.compile("zut|yellow|oker"));
+        patterns.put("red", Pattern.compile("crven|bordo|\\bred\\b"));
+        patterns.put("pink", Pattern.compile("roza|roze|pink"));
+        patterns.put("natural", Pattern.compile("prirodn|natural|hrast|oak"));
+        patterns.put("gold", Pattern.compile("zlatn|gold|mjed"));
+        return patterns;
+    }
+
+    private static Map<String, Pattern> materialPatterns() {
+        LinkedHashMap<String, Pattern> patterns = new LinkedHashMap<>();
+        patterns.put("wood", Pattern.compile("drv|hrast|oak|orah|wood|bambus"));
+        patterns.put("metal", Pattern.compile("metal|celik|aluminij|krom"));
+        patterns.put("glass", Pattern.compile("stakl|glass"));
+        patterns.put("fabric", Pattern.compile("tkanin|tekstil|pamuk|platno|fabric|\\blan\\b"));
+        patterns.put("leather", Pattern.compile("koza|kozn|leather"));
+        patterns.put("rattan", Pattern.compile("ratan|rattan|pleten"));
+        patterns.put("marble", Pattern.compile("mramor|marble"));
+        patterns.put("velvet", Pattern.compile("barsun|samt|velvet|plis"));
+        return patterns;
     }
 
     private Optional<Integer> findBudget(String text) {

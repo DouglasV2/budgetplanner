@@ -26,7 +26,9 @@ public record ProductDto(
         String url,
         double rating,
         boolean inStock,
-        String note
+        String note,
+        List<String> colorTags,
+        List<String> materialTags
 ) {
     public static ProductDto from(Product product) {
         return new ProductDto(
@@ -49,7 +51,9 @@ public record ProductDto(
                 product.getUrl(),
                 product.getRating(),
                 product.isInStock(),
-                product.getNote()
+                product.getNote(),
+                splitTags(product.getColorTags()),
+                splitTags(product.getMaterialTags())
         );
     }
 

@@ -43,7 +43,9 @@ public class RetailerCatalogAdapter {
                 defaultSourceName(snapshot.sourceName(), snapshot.retailer()),
                 snapshot.sourceReference(),
                 snapshot.dataQuality(),
-                snapshot.dataQualityNotes()
+                snapshot.dataQualityNotes(),
+                snapshot.colorTags(),
+                snapshot.materialTags()
         );
     }
 

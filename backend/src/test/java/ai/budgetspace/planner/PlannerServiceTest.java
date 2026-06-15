@@ -299,6 +299,44 @@ class PlannerServiceTest {
                 .doesNotContain("sofa");
     }
 
+    @Test
+    void scoringPrefersProductMatchingColorAndMaterialPreferences() {
+        Product green = product("sofa-green", "Kauč zeleni", "IKEA", "sofa", 600, 4.5);
+        green.setColorTags("green");
+        green.setMaterialTags("wood");
+        Product grey = product("sofa-grey", "Kauč sivi", "IKEA", "sofa", 600, 4.5);
+        grey.setColorTags("grey");
+        grey.setMaterialTags("metal");
+        PlannerService service = serviceWithProducts(List.of(grey, green));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak, želim zelene detalje i drvo."))
+                .plans()
+                .get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-green");
+        assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-grey");
+    }
+
+    @Test
+    void colorBonusDoesNotOverrideStockOrStyle() {
+        // A colour/material match must not pull an out-of-stock product into the plan.
+        Product matchingButOutOfStock = product("sofa-match-oos", "Kauč zeleni drveni", "IKEA", "sofa", 600, 4.9);
+        matchingButOutOfStock.setColorTags("green");
+        matchingButOutOfStock.setMaterialTags("wood");
+        matchingButOutOfStock.setAvailabilityStatus("unavailable");
+        matchingButOutOfStock.setInStock(false);
+        Product plainInStock = product("sofa-plain", "Kauč sivi", "IKEA", "sofa", 600, 4.4);
+
+        PlannerService service = serviceWithProducts(List.of(matchingButOutOfStock, plainInStock));
+
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak, želim zeleno i drvo."))
+                .plans()
+                .get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-plain");
+        assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-match-oos");
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);

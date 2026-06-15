@@ -7,7 +7,9 @@ spring:
     password: ${DATABASE_PASSWORD:budgetspace}
   jpa:
     hibernate:
-      ddl-auto: create
+      # Overridable via env (HIBERNATE_DDL_AUTO). Default 'create' keeps the dev/pilot flow where
+      # the schema is rebuilt and data.sql + RealCatalogSeeder repopulate it on each start.
+      ddl-auto: ${HIBERNATE_DDL_AUTO:create}
     defer-datasource-initialization: true
     open-in-view: false
     properties:

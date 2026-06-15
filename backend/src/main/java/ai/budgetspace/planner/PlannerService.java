@@ -18,34 +18,54 @@ public class PlannerService {
     private static final Logger log = LoggerFactory.getLogger(PlannerService.class);
     private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina");
 
-    private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.of(
-            "living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor"),
-            "home-office", List.of("desk", "chair", "lighting", "storage", "decor", "rug"),
-            "bedroom", List.of("bed", "mattress", "storage", "lighting", "rug", "decor"),
-            "home-gym", List.of("gym-equipment", "storage", "lighting", "decor", "rug")
+    private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.ofEntries(
+            Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor")),
+            Map.entry("home-office", List.of("desk", "chair", "lighting", "storage", "decor", "rug")),
+            Map.entry("bedroom", List.of("bed", "mattress", "nightstand", "wardrobe", "storage", "lighting", "rug", "decor")),
+            Map.entry("home-gym", List.of("gym-equipment", "storage", "lighting", "decor", "rug")),
+            // Sprint 10.7: new rooms.
+            Map.entry("kitchen", List.of("kitchen-storage", "kitchen-cart", "lighting", "storage", "decor")),
+            Map.entry("dining-room", List.of("dining-table", "dining-chair", "lighting", "rug", "storage", "decor")),
+            Map.entry("hallway", List.of("storage", "lighting", "rug", "decor")),
+            Map.entry("bathroom", List.of("storage", "lighting", "decor"))
     );
 
     // Najvažnije (buy-first) po prostoru.
-    private static final Map<String, Set<String>> CORE_CATEGORIES_BY_ROOM = Map.of(
-            "living-room", Set.of("sofa", "tv-unit"),
-            "home-office", Set.of("desk", "chair"),
-            "bedroom", Set.of("bed", "mattress"),
-            "home-gym", Set.of("gym-equipment")
+    private static final Map<String, Set<String>> CORE_CATEGORIES_BY_ROOM = Map.ofEntries(
+            Map.entry("living-room", Set.of("sofa", "tv-unit")),
+            Map.entry("home-office", Set.of("desk", "chair")),
+            Map.entry("bedroom", Set.of("bed", "mattress")),
+            Map.entry("home-gym", Set.of("gym-equipment")),
+            // Sprint 10.7: new rooms.
+            Map.entry("kitchen", Set.of("kitchen-storage")),
+            Map.entry("dining-room", Set.of("dining-table", "dining-chair")),
+            Map.entry("hallway", Set.of("storage")),
+            Map.entry("bathroom", Set.of("storage"))
     );
 
     // Za ugodniji prostor (add-comfort) po prostoru. Sve ostalo u flowu je "može kasnije".
-    private static final Map<String, Set<String>> COMFORT_CATEGORIES_BY_ROOM = Map.of(
-            "living-room", Set.of("table", "rug", "lighting", "storage"),
-            "home-office", Set.of("lighting", "storage"),
-            "bedroom", Set.of("storage", "lighting", "rug"),
-            "home-gym", Set.of("storage", "lighting")
+    private static final Map<String, Set<String>> COMFORT_CATEGORIES_BY_ROOM = Map.ofEntries(
+            Map.entry("living-room", Set.of("table", "rug", "lighting", "storage")),
+            Map.entry("home-office", Set.of("lighting", "storage")),
+            Map.entry("bedroom", Set.of("nightstand", "wardrobe", "storage", "lighting", "rug")),
+            Map.entry("home-gym", Set.of("storage", "lighting")),
+            // Sprint 10.7: new rooms.
+            Map.entry("kitchen", Set.of("kitchen-cart", "lighting", "storage")),
+            Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
+            Map.entry("hallway", Set.of("lighting", "rug")),
+            Map.entry("bathroom", Set.of("lighting"))
     );
 
-    private static final Map<String, String> ROOM_LABELS = Map.of(
-            "living-room", "dnevni boravak",
-            "home-office", "radni kutak",
-            "bedroom", "spavaća soba",
-            "home-gym", "kućna teretana"
+    private static final Map<String, String> ROOM_LABELS = Map.ofEntries(
+            Map.entry("living-room", "dnevni boravak"),
+            Map.entry("home-office", "radni kutak"),
+            Map.entry("bedroom", "spavaća soba"),
+            Map.entry("home-gym", "kućna teretana"),
+            // Sprint 10.7: new rooms.
+            Map.entry("kitchen", "kuhinja"),
+            Map.entry("dining-room", "blagovaonica"),
+            Map.entry("hallway", "hodnik"),
+            Map.entry("bathroom", "kupaonica")
     );
 
     private final ProductRepository productRepository;
@@ -291,10 +311,34 @@ public class PlannerService {
         double requestedBonus = input.mustHaveCategories() != null && input.mustHaveCategories().contains(product.getCategory()) ? 18 : 0;
         double storeCapBonus = storeCapBonus(input, product, currentRetailers);
         double dataQualityBonus = dataQualityBonus(product);
+        double preferenceBonus = colorMaterialBonus(product, input);
 
         return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias
                 + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus
-                + preferredRetailerBonus + requestedBonus + storeCapBonus + dataQualityBonus;
+                + preferredRetailerBonus + requestedBonus + storeCapBonus + dataQualityBonus
+                + preferenceBonus;
+    }
+
+    // Sprint 10.7: gently prefer products whose colour/material tags match what the user asked for
+    // ("zelene zidove, drvo i crni detalji"). Deliberately capped well below styleScore (38) and
+    // roomScore (36) so a colour/material match nudges ties but never overrides style, room or price.
+    private double colorMaterialBonus(Product product, PlannerInputDto input) {
+        double colorBonus = Math.min(16, overlapCount(product.getColorTags(), input.colorPreferences()) * 10);
+        double materialBonus = Math.min(16, overlapCount(product.getMaterialTags(), input.materialPreferences()) * 10);
+        return Math.min(24, colorBonus + materialBonus);
+    }
+
+    private int overlapCount(String productCsvTags, List<String> preferences) {
+        if (preferences == null || preferences.isEmpty()) return 0;
+        Set<String> productTags = new LinkedHashSet<>(splitCsv(productCsvTags));
+        if (productTags.isEmpty()) return 0;
+        return (int) preferences.stream()
+                .filter(Objects::nonNull)
+                .map(value -> value.trim().toLowerCase(Locale.ROOT))
+                .filter(value -> !value.isBlank())
+                .distinct()
+                .filter(productTags::contains)
+                .count();
     }
 
     // Sprint 9.0: gently prefer products with better data (real link, image, recent check,
@@ -871,6 +915,13 @@ public class PlannerService {
             case "bed" -> "krevet";
             case "mattress" -> "madrac";
             case "gym-equipment" -> "oprema za vježbanje";
+            case "dining-table" -> "blagovaonski stol";
+            case "dining-chair" -> "blagovaonska stolica";
+            case "kitchen-storage" -> "kuhinjsko spremanje";
+            case "kitchen-cart" -> "kuhinjska kolica";
+            case "nightstand" -> "noćni ormarić";
+            case "wardrobe" -> "ormar za odjeću";
+            case "dresser" -> "komoda s ladicama";
             default -> category;
         };
     }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { generatePlan, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
-import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
+import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
+import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, roomLabels, styleLabels } from '../utils/planner';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
@@ -135,6 +135,7 @@ export function Planner() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
+  const [design, setDesign] = useState<DesignAssistant | null>(null);
 
   async function refreshSavedPlans() {
     try {
@@ -169,6 +170,7 @@ export function Planner() {
     setError(null);
     setNotice(null);
     setPartialNotice(null);
+    setDesign(null);
 
     try {
       const response = await generatePlan(nextInput);
@@ -181,6 +183,10 @@ export function Planner() {
         setPartialNotice(response.partialPlan ? (response.catalogWarning ?? 'Nemamo još dovoljno proizvoda za kompletan plan. Ovo je najbolja dostupna kombinacija.') : null);
       }
       setGenerationCount((count) => count + 1);
+      // Sprint 10.8: fetch the design-assistant description. Non-blocking: if it fails the plan still shows.
+      getDesignSummary(response)
+        .then((summary) => setDesign(summary))
+        .catch(() => setDesign(null));
     } catch (apiError) {
       setError(
         apiError instanceof Error
@@ -246,6 +252,7 @@ export function Planner() {
     setInput(savedPlan.input);
     setPlans([savedPlan.plan]);
     setPartialNotice(null);
+    setDesign(null);
     window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
     setNotice('Otvoren je spremljeni plan. Možeš ga odmah kopirati, prilagoditi ili složiti novu verziju.');
   }
@@ -348,6 +355,23 @@ export function Planner() {
           partialNotice={partialNotice}
         />
       </div>
+
+      {design && plans.length > 0 && (
+        <section className="design-assistant-card" aria-label="Dizajn asistent">
+          <div className="design-assistant-head">
+            <span>Dizajn asistent</span>
+            <small>Kratki opis tvog plana (uskoro generiran pomoću AI modela).</small>
+          </div>
+          <p className="design-assistant-summary">{design.summary}</p>
+          {design.highlights.length > 0 && (
+            <ul className="design-assistant-highlights">
+              {design.highlights.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
     </section>
   );
 }

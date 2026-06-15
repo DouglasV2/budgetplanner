@@ -169,7 +169,9 @@ public class ProductImportService {
                 value(row, "sourcename", "source_name", "izvor"),
                 value(row, "sourcereference", "source_reference", "izvor_ref"),
                 value(row, "dataquality", "data_quality", "kvaliteta"),
-                value(row, "dataqualitynotes", "data_quality_notes", "kvaliteta_napomena")
+                value(row, "dataqualitynotes", "data_quality_notes", "kvaliteta_napomena"),
+                splitTags(value(row, "colortags", "color_tags", "boje")),
+                splitTags(value(row, "materialtags", "material_tags", "materijali"))
         );
     }
 
@@ -217,7 +219,31 @@ public class ProductImportService {
             entity.setDataQuality(ProductTaxonomy.normalizeDataQuality(dto.dataQuality()).orElse(dto.dataQuality().trim().toLowerCase(Locale.ROOT)));
         }
         if (hasText(dto.dataQualityNotes())) entity.setDataQualityNotes(dto.dataQualityNotes().trim());
+        applyColorAndMaterialTags(dto, entity);
         entity.setImportedAt(Instant.now().toString());
+    }
+
+    // Sprint 10.7: store colour/material tags so the planner can prefer products that match the
+    // user's colour/material preferences. If the import did not declare them, derive a best-effort
+    // set from the product name (e.g. "Kauč sivi" -> grey, "Stol hrast" -> wood). Only overwrites
+    // when we actually have a value, so re-imports never wipe previously-set tags.
+    private void applyColorAndMaterialTags(ImportProductDto dto, Product entity) {
+        String color = joinSimpleTags(dto.colorTags());
+        if (!hasText(color)) color = String.join(",", ProductTaxonomy.deriveColorTags(dto.name()));
+        if (hasText(color)) entity.setColorTags(color);
+
+        String material = joinSimpleTags(dto.materialTags());
+        if (!hasText(material)) material = String.join(",", ProductTaxonomy.deriveMaterialTags(dto.name()));
+        if (hasText(material)) entity.setMaterialTags(material);
+    }
+
+    private String joinSimpleTags(List<String> tags) {
+        if (tags == null) return null;
+        return tags.stream()
+                .filter(this::hasText)
+                .map(tag -> tag.trim().toLowerCase(Locale.ROOT))
+                .distinct()
+                .collect(Collectors.joining(","));
     }
 
     private void applyDefaults(Product entity) {

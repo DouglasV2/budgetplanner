@@ -36,6 +36,37 @@ public record RetailerProductSnapshotDto(
         String sourceName,
         String sourceReference,
         String dataQuality,
-        String dataQualityNotes
+        String dataQualityNotes,
+        // Sprint 10.7: optional colour/material tags a curated snapshot may declare for a product.
+        List<String> colorTags,
+        List<String> materialTags
 ) {
+    /**
+     * Backwards-compatible constructor for snapshots prepared before Sprint 10.7. Colour and
+     * material tags default to empty; the import pipeline derives them from the name/style.
+     */
+    public RetailerProductSnapshotDto(
+            String externalId,
+            String name,
+            String retailer,
+            String category,
+            BigDecimal price,
+            String productUrl,
+            String imageUrl,
+            String availabilityStatus,
+            String deliveryNote,
+            String lastCheckedAt,
+            List<String> roomTags,
+            List<String> styleTags,
+            String priceTier,
+            String sourceType,
+            String sourceName,
+            String sourceReference,
+            String dataQuality,
+            String dataQualityNotes
+    ) {
+        this(externalId, name, retailer, category, price, productUrl, imageUrl, availabilityStatus,
+                deliveryNote, lastCheckedAt, roomTags, styleTags, priceTier, sourceType, sourceName,
+                sourceReference, dataQuality, dataQualityNotes, null, null);
+    }
 }

@@ -77,6 +77,36 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Kućna teretana do 500 €, samo osnovno.").roomType()).isEqualTo("home-gym");
     }
 
+    @Test
+    void parsesColorAndMaterialPreferences() {
+        PlannerInputDto parsed = parse("Dnevni boravak, želim zelene zidove, drvo i crne detalje.");
+
+        assertThat(parsed.colorPreferences()).contains("green", "black");
+        assertThat(parsed.materialPreferences()).contains("wood");
+    }
+
+    @Test
+    void colorPreferencesAreEmptyWhenNoneMentioned() {
+        PlannerInputDto parsed = parse("Dnevni boravak, treba mi kauč.");
+
+        assertThat(parsed.colorPreferences()).isEmpty();
+        assertThat(parsed.materialPreferences()).isEmpty();
+    }
+
+    @Test
+    void recognisesNewRooms() {
+        assertThat(parse("Trebam urediti kuhinju do 2000 €.").roomType()).isEqualTo("kitchen");
+        assertThat(parse("Blagovaonica, treba mi stol i stolice.").roomType()).isEqualTo("dining-room");
+        assertThat(parse("Mali hodnik, treba mi ormar.").roomType()).isEqualTo("hallway");
+        assertThat(parse("Kupaonica, treba mi polica.").roomType()).isEqualTo("bathroom");
+    }
+
+    @Test
+    void parsesDiningTableCategory() {
+        assertThat(parse("Blagovaonica, treba mi blagovaonski stol.").mustHaveCategories())
+                .contains("dining-table");
+    }
+
     private PlannerInputDto parse(String prompt) {
         return extractor.enrich(base(prompt));
     }

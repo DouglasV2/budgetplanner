@@ -36,6 +36,41 @@ public record ImportProductDto(
         String sourceName,
         String sourceReference,
         String dataQuality,
-        String dataQualityNotes
+        String dataQualityNotes,
+        // Sprint 10.7: optional colour/material tags joined onto the entity at import time.
+        List<String> colorTags,
+        List<String> materialTags
 ) {
+    /**
+     * Backwards-compatible constructor for callers created before Sprint 10.7 added the
+     * colour/material tags. Colour and material default to empty (the import pipeline can
+     * then derive them from the product name/style).
+     */
+    public ImportProductDto(
+            String id,
+            String externalId,
+            String name,
+            String retailer,
+            String category,
+            BigDecimal price,
+            BigDecimal originalPrice,
+            List<String> styleTags,
+            List<String> roomTags,
+            String imageUrl,
+            String productUrl,
+            String availabilityStatus,
+            String deliveryNote,
+            String lastCheckedAt,
+            String priceTier,
+            String note,
+            String sourceType,
+            String sourceName,
+            String sourceReference,
+            String dataQuality,
+            String dataQualityNotes
+    ) {
+        this(id, externalId, name, retailer, category, price, originalPrice, styleTags, roomTags,
+                imageUrl, productUrl, availabilityStatus, deliveryNote, lastCheckedAt, priceTier, note,
+                sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes, null, null);
+    }
 }

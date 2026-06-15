@@ -64,6 +64,9 @@ export interface Product {
   rating: number;
   inStock?: boolean;
   note: string;
+  // Sprint 10.7: optional colour/material tags used for smarter matching.
+  colorTags?: string[];
+  materialTags?: string[];
 }
 
 export interface PlannerInput {
@@ -83,6 +86,15 @@ export interface PlannerInput {
   preferredRetailers?: Retailer[];
   excludedRetailers?: Retailer[];
   maxStores?: number;
+  // Sprint 10.7: colour/material preferences parsed from the prompt (canonical keys, optional).
+  colorPreferences?: string[];
+  materialPreferences?: string[];
+}
+
+// Sprint 10.8: short description of a generated plan from the (rule-based) design assistant.
+export interface DesignAssistant {
+  summary: string;
+  highlights: string[];
 }
 
 export interface PlanItem {

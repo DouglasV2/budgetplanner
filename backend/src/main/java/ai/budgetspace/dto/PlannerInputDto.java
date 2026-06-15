@@ -18,8 +18,39 @@ public record PlannerInputDto(
         List<String> lockedProductIds,
         List<String> preferredRetailers,
         List<String> excludedRetailers,
-        int maxStores
+        int maxStores,
+        // Sprint 10.7: colour/material preferences parsed from the prompt (canonical keys, e.g.
+        // "green", "wood"). Used by PlannerService.scoreProduct to gently prefer matching products.
+        List<String> colorPreferences,
+        List<String> materialPreferences
 ) {
+    /**
+     * Backwards-compatible constructor for callers created before Sprint 10.7 added colour/material
+     * preferences (the frontend, tests and scenario fixtures). Both preference lists default to empty.
+     */
+    public PlannerInputDto(
+            String prompt,
+            int budget,
+            String roomType,
+            String style,
+            String location,
+            int size,
+            String retailerMode,
+            List<String> selectedRetailers,
+            String optimizationGoal,
+            String furnishingLevel,
+            List<String> mustHaveCategories,
+            List<String> alreadyHaveCategories,
+            List<String> lockedProductIds,
+            List<String> preferredRetailers,
+            List<String> excludedRetailers,
+            int maxStores
+    ) {
+        this(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
+                optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories,
+                lockedProductIds, preferredRetailers, excludedRetailers, maxStores, List.of(), List.of());
+    }
+
     public PlannerInputDto normalized() {
         return new PlannerInputDto(
                 prompt == null ? "" : prompt,
@@ -37,7 +68,9 @@ public record PlannerInputDto(
                 lockedProductIds == null ? List.of() : lockedProductIds,
                 preferredRetailers == null ? List.of() : preferredRetailers,
                 excludedRetailers == null ? List.of() : excludedRetailers,
-                Math.max(0, maxStores)
+                Math.max(0, maxStores),
+                colorPreferences == null ? List.of() : colorPreferences,
+                materialPreferences == null ? List.of() : materialPreferences
         );
     }
 
@@ -87,6 +120,10 @@ public record PlannerInputDto(
         return copy().lockedProductIds(nextLockedProductIds).build();
     }
 
+    public PlannerInputDto withColorAndMaterialPreferences(List<String> nextColors, List<String> nextMaterials) {
+        return copy().colorPreferences(nextColors).materialPreferences(nextMaterials).build();
+    }
+
     private boolean blank(String value) {
         return value == null || value.isBlank();
     }
@@ -116,6 +153,8 @@ public record PlannerInputDto(
         private List<String> preferredRetailers;
         private List<String> excludedRetailers;
         private int maxStores;
+        private List<String> colorPreferences;
+        private List<String> materialPreferences;
 
         private Builder(PlannerInputDto source) {
             this.prompt = source.prompt();
@@ -134,6 +173,8 @@ public record PlannerInputDto(
             this.preferredRetailers = source.preferredRetailers();
             this.excludedRetailers = source.excludedRetailers();
             this.maxStores = source.maxStores();
+            this.colorPreferences = source.colorPreferences();
+            this.materialPreferences = source.materialPreferences();
         }
 
         private Builder budget(int value) { this.budget = value; return this; }
@@ -150,12 +191,14 @@ public record PlannerInputDto(
         private Builder preferredRetailers(List<String> value) { this.preferredRetailers = value; return this; }
         private Builder excludedRetailers(List<String> value) { this.excludedRetailers = value; return this; }
         private Builder maxStores(int value) { this.maxStores = value; return this; }
+        private Builder colorPreferences(List<String> value) { this.colorPreferences = value; return this; }
+        private Builder materialPreferences(List<String> value) { this.materialPreferences = value; return this; }
 
         private PlannerInputDto build() {
             return new PlannerInputDto(
                     prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                     optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds,
-                    preferredRetailers, excludedRetailers, maxStores
+                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences
             ).normalized();
         }
     }

@@ -1,5 +1,18 @@
 # Production profile — activate with SPRING_PROFILES_ACTIVE=prod.
 # Locks down the dev/admin surface and forces an explicit frontend origin for CORS.
+# Database, port and DDL strategy are all driven by environment variables (no secrets in the repo).
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/budgetspace}
+    username: ${DATABASE_USERNAME:budgetspace}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: ${HIBERNATE_DDL_AUTO:create}
+
+server:
+  port: ${SERVER_PORT:8080}
+
 budgetspace:
   admin-endpoints:
     # Dev collector / import / catalog-health endpoints are NOT public in production.

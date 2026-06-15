@@ -89,6 +89,19 @@ public class Product {
     @Column(nullable = false, length = 700)
     private String note;
 
+    // --- Sprint 10.7: smart product matching ---
+    // Optional comma-separated colour tags using the canonical keys produced by
+    // ProductTaxonomy.deriveColorTags / matched against PlannerInputDto.colorPreferences
+    // (e.g. "white,grey,green"). Nullable: a product without colour tags is treated as
+    // having no colour preference and simply earns no colour bonus.
+    @Column(name = "color_tags", length = 200)
+    private String colorTags;
+
+    // Optional comma-separated material tags using the canonical keys produced by
+    // ProductTaxonomy.deriveMaterialTags (e.g. "wood,metal,glass"). Nullable, same as above.
+    @Column(name = "material_tags", length = 200)
+    private String materialTags;
+
     public Product() {
     }
 
@@ -144,4 +157,8 @@ public class Product {
     public void setInStock(boolean inStock) { this.inStock = inStock; }
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+    public String getColorTags() { return colorTags; }
+    public void setColorTags(String colorTags) { this.colorTags = colorTags; }
+    public String getMaterialTags() { return materialTags; }
+    public void setMaterialTags(String materialTags) { this.materialTags = materialTags; }
 }

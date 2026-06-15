@@ -1,4 +1,4 @@
-import type { FurnishingPlan, PlanFeedback, PlannerInput, Product, ReplacementChoice, SavedPlanResponse } from '../types';
+import type { DesignAssistant, FurnishingPlan, PlanFeedback, PlannerInput, Product, ReplacementChoice, SavedPlanResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
@@ -48,6 +48,15 @@ export function generatePlan(input: PlannerInput) {
   return request<PlanGenerationResponse>('/api/plans/generate', {
     method: 'POST',
     body: JSON.stringify(input)
+  });
+}
+
+// Sprint 10.8: ask the design assistant to describe a freshly generated plan. The frontend first
+// calls generatePlan, then passes the whole response here.
+export function getDesignSummary(plan: PlanGenerationResponse) {
+  return request<DesignAssistant>('/api/plans/design', {
+    method: 'POST',
+    body: JSON.stringify(plan)
   });
 }
 

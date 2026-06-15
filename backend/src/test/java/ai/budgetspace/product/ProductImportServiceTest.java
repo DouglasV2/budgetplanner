@@ -2,6 +2,7 @@ package ai.budgetspace.product;
 
 import ai.budgetspace.dto.ImportProductDto;
 import ai.budgetspace.dto.ImportSummaryDto;
+import ai.budgetspace.dto.ProductDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -195,6 +196,49 @@ class ProductImportServiceTest {
         assertThat(summary.created()).isZero();
         assertThat(summary.skipped()).isEqualTo(1);
         assertThat(summary.errors()).anySatisfy(error -> assertThat(error.message()).contains("productUrl"));
+    }
+
+    @Test
+    void derivesColorAndMaterialTagsFromNameAndExposesThemInDto() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        service.importProducts(List.of(
+                product("color-1", "Kauč sivi, drvene nogice", "IKEA", "sofa", BigDecimal.valueOf(499), List.of("modern"), List.of("living-room"))
+        ));
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(repository).save(captor.capture());
+        Product saved = captor.getValue();
+        assertThat(saved.getColorTags()).contains("grey");
+        assertThat(saved.getMaterialTags()).contains("wood");
+
+        ProductDto dto = ProductDto.from(saved);
+        assertThat(dto.colorTags()).contains("grey");
+        assertThat(dto.materialTags()).contains("wood");
+    }
+
+    @Test
+    void explicitColorAndMaterialTagsArePreferredOverDerivation() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        ImportProductDto dto = new ImportProductDto(
+                null, "color-2", "Neutralan kauč", "IKEA", "sofa", BigDecimal.valueOf(499), null,
+                List.of("modern"), List.of("living-room"), null, null, "in-stock", null,
+                "2026-06-10", "standard", null, "manual", "IKEA", null, "partial", null,
+                List.of("green"), List.of("velvet"));
+
+        service.importProducts(List.of(dto));
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue().getColorTags()).isEqualTo("green");
+        assertThat(captor.getValue().getMaterialTags()).isEqualTo("velvet");
     }
 
     private ImportProductDto product(String externalId, String name, String retailer, String category, BigDecimal price, List<String> styleTags, List<String> roomTags) {
