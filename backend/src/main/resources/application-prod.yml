@@ -1,0 +1,14 @@
+# Production profile — activate with SPRING_PROFILES_ACTIVE=prod.
+# Locks down the dev/admin surface and forces an explicit frontend origin for CORS.
+budgetspace:
+  admin-endpoints:
+    # Dev collector / import / catalog-health endpoints are NOT public in production.
+    enabled: ${BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED:false}
+  real-catalog:
+    seed-enabled: ${BUDGETSPACE_REAL_CATALOG_SEED_ENABLED:true}
+
+app:
+  cors:
+    # No localhost fallback in prod: CORS_ALLOWED_ORIGINS must be set to the real frontend origin
+    # (comma-separated for more than one). The app fails fast at startup if it is missing.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}

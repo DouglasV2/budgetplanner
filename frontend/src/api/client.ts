@@ -11,13 +11,19 @@ export interface PlanGenerationResponse {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options?.headers ?? {})
-    },
-    ...options
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options?.headers ?? {})
+      },
+      ...options
+    });
+  } catch {
+    // Network/CORS failure: the backend is unreachable rather than returning an error status.
+    throw new Error('Backend trenutno nije dostupan. Provjeri je li server pokrenut i pokušaj ponovno.');
+  }
 
   if (!response.ok) {
     const message = await response.text().catch(() => '');

@@ -1,0 +1,127 @@
+[
+  {
+    "externalId": "ikea-hr-poaeng-fotelja-crno-smeda-knisa-crna",
+    "name": "POÄNG fotelja, crno-smeđa/Knisa crna",
+    "retailer": "IKEA",
+    "category": "chair",
+    "price": 79.0,
+    "productUrl": "https://www.ikea.com/hr/hr/p/poaeng-fotelja-crno-smeda-knisa-crna-s59240828/",
+    "imageUrl": "",
+    "availabilityStatus": "check-store",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-15",
+    "roomTags": [
+      "living-room"
+    ],
+    "styleTags": [
+      "modern",
+      "cozy"
+    ],
+    "priceTier": "budget",
+    "sourceType": "retailer-snapshot",
+    "sourceName": "IKEA HR production pilot (10.5 web-verified)",
+    "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
+    "dataQuality": "partial",
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+  },
+  {
+    "externalId": "ikea-hr-poaeng-fotelja-crno-smeda-gunnared-tamno-siva",
+    "name": "POÄNG fotelja, crno-smeđa/Gunnared tamno siva",
+    "retailer": "IKEA",
+    "category": "chair",
+    "price": 149.0,
+    "productUrl": "https://www.ikea.com/hr/hr/p/poaeng-fotelja-crno-smeda-gunnared-tamno-siva-s69502061/",
+    "imageUrl": "",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-15",
+    "roomTags": [
+      "living-room"
+    ],
+    "styleTags": [
+      "modern",
+      "cozy"
+    ],
+    "priceTier": "standard",
+    "sourceType": "retailer-snapshot",
+    "sourceName": "IKEA HR production pilot (10.5 web-verified)",
+    "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
+    "dataQuality": "partial",
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+  },
+  {
+    "externalId": "ikea-hr-poaeng-fotelja-brezov-furnir-gunnared-tamno-siva",
+    "name": "POÄNG fotelja, brezov furnir/Gunnared tamno siva",
+    "retailer": "IKEA",
+    "category": "chair",
+    "price": 149.0,
+    "productUrl": "https://www.ikea.com/hr/hr/p/poaeng-fotelja-brezov-furnir-gunnared-tamno-siva-s89502055/",
+    "imageUrl": "",
+    "availabilityStatus": "in-stock",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-15",
+    "roomTags": [
+      "living-room"
+    ],
+    "styleTags": [
+      "modern",
+      "cozy"
+    ],
+    "priceTier": "standard",
+    "sourceType": "retailer-snapshot",
+    "sourceName": "IKEA HR production pilot (10.5 web-verified)",
+    "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
+    "dataQuality": "partial",
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+  },
+  {
+    "externalId": "ikea-hr-strandmon-naslonjac-nordvalla-tamno-siva",
+    "name": "STRANDMON naslonjač, Nordvalla tamno siva",
+    "retailer": "IKEA",
+    "category": "chair",
+    "price": 219.0,
+    "productUrl": "https://www.ikea.com/hr/hr/p/strandmon-naslonjac-nordvalla-tamno-siva-20343224/",
+    "imageUrl": "",
+    "availabilityStatus": "check-store",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-15",
+    "roomTags": [
+      "living-room"
+    ],
+    "styleTags": [
+      "classic",
+      "cozy"
+    ],
+    "priceTier": "standard",
+    "sourceType": "retailer-snapshot",
+    "sourceName": "IKEA HR production pilot (10.5 web-verified)",
+    "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
+    "dataQuality": "partial",
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+  },
+  {
+    "externalId": "ikea-hr-strandmon-fotelja-podnoznik-grann-bomstad-tamno-smeda",
+    "name": "STRANDMON fotelja i podnožnik, Grann/Bomstad tamno smeđa",
+    "retailer": "IKEA",
+    "category": "chair",
+    "price": 498.0,
+    "productUrl": "https://www.ikea.com/hr/hr/p/strandmon-fotelja-i-podnoznik-grann-bomstad-tamno-smeda-s09483904/",
+    "imageUrl": "",
+    "availabilityStatus": "check-store",
+    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+    "lastCheckedAt": "2026-06-15",
+    "roomTags": [
+      "living-room"
+    ],
+    "styleTags": [
+      "classic",
+      "cozy"
+    ],
+    "priceTier": "premium",
+    "sourceType": "retailer-snapshot",
+    "sourceName": "IKEA HR production pilot (10.5 web-verified)",
+    "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
+    "dataQuality": "partial",
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+  }
+]

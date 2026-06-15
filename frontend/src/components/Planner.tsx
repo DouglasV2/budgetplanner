@@ -174,7 +174,12 @@ export function Planner() {
       const response = await generatePlan(nextInput);
       setInput({ ...response.input, lockedProductIds: response.input.lockedProductIds ?? nextInput.lockedProductIds ?? [] });
       setPlans(response.plans);
-      setPartialNotice(response.partialPlan ? (response.catalogWarning ?? 'Nemamo još dovoljno proizvoda za kompletan plan. Ovo je najbolja dostupna kombinacija.') : null);
+      const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
+      if (!hasAnyItems) {
+        setPartialNotice('Nema dovoljno proizvoda za ovaj zahtjev. Pokušaj povećati budžet ili ukloniti ograničenje trgovine.');
+      } else {
+        setPartialNotice(response.partialPlan ? (response.catalogWarning ?? 'Nemamo još dovoljno proizvoda za kompletan plan. Ovo je najbolja dostupna kombinacija.') : null);
+      }
       setGenerationCount((count) => count + 1);
     } catch (apiError) {
       setError(

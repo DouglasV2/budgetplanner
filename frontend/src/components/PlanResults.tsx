@@ -605,6 +605,7 @@ export function PlanResults({
                         </div>
                         <div className="meta-line">
                           <span>{product.retailer}</span>
+                          <span>{categoryLabels[product.category]}</span>
                           <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
                           <span>{availabilityLabel(product)}</span>
                           {product.originalPrice && <span>Akcija</span>}
@@ -622,8 +623,8 @@ export function PlanResults({
                               Otvori u trgovini
                             </a>
                           ) : (
-                            <button type="button" disabled title="Link će biti dostupan kad spojimo trgovinu">
-                              Link će biti dostupan
+                            <button type="button" disabled title="Link proizvoda nije dostupan.">
+                              Link proizvoda nije dostupan
                             </button>
                           )}
                           <button type="button" onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>

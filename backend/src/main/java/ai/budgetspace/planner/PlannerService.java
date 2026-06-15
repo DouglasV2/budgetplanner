@@ -4,6 +4,8 @@ import ai.budgetspace.dto.*;
 import ai.budgetspace.product.Product;
 import ai.budgetspace.product.ProductRepository;
 import ai.budgetspace.product.ProductTaxonomy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class PlannerService {
+    private static final Logger log = LoggerFactory.getLogger(PlannerService.class);
     private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina");
 
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.of(
@@ -62,7 +65,24 @@ public class PlannerService {
         List<String> missingImportant = missingImportantCategories(input);
         boolean partial = !missingImportant.isEmpty();
         String catalogWarning = partial ? buildCatalogWarning(missingImportant) : null;
+        logPlanSummary(input, plans, missingImportant);
         return new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning);
+    }
+
+    // Observability: one line per generated plan so an operator can see the planner is producing
+    // real, priced items with a sane retailer mix. No user PII is logged (only the room and budget).
+    private void logPlanSummary(PlannerInputDto input, List<FurnishingPlanDto> plans, List<String> missingImportant) {
+        FurnishingPlanDto primary = plans.isEmpty() ? null : plans.get(0);
+        int itemCount = primary == null ? 0 : primary.items().size();
+        String total = primary == null ? "0" : String.valueOf(primary.total());
+        String retailerMix = primary == null || primary.retailersUsed().isEmpty()
+                ? "none" : String.join("+", primary.retailersUsed());
+        log.info("Plan generated: room={}, budget={} EUR, primaryItems={}, primaryTotal={} EUR, retailers=[{}], missingImportant={}.",
+                input.roomType(), input.budget(), itemCount, total, retailerMix, missingImportant);
+        if (itemCount == 0) {
+            log.warn("Plan generated with 0 items for room={}, budget={} EUR — catalog likely has no usable products for this request.",
+                    input.roomType(), input.budget());
+        }
     }
 
     // Required categories for the room that the catalog cannot supply (and the user did not
