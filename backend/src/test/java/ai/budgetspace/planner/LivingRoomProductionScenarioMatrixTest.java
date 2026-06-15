@@ -119,7 +119,11 @@ class LivingRoomProductionScenarioMatrixTest {
                 Set<String> categories = plan.items().stream()
                         .map(item -> item.product().category())
                         .collect(Collectors.toCollection(LinkedHashSet::new));
-                assertThat(categories).as(scenario.path("id").asText()).doesNotContainAnyElementsOf(forbiddenCategories);
+                if (!forbiddenCategories.isEmpty()) {
+                    // AssertJ's doesNotContainAnyElementsOf rejects an empty expected set, so only
+                    // assert when the scenario actually forbids categories.
+                    assertThat(categories).as(scenario.path("id").asText()).doesNotContainAnyElementsOf(forbiddenCategories);
+                }
                 assertThat(categories).as(scenario.path("id").asText()).containsAll(mustHaveCategories);
                 assertThat(plan.items().stream().map(item -> item.product().id()).toList())
                         .as(scenario.path("id").asText())

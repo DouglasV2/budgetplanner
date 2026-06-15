@@ -1,6 +1,14 @@
 export type Retailer = 'IKEA' | 'JYSK' | 'Pevex' | 'Decathlon' | 'Emmezeta' | 'Lesnina';
 
-export type RoomType = 'living-room' | 'home-office' | 'bedroom' | 'home-gym';
+export type RoomType =
+  | 'living-room'
+  | 'home-office'
+  | 'bedroom'
+  | 'home-gym'
+  | 'kitchen'
+  | 'dining-room'
+  | 'hallway'
+  | 'bathroom';
 
 export type StyleType =
   | 'bright'
@@ -40,7 +48,14 @@ export type ProductCategory =
   | 'desk'
   | 'bed'
   | 'mattress'
-  | 'gym-equipment';
+  | 'gym-equipment'
+  | 'dining-table'
+  | 'dining-chair'
+  | 'kitchen-storage'
+  | 'kitchen-cart'
+  | 'nightstand'
+  | 'wardrobe'
+  | 'dresser';
 
 export interface Product {
   id: string;

@@ -137,8 +137,13 @@ public class PlannerIntentExtractor {
     }
 
     private PlannerInputDto applyRetailerIntent(String text, PlannerInputDto input) {
-        LinkedHashSet<String> preferred = new LinkedHashSet<>();
-        LinkedHashSet<String> excluded = new LinkedHashSet<>();
+        // Seed from what the caller already chose (form / API), then let the prompt refine it.
+        // Without this, an explicit excludedRetailers/preferredRetailers on the request would be
+        // discarded whenever the prompt also mentions the retailers.
+        LinkedHashSet<String> preferred = new LinkedHashSet<>(
+                input.preferredRetailers() == null ? List.of() : input.preferredRetailers());
+        LinkedHashSet<String> excluded = new LinkedHashSet<>(
+                input.excludedRetailers() == null ? List.of() : input.excludedRetailers());
         List<String> mentioned = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : RETAILER_STEMS.entrySet()) {
@@ -147,7 +152,12 @@ public class PlannerIntentExtractor {
             int idx = text.indexOf(stem);
             if (idx < 0) continue;
             mentioned.add(retailer);
+            // Look back a short window, but stop at the previous clause boundary (comma/“;”) so a
+            // word like "bez" in an earlier clause ("bez Lesnine, najviše IKEA") doesn't leak onto
+            // the next retailer and flip "preferred" into "excluded".
             String before = text.substring(Math.max(0, idx - 22), idx);
+            int boundary = Math.max(before.lastIndexOf(','), before.lastIndexOf(';'));
+            if (boundary >= 0) before = before.substring(boundary + 1);
             if (matches(before, "\\bbez\\b|izbjegni|izbaci|ne zelim|ne trebam|ne treba|\\bosim\\b|preskoci")) {
                 excluded.add(retailer);
             } else if (matches(before, "najvise|radije|preferiram|ako moze|po mogucnosti|volio bih|voljela bih|prvenstveno|preferira")) {

@@ -14,14 +14,25 @@ export const categoryLabels: Record<ProductCategory, string> = {
   desk: 'Radni stol',
   bed: 'Krevet',
   mattress: 'Madrac',
-  'gym-equipment': 'Oprema za vježbanje'
+  'gym-equipment': 'Oprema za vježbanje',
+  'dining-table': 'Blagovaonski stol',
+  'dining-chair': 'Blagovaonska stolica',
+  'kitchen-storage': 'Kuhinjsko spremanje',
+  'kitchen-cart': 'Kuhinjska kolica',
+  nightstand: 'Noćni ormarić',
+  wardrobe: 'Ormar za odjeću',
+  dresser: 'Komoda s ladicama'
 };
 
 export const roomLabels: Record<RoomType, string> = {
   'living-room': 'dnevni boravak',
   'home-office': 'radni kutak',
   bedroom: 'spavaća soba',
-  'home-gym': 'kućna teretana'
+  'home-gym': 'kućna teretana',
+  kitchen: 'kuhinja',
+  'dining-room': 'blagovaonica',
+  hallway: 'hodnik',
+  bathroom: 'kupaonica'
 };
 
 export const furnishingLevelLabels: Record<FurnishingLevel, string> = {

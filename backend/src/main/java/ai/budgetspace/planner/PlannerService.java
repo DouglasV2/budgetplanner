@@ -24,7 +24,7 @@ public class PlannerService {
             Map.entry("bedroom", List.of("bed", "mattress", "nightstand", "wardrobe", "storage", "lighting", "rug", "decor")),
             Map.entry("home-gym", List.of("gym-equipment", "storage", "lighting", "decor", "rug")),
             // Sprint 10.7: new rooms.
-            Map.entry("kitchen", List.of("kitchen-storage", "kitchen-cart", "lighting", "storage", "decor")),
+            Map.entry("kitchen", List.of("kitchen-cart", "kitchen-storage", "lighting", "storage", "decor")),
             Map.entry("dining-room", List.of("dining-table", "dining-chair", "lighting", "rug", "storage", "decor")),
             Map.entry("hallway", List.of("storage", "lighting", "rug", "decor")),
             Map.entry("bathroom", List.of("storage", "lighting", "decor"))
@@ -37,7 +37,7 @@ public class PlannerService {
             Map.entry("bedroom", Set.of("bed", "mattress")),
             Map.entry("home-gym", Set.of("gym-equipment")),
             // Sprint 10.7: new rooms.
-            Map.entry("kitchen", Set.of("kitchen-storage")),
+            Map.entry("kitchen", Set.of("kitchen-cart")),
             Map.entry("dining-room", Set.of("dining-table", "dining-chair")),
             Map.entry("hallway", Set.of("storage")),
             Map.entry("bathroom", Set.of("storage"))
@@ -50,7 +50,7 @@ public class PlannerService {
             Map.entry("bedroom", Set.of("nightstand", "wardrobe", "storage", "lighting", "rug")),
             Map.entry("home-gym", Set.of("storage", "lighting")),
             // Sprint 10.7: new rooms.
-            Map.entry("kitchen", Set.of("kitchen-cart", "lighting", "storage")),
+            Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
             Map.entry("hallway", Set.of("lighting", "rug")),
             Map.entry("bathroom", Set.of("lighting"))

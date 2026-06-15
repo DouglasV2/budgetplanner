@@ -18,8 +18,9 @@ public final class PlannerReadiness {
             Map.entry("bedroom", List.of("bed", "mattress")),
             Map.entry("home-office", List.of("desk", "chair")),
             Map.entry("home-gym", List.of("gym-equipment")),
-            // Sprint 10.7: new rooms.
-            Map.entry("kitchen", List.of("kitchen-storage")),
+            // Sprint 10.7: new rooms. Kitchen's required core is the movable kitchen cart/shelf
+            // (we don't sell built-in kitchens); dedicated kitchen storage stays recommended.
+            Map.entry("kitchen", List.of("kitchen-cart")),
             Map.entry("dining-room", List.of("dining-table", "dining-chair")),
             Map.entry("hallway", List.of("storage")),
             Map.entry("bathroom", List.of("storage"))
@@ -31,7 +32,7 @@ public final class PlannerReadiness {
             Map.entry("home-office", List.of("lighting", "storage")),
             Map.entry("home-gym", List.of("storage", "lighting")),
             // Sprint 10.7: new rooms.
-            Map.entry("kitchen", List.of("kitchen-cart", "lighting", "storage")),
+            Map.entry("kitchen", List.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", List.of("lighting", "rug", "storage")),
             Map.entry("hallway", List.of("lighting", "decor", "rug")),
             Map.entry("bathroom", List.of("lighting", "decor"))

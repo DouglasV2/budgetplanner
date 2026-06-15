@@ -49,7 +49,9 @@ public class RealCatalogSeeder implements ApplicationRunner {
     /** Real catalog resources, imported in order. Add new approved snapshots here. */
     private static final List<String> SNAPSHOT_RESOURCES = List.of(
             "/catalog/real-ikea-jysk-hr-living-room.json",
-            "/catalog/real-ikea-jysk-hr-living-room-expansion.json"
+            "/catalog/real-ikea-jysk-hr-living-room-expansion.json",
+            // Sprint 10.7/10.9: verified JYSK HR products for the new rooms (dining-room, kitchen, hallway).
+            "/catalog/real-jysk-hr-new-rooms.json"
     );
 
     private final ProductRepository productRepository;

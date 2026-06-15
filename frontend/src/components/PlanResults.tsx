@@ -64,8 +64,12 @@ function labelCategories(categories: ProductCategory[]) {
 const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
   'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
   'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
-  bedroom: ['bed', 'mattress', 'storage', 'lighting', 'decor'],
-  'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor']
+  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'storage', 'lighting', 'decor'],
+  'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor'],
+  kitchen: ['kitchen-cart', 'kitchen-storage', 'lighting', 'storage', 'decor'],
+  'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],
+  hallway: ['storage', 'lighting', 'rug', 'decor'],
+  bathroom: ['storage', 'lighting', 'decor']
 };
 
 const TIER_LABELS: Record<string, string> = {
@@ -98,7 +102,11 @@ const CORE_BY_ROOM: Record<RoomType, ProductCategory[]> = {
   'living-room': ['sofa', 'tv-unit', 'table'],
   'home-office': ['desk', 'chair'],
   bedroom: ['bed', 'mattress'],
-  'home-gym': ['gym-equipment']
+  'home-gym': ['gym-equipment'],
+  kitchen: ['kitchen-cart'],
+  'dining-room': ['dining-table', 'dining-chair'],
+  hallway: ['storage'],
+  bathroom: ['storage']
 };
 
 const FALLBACK_IMAGES: Record<ProductCategory, string> = {
@@ -113,7 +121,15 @@ const FALLBACK_IMAGES: Record<ProductCategory, string> = {
   desk: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80',
   bed: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
   mattress: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80',
-  'gym-equipment': 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80'
+  'gym-equipment': 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80',
+  // New rooms (Sprint 10.7): reuse the closest existing category placeholder image.
+  'dining-table': 'https://images.unsplash.com/photo-1532372320572-cda25653a694?auto=format&fit=crop&w=900&q=80',
+  'dining-chair': 'https://images.unsplash.com/photo-1589384267710-7a25bc5ca5f3?auto=format&fit=crop&w=900&q=80',
+  'kitchen-storage': 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80',
+  'kitchen-cart': 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80',
+  nightstand: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80',
+  wardrobe: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80',
+  dresser: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=900&q=80'
 };
 
 function priorityForItem(item: PlanItem, roomType: RoomType): ShoppingPriority {

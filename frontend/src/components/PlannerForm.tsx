@@ -13,7 +13,11 @@ const rooms: Array<{ value: RoomType; label: string; icon: string; hint: string 
   { value: 'living-room', label: 'Dnevni boravak', icon: '🛋️', hint: 'kauč, TV komoda, tepih' },
   { value: 'home-office', label: 'Radni kutak', icon: '💻', hint: 'stol, stolica, rasvjeta' },
   { value: 'bedroom', label: 'Spavaća soba', icon: '🛏️', hint: 'krevet, ormar, lampe' },
-  { value: 'home-gym', label: 'Kućna teretana', icon: '🏋️', hint: 'oprema, spremanje, podloga' }
+  { value: 'home-gym', label: 'Kućna teretana', icon: '🏋️', hint: 'oprema, spremanje, podloga' },
+  { value: 'dining-room', label: 'Blagovaonica', icon: '🍽️', hint: 'stol, stolice, rasvjeta' },
+  { value: 'kitchen', label: 'Kuhinja', icon: '🍳', hint: 'kolica, polica, rasvjeta' },
+  { value: 'hallway', label: 'Hodnik', icon: '🚪', hint: 'ormar za cipele, polica' },
+  { value: 'bathroom', label: 'Kupaonica', icon: '🛁', hint: 'ormarić, polica (uskoro)' }
 ];
 
 const styles: Array<{ value: StyleType; label: string; hint: string }> = [
@@ -58,8 +62,12 @@ const categoryOrder: ProductCategory[] = [
 const categoryOrderByRoom: Record<RoomType, ProductCategory[]> = {
   'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
   'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
-  bedroom: ['bed', 'mattress', 'storage', 'lighting', 'rug', 'decor'],
-  'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor']
+  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'storage', 'lighting', 'rug', 'decor'],
+  'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor'],
+  kitchen: ['kitchen-cart', 'kitchen-storage', 'lighting', 'storage', 'decor'],
+  'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],
+  hallway: ['storage', 'lighting', 'rug', 'decor'],
+  bathroom: ['storage', 'lighting', 'decor']
 };
 
 const sizePresets = [
