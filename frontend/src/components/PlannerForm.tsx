@@ -258,8 +258,14 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
       </div>
 
+      <details className="advanced-settings">
+        <summary>
+          <span>Detaljnije postavke</span>
+          <small>Budžet, soba, trgovine i želje — nije obavezno. Najčešće je dovoljan opis gore; AI ovo izvuče iz njega.</small>
+        </summary>
+
       <div className="form-step easy-controls">
-        <div className="step-kicker">2. Podesi ako želiš</div>
+        <div className="step-kicker">Podesi ako želiš</div>
         <h3>Osnovne stvari</h3>
         <p>Ovo možeš preskočiti ako si sve napisao gore.</p>
 
@@ -500,6 +506,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           </div>
         </div>
       </div>
+      </details>
 
       <div className="sticky-generate-bar">
         <button className="generate-button" type="submit" disabled={isLoading}>

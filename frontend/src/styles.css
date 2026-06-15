@@ -3254,3 +3254,48 @@ textarea {
   color: #5b6472;
   font-size: 0.9rem;
 }
+
+/* Sprint 10.12: collapse the optional advanced controls so the prompt-first flow dominates. */
+.advanced-settings {
+  border: 1px solid rgba(20, 20, 30, 0.1);
+  border-radius: 18px;
+  background: rgba(20, 20, 30, 0.02);
+  margin-top: 6px;
+}
+
+.advanced-settings > summary {
+  cursor: pointer;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  padding: 14px 16px;
+}
+
+.advanced-settings > summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-settings > summary span {
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.advanced-settings > summary span::before {
+  content: '⚙  ';
+}
+
+.advanced-settings[open] > summary span::before {
+  content: '▾  ';
+}
+
+.advanced-settings:not([open]) > summary span::before {
+  content: '▸  ';
+}
+
+.advanced-settings > summary small {
+  color: #5b6472;
+}
+
+.advanced-settings > .form-step {
+  border-top: 1px solid rgba(20, 20, 30, 0.06);
+}

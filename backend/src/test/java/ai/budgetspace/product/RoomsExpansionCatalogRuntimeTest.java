@@ -28,7 +28,8 @@ import static org.mockito.Mockito.when;
 class RoomsExpansionCatalogRuntimeTest {
     private static final List<String> RESOURCES = List.of(
             "/catalog/real-jysk-hr-new-rooms.json",
-            "/catalog/real-ikea-jysk-hr-rooms-expansion.json");
+            "/catalog/real-ikea-jysk-hr-rooms-expansion.json",
+            "/catalog/real-ikea-jysk-hr-depth.json");
 
     @Test
     void expansionProductsAreRealIkeaOrJyskWithRealUrls() throws Exception {
@@ -87,8 +88,10 @@ class RoomsExpansionCatalogRuntimeTest {
             saved.add(product);
             return product;
         });
-        new RetailerSnapshotImportService(new ProductImportService(repository), new RetailerCatalogAdapter())
-                .importSnapshot(snapshot);
+        ai.budgetspace.dto.ImportSummaryDto summary =
+                new RetailerSnapshotImportService(new ProductImportService(repository), new RetailerCatalogAdapter())
+                        .importSnapshot(snapshot);
+        assertThat(summary.errors()).as("snapshot import errors").isEmpty();
         return saved;
     }
 
