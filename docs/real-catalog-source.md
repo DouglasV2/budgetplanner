@@ -48,6 +48,9 @@ JSON lista proizvoda. Polja:
 | `deliveryNote` | ne | Slobodan tekst. |
 | `lastCheckedAt` | ne | Datum (`2026-06-01`) ili ISO vrijeme. Mora biti parsabilan ako postoji. |
 | `priceTier` | ne | `budget`, `standard`, `premium`. Inače se izračuna iz cijene. |
+| `reviewCount` | ne | Sprint 10.13 (#2). Broj recenzija u trgovini. Prikaže se agregat tek kad je zadan — ocjene se ne izmišljaju. |
+| `reviewsUrl` | ne | Sprint 10.13 (#2). Link na recenzije; ako fali, UI koristi `productUrl`. |
+| `market` | ne | Sprint 10.13 (#3). Tržište/država (`HR`, `SI`, `AT`, `DE`…). Prazno = globalno (vidi se na svim tržištima). Default `HR` pri importu. |
 
 ### Source metadata
 
@@ -66,6 +69,29 @@ nedavnom provjerom je `complete`, inače `partial`.
 
 Gotov primjer s 40 proizvoda (6 trgovina, sve sobe, miješana dostupnost i kvaliteta) je
 [sample-real-catalog-source.json](sample-real-catalog-source.json).
+
+## Status izvora po trgovini (Sprint 10.13)
+
+Dodajemo trgovine **samo kad možemo provjeriti naziv, cijenu i URL**. Ne izmišljamo podatke.
+
+| Trgovina | Status | Napomena |
+| --- | --- | --- |
+| IKEA | ✅ verificirano | Cijene se daju web-provjeriti (raniji „no price” slučajevi su ugašeni proizvodi). |
+| JYSK | ✅ verificirano | Pokriva većinu soba u HR. |
+| Emmezeta | ✅ verificirano | `real-emmezeta-hr.json` (4 provjerena proizvoda). |
+| Decathlon | ⛔ blokirano | Stranice vraćaju HTTP 403 na naš fetch → cijene/URL-ovi neprovjerljivi. Treba službeni feed/partner. Zbog toga home-gym ostaje na sample podacima. |
+| Pevex | ⛔ blokirano | HTTP 403, isto kao gore. |
+| Lesnina (xxxlesnina.hr) | ⛔ blokirano | HTTP 403, isto kao gore. |
+
+Blokirane trgovine ulaze tek kad dobiju isti JSON oblik iz službenog feeda/partnerskog pristupa
+(vidi „Kako kasnije spojiti pravi scraper”) — ne kroz HTML fetch koji vraća 403.
+
+## Tržišta i prijevodi (Sprint 10.13, #3)
+
+`market` na proizvodu određuje na kojem se tržištu vidi i u kojoj se valuti prikazuje. Trenutno su
+svi pravi proizvodi `HR` (EUR); ostala EU tržišta zato dobivaju samo globalne/sample proizvode.
+Frontend zato u biraču nudi **samo EUR tržišta** i prikazuje napomenu da se katalog za tu državu još
+puni. Prije uključivanja ne-EUR tržišta treba dodati verificirane kataloge s ispravnom valutom.
 
 ## Import preko curl-a
 

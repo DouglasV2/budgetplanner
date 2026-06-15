@@ -18,7 +18,14 @@ url             product URL
 rating          number
 inStock         boolean
 note            short recommendation note
+reviewCount     number nullable   (Sprint 10.13 #2 — aggregate shown only when present)
+reviewsUrl      URL nullable      (Sprint 10.13 #2 — falls back to product URL)
+market          string nullable   (Sprint 10.13 #3 — e.g. HR/SI/AT/DE; null = global, visible on all markets)
 ```
+
+> Note: the model has grown since the MVP. Other live fields include `colorTags`, `materialTags`,
+> `availabilityStatus`, `deliveryNote`, `lastCheckedAt`, `priceTier`, and affiliate groundwork
+> (`originalProductUrl`, `affiliateUrl`, `sponsored`, `sponsorLabel`).
 
 Later, split into proper relational tables:
 
@@ -46,6 +53,7 @@ selectedRetailers
 optimizationGoal
 mustHaveCategories
 alreadyHaveCategories
+market                (Sprint 10.13 #3 — defaults to HR; filters catalog + drives currency)
 ```
 
 ## Planner output
