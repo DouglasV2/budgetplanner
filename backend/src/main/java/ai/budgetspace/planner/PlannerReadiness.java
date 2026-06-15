@@ -28,7 +28,7 @@ public final class PlannerReadiness {
 
     public static final Map<String, List<String>> RECOMMENDED_BY_ROOM = Map.ofEntries(
             Map.entry("living-room", List.of("table", "rug", "lighting")),
-            Map.entry("bedroom", List.of("storage", "lighting", "rug", "nightstand", "wardrobe")),
+            Map.entry("bedroom", List.of("storage", "lighting", "rug", "nightstand", "wardrobe", "dresser")),
             Map.entry("home-office", List.of("lighting", "storage")),
             Map.entry("home-gym", List.of("storage", "lighting")),
             // Sprint 10.7: new rooms.

@@ -64,7 +64,7 @@ function labelCategories(categories: ProductCategory[]) {
 const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
   'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
   'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
-  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'storage', 'lighting', 'decor'],
+  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'dresser', 'storage', 'lighting', 'decor'],
   'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor'],
   kitchen: ['kitchen-cart', 'kitchen-storage', 'lighting', 'storage', 'decor'],
   'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],

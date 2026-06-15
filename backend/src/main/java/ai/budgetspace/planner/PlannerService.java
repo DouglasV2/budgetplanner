@@ -21,7 +21,7 @@ public class PlannerService {
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.ofEntries(
             Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor")),
             Map.entry("home-office", List.of("desk", "chair", "lighting", "storage", "decor", "rug")),
-            Map.entry("bedroom", List.of("bed", "mattress", "nightstand", "wardrobe", "storage", "lighting", "rug", "decor")),
+            Map.entry("bedroom", List.of("bed", "mattress", "nightstand", "wardrobe", "dresser", "storage", "lighting", "rug", "decor")),
             Map.entry("home-gym", List.of("gym-equipment", "storage", "lighting", "decor", "rug")),
             // Sprint 10.7: new rooms.
             Map.entry("kitchen", List.of("kitchen-cart", "kitchen-storage", "lighting", "storage", "decor")),
@@ -47,7 +47,7 @@ public class PlannerService {
     private static final Map<String, Set<String>> COMFORT_CATEGORIES_BY_ROOM = Map.ofEntries(
             Map.entry("living-room", Set.of("table", "rug", "lighting", "storage")),
             Map.entry("home-office", Set.of("lighting", "storage")),
-            Map.entry("bedroom", Set.of("nightstand", "wardrobe", "storage", "lighting", "rug")),
+            Map.entry("bedroom", Set.of("nightstand", "wardrobe", "dresser", "storage", "lighting", "rug")),
             Map.entry("home-gym", Set.of("storage", "lighting")),
             // Sprint 10.7: new rooms.
             Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),

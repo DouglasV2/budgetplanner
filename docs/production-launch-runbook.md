@@ -120,12 +120,20 @@ Catalog size today (honestly web-verified, not fabricated): **76 products — IK
 style/room/price). Products get `colorTags`/`materialTags` at import — declared in the snapshot or
 derived from the product name (e.g. "Kauč sivi, hrast" → grey + wood).
 
-The new rooms are seeded from a verified **JYSK HR** snapshot
-(`backend/src/main/resources/catalog/real-jysk-hr-new-rooms.json`, registered in
-`RealCatalogSeeder`): dining-room (tables + chair), kitchen (carts/shelves) and hallway (storage)
-produce complete plans. **Bathroom** is supported in the taxonomy/UI but has no verified products
-yet, so it returns a partial plan with the standard "not enough products" message. Add more approved
-snapshots (IKEA via an official feed/collector, or more JYSK) to fill the gaps — no fabricated data.
+The new rooms are seeded from verified snapshots (registered in `RealCatalogSeeder`):
+`real-jysk-hr-new-rooms.json` (dining-room, kitchen, hallway) and `real-ikea-jysk-hr-rooms-expansion.json`
+(Sprint 10.11 — bedroom, home-office, bathroom). Every room now produces a complete (non-partial)
+plan from real IKEA/JYSK HR products with real product URLs:
+
+- **bedroom** — bed, mattress, nightstand, wardrobe, dresser (JYSK VEDDE/TRYA/LIMFJORDEN/TAPDRUP/DAMHUS, IKEA MALM)
+- **home-office** — desk, chair, storage (IKEA LAGKAPTEN, FLINTAN, BILLY/KALLAX, JYSK SVANEKE)
+- **bathroom** — storage cabinets (IKEA NYSJÖN, ENHET mirror cabinet — JYSK HR sells only bathroom
+  accessories online, so IKEA covers bathroom)
+- **dining-room / kitchen / hallway** — as in 10.7
+
+Only **home-gym** still relies on the legacy `data.sql` sample data — neither IKEA HR nor JYSK HR
+sells gym equipment, so it cannot be covered with real products from those retailers. Add more
+approved snapshots to `backend/src/main/resources/catalog/` (no fabricated data) to extend coverage.
 
 ### Design assistant (10.8)
 After `POST /api/plans/generate`, the frontend calls `POST /api/plans/design` with the generation

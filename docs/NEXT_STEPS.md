@@ -54,10 +54,20 @@ Shipped:
   `sponsored`, `sponsorLabel`) — no aggressive ad UI.
 - Value-first pricing UI (Free / Pro / Pro+), AI-insight + low-confidence display.
 
+## Sprint 10.11 (done): room catalog coverage
+
+Added a verified IKEA + JYSK HR snapshot (`real-ikea-jysk-hr-rooms-expansion.json`) so **every room
+except home-gym** now produces a complete plan from real products with real URLs:
+
+- bedroom (bed, mattress, nightstand, wardrobe, dresser), home-office (desk, chair, storage),
+  bathroom (storage cabinets — IKEA, since JYSK HR has no online bathroom cabinets).
+- IKEA prices are web-verified (the earlier "no price" cases were discontinued products).
+- home-gym stays on sample data (IKEA/JYSK don't sell gym equipment).
+
 ### What's next
 
-1. **Bathroom catalog** (deferred from 10.7/10.9): verify 2-3 real JYSK bathroom storage products
-   with prices and add to a snapshot, or hide bathroom from the room dropdown until ready.
+1. **Expand depth**: more products per category/colour/material/budget tier for richer matching;
+   add real lighting/rug/decor for bedroom/home-office (currently thin → may fall back to samples).
 2. **Wire AI in a staging env**: set `BUDGETSPACE_AI_ENABLED=true`, `BUDGETSPACE_LLM_PROVIDER=openai`
    and a real `OPENAI_API_KEY`; verify intent extraction quality on messy Croatian prompts.
 3. **Persist usage**: move `AiUsageTracker` to a DB table (`ai_usage_event`) when multi-instance.

@@ -51,7 +51,9 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-ikea-jysk-hr-living-room.json",
             "/catalog/real-ikea-jysk-hr-living-room-expansion.json",
             // Sprint 10.7/10.9: verified JYSK HR products for the new rooms (dining-room, kitchen, hallway).
-            "/catalog/real-jysk-hr-new-rooms.json"
+            "/catalog/real-jysk-hr-new-rooms.json",
+            // Sprint 10.11: verified IKEA + JYSK HR products covering bedroom, home-office and bathroom.
+            "/catalog/real-ikea-jysk-hr-rooms-expansion.json"
     );
 
     private final ProductRepository productRepository;
