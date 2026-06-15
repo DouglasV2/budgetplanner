@@ -618,7 +618,7 @@ export function PlanResults({
                         </div>
                         <div className="product-actions decision-product-actions">
                           {openUrl ? (
-                            <a href={openUrl} target="_blank" rel="noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
+                            <a href={openUrl} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
                               Otvori u trgovini
                             </a>
                           ) : (
