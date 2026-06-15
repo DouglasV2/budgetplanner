@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FurnishingLevel, OptimizationGoal, PlannerInput, ProductCategory, Retailer, RoomType, StyleType } from '../types';
 import { categoryLabels, formatCurrency, retailers } from '../utils/planner';
+import { useLocale } from '../LocaleContext';
 
 interface PlannerFormProps {
   input: PlannerInput;
@@ -206,6 +207,7 @@ function categoriesFromText(value: string): ProductCategory[] {
 }
 
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
+  const { t } = useLocale();
   const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
   const shopMode = selectedShopMode(input);
   const visibleCategoryOptions = visibleCategories(input);
@@ -239,7 +241,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           />
         </label>
         <button className="generate-button" type="submit" disabled={isLoading}>
-          {isLoading ? 'Slažem plan...' : 'Složi moj plan'}
+          {isLoading ? t('planner.generating') : t('planner.generate')}
           <span>dobiješ popis proizvoda i ukupnu cijenu</span>
         </button>
       </div>
@@ -510,7 +512,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
 
       <div className="sticky-generate-bar">
         <button className="generate-button" type="submit" disabled={isLoading}>
-          {isLoading ? 'Slažem plan...' : 'Složi moj plan'}
+          {isLoading ? t('planner.generating') : t('planner.generate')}
           <span>{formatCurrency(input.budget)} budžet</span>
         </button>
       </div>

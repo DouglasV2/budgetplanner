@@ -87,6 +87,11 @@ export interface Product {
   affiliateUrl?: string;
   sponsored?: boolean;
   sponsorLabel?: string;
+  // Sprint 10.13: reviews (#2) + market/currency (#3).
+  reviewCount?: number;
+  reviewsUrl?: string;
+  market?: string;
+  currency?: string;
 }
 
 // Sprint 10.10: structured understanding of the user's prompt (AI or rule-based).
@@ -133,6 +138,8 @@ export interface PlannerInput {
   // Sprint 10.7: colour/material preferences parsed from the prompt (canonical keys, optional).
   colorPreferences?: string[];
   materialPreferences?: string[];
+  // Sprint 10.13: market/country (e.g. HR, SI, AT, DE) for catalog + currency.
+  market?: string;
 }
 
 // Sprint 10.8: short description of a generated plan from the (rule-based) design assistant.

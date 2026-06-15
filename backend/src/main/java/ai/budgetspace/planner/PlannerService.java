@@ -1,6 +1,7 @@
 package ai.budgetspace.planner;
 
 import ai.budgetspace.dto.*;
+import ai.budgetspace.product.Markets;
 import ai.budgetspace.product.Product;
 import ai.budgetspace.product.ProductRepository;
 import ai.budgetspace.product.ProductTaxonomy;
@@ -121,7 +122,7 @@ public class PlannerService {
     // Required categories for the room that the catalog cannot supply (and the user did not
     // already have). The planner never invents products to fill the gap — it surfaces it.
     private List<String> missingImportantCategories(PlannerInputDto input) {
-        Set<String> usableCategories = productRepository.findAll().stream()
+        Set<String> usableCategories = marketCatalog(input).stream()
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
                 .map(product -> product.getCategory() == null ? "" : product.getCategory().toLowerCase(Locale.ROOT))
@@ -220,7 +221,7 @@ public class PlannerService {
         Set<String> lockedIds = new LinkedHashSet<>(input.lockedProductIds());
         if (!lockedIds.isEmpty()) {
             List<String> lockedOrder = new ArrayList<>(lockedIds);
-            List<Product> lockedProducts = productRepository.findAll().stream()
+            List<Product> lockedProducts = marketCatalog(input).stream()
                     .filter(product -> lockedIds.contains(product.getId()))
                     .filter(ProductTaxonomy::canEnterPlanner)
                     .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
@@ -286,7 +287,7 @@ public class PlannerService {
                 ? Math.max(remainingBudget, input.budget() * 0.28)
                 : remainingBudget;
 
-        return productRepository.findAll().stream()
+        return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
                 .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
@@ -402,7 +403,7 @@ public class PlannerService {
         double safeLimit = Math.max(remainingBudget, currentPrice);
         double stretchLimit = Math.max(remainingBudget, Math.min(input.budget() * 0.45, currentPrice * 1.25));
 
-        return productRepository.findAll().stream()
+        return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(current.category()))
                 .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
@@ -611,7 +612,7 @@ public class PlannerService {
 
     private Product cheapestInCategory(String category, PlannerInputDto input, Set<String> excludeIds, double maxPriceExclusive) {
         List<String> allowed = selectedRetailers(input);
-        return productRepository.findAll().stream()
+        return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
                 .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
@@ -1058,7 +1059,7 @@ public class PlannerService {
         int styleHits = 0;
 
         for (String category : categories) {
-            Optional<Product> cheapest = productRepository.findAll().stream()
+            Optional<Product> cheapest = marketCatalog(input).stream()
                     .filter(product -> product.getRetailer().equals(retailer))
                     .filter(product -> product.getCategory().equalsIgnoreCase(category))
                     .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
@@ -1127,6 +1128,17 @@ public class PlannerService {
         return Arrays.stream(csv.split(","))
                 .map(value -> value.trim().toLowerCase(Locale.ROOT))
                 .filter(value -> !value.isBlank())
+                .toList();
+    }
+
+    // Sprint 10.13 (#3): the catalog scoped to the request's market. A product with no market is
+    // treated as global (matches any market), so legacy/sample data and HR products keep working.
+    private List<Product> marketCatalog(PlannerInputDto input) {
+        String market = Markets.normalize(input == null ? null : input.market());
+        List<Product> all = productRepository.findAll();
+        return all.stream()
+                .filter(product -> product.getMarket() == null || product.getMarket().isBlank()
+                        || product.getMarket().equalsIgnoreCase(market))
                 .toList();
     }
 

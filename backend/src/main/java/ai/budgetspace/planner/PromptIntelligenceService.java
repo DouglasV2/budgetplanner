@@ -130,7 +130,7 @@ public class PromptIntelligenceService {
                 budget, roomType, style, base.location(), size, base.retailerMode(), base.selectedRetailers(),
                 optimizationGoal, furnishingLevel, mustHave, new ArrayList<>(alreadyHave), base.lockedProductIds(),
                 preferred, base.excludedRetailers(), base.maxStores(),
-                lowerAll(analysis.colorPreferences()), lowerAll(analysis.materialPreferences())
+                lowerAll(analysis.colorPreferences()), lowerAll(analysis.materialPreferences()), base.market()
         ).normalized();
     }
 

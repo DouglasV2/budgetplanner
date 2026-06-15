@@ -337,6 +337,23 @@ class PlannerServiceTest {
         assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-match-oos");
     }
 
+    @Test
+    void plannerOnlyUsesProductsForTheRequestedMarketAndGlobalProducts() {
+        Product hr = product("sofa-hr", "Kauč HR", "IKEA", "sofa", 600, 4.5);
+        hr.setMarket("HR");
+        Product si = product("sofa-si", "Kauč SI", "IKEA", "sofa", 500, 4.6);
+        si.setMarket("SI");
+        Product global = product("tv-global", "TV global", "IKEA", "tv-unit", 200, 4.4);
+        // global.market stays null → matches any market
+        PlannerService service = serviceWithProducts(List.of(hr, si, global));
+
+        FurnishingPlanDto hrPlan = service.generate(input("Imam 1500 € za dnevni boravak.").withMarket("HR")).plans().get(0);
+        assertThat(hrPlan.items()).extracting(item -> item.product().id()).contains("sofa-hr", "tv-global").doesNotContain("sofa-si");
+
+        FurnishingPlanDto siPlan = service.generate(input("Imam 1500 € za dnevni boravak.").withMarket("SI")).plans().get(0);
+        assertThat(siPlan.items()).extracting(item -> item.product().id()).contains("sofa-si", "tv-global").doesNotContain("sofa-hr");
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);

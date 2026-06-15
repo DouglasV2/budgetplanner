@@ -39,34 +39,25 @@ public record RetailerProductSnapshotDto(
         String dataQualityNotes,
         // Sprint 10.7: optional colour/material tags a curated snapshot may declare for a product.
         List<String> colorTags,
-        List<String> materialTags
+        List<String> materialTags,
+        // Sprint 10.13: optional reviews aggregate (#2) and market/country (#3).
+        Integer reviewCount,
+        String reviewsUrl,
+        String market
 ) {
     /**
-     * Backwards-compatible constructor for snapshots prepared before Sprint 10.7. Colour and
-     * material tags default to empty; the import pipeline derives them from the name/style.
+     * Backwards-compatible constructor for snapshots prepared before Sprint 10.7. Colour/material,
+     * reviews and market default to empty; the import pipeline derives colour/material from the name.
      */
     public RetailerProductSnapshotDto(
-            String externalId,
-            String name,
-            String retailer,
-            String category,
-            BigDecimal price,
-            String productUrl,
-            String imageUrl,
-            String availabilityStatus,
-            String deliveryNote,
-            String lastCheckedAt,
-            List<String> roomTags,
-            List<String> styleTags,
-            String priceTier,
-            String sourceType,
-            String sourceName,
-            String sourceReference,
-            String dataQuality,
+            String externalId, String name, String retailer, String category, BigDecimal price,
+            String productUrl, String imageUrl, String availabilityStatus, String deliveryNote,
+            String lastCheckedAt, List<String> roomTags, List<String> styleTags, String priceTier,
+            String sourceType, String sourceName, String sourceReference, String dataQuality,
             String dataQualityNotes
     ) {
         this(externalId, name, retailer, category, price, productUrl, imageUrl, availabilityStatus,
                 deliveryNote, lastCheckedAt, roomTags, styleTags, priceTier, sourceType, sourceName,
-                sourceReference, dataQuality, dataQualityNotes, null, null);
+                sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null);
     }
 }

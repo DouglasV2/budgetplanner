@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, roomLabels, styleLabels } from '../utils/planner';
+import { useLocale } from '../LocaleContext';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
 
@@ -126,7 +127,8 @@ function SavedPlansInbox({
 }
 
 export function Planner() {
-  const [input, setInput] = useState<PlannerInput>(initialInput);
+  const { market, config, t } = useLocale();
+  const [input, setInput] = useState<PlannerInput>({ ...initialInput, market });
   const [plans, setPlans] = useState<FurnishingPlan[]>([]);
   const [savedPlans, setSavedPlans] = useState<SavedPlanResponse[]>([]);
   const [savedSearch, setSavedSearch] = useState('');
@@ -150,6 +152,12 @@ export function Planner() {
   useEffect(() => {
     void refreshSavedPlans();
   }, []);
+
+  // Sprint 10.13 (#3): keep the request's market in sync with the selected country so the backend
+  // filters the catalog and the totals are formatted in that market's currency.
+  useEffect(() => {
+    setInput((current) => (current.market === market ? current : { ...current, market }));
+  }, [market]);
 
   useEffect(() => {
     const sharedPlanId = readSharedPlanIdFromUrl();
@@ -176,7 +184,7 @@ export function Planner() {
 
     try {
       const response = await generatePlan(nextInput);
-      setInput({ ...response.input, lockedProductIds: response.input.lockedProductIds ?? nextInput.lockedProductIds ?? [] });
+      setInput({ ...response.input, market: response.input.market ?? nextInput.market, lockedProductIds: response.input.lockedProductIds ?? nextInput.lockedProductIds ?? [] });
       setPlans(response.plans);
       setAnalysis(response.intentAnalysis ?? null);
       const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
@@ -318,17 +326,17 @@ export function Planner() {
     <section className="planner-section shell" id="planner">
       <div className="section-heading left planner-heading-row">
         <div>
-          <span className="eyebrow">Planer za kupnju</span>
-          <h2>Prvo napišeš želju. Desno dobiješ gotov plan.</h2>
-          <p>
-            Nema komplicirane forme. Opiši prostor svojim riječima, a zatim po potrebi dotjeraj budžet, trgovine ili stvari koje već imaš.
-          </p>
+          <span className="eyebrow">{t('planner.eyebrow')}</span>
+          <h2>{t('planner.heading')}</h2>
+          <p>{t('planner.subheading')}</p>
         </div>
         <div className="demo-status">
           <span>Složeno planova</span>
           <strong>{generationCount}</strong>
         </div>
       </div>
+
+      {!config.available && <div className="planner-notice market-note">{t('planner.marketComingSoon')}</div>}
 
       {notice && <div className="planner-notice">{notice}</div>}
 

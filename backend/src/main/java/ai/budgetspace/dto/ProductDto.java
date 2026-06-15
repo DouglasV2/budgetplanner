@@ -1,5 +1,6 @@
 package ai.budgetspace.dto;
 
+import ai.budgetspace.product.Markets;
 import ai.budgetspace.product.Product;
 
 import java.math.BigDecimal;
@@ -34,9 +35,16 @@ public record ProductDto(
         String originalProductUrl,
         String affiliateUrl,
         boolean sponsored,
-        String sponsorLabel
+        String sponsorLabel,
+        // Sprint 10.13: reviews (#2) + market/currency (#3). reviewsUrl always points somewhere the
+        // user can read real reviews (the product page); currency is derived from the market.
+        Integer reviewCount,
+        String reviewsUrl,
+        String market,
+        String currency
 ) {
     public static ProductDto from(Product product) {
+        String market = Markets.normalize(product.getMarket());
         return new ProductDto(
                 product.getId(),
                 product.getName(),
@@ -63,7 +71,11 @@ public record ProductDto(
                 firstNonBlank(product.getOriginalProductUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),
                 product.getAffiliateUrl(),
                 product.isSponsored(),
-                product.getSponsorLabel()
+                product.getSponsorLabel(),
+                product.getReviewCount(),
+                firstNonBlank(product.getReviewsUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),
+                market,
+                Markets.currencyFor(market)
         );
     }
 

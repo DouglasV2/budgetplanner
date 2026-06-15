@@ -1,4 +1,5 @@
 import type { FurnishingLevel, FurnishingPlan, PlanItem, PlannerInput, Product, ProductCategory, Retailer, RoomType, ShoppingPriority, StoreTotal, StoreTrip, StyleType } from '../types';
+import { marketConfig } from '../markets';
 
 export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon', 'Lesnina'];
 
@@ -149,10 +150,20 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
   ].filter(Boolean).join('\n');
 }
 
-export function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('hr-HR', {
+// Sprint 10.13 (#3): the active market drives currency formatting app-wide. It defaults to HR
+// (EUR / hr-HR) so every existing `formatCurrency(amount)` call keeps its previous behaviour; the
+// LocaleProvider updates it when the user switches country.
+let activeMarket = 'HR';
+
+export function setFormattingMarket(market: string | undefined) {
+  activeMarket = market ?? 'HR';
+}
+
+export function formatCurrency(amount: number, market?: string) {
+  const config = marketConfig(market ?? activeMarket);
+  return new Intl.NumberFormat(config.locale, {
     style: 'currency',
-    currency: 'EUR',
+    currency: config.currency,
     maximumFractionDigits: 0
   }).format(amount);
 }

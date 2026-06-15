@@ -23,6 +23,7 @@ import {
   storeCountText,
   styleLabels
 } from '../utils/planner';
+import { useLocale } from '../LocaleContext';
 
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
 
@@ -251,6 +252,22 @@ function productUrl(product: Product) {
   return url.startsWith('http') ? url : '';
 }
 
+// Sprint 10.13 (#2): reviews. We never invent ratings — we only show the aggregate the catalog
+// recorded and link out to the store so the shopper can read the real reviews and judge for
+// themselves (incl. availability).
+function hasReviews(product: Product) {
+  return typeof product.reviewCount === 'number' && product.reviewCount > 0;
+}
+
+function reviewsUrl(product: Product) {
+  const url = product.reviewsUrl || product.productUrl || product.url || '';
+  return url.startsWith('http') ? url : '';
+}
+
+function ratingText(product: Product) {
+  return typeof product.rating === 'number' && product.rating > 0 ? product.rating.toFixed(1) : '—';
+}
+
 const STALE_AFTER_DAYS = 14;
 
 // Freshness v0: if we last checked this product too long ago (or never), the price and
@@ -405,6 +422,7 @@ export function PlanResults({
   error = null,
   partialNotice = null
 }: PlanResultsProps) {
+  const { t } = useLocale();
   const [copiedPlanId, setCopiedPlanId] = useState<string | null>(null);
   const [savingPlanId, setSavingPlanId] = useState<string | null>(null);
   const [feedbackByPlan, setFeedbackByPlan] = useState<Record<string, PlanFeedback>>({});
@@ -611,6 +629,7 @@ export function PlanResults({
                   const priority = priorityForItem(item, input.roomType);
                   const expanded = expandedProductId === product.id;
                   const openUrl = productUrl(product);
+                  const reviewsHref = reviewsUrl(product);
                   return (
                     <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
                       <img src={productImage(product)} alt="" loading="lazy" onError={(event) => handleProductImageError(event, product.category)} />
@@ -624,6 +643,11 @@ export function PlanResults({
                           <span>{categoryLabels[product.category]}</span>
                           <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
                           <span>{availabilityLabel(product)}</span>
+                          {hasReviews(product) && (
+                            <span className="review-chip" title="Prosječna ocjena i broj recenzija u trgovini">
+                              ★ {ratingText(product)} ({product.reviewCount})
+                            </span>
+                          )}
                           {product.originalPrice && <span>Akcija</span>}
                           {locked && <span>Zadržano</span>}
                         </div>
@@ -642,6 +666,11 @@ export function PlanResults({
                             <button type="button" disabled title="Link proizvoda nije dostupan.">
                               Link proizvoda nije dostupan
                             </button>
+                          )}
+                          {hasReviews(product) && reviewsHref && (
+                            <a className="reviews-link" href={reviewsHref} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
+                              {t('product.reviews')} ↗
+                            </a>
                           )}
                           <button type="button" onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>
                             {expanded ? 'Sakrij zamjene' : 'Promijeni'}

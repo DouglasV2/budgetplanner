@@ -22,11 +22,13 @@ public record PlannerInputDto(
         // Sprint 10.7: colour/material preferences parsed from the prompt (canonical keys, e.g.
         // "green", "wood"). Used by PlannerService.scoreProduct to gently prefer matching products.
         List<String> colorPreferences,
-        List<String> materialPreferences
+        List<String> materialPreferences,
+        // Sprint 10.13: market/country (e.g. HR, SI, AT, DE). Filters the catalog and drives currency.
+        String market
 ) {
     /**
      * Backwards-compatible constructor for callers created before Sprint 10.7 added colour/material
-     * preferences (the frontend, tests and scenario fixtures). Both preference lists default to empty.
+     * preferences (the frontend, tests and scenario fixtures). Preferences default to empty, market to HR.
      */
     public PlannerInputDto(
             String prompt,
@@ -48,7 +50,7 @@ public record PlannerInputDto(
     ) {
         this(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                 optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories,
-                lockedProductIds, preferredRetailers, excludedRetailers, maxStores, List.of(), List.of());
+                lockedProductIds, preferredRetailers, excludedRetailers, maxStores, List.of(), List.of(), "HR");
     }
 
     public PlannerInputDto normalized() {
@@ -70,8 +72,13 @@ public record PlannerInputDto(
                 excludedRetailers == null ? List.of() : excludedRetailers,
                 Math.max(0, maxStores),
                 colorPreferences == null ? List.of() : colorPreferences,
-                materialPreferences == null ? List.of() : materialPreferences
+                materialPreferences == null ? List.of() : materialPreferences,
+                blank(market) ? "HR" : market.trim().toUpperCase(java.util.Locale.ROOT)
         );
+    }
+
+    public PlannerInputDto withMarket(String nextMarket) {
+        return copy().market(nextMarket).build();
     }
 
     public PlannerInputDto withBudget(int nextBudget) {
@@ -155,6 +162,7 @@ public record PlannerInputDto(
         private int maxStores;
         private List<String> colorPreferences;
         private List<String> materialPreferences;
+        private String market;
 
         private Builder(PlannerInputDto source) {
             this.prompt = source.prompt();
@@ -175,6 +183,7 @@ public record PlannerInputDto(
             this.maxStores = source.maxStores();
             this.colorPreferences = source.colorPreferences();
             this.materialPreferences = source.materialPreferences();
+            this.market = source.market();
         }
 
         private Builder budget(int value) { this.budget = value; return this; }
@@ -193,12 +202,13 @@ public record PlannerInputDto(
         private Builder maxStores(int value) { this.maxStores = value; return this; }
         private Builder colorPreferences(List<String> value) { this.colorPreferences = value; return this; }
         private Builder materialPreferences(List<String> value) { this.materialPreferences = value; return this; }
+        private Builder market(String value) { this.market = value; return this; }
 
         private PlannerInputDto build() {
             return new PlannerInputDto(
                     prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                     optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds,
-                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences
+                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences, market
             ).normalized();
         }
     }

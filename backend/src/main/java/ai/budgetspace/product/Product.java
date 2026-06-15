@@ -115,6 +115,19 @@ public class Product {
     @Column(name = "sponsor_label", length = 120)
     private String sponsorLabel;
 
+    // --- Sprint 10.13 (#2): reviews. We never fabricate review text; we store the retailer's
+    // aggregate (count) when a feed provides it and always link out to the product page where the
+    // real reviews live. reviewCount null = unknown. ---
+    @Column(name = "review_count")
+    private Integer reviewCount;
+    @Column(name = "reviews_url", length = 700)
+    private String reviewsUrl;
+
+    // --- Sprint 10.13 (#3): market/country this product belongs to (e.g. HR, SI, AT, DE).
+    // Null/blank is treated as global (matches any market) so legacy/sample data still works. ---
+    @Column(name = "market", length = 8)
+    private String market;
+
     public Product() {
     }
 
@@ -182,4 +195,10 @@ public class Product {
     public void setSponsored(boolean sponsored) { this.sponsored = sponsored; }
     public String getSponsorLabel() { return sponsorLabel; }
     public void setSponsorLabel(String sponsorLabel) { this.sponsorLabel = sponsorLabel; }
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
+    public String getReviewsUrl() { return reviewsUrl; }
+    public void setReviewsUrl(String reviewsUrl) { this.reviewsUrl = reviewsUrl; }
+    public String getMarket() { return market; }
+    public void setMarket(String market) { this.market = market; }
 }

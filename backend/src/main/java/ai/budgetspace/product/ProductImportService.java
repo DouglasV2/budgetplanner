@@ -220,6 +220,10 @@ public class ProductImportService {
         }
         if (hasText(dto.dataQualityNotes())) entity.setDataQualityNotes(dto.dataQualityNotes().trim());
         applyColorAndMaterialTags(dto, entity);
+        // Sprint 10.13: reviews (#2) + market (#3). Market defaults to HR (the launch market).
+        if (dto.reviewCount() != null) entity.setReviewCount(dto.reviewCount());
+        if (hasText(dto.reviewsUrl())) entity.setReviewsUrl(dto.reviewsUrl().trim());
+        entity.setMarket(Markets.normalize(dto.market()));
         entity.setImportedAt(Instant.now().toString());
     }
 

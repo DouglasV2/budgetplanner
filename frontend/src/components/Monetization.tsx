@@ -1,5 +1,7 @@
 // Sprint 10.10 — value-first pricing. Deliberately discreet: the core AI plan is free, tiers are
 // framed around "planning more rooms", and there is no real checkout yet (pilot pricing).
+import { useLocale } from '../LocaleContext';
+
 const tiers = [
   {
     name: 'Free',
@@ -28,12 +30,13 @@ const tiers = [
 ];
 
 export function Monetization() {
+  const { t } = useLocale();
   return (
     <section className="section shell pricing-section" id="pricing">
       <div className="section-heading">
-        <span className="eyebrow">Need more plans?</span>
-        <h2>Osnovni AI plan je besplatan. Nadogradi kad planiraš više.</h2>
-        <p>Spremi i usporedi više ideja za sobe, izvezi popis za kupnju ili planiraj više prostorija. Plaćanje još nije aktivno — ovo je pilot cijena.</p>
+        <span className="eyebrow">{t('pricing.eyebrow')}</span>
+        <h2>{t('pricing.heading')}</h2>
+        <p>{t('pricing.sub')}</p>
       </div>
       <div className="pricing-grid">
         {tiers.map((tier) => (
