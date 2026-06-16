@@ -45,9 +45,15 @@ public final class CatalogSourcePolicy {
     public static final String SOURCE_PUBLIC_PRODUCT_PAGE = "public-product-page";
     public static final String SOURCE_OFFICIAL_FEED = "official-feed";
     public static final String SOURCE_AFFILIATE_FEED = "affiliate-feed";
+    /**
+     * Sprint 10.21: a used item from a consumer marketplace (Njuškalo, Facebook Marketplace), delivered
+     * by a compliant feed/API — never scraped. Distinct from {@link #SOURCE_OFFICIAL_FEED} because its
+     * trust/freshness/UI handling differs (single-unit, ephemeral, "used"). See docs/marketplace-sourcing.md.
+     */
+    public static final String SOURCE_MARKETPLACE_LISTING = "marketplace-listing";
 
-    /** Source types that mean the product was delivered by a configured retailer/affiliate feed. */
-    public static final Set<String> FEED_SOURCE_TYPES = Set.of(SOURCE_OFFICIAL_FEED, SOURCE_AFFILIATE_FEED);
+    /** Source types that mean the product was delivered by a configured feed (retailer/affiliate/marketplace). */
+    public static final Set<String> FEED_SOURCE_TYPES = Set.of(SOURCE_OFFICIAL_FEED, SOURCE_AFFILIATE_FEED, SOURCE_MARKETPLACE_LISTING);
 
     // Per-retailer sourcing status. Re-confirmed 2026-06-16: decathlon.hr, pevex.hr and xxxlesnina.hr
     // return HTTP 403 even on the homepage (edge/WAF bot block, not auth), so they are feed-required.
@@ -85,6 +91,11 @@ public final class CatalogSourcePolicy {
         map.put("Kika", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Leiner", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("XXXLutz", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.21: second-hand consumer marketplaces. ToS-protected, no open product API, anti-bot —
+        // populated only by a compliant official/partner feed (sourceType=marketplace-listing), never
+        // scraped. See docs/marketplace-sourcing.md.
+        map.put("Njuškalo", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Facebook Marketplace", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         return Map.copyOf(map);
     }
 

@@ -26,7 +26,10 @@ public final class ProductTaxonomy {
             CatalogSourcePolicy.SOURCE_MANUAL_VERIFIED,
             CatalogSourcePolicy.SOURCE_PUBLIC_PRODUCT_PAGE,
             CatalogSourcePolicy.SOURCE_OFFICIAL_FEED,
-            CatalogSourcePolicy.SOURCE_AFFILIATE_FEED
+            CatalogSourcePolicy.SOURCE_AFFILIATE_FEED,
+            // Sprint 10.21: second-hand marketplace listing delivered by a compliant feed/API (never
+            // scraped). See CatalogSourcePolicy + docs/marketplace-sourcing.md.
+            CatalogSourcePolicy.SOURCE_MARKETPLACE_LISTING
     );
 
     public static final Set<String> DATA_QUALITIES = Set.of(
@@ -62,7 +65,11 @@ public final class ProductTaxonomy {
             "Roller",
             "Kika",
             "Leiner",
-            "XXXLutz"
+            "XXXLutz",
+            // Sprint 10.21: second-hand consumer marketplaces. Feed/API-only (OFFICIAL_FEED_REQUIRED) —
+            // never scraped; carry no products until a compliant feed exists. See docs/marketplace-sourcing.md.
+            "Njuškalo",
+            "Facebook Marketplace"
     );
 
     public static final Set<String> AVAILABILITY_STATUSES = Set.of(

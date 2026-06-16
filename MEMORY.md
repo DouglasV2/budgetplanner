@@ -24,7 +24,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-16)
-- Backend tests: **121 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
+- Backend tests: **128 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
 - Catalog snapshot files: **665 web-verified rows** across 32 files (seeded total ~715 incl. data.sql
   samples). IKEA is the bulk. Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
@@ -43,11 +43,12 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
     Home24, Roller, Kika, Leiner, XXXLutz. (Most big chains are bot-blocked — confirmed by probing.)
   - `home-gym` still relies on sample data (needs a Decathlon feed).
-- **Second-hand marketplace (Njuškalo, FB Marketplace): designed in 10.17** →
-  `docs/marketplace-sourcing.md`. Feed/API model (never scrape; both are `OFFICIAL_FEED_REQUIRED`), new
-  `marketplace-listing` provenance + `second-hand` flag, aggressive sold/expired guard (drop
-  `PRODANO`/reserved/dead listings on ingest + 24h freshness, prune when gone from the feed), separate
-  "Rabljeno" UI section, no affiliate/sponsored on used. Build is Phase 1 (scaffold, no data) — see `TASKS.md`.
+- **Second-hand marketplace (Njuškalo, FB Marketplace): designed 10.17 + Phase 1 built 10.21** →
+  `docs/marketplace-sourcing.md`. Feed/API model (never scrape; both `OFFICIAL_FEED_REQUIRED`). Phase 1
+  (scaffold, no feed/data/UI): `marketplace-listing` provenance (in `SOURCE_TYPES` + `FEED_SOURCE_TYPES`),
+  Njuškalo/FB registered, `MarketplaceListingFilter` (SOLD_MARKERS PRODANO/rezervirano/… + 24h freshness +
+  `shouldDrop`), `Product.secondHand`/`conditionLabel`/`sellerLocation` columns, tests. Next: Phase 2 =
+  a `MarketplaceFeed` over a compliant API/export; Phase 3 = separate "Rabljeno" UI (out of new-retail total).
 - App runs via `docker compose up`: frontend **:5180**, backend **:8090**, postgres :5432. After
   `docker compose up`, wait for the seed to finish (log "Real catalog seed: done") before the first
   plan request — a request mid-seed can return 0 items (race, not a bug).

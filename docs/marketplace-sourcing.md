@@ -148,13 +148,19 @@ When a compliant feed exists:
 
 ## 9. Phased rollout
 
-1. **Now (this sprint):** this design + backlog entry. No code.
-2. **Phase 1:** data-model + `marketplace-listing` provenance + `MarketplaceListingFilter` + tests, behind
-   an unconfigured feed (imports nothing) — same "scaffold first, no credentials" approach as the 10.14
-   feed seam.
+1. **Design (Sprint 10.17):** ✅ this document + backlog entry.
+2. **Phase 1 (Sprint 10.21):** ✅ done — `marketplace-listing` provenance (`ProductTaxonomy.SOURCE_TYPES`
+   + `CatalogSourcePolicy.SOURCE_MARKETPLACE_LISTING`, added to `FEED_SOURCE_TYPES`); `Njuškalo` +
+   `Facebook Marketplace` registered as `OFFICIAL_FEED_REQUIRED`; `MarketplaceListingFilter` (the §4
+   sold/expired guard, with `SOLD_MARKERS` + `MARKETPLACE_STALE_AFTER_HOURS=24` + `shouldDrop`);
+   `Product.secondHand` / `conditionLabel` / `sellerLocation` columns; `MarketplaceListingFilterTest` +
+   `MarketplaceSourcingPolicyTest`. No feed/data/UI yet — imports nothing (scaffold-first, like 10.14).
 3. **Phase 2:** integrate the first **compliant** source (whichever of Njuškalo's partner API / a sanctioned
-   export becomes available). FB Marketplace only if an official Commerce API path is authorised.
-4. **Phase 3:** UI section + trust/safety copy + freshness monitoring.
+   export becomes available) — a `MarketplaceFeed` mapping rows to `sourceType=marketplace-listing`, each run
+   through `MarketplaceListingFilter` before import. FB Marketplace only if an official Commerce API path is
+   authorised. Never scrape.
+4. **Phase 3:** UI section ("Rabljeno") + trust/safety copy + freshness monitoring; used items kept out of
+   the new-retail plan total.
 
 ## 10. Open questions
 

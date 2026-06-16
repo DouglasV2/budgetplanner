@@ -4,7 +4,24 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
 ## Recently done
 
-### Sprint 10.20 — new EU markets: Italy (IT) + Finland (FI) (current)
+### Sprint 10.21 — second-hand marketplace Phase 1 (scaffold, no feed) (current)
+- Built the data-model + provenance + guard from the 10.17 design (docs/marketplace-sourcing.md §8),
+  behind an unconfigured feed (imports nothing — `Njuškalo`/`Facebook Marketplace` are
+  `OFFICIAL_FEED_REQUIRED`, carry no products):
+  - **`marketplace-listing`** provenance: in `ProductTaxonomy.SOURCE_TYPES` + `CatalogSourcePolicy`
+    (`SOURCE_MARKETPLACE_LISTING`, added to `FEED_SOURCE_TYPES` — it's compliant-feed-delivered).
+  - **Njuškalo + Facebook Marketplace** registered (`SUPPORTED_RETAILERS` + policy `OFFICIAL_FEED_REQUIRED`).
+  - **`MarketplaceListingFilter`** (the §4 guard): `SOLD_MARKERS` (PRODANO/rezervirano/SOLD/završeno/
+    povučeno/nije dostupno… accent-insensitive) + a 24h freshness window + `shouldDrop()` — so a sold or
+    expired listing is never ingested.
+  - `Product` second-hand columns (data model only): `secondHand` (`@ColumnDefault("false")`),
+    `conditionLabel`, `sellerLocation`.
+  - Tests: `MarketplaceListingFilterTest` + `MarketplaceSourcingPolicyTest`. Backend **128 tests, 0 failures**.
+- **Next = Phase 2** (integrate a compliant Njuškalo/FB feed → implement a `MarketplaceFeed` mapping rows
+  to `sourceType=marketplace-listing`, run each through `MarketplaceListingFilter`) and **Phase 3** (a
+  separate "Rabljeno" UI section + buyer-beware copy; keep used items out of the new-retail plan total).
+
+### Sprint 10.20 — new EU markets: Italy (IT) + Finland (FI)
 - First catalog for **IT (+51)** and **FI (+50, IKEA)** plus **JYSK FI (+15)** = **+116** verified rows.
   IT/FI now cover living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA); FI also has
   JYSK hallway/kitchen. Files `real-ikea-{it,fi}-rooms.json`, `real-jysk-fi-rooms.json`.
@@ -129,12 +146,13 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
    (PL/CZ/HU/RO/SE/DK): need currency-correct UI first (frontend `markets.ts` is EUR-only) — do that UI
    work before sourcing their catalogs. Optionally flip `available:true` in `markets.ts` for SI/AT/DE/IT/FI
    to expose them in the picker (currently only HR is "available"; the rest are catalog-ready "coming soon").
-9. **Second-hand marketplace section (Njuškalo, FB Marketplace).** ✅ **Designed in 10.17** —
-   [docs/marketplace-sourcing.md](docs/marketplace-sourcing.md) (feed/API not scraping; `marketplace-listing`
-   provenance + `second-hand` flag; sold/expired guard; separate "Rabljeno" UI). **Next = Phase 1 build:**
-   data-model columns + `marketplace-listing` in `SOURCE_TYPES` + `MarketplaceListingFilter` (SOLD_MARKERS
-   + 24h freshness) + tests, behind an unconfigured feed (imports nothing) — same scaffold-first approach
-   as 10.14. Phase 2 = integrate a compliant Njuškalo feed if/when one exists.
+9. **Second-hand marketplace section (Njuškalo, FB Marketplace).** ✅ **Designed (10.17)** +
+   ✅ **Phase 1 built (10.21)** — [docs/marketplace-sourcing.md](docs/marketplace-sourcing.md):
+   `marketplace-listing` provenance, Njuškalo/FB registered as `OFFICIAL_FEED_REQUIRED`,
+   `MarketplaceListingFilter` (sold/expired guard, tested), `Product` second-hand columns. No feed/data/UI
+   yet. **Next = Phase 2** (a `MarketplaceFeed` over a compliant Njuškalo/FB API/export → rows with
+   `sourceType=marketplace-listing`, each run through `MarketplaceListingFilter`; never scrape) and
+   **Phase 3** (separate "Rabljeno" UI section + buyer-beware copy; used items stay out of the new-retail total).
 
 10b. **Catalog hygiene: dedupe duplicate productUrls.** 6 pre-existing rows (from sprints ≤10.16) point
    the same retailer URL under two `externalId`s (e.g. JYSK KANSTRUP carts in both `real-hr-kitchen.json`

@@ -136,6 +136,20 @@ public class Product {
     @Column(name = "market", length = 8)
     private String market;
 
+    // --- Sprint 10.21: second-hand marketplace groundwork (data model only; no feed wired yet). ---
+    // True for a used item from a consumer marketplace (Njuškalo/FB) delivered via a compliant feed
+    // (sourceType=marketplace-listing). Drives the separate "Rabljeno" UI section and must never be
+    // mixed silently into the new-retail plan total. ColumnDefault so legacy/sample inserts stay valid.
+    @Column(name = "second_hand", nullable = false)
+    @ColumnDefault("false")
+    private boolean secondHand;
+    // The used item's stated condition (e.g. like-new, used-good); never guessed. Null = unknown.
+    @Column(name = "condition_label", length = 40)
+    private String conditionLabel;
+    // City/region of the seller (e.g. "Zagreb"); helps the buyer judge pickup distance. No precise address.
+    @Column(name = "seller_location", length = 120)
+    private String sellerLocation;
+
     public Product() {
     }
 
@@ -211,4 +225,10 @@ public class Product {
     public void setReviewsUrl(String reviewsUrl) { this.reviewsUrl = reviewsUrl; }
     public String getMarket() { return market; }
     public void setMarket(String market) { this.market = market; }
+    public boolean isSecondHand() { return secondHand; }
+    public void setSecondHand(boolean secondHand) { this.secondHand = secondHand; }
+    public String getConditionLabel() { return conditionLabel; }
+    public void setConditionLabel(String conditionLabel) { this.conditionLabel = conditionLabel; }
+    public String getSellerLocation() { return sellerLocation; }
+    public void setSellerLocation(String sellerLocation) { this.sellerLocation = sellerLocation; }
 }
