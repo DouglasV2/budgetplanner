@@ -130,6 +130,14 @@ Imam 1500 € za dnevni boravak od 20 m² u Zagrebu. Želim skandinavski stil, s
 
 Those are the next phases after this foundation works locally.
 
+### Catalog sourcing policy
+
+Products come only from a local, verified catalog. Retailers that block automated access (HTTP 403:
+Decathlon, Pevex, Lesnina) are **never scraped or bypassed** — they are `OFFICIAL_FEED_REQUIRED` and
+populated only via an official/partner feed (the feed seam exists in `ai.budgetspace.feed`, unconfigured
+by default and skipped cleanly). IKEA/JYSK are verified public product pages; Emmezeta is link-out only.
+We never fabricate products, prices, reviews, images or URLs. Full rules: [docs/sourcing-policy.md](docs/sourcing-policy.md).
+
 
 ## UX Sprint 2 update
 

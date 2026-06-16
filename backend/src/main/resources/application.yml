@@ -32,6 +32,18 @@ budgetspace:
   real-catalog:
     # Seed the real IKEA/JYSK living-room catalog on startup (env BUDGETSPACE_REAL_CATALOG_SEED_ENABLED).
     seed-enabled: ${BUDGETSPACE_REAL_CATALOG_SEED_ENABLED:true}
+  feeds:
+    # Sprint 10.14: official/partner feed slots for the feed-required retailers (Decathlon, Pevex,
+    # Lesnina) whose sites return HTTP 403 and which we therefore never scrape. Blank = not configured
+    # → the feed import is skipped cleanly on startup. NEVER commit a real URL/token here; supply it as
+    # an environment variable in your deployment. The secret (if any) is read by the real feed client,
+    # not from this file.
+    decathlon:
+      url: ${BUDGETSPACE_FEED_DECATHLON_URL:}
+    pevex:
+      url: ${BUDGETSPACE_FEED_PEVEX_URL:}
+    lesnina:
+      url: ${BUDGETSPACE_FEED_LESNINA_URL:}
   admin-endpoints:
     # Dev/collector/import/admin endpoints. Public in dev; disable in prod (env BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED=false).
     # The 'prod' Spring profile (SPRING_PROFILES_ACTIVE=prod) turns these off automatically.

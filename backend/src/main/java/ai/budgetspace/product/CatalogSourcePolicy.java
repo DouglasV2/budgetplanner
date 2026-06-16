@@ -1,0 +1,140 @@
+package ai.budgetspace.product;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Sprint 10.14 — the single source of truth for <strong>how a retailer may be sourced</strong> and
+ * <strong>what counts as a production-verified product</strong>.
+ *
+ * <p>Architectural rule (do not work around it): a retailer that blocks automated access (e.g. an
+ * HTTP&nbsp;403 / WAF bot block on the homepage) is <em>not</em> solved by bypassing the protection.
+ * We never rotate proxies, spoof a browser fingerprint, reuse cookies/sessions or call private
+ * search/stock/Algolia endpoints. Instead the sourcing strategy changes: such a retailer is marked
+ * {@link SourcingStatus#OFFICIAL_FEED_REQUIRED} and only an official/partner feed (or a hand-verified
+ * product) may ever populate it. See {@code docs/sourcing-policy.md}.</p>
+ *
+ * <p>Provenance of every imported product is recorded in {@code Product.sourceType}. The canonical
+ * provenance values are:</p>
+ * <ul>
+ *   <li>{@link #SOURCE_MANUAL_VERIFIED} — a human verified name/price/URL by hand,</li>
+ *   <li>{@link #SOURCE_PUBLIC_PRODUCT_PAGE} — verified from a publicly reachable product page,</li>
+ *   <li>{@link #SOURCE_OFFICIAL_FEED} — delivered by the retailer's official/partner feed,</li>
+ *   <li>{@link #SOURCE_AFFILIATE_FEED} — delivered by an affiliate network feed.</li>
+ * </ul>
+ * (The pre-10.14 values {@code manual}, {@code retailer-snapshot} and {@code future-scraper} remain
+ * valid; {@code retailer-snapshot} is the historical equivalent of {@link #SOURCE_PUBLIC_PRODUCT_PAGE}.)
+ */
+public final class CatalogSourcePolicy {
+
+    /** How a retailer is allowed to be sourced. */
+    public enum SourcingStatus {
+        /** Public product pages are reachable and hand-verified; live fetch + manual import allowed (IKEA, JYSK). */
+        DIRECT_VERIFIED,
+        /** Hand-verified, link-out only — no automated fetch (Emmezeta shows no prices/ratings to scrape). */
+        MANUAL_VERIFIED_ONLY,
+        /** Homepage returns 403 / is WAF-blocked. Direct import is forbidden; needs an official/partner feed. */
+        OFFICIAL_FEED_REQUIRED
+    }
+
+    // Canonical import-source provenance values (mirrors the product direction's MANUAL_VERIFIED etc.).
+    public static final String SOURCE_MANUAL_VERIFIED = "manual-verified";
+    public static final String SOURCE_PUBLIC_PRODUCT_PAGE = "public-product-page";
+    public static final String SOURCE_OFFICIAL_FEED = "official-feed";
+    public static final String SOURCE_AFFILIATE_FEED = "affiliate-feed";
+
+    /** Source types that mean the product was delivered by a configured retailer/affiliate feed. */
+    public static final Set<String> FEED_SOURCE_TYPES = Set.of(SOURCE_OFFICIAL_FEED, SOURCE_AFFILIATE_FEED);
+
+    // Per-retailer sourcing status. Re-confirmed 2026-06-16: decathlon.hr, pevex.hr and xxxlesnina.hr
+    // return HTTP 403 even on the homepage (edge/WAF bot block, not auth), so they are feed-required.
+    private static final Map<String, SourcingStatus> STATUS_BY_RETAILER = buildStatusMap();
+
+    private CatalogSourcePolicy() {
+    }
+
+    private static Map<String, SourcingStatus> buildStatusMap() {
+        LinkedHashMap<String, SourcingStatus> map = new LinkedHashMap<>();
+        map.put("IKEA", SourcingStatus.DIRECT_VERIFIED);
+        map.put("JYSK", SourcingStatus.DIRECT_VERIFIED);
+        map.put("Emmezeta", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Decathlon", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Pevex", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Lesnina", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        return Map.copyOf(map);
+    }
+
+    /**
+     * The sourcing status for a retailer. Unknown / unmapped retailers default to
+     * {@link SourcingStatus#OFFICIAL_FEED_REQUIRED} so we never fetch something we have not vetted.
+     */
+    public static SourcingStatus statusFor(String retailer) {
+        String key = ProductTaxonomy.normalizeRetailer(retailer).orElse(retailer == null ? "" : retailer.trim());
+        return STATUS_BY_RETAILER.getOrDefault(key, SourcingStatus.OFFICIAL_FEED_REQUIRED);
+    }
+
+    /** True when the retailer's homepage/pages are blocked and only a feed may populate it. */
+    public static boolean isFeedRequired(String retailer) {
+        return statusFor(retailer) == SourcingStatus.OFFICIAL_FEED_REQUIRED;
+    }
+
+    /** True only for retailers whose public product pages we are allowed to fetch directly. */
+    public static boolean isDirectFetchAllowed(String retailer) {
+        return statusFor(retailer) == SourcingStatus.DIRECT_VERIFIED;
+    }
+
+    /** Retailers that must not be scraped/collected and require an official or partner feed. */
+    public static List<String> feedRequiredRetailers() {
+        return STATUS_BY_RETAILER.entrySet().stream()
+                .filter(entry -> entry.getValue() == SourcingStatus.OFFICIAL_FEED_REQUIRED)
+                .map(Map.Entry::getKey)
+                .sorted()
+                .toList();
+    }
+
+    /** True when the source type means the product came from a configured official/affiliate feed. */
+    public static boolean isFeedSourceType(String sourceType) {
+        return sourceType != null && FEED_SOURCE_TYPES.contains(sourceType.trim().toLowerCase(Locale.ROOT));
+    }
+
+    /** A short, honest explanation an operator/log can show for the retailer's status. */
+    public static String reasonFor(String retailer) {
+        return switch (statusFor(retailer)) {
+            case DIRECT_VERIFIED -> "Javne product stranice su dohvatljive i ručno provjerene — dopušten kontrolirani import.";
+            case MANUAL_VERIFIED_ONLY -> "Samo ručno provjereni proizvodi s link-outom — bez automatiziranog dohvaćanja.";
+            case OFFICIAL_FEED_REQUIRED -> "Naslovnica/stranice vraćaju HTTP 403 (WAF/anti-bot). Ne zaobilazimo zaštitu — "
+                    + "uvoz je moguć samo preko službenog/partnerskog feeda ili ručno provjerenih proizvoda.";
+        };
+    }
+
+    /**
+     * The production / verified-catalog gate. A product is production-verified only when:
+     * <ol>
+     *   <li>it can enter the planner at all ({@link ProductTaxonomy#canEnterPlanner} — in stock, priced,
+     *       has a room + style, and is <em>not</em> {@code needs-review}),</li>
+     *   <li>it is not {@link ProductTaxonomy#isStale stale} (price/availability recently checked),</li>
+     *   <li>it carries a real {@code sourceReference} — legacy {@code data.sql} sample rows have none, so
+     *       they are excluded, and</li>
+     *   <li>if its retailer is {@link SourcingStatus#OFFICIAL_FEED_REQUIRED}, it actually came from an
+     *       official/affiliate feed (never from scraping a blocked site).</li>
+     * </ol>
+     * NEEDS_REVIEW, STALE and sample products therefore never count as verified.
+     */
+    public static boolean isProductionVerified(Product product) {
+        if (product == null) return false;
+        if (!ProductTaxonomy.canEnterPlanner(product)) return false;
+        if (ProductTaxonomy.isStale(product.getLastCheckedAt())) return false;
+        if (isBlank(product.getSourceReference())) return false;
+        if (statusFor(product.getRetailer()) == SourcingStatus.OFFICIAL_FEED_REQUIRED) {
+            return isFeedSourceType(product.getSourceType());
+        }
+        return true;
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+}
