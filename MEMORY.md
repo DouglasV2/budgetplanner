@@ -24,11 +24,12 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-16)
-- Backend tests: **129 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
-- Catalog snapshot files: **665 web-verified rows** across 32 files (seeded total ~715 incl. data.sql
+- Backend tests: **130 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
+- Catalog snapshot files: **718 web-verified rows** across 33 files (seeded total ~770 incl. data.sql
   samples). IKEA is the bulk. Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
-  FI 50 IKEA + JYSK FI 15).
+  FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
+  planner-flow room×category cell covered).
 - **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI.** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend

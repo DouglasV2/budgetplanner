@@ -115,7 +115,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // (PL/CZ/HU/RO/SE/DK) are deferred until the UI handles their currency. JYSK IT has no stores.
             "/catalog/real-ikea-it-rooms.json",
             "/catalog/real-ikea-fi-rooms.json",
-            "/catalog/real-jysk-fi-rooms.json"
+            "/catalog/real-jysk-fi-rooms.json",
+            // Sprint 10.22 (road-to-production step 2): HR catalog maximization. Gap-fill across the thin
+            // room/category cells (dining-room lighting/storage/decor, home-office storage/rug/decor,
+            // kitchen storage/decor, hallway lighting, bathroom mirrors) + non-IKEA breadth (Emmezeta,
+            // Harvey Norman, Namjestaj.hr) for price/style diversity. All web-verified 2026-06-17.
+            "/catalog/real-hr-max-10-22.json"
     );
 
     private final ProductRepository productRepository;

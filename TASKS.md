@@ -22,11 +22,13 @@ needs `OPENAI_API_KEY`, backend env only).
    fed. Stale rows still enter (with the "provjeri u trgovini" note) so an aging catalog never silently
    empties; uncovered rooms (e.g. `home-gym`) yield an honest empty/partial plan. Added test
    `sampleProductWithoutSourceReferenceIsExcludedFromPlan`; recalibrated planner test helpers. 129 tests, 0 failures.
-2. **[ ] Maximize the HR catalog (all reachable shops, all rooms).** Before any LLM testing, exhaustively
-   add HR furniture from every retailer whose product pages we can actually verify — IKEA, JYSK, Emmezeta,
-   Harvey Norman, Namjestaj.hr — across every room/category, until coverage saturates (diminishing returns).
-   **No 403/anti-bot bypass** (blocked chains stay feed-required). Each row web-verified, no fabrication.
-   *Done when:* HR is as broad+deep as the reachable retailers allow; runtime import tests stay at 0 errors.
+2. **[x] Maximize the HR catalog (all reachable shops, all rooms).** ✅ **Done 2026-06-17.** Gap-driven:
+   measured HR coverage by room×category, then web-verified **+53** rows (`real-hr-max-10-22.json`) filling
+   every thin cell — dining-room storage 0→4 / lighting 1→4 / decor 2→5; home-office storage 2→6 / decor 0→2 /
+   rug 0→1; kitchen storage 1→5 / decor 0→2; hallway lighting 2→6; bathroom decor 2→7 — plus non-IKEA breadth
+   (Emmezeta/Harvey Norman/Namjestaj.hr: corner sofas, beds, wardrobes, sideboards, dining sets across budget→
+   premium). HR sourced rows 237→**290**; every planner-flow cell now ≥1. No 403-bypass. `HrMaxCatalogRuntimeTest`
+   (0 import errors); programmatic dedup dropped 5 already-present URLs. Backend **130 tests, 0 failures**.
 3. **[ ] HR data re-verification before launch.** Re-verify prices + availability across the (now maxed) HR
    catalog; flip confirmed rows `partial → complete`, mark drifted/vanished ones `needs-review`. Use/extend
    `CatalogHealthService` for a stale-rows report + a re-check cadence. Dedupe the 6 duplicate `productUrl`s
