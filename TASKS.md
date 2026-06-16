@@ -4,7 +4,24 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
 ## Recently done
 
-### Sprint 10.15 — production catalog depth (current)
+### Sprint 10.16 — HR kitchen + retailer expansion (current)
+- HR **kitchen** depth (+15: IKEA/JYSK/Emmezeta — carts, wall storage, pendants).
+- **New verified retailers** (web-verified products): Harvey Norman (HR 9 + SI 6), Namjestaj.hr (HR 9),
+  Otto (DE 6), Segmüller (DE 6), Poco (DE 2). Catalog now ~493 products.
+- Registered **all targeted retailers** in `ProductTaxonomy.SUPPORTED_RETAILERS` + `CatalogSourcePolicy`.
+  Probed fetchability of every named chain — most big ones are bot-blocked (see classification below)
+  → `OFFICIAL_FEED_REQUIRED`, no products until a feed.
+- Added `NewRetailersCatalogRuntimeTest`; backend 117 tests, 0 failures.
+
+#### Retailer fetchability assessment (2026-06-16)
+| Country | Verified (have products) | Blocked / unusable → feed-required |
+|---|---|---|
+| HR | Harvey Norman, Namjestaj.hr (+ IKEA/JYSK/Emmezeta) | Momax, Prima Namještaj, Bauhaus, FeroTerm (403/refused), Perfecta Dreams (JS-only prices) |
+| SI | Harvey Norman | Momax, Lesnina/XXXLutz (403), Dipo, Merkur (garden-only, out of scope) |
+| DE | Otto, Segmüller, Poco | Wayfair (closed in DE), Home24 (403), Roller (JS-only) |
+| AT | — | Kika, Leiner, Momax, XXXLutz (403/TLS/refused) |
+
+### Sprint 10.15 — production catalog depth
 - Web-verified **~150 new products** across retailers × markets (no fabrication; each verified on the
   live public product page, `sourceType=public-product-page`):
   - IKEA depth: SI (+17), AT (+23), DE (+24) — beds, mattresses, nightstands, wardrobes, dining,
@@ -43,6 +60,14 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
    sourced — then retire `data.sql` sample fallback. Recalibrate planner tests.
 7. **Refresh `dataQuality`** from `partial` → re-verify prices/stock before a real production launch.
 8. Add more EU markets (IT/FI/PL/…) only when their catalog is sourced (else they return empty plans).
+9. **Second-hand marketplace section (Njuškalo, FB Marketplace).** New source model: user-listed,
+   no stable catalog, ToS + anti-bot constraints → treat as a feed/API integration (NOT scraping), and
+   likely a separate UI section ("rabljeno / second-hand") with its own freshness + trust handling.
+   Probably a new `sourceType` (e.g. `marketplace-listing`) and a clear "used item" label. Design first.
+10. **Bring blocked retailers online via feeds.** The big chains we probed (Otto beyond rate-limits,
+   Wayfair, Home24, Roller, XXXLutz/Kika/Leiner, Momax, Bauhaus, FeroTerm, Lesnina, Decathlon, Pevex,
+   Merkur, Dipo) are registered as feed-required — integrate an official/affiliate feed per the
+   `ai.budgetspace.feed` seam when available. Never scrape them.
 
 ## Manual test prompts (rule-based, no LLM spend)
 Pick the country (top-right) to match the market, then paste the wish. Markets with data: HR, SI, AT, DE.
@@ -50,6 +75,7 @@ Pick the country (top-right) to match the market, then paste the wish. Markets w
 - **HR · dnevni boravak**: „Imam 1500 € za dnevni boravak, moderno, najviše IKEA, već imam TV i tepih."
 - **HR · spavaća**: „Spavaća soba do 1200 €, minimalistički, trebam krevet, madrac, ormar i noćne ormariće."
 - **HR · blagovaonica**: „Blagovaonica do 800 €, kombiniraj IKEA i JYSK, trebam stol i 4 stolice."
+- **HR · kuhinja**: „Kuhinja do 600 €, trebam kuhinjska kolica, zidnu policu i rasvjetu." (kitchen depth)
 - **DE · Wohnzimmer (all IKEA)**: „Imam 1800 € za dnevni boravak i želim sve iz IKEA-e, svijetli stil, već imam TV."
 - **DE · spavaća (complete)**: „Spavaća soba 1500 €, kompletno, minimalistički — krevet, madrac, ormar, komoda."
 - **AT · radni kutak**: „Radni kutak do 600 €, moderno, trebam radni stol, uredsku stolicu i policu."

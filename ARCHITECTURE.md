@@ -49,9 +49,15 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   `RetailerProductSnapshotDto`). `data.sql` still seeds legacy sample rows for not-yet-sourced rooms.
 - **`CatalogSourcePolicy` is the single source of truth.** A 403 is never bypassed (no proxy / stealth
   / fingerprint / cookies / private endpoints). Per-retailer status:
-  - IKEA, JYSK → `DIRECT_VERIFIED` (public product pages fetchable + hand-verified)
-  - Emmezeta → `MANUAL_VERIFIED_ONLY` (link-out, no ratings)
-  - Decathlon, Pevex, Lesnina → `OFFICIAL_FEED_REQUIRED` (403/WAF; only an official/partner feed)
+  - `DIRECT_VERIFIED` (pages fetchable + hand-verified, in collector allowlist): IKEA, JYSK
+  - `MANUAL_VERIFIED_ONLY` (verified, link-out, have products): Emmezeta, Harvey Norman, Namjestaj.hr,
+    Otto, Segmüller, Poco
+  - `OFFICIAL_FEED_REQUIRED` (403/anti-bot/JS-only/out-of-scope → only an official/partner feed, no
+    products yet): Decathlon, Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus,
+    FeroTerm, Merkur, Dipo, Wayfair, Home24, Roller, Kika, Leiner, XXXLutz
+  - Adding a retailer = add to `ProductTaxonomy.SUPPORTED_RETAILERS` + `CatalogSourcePolicy` status
+    (+ `PlannerService.RETAILERS` if it has products). Most big chains are bot-blocked (confirmed by
+    probing) → they wait for a feed.
 - Import-source provenance (`Product.sourceType`): `manual-verified`, `public-product-page`,
   `official-feed`, `affiliate-feed` (+ legacy `manual`/`retailer-snapshot`/`future-scraper`).
 - `CatalogSourcePolicy.isProductionVerified(Product)` = the verified gate (canEnterPlanner AND not

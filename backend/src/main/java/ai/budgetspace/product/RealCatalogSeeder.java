@@ -79,7 +79,15 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-jysk-si.json",
             "/catalog/real-jysk-at.json",
             "/catalog/real-jysk-de.json",
-            "/catalog/real-emmezeta-hr-depth.json"
+            "/catalog/real-emmezeta-hr-depth.json",
+            // Sprint 10.16: HR kitchen depth + additional verified retailers (Harvey Norman HR/SI,
+            // Namjestaj.hr, Otto/Segmüller/Poco DE). Other named retailers (Momax, Bauhaus, FeroTerm,
+            // Prima, Perfecta, Merkur, Dipo, Wayfair, Home24, Roller, Kika, Leiner, XXXLutz) are
+            // registered as OFFICIAL_FEED_REQUIRED (403/anti-bot/JS-only) and carry no products yet.
+            "/catalog/real-hr-kitchen.json",
+            "/catalog/real-harvey-norman.json",
+            "/catalog/real-namjestaj-hr.json",
+            "/catalog/real-de-new-retailers.json"
     );
 
     private final ProductRepository productRepository;

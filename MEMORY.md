@@ -24,15 +24,25 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-16)
-- Backend tests: **115 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x).
-- Catalog after seeding: **~440 products** — IKEA ≈178, JYSK ≈146, plus Emmezeta + legacy samples.
-- **Markets with real catalog: HR (deep), SI, AT, DE.** SI/AT/DE now cover living-room + bedroom +
-  dining + home-office (IKEA + JYSK). Per-market prices verified individually (they genuinely differ:
-  KALLAX 169 DE / 189 AT / 199 SI / 179 HR). Other countries in `Markets` (IT/FI/PL/CZ/HU/RO/SE/DK)
-  have **no catalog** → empty plan (expected).
-- Retailers: IKEA + JYSK (HR/SI/AT/DE), Emmezeta (HR only). Decathlon/Pevex/Lesnina = feed-required,
-  empty until a feed is wired → `home-gym` still relies on sample data.
-- App runs via `docker compose up`: frontend **:5180**, backend **:8090**, postgres :5432.
+- Backend tests: **117 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x).
+- Catalog after seeding: **~493 products** — IKEA ≈188, JYSK ≈149, plus Emmezeta + new retailers + samples.
+- **Markets with real catalog: HR (deep, incl. kitchen), SI, AT, DE.** SI/AT/DE cover living-room +
+  bedroom + dining + home-office (IKEA + JYSK). Per-market prices verified individually (they genuinely
+  differ: KALLAX 169 DE / 189 AT / 199 SI / 179 HR). Other countries in `Markets` (IT/FI/PL/CZ/HU/RO/
+  SE/DK) have **no catalog** → empty plan (expected).
+- **Retailers** (single source of truth = `CatalogSourcePolicy`):
+  - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE), Emmezeta (HR), **Harvey Norman (HR/SI),
+    Namjestaj.hr (HR), Otto/Segmüller/Poco (DE)**.
+  - Registered but **feed-required** (403/anti-bot/JS-only/out-of-scope → no products yet): Decathlon,
+    Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
+    Home24, Roller, Kika, Leiner, XXXLutz. (Most big chains are bot-blocked — confirmed by probing.)
+  - `home-gym` still relies on sample data (needs a Decathlon feed).
+- **Marketplace idea (backlog):** second-hand marketplaces (Njuškalo, FB Marketplace) as a future
+  source — different model (user-listed, no stable catalog, ToS/anti-bot) → treat like a feed
+  integration, not scraping. See `TASKS.md`.
+- App runs via `docker compose up`: frontend **:5180**, backend **:8090**, postgres :5432. After
+  `docker compose up`, wait for the seed to finish (log "Real catalog seed: done") before the first
+  plan request — a request mid-seed can return 0 items (race, not a bug).
 
 ## Hard-won gotchas (cost real debugging time)
 - `data.sql` sample rows omit `is_sponsored` (a NOT NULL col since 10.10) → on PostgreSQL the seed

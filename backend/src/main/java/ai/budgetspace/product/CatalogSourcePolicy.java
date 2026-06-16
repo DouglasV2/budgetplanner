@@ -64,6 +64,27 @@ public final class CatalogSourcePolicy {
         map.put("Decathlon", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Pevex", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Lesnina", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.16: reachable + hand-verified (link-out; have products in the catalog).
+        map.put("Harvey Norman", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Namjestaj.hr", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Otto", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Segmüller", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Poco", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Re-confirmed 2026-06-16: blocked (403/anti-bot/unreachable) or unusable for direct import
+        // (JS-only prices / out-of-scope catalog) → only an official/partner feed may populate them.
+        map.put("Momax", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Prima Namještaj", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Perfecta Dreams", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Bauhaus", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("FeroTerm", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Merkur", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Dipo", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Wayfair", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Home24", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Roller", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Kika", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Leiner", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("XXXLutz", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         return Map.copyOf(map);
     }
 

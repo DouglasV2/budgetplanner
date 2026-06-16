@@ -41,7 +41,28 @@ public final class ProductTaxonomy {
             "Pevex",
             "Emmezeta",
             "Decathlon",
-            "Lesnina"
+            "Lesnina",
+            // Sprint 10.16: additional EU retailers. Fetchable + hand-verified (have products):
+            "Harvey Norman",
+            "Namjestaj.hr",
+            "Otto",
+            "Segmüller",
+            "Poco",
+            // Known/targeted but currently feed-required (403/anti-bot/JS-only or out-of-scope). Registered
+            // so the system is aware of them and a feed can target them later; they carry no products yet.
+            "Momax",
+            "Prima Namještaj",
+            "Perfecta Dreams",
+            "Bauhaus",
+            "FeroTerm",
+            "Merkur",
+            "Dipo",
+            "Wayfair",
+            "Home24",
+            "Roller",
+            "Kika",
+            "Leiner",
+            "XXXLutz"
     );
 
     public static final Set<String> AVAILABILITY_STATUSES = Set.of(

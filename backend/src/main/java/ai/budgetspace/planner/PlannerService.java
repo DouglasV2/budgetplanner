@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 @Service
 public class PlannerService {
     private static final Logger log = LoggerFactory.getLogger(PlannerService.class);
-    private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina");
+    private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina",
+            // Sprint 10.16: additional retailers that have verified products (HR/SI/DE).
+            "Harvey Norman", "Namjestaj.hr", "Otto", "Segmüller", "Poco");
 
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.ofEntries(
             Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor")),

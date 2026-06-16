@@ -28,8 +28,10 @@ class CatalogSourcePolicyTest {
             assertThat(CatalogSourcePolicy.isDirectFetchAllowed(retailer)).as("%s direct fetch", retailer).isFalse();
             assertThat(CatalogSourcePolicy.reasonFor(retailer)).contains("403");
         }
+        // The original three are always feed-required; sprint 10.16 added more blocked retailers.
         assertThat(CatalogSourcePolicy.feedRequiredRetailers())
-                .containsExactly("Decathlon", "Lesnina", "Pevex");
+                .contains("Decathlon", "Lesnina", "Pevex")
+                .doesNotContain("IKEA", "JYSK", "Emmezeta", "Harvey Norman", "Otto");
     }
 
     @Test
