@@ -67,7 +67,19 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-ikea-at.json",
             // Sprint 10.14 (go-wide): third EU market — verified IKEA Germany (DE) catalog. Prices
             // verified per-market on ikea.com/de (they differ again from HR/SI/AT). market="DE".
-            "/catalog/real-ikea-de.json"
+            "/catalog/real-ikea-de.json",
+            // Sprint 10.15 (production-depth): web-verified catalog depth across retailers and markets
+            // (beds, mattresses, wardrobes, dining, office, more living-room) so the rule-based planner
+            // has rich data before any LLM spend. Each row's name + EUR price verified on the live
+            // public product page; sourceType=public-product-page.
+            "/catalog/real-ikea-si-depth.json",
+            "/catalog/real-ikea-at-depth.json",
+            "/catalog/real-ikea-de-depth.json",
+            "/catalog/real-jysk-hr-depth.json",
+            "/catalog/real-jysk-si.json",
+            "/catalog/real-jysk-at.json",
+            "/catalog/real-jysk-de.json",
+            "/catalog/real-emmezeta-hr-depth.json"
     );
 
     private final ProductRepository productRepository;

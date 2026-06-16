@@ -262,7 +262,7 @@ public final class ProductTaxonomy {
         alias(aliases, "home-gym", "home-gym", "home gym", "kućna teretana", "kucna teretana", "teretana", "gym");
         // Sprint 10.7: new rooms.
         alias(aliases, "kitchen", "kitchen", "kuhinja", "kuhinju", "kuhinji");
-        alias(aliases, "dining-room", "dining-room", "dining room", "blagovaonica", "blagovaonicu", "trpezarija");
+        alias(aliases, "dining-room", "dining-room", "dining room", "dining", "blagovaonica", "blagovaonicu", "trpezarija");
         alias(aliases, "hallway", "hallway", "hodnik", "predsoblje", "ulazni prostor");
         alias(aliases, "bathroom", "bathroom", "kupaonica", "kupaonicu", "kupaona", "kupatilo");
         return Map.copyOf(aliases);
