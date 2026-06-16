@@ -108,7 +108,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // ausverkauft" in the static HTML WebFetch sees, so availability can't be honestly confirmed
             // (needs an official feed/API or headless render — out of scope). See catalog-sourcing notes.
             "/catalog/real-jysk-si-rooms.json",
-            "/catalog/real-jysk-de-rooms.json"
+            "/catalog/real-jysk-de-rooms.json",
+            // Sprint 10.20: first catalog for two new EUR markets — Italy (IT) and Finland (FI). IKEA
+            // core+rooms ported via the number-trick to /it/it/ and /fi/fi/ (per-market EUR prices
+            // re-verified; e.g. KIVIK 599 IT vs 749 FI), plus JYSK FI hallway/kitchen. Non-EUR EU markets
+            // (PL/CZ/HU/RO/SE/DK) are deferred until the UI handles their currency. JYSK IT has no stores.
+            "/catalog/real-ikea-it-rooms.json",
+            "/catalog/real-ikea-fi-rooms.json",
+            "/catalog/real-jysk-fi-rooms.json"
     );
 
     private final ProductRepository productRepository;

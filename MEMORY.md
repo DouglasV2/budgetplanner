@@ -24,15 +24,16 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-16)
-- Backend tests: **120 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
-- Catalog snapshot files: **549 web-verified rows** across 29 files (seeded total ~600 incl. data.sql
-  samples). IKEA is the bulk (≈330). Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
-  bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI 19 + DE 25 hallway/kitchen).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE.** SI/AT/DE cover living-room +
-  bedroom + dining + home-office + bathroom + hallway + kitchen (IKEA). JYSK now also covers
-  hallway/kitchen for **SI + DE** (not AT — jysk.at gates stock behind JS, "Vorübergehend ausverkauft"
-  in static HTML → can't confirm availability; needs feed/API). Per-market prices verified individually
-  (they genuinely
+- Backend tests: **121 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
+- Catalog snapshot files: **665 web-verified rows** across 32 files (seeded total ~715 incl. data.sql
+  samples). IKEA is the bulk. Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
+  bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
+  FI 50 IKEA + JYSK FI 15).
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI.** SI/AT/DE/IT/FI cover
+  living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
+  covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
+  ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets
+  (PL/CZ/HU/RO/SE/DK) deferred (frontend is EUR-only). Per-market prices verified individually (they genuinely
   differ: KALLAX 169 DE / 189 AT / 199 SI / 179 HR). Other countries in `Markets` (IT/FI/PL/CZ/HU/RO/
   SE/DK) have **no catalog** → empty plan (expected).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):

@@ -4,7 +4,22 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
 ## Recently done
 
-### Sprint 10.19 — JYSK SI/DE hallway + kitchen depth (current)
+### Sprint 10.20 — new EU markets: Italy (IT) + Finland (FI) (current)
+- First catalog for **IT (+51)** and **FI (+50, IKEA)** plus **JYSK FI (+15)** = **+116** verified rows.
+  IT/FI now cover living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA); FI also has
+  JYSK hallway/kitchen. Files `real-ikea-{it,fi}-rooms.json`, `real-jysk-fi-rooms.json`.
+- **IKEA number-trick** ported the verified core+room SKUs to `/it/it/` and `/fi/fi/`; each EUR price was
+  re-verified per market (genuinely different — KIVIK 599 IT / 749 FI; STENSTORP cart 169 IT; TÄNNFORSEN
+  299 IT / 329 FI). Skipped SKUs that hit category pages / weren't carried (TRONES 2-pack in IT, NYMÅNE
+  pendants, FI TARVA bed / STENSTORP); when the number-trick hit a category in FI, the agent found the FI
+  canonical URL via search (MALM, LAGKAPTEN). **jysk.fi is NOT JS-gated** (unlike jysk.at) → verified fine.
+- Only **EUR** new markets added (IT/FI). Non-EUR EU markets (PL/CZ/HU/RO/SE/DK) deferred: the frontend
+  `markets.ts` deliberately offers EUR only ("a non-EUR market needs a currency-correct catalog first").
+  IT/FI were already in `Markets.java` + `markets.ts` + city-detection, so no app change was needed.
+- `NewMarketsCatalogRuntimeTest` (0 import errors; both markets cover the main rooms); backend **121
+  tests, 0 failures**. Catalog snapshot files now **665 rows** (32 files).
+
+### Sprint 10.19 — JYSK SI/DE hallway + kitchen depth
 - **JYSK SI (+19), DE (+25)** = +44 verified rows: hallway shoe storage / coat racks / benches / hall
   mirrors / rugs + kitchen carts & wall shelves (those markets previously had JYSK only for
   living-room/bedroom/dining/office). Files `real-jysk-{si,de}-rooms.json`.
@@ -110,7 +125,10 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 6. **Flip planner to verified-only** (`CatalogSourcePolicy.isProductionVerified`) once every room is
    sourced — then retire `data.sql` sample fallback. Recalibrate planner tests.
 7. **Refresh `dataQuality`** from `partial` → re-verify prices/stock before a real production launch.
-8. Add more EU markets (IT/FI/PL/…) only when their catalog is sourced (else they return empty plans).
+8. Add more EU markets only when their catalog is sourced. **IT + FI done (10.20, EUR).** Non-EUR
+   (PL/CZ/HU/RO/SE/DK): need currency-correct UI first (frontend `markets.ts` is EUR-only) — do that UI
+   work before sourcing their catalogs. Optionally flip `available:true` in `markets.ts` for SI/AT/DE/IT/FI
+   to expose them in the picker (currently only HR is "available"; the rest are catalog-ready "coming soon").
 9. **Second-hand marketplace section (Njuškalo, FB Marketplace).** ✅ **Designed in 10.17** —
    [docs/marketplace-sourcing.md](docs/marketplace-sourcing.md) (feed/API not scraping; `marketplace-listing`
    provenance + `second-hand` flag; sold/expired guard; separate "Rabljeno" UI). **Next = Phase 1 build:**
