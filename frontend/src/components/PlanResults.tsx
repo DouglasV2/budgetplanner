@@ -252,20 +252,26 @@ function productUrl(product: Product) {
   return url.startsWith('http') ? url : '';
 }
 
-// Sprint 10.13 (#2): reviews. We never invent ratings — we only show the aggregate the catalog
-// recorded and link out to the store so the shopper can read the real reviews and judge for
-// themselves (incl. availability).
+// Sprint 10.13 (#2): reviews. We never invent ratings — we only show the verified aggregate the
+// catalog recorded (average star + count) and link out to the store so the shopper can read the real
+// reviews and judge for themselves (incl. availability). reviewRating is display-only and separate
+// from the planner's internal `rating`.
+function reviewSummary(product: Product): string {
+  const hasRating = typeof product.reviewRating === 'number' && product.reviewRating > 0;
+  const hasCount = typeof product.reviewCount === 'number' && product.reviewCount > 0;
+  if (hasRating && hasCount) return `★ ${product.reviewRating!.toFixed(1)} (${product.reviewCount})`;
+  if (hasRating) return `★ ${product.reviewRating!.toFixed(1)}`;
+  if (hasCount) return `★ ${product.reviewCount} recenzija`;
+  return '';
+}
+
 function hasReviews(product: Product) {
-  return typeof product.reviewCount === 'number' && product.reviewCount > 0;
+  return reviewSummary(product) !== '';
 }
 
 function reviewsUrl(product: Product) {
   const url = product.reviewsUrl || product.productUrl || product.url || '';
   return url.startsWith('http') ? url : '';
-}
-
-function ratingText(product: Product) {
-  return typeof product.rating === 'number' && product.rating > 0 ? product.rating.toFixed(1) : '—';
 }
 
 const STALE_AFTER_DAYS = 14;
@@ -644,8 +650,8 @@ export function PlanResults({
                           <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
                           <span>{availabilityLabel(product)}</span>
                           {hasReviews(product) && (
-                            <span className="review-chip" title="Prosječna ocjena i broj recenzija u trgovini">
-                              ★ {ratingText(product)} ({product.reviewCount})
+                            <span className="review-chip" title="Prosječna ocjena i broj recenzija u trgovini (provjereno)">
+                              {reviewSummary(product)}
                             </span>
                           )}
                           {product.originalPrice && <span>Akcija</span>}

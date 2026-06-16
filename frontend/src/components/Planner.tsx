@@ -3,6 +3,7 @@ import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replacePr
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, roomLabels, styleLabels } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
+import { detectMarketFromText, marketConfig } from '../markets';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
 
@@ -127,7 +128,7 @@ function SavedPlansInbox({
 }
 
 export function Planner() {
-  const { market, config, t } = useLocale();
+  const { market, config, setMarket, t } = useLocale();
   const [input, setInput] = useState<PlannerInput>({ ...initialInput, market });
   const [plans, setPlans] = useState<FurnishingPlan[]>([]);
   const [savedPlans, setSavedPlans] = useState<SavedPlanResponse[]>([]);
@@ -139,6 +140,8 @@ export function Planner() {
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
   const [design, setDesign] = useState<DesignAssistant | null>(null);
   const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
+  // Sprint 10.13 (#3): reversible "we picked your country from the prompt" note.
+  const [marketNote, setMarketNote] = useState<string | null>(null);
 
   async function refreshSavedPlans() {
     try {
@@ -175,6 +178,23 @@ export function Planner() {
   }, []);
 
   async function runGeneration(nextInput: PlannerInput) {
+    // Sprint 10.13 (#3): if the prompt names a country/city we support, auto-switch the market for
+    // this plan and show a reversible note. The selector stays the source of truth (user can revert).
+    let effectiveInput = nextInput;
+    const detected = detectMarketFromText(nextInput.prompt);
+    if (detected && detected !== market) {
+      const cfg = marketConfig(detected);
+      setMarket(detected);
+      setMarketNote(
+        cfg.lang === 'hr'
+          ? `Tržište postavljeno na ${cfg.label} (iz tvog opisa). Promijeni gore ako nije točno.`
+          : `Market set to ${cfg.label} (from your description). Change it above if needed.`
+      );
+      effectiveInput = { ...nextInput, market: detected };
+    } else {
+      setMarketNote(null);
+    }
+
     setIsLoading(true);
     setError(null);
     setNotice(null);
@@ -183,8 +203,8 @@ export function Planner() {
     setAnalysis(null);
 
     try {
-      const response = await generatePlan(nextInput);
-      setInput({ ...response.input, market: response.input.market ?? nextInput.market, lockedProductIds: response.input.lockedProductIds ?? nextInput.lockedProductIds ?? [] });
+      const response = await generatePlan(effectiveInput);
+      setInput({ ...response.input, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
       setPlans(response.plans);
       setAnalysis(response.intentAnalysis ?? null);
       const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
@@ -335,6 +355,8 @@ export function Planner() {
           <strong>{generationCount}</strong>
         </div>
       </div>
+
+      {marketNote && <div className="planner-notice market-note">{marketNote}</div>}
 
       {!config.available && <div className="planner-notice market-note">{t('planner.marketComingSoon')}</div>}
 

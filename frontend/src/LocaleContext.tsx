@@ -1,7 +1,7 @@
 // Sprint 10.13 (#3): app-wide market + language. Holds the selected market, exposes a `t()`
 // translator for the market's language, and keeps the currency formatter in sync.
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { marketConfig, type MarketConfig } from './markets';
+import { marketConfig, marketFromBrowser, type MarketConfig } from './markets';
 import { translate } from './i18n';
 import { setFormattingMarket } from './utils/planner';
 
@@ -18,7 +18,8 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 function readInitialMarket(): string {
   if (typeof window === 'undefined') return 'HR';
-  return window.localStorage.getItem(STORAGE_KEY) ?? 'HR';
+  // Saved choice wins; otherwise guess from the browser locale region; otherwise default to HR.
+  return window.localStorage.getItem(STORAGE_KEY) ?? marketFromBrowser() ?? 'HR';
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {

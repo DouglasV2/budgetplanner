@@ -89,6 +89,7 @@ export interface Product {
   sponsorLabel?: string;
   // Sprint 10.13: reviews (#2) + market/currency (#3).
   reviewCount?: number;
+  reviewRating?: number;
   reviewsUrl?: string;
   market?: string;
   currency?: string;
