@@ -64,7 +64,10 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Sprint 10.14 (go-wide): second EU market — verified IKEA Austria (AT) catalog across
             // living-room, home-office, bedroom and kitchen. Prices verified per-market on ikea.com/at
             // (they genuinely differ from HR/SI), reviews are the near-global aggregate. market="AT".
-            "/catalog/real-ikea-at.json"
+            "/catalog/real-ikea-at.json",
+            // Sprint 10.14 (go-wide): third EU market — verified IKEA Germany (DE) catalog. Prices
+            // verified per-market on ikea.com/de (they differ again from HR/SI/AT). market="DE".
+            "/catalog/real-ikea-de.json"
     );
 
     private final ProductRepository productRepository;
