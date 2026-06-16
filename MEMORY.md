@@ -24,7 +24,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-16)
-- Backend tests: **128 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
+- Backend tests: **129 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
 - Catalog snapshot files: **665 web-verified rows** across 32 files (seeded total ~715 incl. data.sql
   samples). IKEA is the bulk. Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
@@ -68,8 +68,11 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
 - Build needs the jdk-21 + downloaded-Maven + `settings-central.xml` workaround (see `ARCHITECTURE.md`).
 
 ## Known limitations
-- Planner is NOT globally restricted to `isProductionVerified` (home-gym + some rooms still use
-  sample fallback). Flipping it on requires sourcing those rooms first.
+- ~~Planner not restricted to verified products~~ **RESOLVED (2026-06-16, road-to-prod step 1):**
+  `PlannerService.marketCatalog` is gated on `CatalogSourcePolicy.isPlannerEligible` (= `isProductionVerified`
+  minus staleness), so `data.sql` sample rows / `needs-review` / blocked-without-feed never reach a plan.
+  Stale rows still enter (with a warning) so the catalog doesn't empty as it ages. Rooms with no sourced
+  catalog (e.g. `home-gym`) now return an honest empty/partial plan instead of sample placeholders.
 - Catalog images are mostly null (placeholder shown in UI, labelled "ilustracija") — we don't
   fabricate image URLs.
 - `dataQuality` of all imported rows is `partial` ("re-check before production") — prices/stock should

@@ -8,37 +8,43 @@ Goal path: **controlled HR beta first**, then full multi-market launch. Catalog 
 are solid; the work to production is data freshness, AI enablement, market/UX exposure and prod hardening
 — not core code. Do the 5 steps in order; check off as done.
 
-### Next 5 steps (toward a HR beta)
+### Next 5 steps (owner-confirmed order 2026-06-16; deploy target = Railway)
 
-1. **[ ] Planner verified-only gate (catalog integrity end-to-end).** Make `PlannerService` build plans
-   only from `CatalogSourcePolicy.isProductionVerified` products. For rooms with a verified catalog, never
-   serve `data.sql` sample rows; for rooms without one (e.g. `home-gym`), show an honest empty-state
-   ("još nemamo provjerene proizvode za ovu sobu") instead of placeholders. Recalibrate planner tests.
-   *Done when:* no sample/needs-review/stale row can appear in any plan; home-gym degrades gracefully; tests green.
-2. **[ ] Enable OpenAI LLM with enforced cost caps** (needs `OPENAI_API_KEY` from the owner — backend env
-   only, never committed). Set `BUDGETSPACE_AI_ENABLED=true`, `BUDGETSPACE_LLM_PROVIDER=openai`. Verify
-   `AiUsageTracker` monthly-USD + per-day + per-session caps actually block past the limit, and that the
-   rule-based path fires on every failure (timeout, bad JSON, network, cap hit). Measure prompt→`PlannerInputDto`
-   quality + token cost on the rich catalog using the manual test prompts. *Done when:* AI improves prompt
-   understanding, never exceeds caps, always falls back cleanly; no key in repo/logs/`.env.example`.
-3. **[ ] HR data freshness / re-verification before launch.** Re-verify prices + availability for the HR
-   catalog (the beta market); flip confirmed rows `partial → complete`, mark drifted/vanished ones
-   `needs-review`. Use/extend `CatalogHealthService` for a stale-rows report + a re-check cadence. Dedupe the
-   6 duplicate `productUrl`s (#10b below). *Done when:* HR catalog is fresh + `complete` where verified, with a documented re-check cadence.
-4. **[ ] HR launch UX + observability.** Run the app and do a UX pass: plan quality, market badge, honest
-   "ilustracija" image labels + disclaimers, store-link correctness. Wire basic analytics (the product-click /
-   plan-feedback endpoints already exist) + error monitoring + structured plan-generation logging. Decide the
-   image strategy (verified images for top items OR keep the labelled placeholder — never fabricate URLs).
-   *Done when:* the HR flow is polished, instrumented and observable.
-5. **[ ] Security review + deploy infra + go-live checklist (HR beta).** Run a security review (keys backend-only,
-   CORS, admin-endpoint guard active in prod, no secrets in logs/`.env.example`, input validation). Stand up
-   production deployment: hosting, env-based config for keys/feeds, **switch DB off `ddl-auto=create`** (it
-   wipes the schema every start — add Flyway/Liquibase migrations + backups), CI/CD, HTTPS. Legal/GDPR for a
-   HR consumer app + affiliate/sponsored disclosure copy. *Done when:* a controlled HR beta can go live safely.
+**LLM/OpenAI is intentionally deferred** until the HR catalog is maxed + re-verified — the owner does not
+want to spend OpenAI keys testing until HR is as complete as possible. It runs *after* these 5 (it stays
+the next phase: enable `BUDGETSPACE_AI_ENABLED=true` + verify `AiUsageTracker` caps + rule-based fallback;
+needs `OPENAI_API_KEY`, backend env only).
 
-> ⚠️ **Hard prod blocker to remember:** `spring.jpa.hibernate.ddl-auto=create` rebuilds (wipes) the DB on
-> every startup — fine for dev, fatal for prod. Must move to validate + versioned migrations before any
-> real deployment (folded into step 5).
+1. **[x] Planner verified-only gate (catalog integrity end-to-end).** ✅ **Done 2026-06-16.**
+   `PlannerService.marketCatalog` now filters on the new `CatalogSourcePolicy.isPlannerEligible` (=
+   `isProductionVerified` minus the staleness check), so plans are built only from sourced, in-stock,
+   non-`needs-review` products and **never** from `data.sql` sample rows or a blocked retailer that wasn't
+   fed. Stale rows still enter (with the "provjeri u trgovini" note) so an aging catalog never silently
+   empties; uncovered rooms (e.g. `home-gym`) yield an honest empty/partial plan. Added test
+   `sampleProductWithoutSourceReferenceIsExcludedFromPlan`; recalibrated planner test helpers. 129 tests, 0 failures.
+2. **[ ] Maximize the HR catalog (all reachable shops, all rooms).** Before any LLM testing, exhaustively
+   add HR furniture from every retailer whose product pages we can actually verify — IKEA, JYSK, Emmezeta,
+   Harvey Norman, Namjestaj.hr — across every room/category, until coverage saturates (diminishing returns).
+   **No 403/anti-bot bypass** (blocked chains stay feed-required). Each row web-verified, no fabrication.
+   *Done when:* HR is as broad+deep as the reachable retailers allow; runtime import tests stay at 0 errors.
+3. **[ ] HR data re-verification before launch.** Re-verify prices + availability across the (now maxed) HR
+   catalog; flip confirmed rows `partial → complete`, mark drifted/vanished ones `needs-review`. Use/extend
+   `CatalogHealthService` for a stale-rows report + a re-check cadence. Dedupe the 6 duplicate `productUrl`s
+   (#10b). *Done when:* HR catalog is fresh + `complete` where verified, with a documented cadence.
+4. **[ ] Product images — fetch every real image we can.** Pull verified product image URLs from the
+   reachable retailers (IKEA/JYSK/Emmezeta expose them) for the HR catalog; add an image-verification field;
+   show real images only when verified, else keep the labelled "ilustracija" placeholder. **Never fabricate
+   an image URL.** *Done when:* HR products carry verified images where available, placeholder otherwise.
+5. **[ ] Security review + deploy to Railway + go-live checklist (HR beta).** Security review (keys
+   backend-only, CORS, admin-endpoint guard active in prod, no secrets in logs/`.env.example`, input
+   validation). Railway deploy: managed Postgres, env-based config for keys/feeds, **switch DB off
+   `ddl-auto=create`** (wipes schema every start — add Flyway/Liquibase migrations + backups), HTTPS, build
+   config. Legal/GDPR for a HR consumer app + affiliate/sponsored disclosure copy. *Done when:* a controlled
+   HR beta can go live on Railway safely.
+
+> ⚠️ **Hard prod blocker:** `spring.jpa.hibernate.ddl-auto=create` rebuilds (wipes) the DB on every startup —
+> fine for dev, fatal on Railway. Move to validate + versioned migrations before deploy (step 5).
+> **Then (post-step-5): enable the OpenAI LLM** on the maxed+verified catalog (the deferred phase above).
 
 ### Further steps (post-HR-beta → full multi-market production)
 

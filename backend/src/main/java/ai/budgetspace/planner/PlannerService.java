@@ -1,6 +1,7 @@
 package ai.budgetspace.planner;
 
 import ai.budgetspace.dto.*;
+import ai.budgetspace.product.CatalogSourcePolicy;
 import ai.budgetspace.product.Markets;
 import ai.budgetspace.product.Product;
 import ai.budgetspace.product.ProductRepository;
@@ -1134,11 +1135,17 @@ public class PlannerService {
     }
 
     // Sprint 10.13 (#3): the catalog scoped to the request's market. A product with no market is
-    // treated as global (matches any market), so legacy/sample data and HR products keep working.
+    // treated as global (matches any market) so HR + global products keep working.
+    // Sprint 10.21+ (verified-only gate): the planner builds plans ONLY from production-eligible products
+    // (CatalogSourcePolicy.isPlannerEligible) — never legacy data.sql sample rows, needs-review rows, or a
+    // blocked retailer that wasn't fed. Stale rows still pass (they enter with a "check in store" note, so
+    // an aging catalog never silently empties). A room with no eligible products yields an empty/partial
+    // plan (honest) rather than placeholder data.
     private List<Product> marketCatalog(PlannerInputDto input) {
         String market = Markets.normalize(input == null ? null : input.market());
         List<Product> all = productRepository.findAll();
         return all.stream()
+                .filter(CatalogSourcePolicy::isPlannerEligible)
                 .filter(product -> product.getMarket() == null || product.getMarket().isBlank()
                         || product.getMarket().equalsIgnoreCase(market))
                 .toList();

@@ -354,6 +354,22 @@ class PlannerServiceTest {
         assertThat(siPlan.items()).extracting(item -> item.product().id()).contains("sofa-si", "tv-global").doesNotContain("sofa-hr");
     }
 
+    @Test
+    void sampleProductWithoutSourceReferenceIsExcludedFromPlan() {
+        // Verified-only gate (production integrity): a legacy data.sql-style row (no sourceReference) must
+        // never reach a user — even when it would otherwise win on price + rating — while an
+        // otherwise-weaker but properly-sourced product is served instead.
+        Product sample = product("sofa-sample", "Kauč bez izvora", "IKEA", "sofa", 480, 4.9);
+        sample.setSourceReference(null);   // legacy sample: no provenance
+        Product sourced = product("sofa-sourced", "Kauč provjereni", "IKEA", "sofa", 520, 4.4);
+
+        PlannerService service = serviceWithProducts(List.of(sample, sourced));
+        FurnishingPlanDto plan = service.generate(input("Imam 1500 € za dnevni boravak.")).plans().get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-sourced");
+        assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-sample");
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);
@@ -419,6 +435,10 @@ class PlannerServiceTest {
         product.setRating(rating);
         product.setInStock(true);
         product.setNote("Dobar omjer cijene i korisnosti.");
+        // Sprint 10.21+: the planner is now verified-only (CatalogSourcePolicy.isPlannerEligible), so a
+        // test product needs a real provenance to be selectable — mirrors an imported, web-verified row.
+        product.setSourceReference("test-catalog");
+        product.setSourceType("public-product-page");
         return product;
     }
 }

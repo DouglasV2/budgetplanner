@@ -86,6 +86,9 @@ class DesignAssistantServiceTest {
         product.setRating(4.5);
         product.setInStock(true);
         product.setNote("Dobar omjer cijene i korisnosti.");
+        // Sprint 10.21+: planner is verified-only — a selectable product needs a real provenance.
+        product.setSourceReference("test-catalog");
+        product.setSourceType("public-product-page");
         return product;
     }
 }

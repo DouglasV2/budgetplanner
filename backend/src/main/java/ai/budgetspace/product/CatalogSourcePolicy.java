@@ -156,9 +156,24 @@ public final class CatalogSourcePolicy {
      * NEEDS_REVIEW, STALE and sample products therefore never count as verified.
      */
     public static boolean isProductionVerified(Product product) {
+        return isPlannerEligible(product)
+                && !ProductTaxonomy.isStale(product == null ? null : product.getLastCheckedAt());
+    }
+
+    /**
+     * Sprint 10.21+ — the gate the <strong>planner</strong> uses to pick products: everything
+     * {@link #isProductionVerified} requires <em>except freshness</em>. A {@link ProductTaxonomy#isStale
+     * stale} row still enters the plan (the UI shows a "provjeri u trgovini" note), so an aging catalog
+     * never silently empties; freshness is handled by re-verification cadence, not by hiding products.
+     *
+     * <p>So this excludes exactly what must never reach a user: legacy {@code data.sql} sample rows (no
+     * {@code sourceReference}), {@code needs-review}/unavailable rows ({@link ProductTaxonomy#canEnterPlanner}),
+     * and any {@link SourcingStatus#OFFICIAL_FEED_REQUIRED} retailer that did not arrive via a feed
+     * (i.e. was never scraped past its block).</p>
+     */
+    public static boolean isPlannerEligible(Product product) {
         if (product == null) return false;
         if (!ProductTaxonomy.canEnterPlanner(product)) return false;
-        if (ProductTaxonomy.isStale(product.getLastCheckedAt())) return false;
         if (isBlank(product.getSourceReference())) return false;
         if (statusFor(product.getRetailer()) == SourcingStatus.OFFICIAL_FEED_REQUIRED) {
             return isFeedSourceType(product.getSourceType());
