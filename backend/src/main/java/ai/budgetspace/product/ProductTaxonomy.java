@@ -20,7 +20,13 @@ public final class ProductTaxonomy {
     public static final Set<String> SOURCE_TYPES = Set.of(
             "manual",
             "retailer-snapshot",
-            "future-scraper"
+            "future-scraper",
+            // Sprint 10.14: explicit import-source provenance (see CatalogSourcePolicy). Additive — the
+            // pre-10.14 values above stay valid; "retailer-snapshot" == historical "public-product-page".
+            CatalogSourcePolicy.SOURCE_MANUAL_VERIFIED,
+            CatalogSourcePolicy.SOURCE_PUBLIC_PRODUCT_PAGE,
+            CatalogSourcePolicy.SOURCE_OFFICIAL_FEED,
+            CatalogSourcePolicy.SOURCE_AFFILIATE_FEED
     );
 
     public static final Set<String> DATA_QUALITIES = Set.of(
@@ -150,6 +156,11 @@ public final class ProductTaxonomy {
 
     public static boolean isSupportedSourceType(String sourceType) {
         return normalizeSourceType(sourceType).isPresent();
+    }
+
+    /** The allowed source types as a stable, sorted, comma-separated string (for error messages). */
+    public static String supportedSourceTypesText() {
+        return SOURCE_TYPES.stream().sorted().collect(java.util.stream.Collectors.joining(", "));
     }
 
     public static Optional<String> normalizeDataQuality(String dataQuality) {

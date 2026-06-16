@@ -60,7 +60,11 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-emmezeta-hr.json",
             // Sprint 10.13 (#3, go-wide): first non-HR market — verified IKEA Slovenia (SI) catalog
             // across living-room, home-office, bedroom and kitchen (EUR prices + real review counts).
-            "/catalog/real-ikea-si.json"
+            "/catalog/real-ikea-si.json",
+            // Sprint 10.14 (go-wide): second EU market — verified IKEA Austria (AT) catalog across
+            // living-room, home-office, bedroom and kitchen. Prices verified per-market on ikea.com/at
+            // (they genuinely differ from HR/SI), reviews are the near-global aggregate. market="AT".
+            "/catalog/real-ikea-at.json"
     );
 
     private final ProductRepository productRepository;

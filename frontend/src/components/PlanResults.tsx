@@ -240,6 +240,21 @@ function productImage(product: Product) {
   return product.imageUrl || product.image || FALLBACK_IMAGES[product.category];
 }
 
+// Sprint 10.14: honesty about images. When the catalog has no real product image we fall back to a
+// generic category photo — we must never imply it is the actual product, so we flag it as an
+// illustration (alt text + a discreet chip). We never invent an imageUrl.
+function usesFallbackImage(product: Product) {
+  return !(product.imageUrl || product.image);
+}
+
+// Sprint 10.14: clearly show the market when a product is from another country's catalog (e.g. SI).
+// HR is the home market, so we keep it implicit to avoid noise.
+function marketBadge(product: Product) {
+  const market = (product.market || '').toUpperCase();
+  if (!market || market === 'HR') return '';
+  return market;
+}
+
 function handleProductImageError(event: SyntheticEvent<HTMLImageElement>, category: ProductCategory) {
   const fallback = FALLBACK_IMAGES[category];
   if (event.currentTarget.src !== fallback) {
@@ -636,9 +651,16 @@ export function PlanResults({
                   const expanded = expandedProductId === product.id;
                   const openUrl = productUrl(product);
                   const reviewsHref = reviewsUrl(product);
+                  const market = marketBadge(product);
+                  const illustration = usesFallbackImage(product);
                   return (
                     <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
-                      <img src={productImage(product)} alt="" loading="lazy" onError={(event) => handleProductImageError(event, product.category)} />
+                      <img
+                        src={productImage(product)}
+                        alt={illustration ? `${product.name} — ilustracija (nije stvarna fotografija proizvoda)` : product.name}
+                        loading="lazy"
+                        onError={(event) => handleProductImageError(event, product.category)}
+                      />
                       <div className="product-info">
                         <div className="product-title-line">
                           <strong>{product.name}</strong>
@@ -646,12 +668,18 @@ export function PlanResults({
                         </div>
                         <div className="meta-line">
                           <span>{product.retailer}</span>
+                          {market && <span title={`Tržište / katalog: ${market}`}>Tržište: {market}</span>}
                           <span>{categoryLabels[product.category]}</span>
                           <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
                           <span>{availabilityLabel(product)}</span>
                           {hasReviews(product) && (
                             <span className="review-chip" title="Prosječna ocjena i broj recenzija u trgovini (provjereno)">
                               {reviewSummary(product)}
+                            </span>
+                          )}
+                          {illustration && (
+                            <span title="Nemamo stvarnu fotografiju ovog proizvoda — prikazana je ilustracija kategorije.">
+                              ilustracija
                             </span>
                           )}
                           {product.originalPrice && <span>Akcija</span>}

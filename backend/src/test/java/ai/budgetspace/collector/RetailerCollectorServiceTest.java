@@ -162,6 +162,26 @@ class RetailerCollectorServiceTest {
     }
 
     @Test
+    void refusesFeedRequiredRetailersAndNeverFetches() {
+        ProductRepository repository = mock(ProductRepository.class);
+        // A fetcher that fails the test if it is ever called — proving we never even try to fetch.
+        ProductPageFetcher explodingFetcher = url -> {
+            throw new AssertionError("Collector must not fetch a feed-required retailer: " + url);
+        };
+        RetailerCollectorService service = service(explodingFetcher, repository);
+
+        for (String retailer : new String[] {"Decathlon", "Pevex", "Lesnina"}) {
+            CollectorRunSummaryDto summary = service.collect(
+                    new CollectorRequestDto(retailer, List.of("https://www." + retailer.toLowerCase() + ".hr/p/x"), defaults, null));
+
+            assertThat(summary.imported()).as("%s imported", retailer).isZero();
+            assertThat(summary.fetched()).as("%s fetched", retailer).isZero();
+            assertThat(summary.errors()).anySatisfy(error ->
+                    assertThat(error.message()).contains("OFFICIAL_FEED_REQUIRED"));
+        }
+    }
+
+    @Test
     void itemWithoutUrlIsRejected() {
         ProductRepository repository = mock(ProductRepository.class);
         RetailerCollectorService service = service(new FakeFetcher(Map.of()), repository);

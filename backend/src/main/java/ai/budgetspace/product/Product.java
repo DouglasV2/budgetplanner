@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 
@@ -110,7 +111,10 @@ public class Product {
     @Column(name = "affiliate_url", length = 700)
     private String affiliateUrl;
     // A sponsored product must be clearly labelled and never replace the best organic recommendation.
+    // ColumnDefault so the generated DDL has `default false`: legacy data.sql sample rows omit this
+    // column, and without a default PostgreSQL rejects the NOT NULL insert on startup.
     @Column(name = "is_sponsored", nullable = false)
+    @ColumnDefault("false")
     private boolean sponsored;
     @Column(name = "sponsor_label", length = 120)
     private String sponsorLabel;

@@ -338,7 +338,7 @@ public class ProductImportService {
             errors.add(error(rowNumber, externalId, "lastCheckedAt mora biti datum, npr. 2026-06-01 ili ISO vrijeme."));
         }
         if (hasText(dto.sourceType()) && ProductTaxonomy.normalizeSourceType(dto.sourceType()).isEmpty()) {
-            errors.add(error(rowNumber, externalId, "sourceType mora biti jedan od: manual, retailer-snapshot, future-scraper."));
+            errors.add(error(rowNumber, externalId, "sourceType mora biti jedan od: " + ProductTaxonomy.supportedSourceTypesText() + "."));
         }
         if (hasText(dto.dataQuality()) && ProductTaxonomy.normalizeDataQuality(dto.dataQuality()).isEmpty()) {
             errors.add(error(rowNumber, externalId, "dataQuality mora biti jedan od: complete, partial, needs-review."));

@@ -11,9 +11,12 @@ import ai.budgetspace.dto.CollectorRunSummaryDto;
 import ai.budgetspace.dto.ImportErrorDto;
 import ai.budgetspace.dto.ImportSummaryDto;
 import ai.budgetspace.dto.RetailerProductSnapshotDto;
+import ai.budgetspace.product.CatalogSourcePolicy;
 import ai.budgetspace.product.ProductRepository;
 import ai.budgetspace.product.ProductTaxonomy;
 import ai.budgetspace.product.RetailerSnapshotImportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -40,6 +43,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class RetailerCollectorService {
+    private static final Logger log = LoggerFactory.getLogger(RetailerCollectorService.class);
     private static final int MAX_URLS = 20;
 
     /**
@@ -104,6 +108,13 @@ public class RetailerCollectorService {
 
         if (retailerOpt.isEmpty()) {
             return rejected(runId, startedAt, retailer, totalReceived, "Trgovina nije podržana: " + request.retailer() + ".");
+        }
+        // Sprint 10.14: a feed-required retailer (403/WAF-blocked) must never be scraped/collected.
+        // We do not bypass the block — we refuse the run up front with a clear reason and log it.
+        if (CatalogSourcePolicy.isFeedRequired(retailer)) {
+            String message = retailer + " zahtijeva službeni feed (OFFICIAL_FEED_REQUIRED): " + CatalogSourcePolicy.reasonFor(retailer);
+            log.warn("Collector: odbijam direktno prikupljanje za feed-required trgovinu {} (run {}). {}", retailer, runId, message);
+            return rejected(runId, startedAt, retailer, totalReceived, message);
         }
         if (workItems.isEmpty()) {
             return rejected(runId, startedAt, retailer, 0, "Nema URL-ova za prikupljanje.");

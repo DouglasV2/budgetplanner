@@ -8,6 +8,18 @@ collector → review → import → catalog health → planner smoke test.
 > dopušta automatizirano dohvaćanje, **ne** koristi collector za tu trgovinu. Poštuj
 > `robots.txt` i ToS.
 
+> **Arhitektonsko pravilo (Sprint 10.14): 403 se ne rješava bypassom.** Vidi
+> [sourcing-policy.md](sourcing-policy.md). Trgovine koje vraćaju HTTP 403 su `OFFICIAL_FEED_REQUIRED`
+> i collector ih **odbija unaprijed** (s jasnim razlogom u logu) — ne pokušava dohvaćanje:
+> - **Decathlon** (`decathlon.hr`) — 403
+> - **Pevex** (`pevex.hr`) — 403
+> - **Lesnina** (`xxxlesnina.hr`) — 403
+>
+> Njih puni samo službeni/partnerski feed (`ai.budgetspace.feed`), koji je po defaultu nekonfiguriran
+> i tada se uvoz **čisto preskače**. `home-gym` ostaje na sample/manual podacima dok ne postoji
+> Decathlon feed. Dohvatljivi izvori: **IKEA** i **JYSK** (`DIRECT_VERIFIED`), **Emmezeta**
+> (`MANUAL_VERIFIED_ONLY`, samo link-out).
+
 ## Koraci
 
 ### 1. Odaberi jedan pack

@@ -12,6 +12,11 @@ services:
       DATABASE_USERNAME: budgetspace
       DATABASE_PASSWORD: budgetspace
       CORS_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      # Spring Boot DevTools auto-restart loops under a Docker bind mount (it watches target/classes,
+      # which mvn spring-boot:run itself rewrites) → the backend kept restarting and requests in that
+      # window failed with ERR_EMPTY_RESPONSE / "no Access-Control-Allow-Origin" in the browser. Keep
+      # LiveReload but turn off the restart loop; restart the container manually to pick up code changes.
+      SPRING_DEVTOOLS_RESTART_ENABLED: "false"
     ports:
       - "8080:8080"
     depends_on:
