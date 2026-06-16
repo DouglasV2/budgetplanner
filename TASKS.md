@@ -4,7 +4,21 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
 ## Recently done
 
-### Sprint 10.17 — HR depth (bathroom/hallway/kitchen) + second-hand marketplace design (current)
+### Sprint 10.18 — SI/AT/DE depth: bathroom + hallway + kitchen (current)
+- Ported the verified HR IKEA SKUs to **SI (+38), AT (+32), DE (+34)** = **+104** rows, filling the
+  bathroom/hallway/kitchen gap those markets had (~0 before). Files `real-ikea-{si,at,de}-rooms.json`.
+- **Number-trick** (swap `/hr/hr/` → `/si/sl/` · `/at/de/` · `/de/de/`, keep the trailing product number):
+  IKEA redirects to the market product; each row's **EUR price re-verified per market** on ikea.com/<cc>
+  and they genuinely differ — never copied across markets. Examples: NYSJÖN mirror cabinet 34.99 SI /
+  30 DE / 29.99 AT (39.99 HR); STENSTORP cart 229 SI / 149 DE; TORNVIKEN island 379 SI / 349 DE / 529 AT.
+- 3 background subagents (one per market); each ported the 38-SKU list, skipped category-redirect/
+  discontinued items (FRIHULT, TJUSIG-wall, NYMÅNE pendants didn't resolve in DE/AT; STENSTORP didn't in
+  AT). Spot-checked ~6 across markets on live pages — all matched. priceTier recomputed from price,
+  proof fields stripped, "Zadnji kosi" (last-pieces) SI items marked `limited`.
+- `EuRoomsDepthCatalogRuntimeTest` (0 import errors, every market covers bathroom/hallway/kitchen);
+  backend **119 tests, 0 failures**. Catalog snapshot files now **505 rows** (27 files).
+
+### Sprint 10.17 — HR depth (bathroom/hallway/kitchen) + second-hand marketplace design
 - HR **bathroom** depth — the thinnest room (2 → 16). +14 IKEA web-verified: NYSJÖN/ENHET/TÄNNFORSEN
   mirror cabinets + VILTO/STOREDAMM/MUSKAN/IVÖSJÖN/FRÖSJÖN shelf units (storage), KABOMBA/FRIHULT/
   LEDSJÖ/BARLAST lights, LINDBYN/NISSEDAL mirrors (decor; cross-tagged hallway). `real-hr-bathroom.json`.
@@ -67,9 +81,10 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
    `BUDGETSPACE_LLM_PROVIDER=openai`, `OPENAI_API_KEY=...` (backend env only). Verify `AiUsageTracker`
    caps (monthly USD / per-day / per-session). The rule-based path stays the fallback. Catalog depth
    is now sufficient to test prompts without burning keys on "no products" runs.
-2. **More catalog depth where thin.** HR bathroom/hallway/kitchen done in 10.17. **Next: SI/AT/DE
-   kitchen + hallway + bathroom** (currently ~0) via the IKEA number-trick + JSON-verified JYSK; then
-   raise per-market counts toward HR parity. Same rule: verify each on the live product page.
+2. **More catalog depth where thin.** HR bathroom/hallway/kitchen done in 10.17; SI/AT/DE
+   bathroom/hallway/kitchen (IKEA) done in 10.18. **Next:** JYSK SI/AT/DE kitchen/hallway (still
+   living-room/bedroom/dining/office only); Emmezeta-style HR retailers for more non-IKEA breadth; raise
+   per-market counts toward HR parity. Same rule: verify each on the live product page.
 3. **First real `RetailerFeed`.** When a Decathlon/Pevex/Lesnina official or affiliate feed is
    available, implement `RetailerFeed` (replaces the `ConfigBackedRetailerFeed` bean) → unlocks
    `home-gym` and removes the last sample-data dependency.

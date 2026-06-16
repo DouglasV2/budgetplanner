@@ -63,10 +63,10 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
 - `CatalogSourcePolicy.isProductionVerified(Product)` = the verified gate (canEnterPlanner AND not
   stale AND has sourceReference AND, if feed-required, came from a feed) → excludes NEEDS_REVIEW /
   STALE / sample. Full rules: [docs/sourcing-policy.md](docs/sourcing-policy.md).
-- **Markets with data**: HR (deep — every room incl. bathroom/hallway/kitchen), SI/AT/DE (IKEA + JYSK
-  depth: living-room/bedroom/dining/home-office; kitchen/hallway/bathroom still TODO). IT/FI/PL/CZ/HU/RO/
-  SE/DK exist in `Markets` but have **no catalog** → empty plan. JYSK/IKEA verified per market (prices
-  differ per country — never copied across markets). Emmezeta = HR only.
+- **Markets with data**: HR (deep — every room), SI/AT/DE (IKEA: living-room/bedroom/dining/home-office
+  **+ bathroom/hallway/kitchen** as of 10.18; JYSK: living-room/bedroom/dining/home-office only).
+  IT/FI/PL/CZ/HU/RO/SE/DK exist in `Markets` but have **no catalog** → empty plan. JYSK/IKEA verified per
+  market (prices differ per country — never copied across markets). Emmezeta = HR only.
 - **Second-hand marketplaces** (Njuškalo, FB Marketplace) are a designed-but-unbuilt future source —
   feed/API only (never scraped), with a sold/expired guard and a separate "Rabljeno" section. Design:
   [docs/marketplace-sourcing.md](docs/marketplace-sourcing.md).

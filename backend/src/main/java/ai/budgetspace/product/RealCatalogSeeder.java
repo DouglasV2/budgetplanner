@@ -94,7 +94,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // on the live public product page on 2026-06-16; sourceType=public-product-page.
             "/catalog/real-hr-bathroom.json",
             "/catalog/real-hr-hallway.json",
-            "/catalog/real-hr-kitchen-depth.json"
+            "/catalog/real-hr-kitchen-depth.json",
+            // Sprint 10.18: SI/AT/DE depth for bathroom + hallway + kitchen (previously ~0 there). Ported
+            // the verified HR IKEA SKUs to each market via IKEA's number-based URL redirect; the EUR price
+            // was re-verified per market on ikea.com/<cc> (prices genuinely differ, e.g. STENSTORP cart
+            // 229 SI vs 149 DE; TORNVIKEN island 379 SI vs 349 DE vs 529 AT) — never copied across markets.
+            "/catalog/real-ikea-si-rooms.json",
+            "/catalog/real-ikea-at-rooms.json",
+            "/catalog/real-ikea-de-rooms.json"
     );
 
     private final ProductRepository productRepository;
