@@ -31,11 +31,14 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
+      // Spread options FIRST, then headers — otherwise an options.headers (e.g. the session header on
+      // /api/plans/generate) overwrites the merged headers and drops Content-Type, so the browser sends
+      // text/plain and the backend rejects it (HttpMediaTypeNotSupportedException → 500).
+      ...options,
       headers: {
         'Content-Type': 'application/json',
         ...(options?.headers ?? {})
-      },
-      ...options
+      }
     });
   } catch {
     // Network/CORS failure: the backend is unreachable rather than returning an error status.
