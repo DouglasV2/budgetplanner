@@ -98,15 +98,31 @@ except home-gym** now produces a complete plan from real products with real URLs
   selector, market-aware `formatCurrency`, market wired into the generate request, and a
   "catalog still being populated" note for non-HR markets.
 
+## Sprint 10.13b (go-wide, done): verified reviews + IKEA Slovenia market + market detection
+
+- **Reviews now populated (verified, no fabrication):** added display-only `reviewRating` (avg star)
+  next to `reviewCount`, kept separate from the planner's internal `rating` (no ranking/test impact).
+  Verified rating + count on ~45 IKEA HR + JYSK HR products across every room (rooms-expansion, depth,
+  jysk-new-rooms, living-room-expansion, and 11 living-room heroes), checked on ikea.com/hr and
+  jysk.hr 2026-06-16. IKEA uses a near-global aggregate (HR ≈ SI counts).
+- **First non-HR market:** `real-ikea-si.json` — 11 verified IKEA Slovenia products (EUR prices from
+  ikea.com/si, `market=SI`, review data). Prices genuinely differ from HR, so each was verified.
+- **Market detection:** browser-locale default for the selector + prompt city/country detection that
+  auto-switches the market with a reversible note. Selector stays authoritative; HR is the fallback.
+- **Confirmed blocked:** decathlon.hr / pevex.hr / xxxlesnina.hr return HTTP 403 even on the homepage
+  (edge/WAF bot block). Need an official/partner feed; home-gym stays on sample data.
+
 ### What's next
 
-1. **Verified review data**: the reviews UI is fully wired but invisible until products carry a real
-   `reviewCount`/`reviewsUrl`. Populate from an official feed/partner data — do not scrape or guess.
-2. **Per-market catalogs**: real catalog products are currently `market="HR"`; other EU markets get
-   only global/sample products. The selector intentionally offers **EUR markets only** (prices are in
-   EUR). Add verified per-market catalogs (and currency-correct data) before enabling non-EUR markets.
+1. **Widen review data further**: the long tail of the 71-row living-room catalog and a few variants
+   (GURLI, BESTÅ, LACK-118) still lack aggregates and rely on the store link. Backfill from an official
+   feed when available — never scrape or guess. Review counts also drift, so refresh `lastCheckedAt`.
+2. **More per-market catalogs**: SI is live; AT and DE are also fetchable on ikea.com (verified
+   reachable). Build verified AT/DE catalogs next. The selector still offers **EUR markets only**
+   (prices are EUR); a non-EUR market needs its own currency-correct catalog first.
 3. **Fuller i18n**: only high-visibility strings are translated (header, generate button, pricing,
-   market note, planner heading). Extend the dictionary to the rest of the planner copy.
+   market notes, planner heading). Extend the dictionary to the rest of the planner copy; some catalog
+   free-text (delivery notes) is still per-source language.
 4. **Unblock retailers**: get an official feed / partner access for Decathlon, Pevex, Lesnina (and
    thus home-gym), instead of HTML fetching that returns 403.
 5. **Expand depth**: more products per category/colour/material/budget tier; richer bedroom/home-office

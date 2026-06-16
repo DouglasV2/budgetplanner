@@ -19,6 +19,7 @@ rating          number
 inStock         boolean
 note            short recommendation note
 reviewCount     number nullable   (Sprint 10.13 #2 — aggregate shown only when present)
+reviewRating    number nullable   (Sprint 10.13 #2 — verified avg star, display-only, separate from `rating`)
 reviewsUrl      URL nullable      (Sprint 10.13 #2 — falls back to product URL)
 market          string nullable   (Sprint 10.13 #3 — e.g. HR/SI/AT/DE; null = global, visible on all markets)
 ```

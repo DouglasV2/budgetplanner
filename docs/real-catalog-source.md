@@ -49,6 +49,7 @@ JSON lista proizvoda. Polja:
 | `lastCheckedAt` | ne | Datum (`2026-06-01`) ili ISO vrijeme. Mora biti parsabilan ako postoji. |
 | `priceTier` | ne | `budget`, `standard`, `premium`. Inače se izračuna iz cijene. |
 | `reviewCount` | ne | Sprint 10.13 (#2). Broj recenzija u trgovini. Prikaže se agregat tek kad je zadan — ocjene se ne izmišljaju. |
+| `reviewRating` | ne | Sprint 10.13 (#2). Prosječna ocjena (npr. 4.6), samo za prikaz. Odvojeno od internog `rating` koji koristi planer, pa prikaz recenzija ne mijenja rangiranje. |
 | `reviewsUrl` | ne | Sprint 10.13 (#2). Link na recenzije; ako fali, UI koristi `productUrl`. |
 | `market` | ne | Sprint 10.13 (#3). Tržište/država (`HR`, `SI`, `AT`, `DE`…). Prazno = globalno (vidi se na svim tržištima). Default `HR` pri importu. |
 
@@ -76,9 +77,9 @@ Dodajemo trgovine **samo kad možemo provjeriti naziv, cijenu i URL**. Ne izmiš
 
 | Trgovina | Status | Napomena |
 | --- | --- | --- |
-| IKEA | ✅ verificirano | Cijene se daju web-provjeriti (raniji „no price” slučajevi su ugašeni proizvodi). |
-| JYSK | ✅ verificirano | Pokriva većinu soba u HR. |
-| Emmezeta | ✅ verificirano | `real-emmezeta-hr.json` (4 provjerena proizvoda). |
+| IKEA | ✅ verificirano | Cijene se daju web-provjeriti (raniji „no price” slučajevi su ugašeni proizvodi). Recenzije (ocjena + broj) provjerene i napunjene 2026-06-16. Dostupna i druga tržišta (SI live, AT/DE dohvatljivi). |
+| JYSK | ✅ verificirano | Pokriva većinu soba u HR. Recenzije provjerene i napunjene 2026-06-16. |
+| Emmezeta | ✅ verificirano | `real-emmezeta-hr.json` (4 provjerena proizvoda). Stranice ne prikazuju ocjene → samo link na trgovinu. |
 | Decathlon | ⛔ blokirano | Stranice vraćaju HTTP 403 na naš fetch → cijene/URL-ovi neprovjerljivi. Treba službeni feed/partner. Zbog toga home-gym ostaje na sample podacima. |
 | Pevex | ⛔ blokirano | HTTP 403, isto kao gore. |
 | Lesnina (xxxlesnina.hr) | ⛔ blokirano | HTTP 403, isto kao gore. |
@@ -88,10 +89,17 @@ Blokirane trgovine ulaze tek kad dobiju isti JSON oblik iz službenog feeda/part
 
 ## Tržišta i prijevodi (Sprint 10.13, #3)
 
-`market` na proizvodu određuje na kojem se tržištu vidi i u kojoj se valuti prikazuje. Trenutno su
-svi pravi proizvodi `HR` (EUR); ostala EU tržišta zato dobivaju samo globalne/sample proizvode.
-Frontend zato u biraču nudi **samo EUR tržišta** i prikazuje napomenu da se katalog za tu državu još
-puni. Prije uključivanja ne-EUR tržišta treba dodati verificirane kataloge s ispravnom valutom.
+`market` na proizvodu određuje na kojem se tržištu vidi i u kojoj se valuti prikazuje. HR je glavno
+tržište; **Slovenija (SI) je prvo ne-HR tržište** s vlastitim verificiranim katalogom
+(`real-ikea-si.json`, IKEA SI, cijene u EUR provjerene na ikea.com/si — primjetno se razlikuju od HR).
+Ostala EU tržišta zasad dobivaju globalne/sample proizvode uz SI/HR. Frontend u biraču nudi **samo EUR
+tržišta** i prikazuje napomenu da se katalog za državu još puni ako za nju nema vlastitog kataloga.
+Prije uključivanja ne-EUR tržišta treba dodati verificirane kataloge s ispravnom valutom.
+
+Država se bira na tri načina (Sprint 10.13b): (1) biraču u headeru, koji se inicijalizira iz
+preglednikove regije; (2) automatski iz prompta — ako korisnik spomene grad/državu (npr. „u
+Ljubljani”), tržište se prebaci uz povratnu napomenu; (3) fallback je HR. Birač je uvijek izvor istine
+i korisnik može vratiti odabir.
 
 ## Import preko curl-a
 
