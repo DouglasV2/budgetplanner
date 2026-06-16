@@ -101,7 +101,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // 229 SI vs 149 DE; TORNVIKEN island 379 SI vs 349 DE vs 529 AT) — never copied across markets.
             "/catalog/real-ikea-si-rooms.json",
             "/catalog/real-ikea-at-rooms.json",
-            "/catalog/real-ikea-de-rooms.json"
+            "/catalog/real-ikea-de-rooms.json",
+            // Sprint 10.19: JYSK SI/AT/DE hallway + kitchen depth (those markets previously had JYSK only
+            // for living-room/bedroom/dining/office). SI + DE verified on jysk.si/jysk.de. JYSK AT was
+            // SKIPPED: jysk.at single-product pages gate stock behind JS and render "Vorübergehend
+            // ausverkauft" in the static HTML WebFetch sees, so availability can't be honestly confirmed
+            // (needs an official feed/API or headless render — out of scope). See catalog-sourcing notes.
+            "/catalog/real-jysk-si-rooms.json",
+            "/catalog/real-jysk-de-rooms.json"
     );
 
     private final ProductRepository productRepository;

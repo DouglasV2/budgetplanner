@@ -24,14 +24,15 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-16)
-- Backend tests: **119 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
-- Catalog snapshot files: **505 web-verified rows** across 27 files (seeded total ~555 incl. data.sql
-  samples). IKEA is now the bulk (≈330). Sprint 10.17 added +51 (HR bathroom/hallway/kitchen); Sprint
-  10.18 added +104 (SI 38, AT 32, DE 34 — bathroom/hallway/kitchen ported from HR IKEA SKUs).
+- Backend tests: **120 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
+- Catalog snapshot files: **549 web-verified rows** across 29 files (seeded total ~600 incl. data.sql
+  samples). IKEA is the bulk (≈330). Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
+  bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI 19 + DE 25 hallway/kitchen).
 - **Markets with real catalog: HR (deep — all rooms), SI, AT, DE.** SI/AT/DE cover living-room +
-  bedroom + dining + home-office **and now bathroom + hallway + kitchen** (IKEA; JYSK depth still
-  living-room/bedroom/dining/office only — JYSK SI/AT/DE kitchen/hallway is the next gap). Per-market
-  prices verified individually (they genuinely
+  bedroom + dining + home-office + bathroom + hallway + kitchen (IKEA). JYSK now also covers
+  hallway/kitchen for **SI + DE** (not AT — jysk.at gates stock behind JS, "Vorübergehend ausverkauft"
+  in static HTML → can't confirm availability; needs feed/API). Per-market prices verified individually
+  (they genuinely
   differ: KALLAX 169 DE / 189 AT / 199 SI / 179 HR). Other countries in `Markets` (IT/FI/PL/CZ/HU/RO/
   SE/DK) have **no catalog** → empty plan (expected).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):

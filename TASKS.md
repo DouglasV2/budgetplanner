@@ -4,7 +4,21 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
 ## Recently done
 
-### Sprint 10.18 — SI/AT/DE depth: bathroom + hallway + kitchen (current)
+### Sprint 10.19 — JYSK SI/DE hallway + kitchen depth (current)
+- **JYSK SI (+19), DE (+25)** = +44 verified rows: hallway shoe storage / coat racks / benches / hall
+  mirrors / rugs + kitchen carts & wall shelves (those markets previously had JYSK only for
+  living-room/bedroom/dining/office). Files `real-jysk-{si,de}-rooms.json`.
+- Web-verified on jysk.si / jysk.de single-product pages (name + EUR price + reviews); per-market prices
+  differ (BAKHUSE shoe cabinet 65 SI vs 50 DE; ALLESHAVE 42.5 SI vs 40 DE). priceTier recomputed from
+  price; colour-suffixed URLs that bounce to a category were skipped.
+- **JYSK AT skipped (honest):** jysk.at gates per-product stock behind JavaScript — every single-product
+  page renders "Vorübergehend ausverkauft" in the static HTML WebFetch sees (category pages show
+  name+price but no stock). Availability can't be confirmed without a feed/API or headless render →
+  coverage not forced. Documented for a future feed/headless pass.
+- `JyskEuRoomsCatalogRuntimeTest` (0 import errors); backend **120 tests, 0 failures**. Catalog snapshot
+  files now **549 rows** (29 files).
+
+### Sprint 10.18 — SI/AT/DE depth: bathroom + hallway + kitchen
 - Ported the verified HR IKEA SKUs to **SI (+38), AT (+32), DE (+34)** = **+104** rows, filling the
   bathroom/hallway/kitchen gap those markets had (~0 before). Files `real-ikea-{si,at,de}-rooms.json`.
 - **Number-trick** (swap `/hr/hr/` → `/si/sl/` · `/at/de/` · `/de/de/`, keep the trailing product number):
@@ -81,10 +95,11 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
    `BUDGETSPACE_LLM_PROVIDER=openai`, `OPENAI_API_KEY=...` (backend env only). Verify `AiUsageTracker`
    caps (monthly USD / per-day / per-session). The rule-based path stays the fallback. Catalog depth
    is now sufficient to test prompts without burning keys on "no products" runs.
-2. **More catalog depth where thin.** HR bathroom/hallway/kitchen done in 10.17; SI/AT/DE
-   bathroom/hallway/kitchen (IKEA) done in 10.18. **Next:** JYSK SI/AT/DE kitchen/hallway (still
-   living-room/bedroom/dining/office only); Emmezeta-style HR retailers for more non-IKEA breadth; raise
-   per-market counts toward HR parity. Same rule: verify each on the live product page.
+2. **More catalog depth where thin.** HR bathroom/hallway/kitchen (10.17); SI/AT/DE bathroom/hallway/
+   kitchen IKEA (10.18); JYSK SI/DE hallway/kitchen (10.19). **Next:** new EU markets IKEA/JYSK (IT, FI —
+   EUR; in progress 10.20); JYSK AT hallway/kitchen once jysk.at stock is feed/headless-readable;
+   Emmezeta-style HR retailers for more non-IKEA breadth. Non-EUR EU markets (PL/CZ/HU/RO/SE/DK) need
+   currency-correct UI first (frontend offers EUR only) — defer. Same rule: verify each live.
 3. **First real `RetailerFeed`.** When a Decathlon/Pevex/Lesnina official or affiliate feed is
    available, implement `RetailerFeed` (replaces the `ConfigBackedRetailerFeed` bean) → unlocks
    `home-gym` and removes the last sample-data dependency.
