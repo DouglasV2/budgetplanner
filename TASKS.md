@@ -2,6 +2,60 @@
 
 Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
+## Road to production (sequenced — added 2026-06-16)
+
+Goal path: **controlled HR beta first**, then full multi-market launch. Catalog + tests + architecture
+are solid; the work to production is data freshness, AI enablement, market/UX exposure and prod hardening
+— not core code. Do the 5 steps in order; check off as done.
+
+### Next 5 steps (toward a HR beta)
+
+1. **[ ] Planner verified-only gate (catalog integrity end-to-end).** Make `PlannerService` build plans
+   only from `CatalogSourcePolicy.isProductionVerified` products. For rooms with a verified catalog, never
+   serve `data.sql` sample rows; for rooms without one (e.g. `home-gym`), show an honest empty-state
+   ("još nemamo provjerene proizvode za ovu sobu") instead of placeholders. Recalibrate planner tests.
+   *Done when:* no sample/needs-review/stale row can appear in any plan; home-gym degrades gracefully; tests green.
+2. **[ ] Enable OpenAI LLM with enforced cost caps** (needs `OPENAI_API_KEY` from the owner — backend env
+   only, never committed). Set `BUDGETSPACE_AI_ENABLED=true`, `BUDGETSPACE_LLM_PROVIDER=openai`. Verify
+   `AiUsageTracker` monthly-USD + per-day + per-session caps actually block past the limit, and that the
+   rule-based path fires on every failure (timeout, bad JSON, network, cap hit). Measure prompt→`PlannerInputDto`
+   quality + token cost on the rich catalog using the manual test prompts. *Done when:* AI improves prompt
+   understanding, never exceeds caps, always falls back cleanly; no key in repo/logs/`.env.example`.
+3. **[ ] HR data freshness / re-verification before launch.** Re-verify prices + availability for the HR
+   catalog (the beta market); flip confirmed rows `partial → complete`, mark drifted/vanished ones
+   `needs-review`. Use/extend `CatalogHealthService` for a stale-rows report + a re-check cadence. Dedupe the
+   6 duplicate `productUrl`s (#10b below). *Done when:* HR catalog is fresh + `complete` where verified, with a documented re-check cadence.
+4. **[ ] HR launch UX + observability.** Run the app and do a UX pass: plan quality, market badge, honest
+   "ilustracija" image labels + disclaimers, store-link correctness. Wire basic analytics (the product-click /
+   plan-feedback endpoints already exist) + error monitoring + structured plan-generation logging. Decide the
+   image strategy (verified images for top items OR keep the labelled placeholder — never fabricate URLs).
+   *Done when:* the HR flow is polished, instrumented and observable.
+5. **[ ] Security review + deploy infra + go-live checklist (HR beta).** Run a security review (keys backend-only,
+   CORS, admin-endpoint guard active in prod, no secrets in logs/`.env.example`, input validation). Stand up
+   production deployment: hosting, env-based config for keys/feeds, **switch DB off `ddl-auto=create`** (it
+   wipes the schema every start — add Flyway/Liquibase migrations + backups), CI/CD, HTTPS. Legal/GDPR for a
+   HR consumer app + affiliate/sponsored disclosure copy. *Done when:* a controlled HR beta can go live safely.
+
+> ⚠️ **Hard prod blocker to remember:** `spring.jpa.hibernate.ddl-auto=create` rebuilds (wipes) the DB on
+> every startup — fine for dev, fatal for prod. Must move to validate + versioned migrations before any
+> real deployment (folded into step 5).
+
+### Further steps (post-HR-beta → full multi-market production)
+
+- **Expose + localize EU markets**: flip `available:true` in `frontend/src/markets.ts` for SI/AT/DE/IT/FI and
+  translate the non-HR UI (currently `lang:'en'`); confirm per-market currency formatting end-to-end.
+- **Full-catalog re-verification** near launch (all 6 markets, ~665 rows) — same freshness rule as step 3.
+- **First real `RetailerFeed`** (Decathlon/Pevex/Lesnina) → unlocks `home-gym` and retires the last sample
+  dependency (`ai.budgetspace.feed` seam already exists; never scrape).
+- **Marketplace Phase 2 + 3**: a `MarketplaceFeed` over a compliant Njuškalo/FB API/export (rows →
+  `sourceType=marketplace-listing`, each run through `MarketplaceListingFilter`), then the separate "Rabljeno"
+  UI section + buyer-beware copy; used items stay out of the new-retail plan total.
+- **Verified product images pipeline** (image-verification field; only show real images when verified, else
+  keep the labelled placeholder).
+- **Monetization live**: affiliate-click analytics + discreet sponsored labelling (never displaces best organic).
+- **Non-EUR markets** (PL/CZ/HU/RO/SE/DK) once the UI handles their currency correctly.
+- **Scale/perf**: load test, query/caching review, CDN for assets.
+
 ## Recently done
 
 ### Sprint 10.21 — second-hand marketplace Phase 1 (scaffold, no feed) (current)
