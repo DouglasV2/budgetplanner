@@ -87,7 +87,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-hr-kitchen.json",
             "/catalog/real-harvey-norman.json",
             "/catalog/real-namjestaj-hr.json",
-            "/catalog/real-de-new-retailers.json"
+            "/catalog/real-de-new-retailers.json",
+            // Sprint 10.17: HR depth for the thinnest rooms — bathroom (IKEA storage/lighting/decor),
+            // hallway (IKEA/JYSK/Emmezeta shoe storage, racks, benches, rugs, mirrors) and more kitchen
+            // depth (IKEA carts/rails/pendants + Emmezeta cabinets). Each row name + EUR price verified
+            // on the live public product page on 2026-06-16; sourceType=public-product-page.
+            "/catalog/real-hr-bathroom.json",
+            "/catalog/real-hr-hallway.json",
+            "/catalog/real-hr-kitchen-depth.json"
     );
 
     private final ProductRepository productRepository;

@@ -4,7 +4,27 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
 ## Recently done
 
-### Sprint 10.16 — HR kitchen + retailer expansion (current)
+### Sprint 10.17 — HR depth (bathroom/hallway/kitchen) + second-hand marketplace design (current)
+- HR **bathroom** depth — the thinnest room (2 → 16). +14 IKEA web-verified: NYSJÖN/ENHET/TÄNNFORSEN
+  mirror cabinets + VILTO/STOREDAMM/MUSKAN/IVÖSJÖN/FRÖSJÖN shelf units (storage), KABOMBA/FRIHULT/
+  LEDSJÖ/BARLAST lights, LINDBYN/NISSEDAL mirrors (decor; cross-tagged hallway). `real-hr-bathroom.json`.
+- HR **hallway** depth (+23): IKEA TRONES/BISSA/STÄLL/MACKAPÄR shoe storage, TJUSIG/NIPÅSEN racks+bench,
+  NISSEDAL mirrors, LOHALS/MORUM rugs, NYMÅNE light; JYSK BELLE/VANDSTED/CIRKELHUSE/EGTVED/OLDEKROG +
+  SANDFIOL rug; Emmezeta Sawa/Anter/Valencia. `real-hr-hallway.json`.
+- HR **kitchen** depth (+14): IKEA NYMÅNE pendants, HULTARP/KUNGSFORS rails+grids, STENSTORP/TORNVIKEN/
+  BROR/LOSHULT carts; Emmezeta Magnolia/Modena/Grey/Clara cabinets. `real-hr-kitchen-depth.json`.
+- Each row web-verified on its **live public product page** on 2026-06-16 (`sourceType=public-product-page`,
+  no fabrication); clearance ("Zadnja prilika za kupnju") items dropped so links don't die. Discovery via
+  `WebSearch` (allowed_domains) → `WebFetch` category page → `WebFetch` each `/p/` page (fanned out 2
+  subagents for hallway/kitchen, spot-checked the results).
+- `HrDepthCatalogRuntimeTest` (0 import errors over the 3 files); backend **118 tests, 0 failures**.
+- **Second-hand marketplace section — designed** (design-first, no code yet):
+  [docs/marketplace-sourcing.md](docs/marketplace-sourcing.md). Feed/API model (Njuškalo/FB are
+  `OFFICIAL_FEED_REQUIRED`, never scraped), new `marketplace-listing` provenance + `second-hand` flag,
+  an aggressive **sold/expired guard** (drop `PRODANO`/reserved/dead listings on ingest + 24h freshness),
+  a separate "Rabljeno" UI section, no affiliate/sponsored on used items.
+
+### Sprint 10.16 — HR kitchen + retailer expansion
 - HR **kitchen** depth (+15: IKEA/JYSK/Emmezeta — carts, wall storage, pendants).
 - **New verified retailers** (web-verified products): Harvey Norman (HR 9 + SI 6), Namjestaj.hr (HR 9),
   Otto (DE 6), Segmüller (DE 6), Poco (DE 2). Catalog now ~493 products.
@@ -47,8 +67,9 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
    `BUDGETSPACE_LLM_PROVIDER=openai`, `OPENAI_API_KEY=...` (backend env only). Verify `AiUsageTracker`
    caps (monthly USD / per-day / per-session). The rule-based path stays the fallback. Catalog depth
    is now sufficient to test prompts without burning keys on "no products" runs.
-2. **More catalog depth where thin.** Per market: more sofas/tv-units/rugs/decor; kitchen + hallway +
-   bathroom coverage for SI/AT/DE; raise per-market counts toward HR parity. Same rule: verify each.
+2. **More catalog depth where thin.** HR bathroom/hallway/kitchen done in 10.17. **Next: SI/AT/DE
+   kitchen + hallway + bathroom** (currently ~0) via the IKEA number-trick + JSON-verified JYSK; then
+   raise per-market counts toward HR parity. Same rule: verify each on the live product page.
 3. **First real `RetailerFeed`.** When a Decathlon/Pevex/Lesnina official or affiliate feed is
    available, implement `RetailerFeed` (replaces the `ConfigBackedRetailerFeed` bean) → unlocks
    `home-gym` and removes the last sample-data dependency.
@@ -60,10 +81,18 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
    sourced — then retire `data.sql` sample fallback. Recalibrate planner tests.
 7. **Refresh `dataQuality`** from `partial` → re-verify prices/stock before a real production launch.
 8. Add more EU markets (IT/FI/PL/…) only when their catalog is sourced (else they return empty plans).
-9. **Second-hand marketplace section (Njuškalo, FB Marketplace).** New source model: user-listed,
-   no stable catalog, ToS + anti-bot constraints → treat as a feed/API integration (NOT scraping), and
-   likely a separate UI section ("rabljeno / second-hand") with its own freshness + trust handling.
-   Probably a new `sourceType` (e.g. `marketplace-listing`) and a clear "used item" label. Design first.
+9. **Second-hand marketplace section (Njuškalo, FB Marketplace).** ✅ **Designed in 10.17** —
+   [docs/marketplace-sourcing.md](docs/marketplace-sourcing.md) (feed/API not scraping; `marketplace-listing`
+   provenance + `second-hand` flag; sold/expired guard; separate "Rabljeno" UI). **Next = Phase 1 build:**
+   data-model columns + `marketplace-listing` in `SOURCE_TYPES` + `MarketplaceListingFilter` (SOLD_MARKERS
+   + 24h freshness) + tests, behind an unconfigured feed (imports nothing) — same scaffold-first approach
+   as 10.14. Phase 2 = integrate a compliant Njuškalo feed if/when one exists.
+
+10b. **Catalog hygiene: dedupe duplicate productUrls.** 6 pre-existing rows (from sprints ≤10.16) point
+   the same retailer URL under two `externalId`s (e.g. JYSK KANSTRUP carts in both `real-hr-kitchen.json`
+   and `real-jysk-hr-new-rooms.json`; TRAPPEDAL; a JYSK madrac/lamp/noćni ormarić). Both import as
+   separate rows → redundant catalog entries. Pick one `externalId` per URL and drop the other; add a
+   build-time guard test against duplicate productUrls. Not introduced by 10.17 (its 51 rows add 0 dup URLs).
 10. **Bring blocked retailers online via feeds.** The big chains we probed (Otto beyond rate-limits,
    Wayfair, Home24, Roller, XXXLutz/Kika/Leiner, Momax, Bauhaus, FeroTerm, Lesnina, Decathlon, Pevex,
    Merkur, Dipo) are registered as feed-required — integrate an official/affiliate feed per the

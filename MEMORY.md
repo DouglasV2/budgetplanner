@@ -24,10 +24,13 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-16)
-- Backend tests: **117 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x).
-- Catalog after seeding: **~493 products** — IKEA ≈188, JYSK ≈149, plus Emmezeta + new retailers + samples.
-- **Markets with real catalog: HR (deep, incl. kitchen), SI, AT, DE.** SI/AT/DE cover living-room +
-  bedroom + dining + home-office (IKEA + JYSK). Per-market prices verified individually (they genuinely
+- Backend tests: **118 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
+- Catalog after seeding: **~544 products** (catalog JSON files now 401 rows + data.sql samples) — IKEA
+  ≈226, JYSK ≈155, plus Emmezeta + new retailers + samples. Sprint 10.17 added +51 (HR bathroom 14,
+  hallway 23, kitchen +14).
+- **Markets with real catalog: HR (deep — ALL rooms incl. bathroom/hallway/kitchen), SI, AT, DE.**
+  SI/AT/DE cover living-room + bedroom + dining + home-office (IKEA + JYSK) but **still lack
+  kitchen/hallway/bathroom** (next sprint). Per-market prices verified individually (they genuinely
   differ: KALLAX 169 DE / 189 AT / 199 SI / 179 HR). Other countries in `Markets` (IT/FI/PL/CZ/HU/RO/
   SE/DK) have **no catalog** → empty plan (expected).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
@@ -37,9 +40,11 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
     Home24, Roller, Kika, Leiner, XXXLutz. (Most big chains are bot-blocked — confirmed by probing.)
   - `home-gym` still relies on sample data (needs a Decathlon feed).
-- **Marketplace idea (backlog):** second-hand marketplaces (Njuškalo, FB Marketplace) as a future
-  source — different model (user-listed, no stable catalog, ToS/anti-bot) → treat like a feed
-  integration, not scraping. See `TASKS.md`.
+- **Second-hand marketplace (Njuškalo, FB Marketplace): designed in 10.17** →
+  `docs/marketplace-sourcing.md`. Feed/API model (never scrape; both are `OFFICIAL_FEED_REQUIRED`), new
+  `marketplace-listing` provenance + `second-hand` flag, aggressive sold/expired guard (drop
+  `PRODANO`/reserved/dead listings on ingest + 24h freshness, prune when gone from the feed), separate
+  "Rabljeno" UI section, no affiliate/sponsored on used. Build is Phase 1 (scaffold, no data) — see `TASKS.md`.
 - App runs via `docker compose up`: frontend **:5180**, backend **:8090**, postgres :5432. After
   `docker compose up`, wait for the seed to finish (log "Real catalog seed: done") before the first
   plan request — a request mid-seed can return 0 items (race, not a bug).
