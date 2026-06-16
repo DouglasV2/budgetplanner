@@ -18,8 +18,10 @@ services:
       # window failed with ERR_EMPTY_RESPONSE / "no Access-Control-Allow-Origin" in the browser. Keep
       # LiveReload but turn off the restart loop; restart the container manually to pick up code changes.
       SPRING_DEVTOOLS_RESTART_ENABLED: "false"
+    # Expose the backend on host port 8090 (container still serves on 8080). 8080 is a commonly
+    # occupied port; 8090 keeps the API on a clean, predictable port. The browser calls :8090.
     ports:
-      - "8080:8080"
+      - "8090:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,7 +36,8 @@ services:
     # Serve on 5180 (host and container) to avoid a stale process already holding 5173 on Windows.
     command: sh -c "npm install --registry=https://registry.npmjs.org --include=dev --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 5180"
     environment:
-      VITE_API_BASE_URL: http://localhost:8080
+      # Must match the backend's host port above (8090); this is the URL the browser calls.
+      VITE_API_BASE_URL: http://localhost:8090
     ports:
       - "5180:5180"
     depends_on:
