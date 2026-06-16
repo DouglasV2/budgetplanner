@@ -116,10 +116,14 @@ public class Product {
     private String sponsorLabel;
 
     // --- Sprint 10.13 (#2): reviews. We never fabricate review text; we store the retailer's
-    // aggregate (count) when a feed provides it and always link out to the product page where the
-    // real reviews live. reviewCount null = unknown. ---
+    // aggregate (count + average star) when a feed/page provides it and always link out to the
+    // product page where the real reviews live. reviewCount/reviewRating null = unknown.
+    // NOTE: reviewRating is display-only and intentionally separate from `rating` (the planner's
+    // internal heuristic), so showing verified stars never changes plan ranking. ---
     @Column(name = "review_count")
     private Integer reviewCount;
+    @Column(name = "review_rating")
+    private Double reviewRating;
     @Column(name = "reviews_url", length = 700)
     private String reviewsUrl;
 
@@ -197,6 +201,8 @@ public class Product {
     public void setSponsorLabel(String sponsorLabel) { this.sponsorLabel = sponsorLabel; }
     public Integer getReviewCount() { return reviewCount; }
     public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
+    public Double getReviewRating() { return reviewRating; }
+    public void setReviewRating(Double reviewRating) { this.reviewRating = reviewRating; }
     public String getReviewsUrl() { return reviewsUrl; }
     public void setReviewsUrl(String reviewsUrl) { this.reviewsUrl = reviewsUrl; }
     public String getMarket() { return market; }

@@ -43,7 +43,10 @@ public record RetailerProductSnapshotDto(
         // Sprint 10.13: optional reviews aggregate (#2) and market/country (#3).
         Integer reviewCount,
         String reviewsUrl,
-        String market
+        String market,
+        // Sprint 10.13 (#2, go-wide): verified average star rating for display only (separate from the
+        // planner's internal `rating`). Null = unknown.
+        Double reviewRating
 ) {
     /**
      * Backwards-compatible constructor for snapshots prepared before Sprint 10.7. Colour/material,
@@ -58,6 +61,6 @@ public record RetailerProductSnapshotDto(
     ) {
         this(externalId, name, retailer, category, price, productUrl, imageUrl, availabilityStatus,
                 deliveryNote, lastCheckedAt, roomTags, styleTags, priceTier, sourceType, sourceName,
-                sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null);
+                sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null);
     }
 }

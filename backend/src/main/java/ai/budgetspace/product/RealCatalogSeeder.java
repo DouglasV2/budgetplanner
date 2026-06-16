@@ -57,7 +57,10 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Sprint 10.12: catalog depth — lighting, rugs, decor, extra chairs/mattress across rooms.
             "/catalog/real-ikea-jysk-hr-depth.json",
             // Sprint 10.13: third HR retailer — verified Emmezeta products (living-room + bedroom).
-            "/catalog/real-emmezeta-hr.json"
+            "/catalog/real-emmezeta-hr.json",
+            // Sprint 10.13 (#3, go-wide): first non-HR market — verified IKEA Slovenia (SI) catalog
+            // across living-room, home-office, bedroom and kitchen (EUR prices + real review counts).
+            "/catalog/real-ikea-si.json"
     );
 
     private final ProductRepository productRepository;

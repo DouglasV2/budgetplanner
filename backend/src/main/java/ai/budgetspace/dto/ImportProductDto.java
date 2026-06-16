@@ -43,7 +43,10 @@ public record ImportProductDto(
         // Sprint 10.13: optional reviews aggregate (#2) and market/country (#3).
         Integer reviewCount,
         String reviewsUrl,
-        String market
+        String market,
+        // Sprint 10.13 (#2, go-wide): verified average star rating, display only (separate from the
+        // planner's internal `rating`). Null = unknown.
+        Double reviewRating
 ) {
     /** Backwards-compatible constructor (pre-10.7): no colour/material, reviews or market. */
     public ImportProductDto(
@@ -55,7 +58,7 @@ public record ImportProductDto(
     ) {
         this(id, externalId, name, retailer, category, price, originalPrice, styleTags, roomTags,
                 imageUrl, productUrl, availabilityStatus, deliveryNote, lastCheckedAt, priceTier, note,
-                sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null);
+                sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null);
     }
 
     /** Backwards-compatible constructor (10.7-10.12): colour/material but no reviews or market. */
@@ -70,6 +73,6 @@ public record ImportProductDto(
         this(id, externalId, name, retailer, category, price, originalPrice, styleTags, roomTags,
                 imageUrl, productUrl, availabilityStatus, deliveryNote, lastCheckedAt, priceTier, note,
                 sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes,
-                colorTags, materialTags, null, null, null);
+                colorTags, materialTags, null, null, null, null);
     }
 }

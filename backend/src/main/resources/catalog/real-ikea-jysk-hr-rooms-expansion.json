@@ -15,11 +15,13 @@
     "colorTags": ["white"],
     "materialTags": ["metal"],
     "priceTier": "budget",
+    "reviewRating": 4.4,
+    "reviewCount": 653,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-enhet-element-ogledalo-bijela",
@@ -37,11 +39,13 @@
     "colorTags": ["white"],
     "materialTags": ["glass", "metal"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 172,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-vedde-140x200-divlji-tamni-hrast",
@@ -59,11 +63,13 @@
     "colorTags": ["brown", "natural"],
     "materialTags": ["wood"],
     "priceTier": "standard",
+    "reviewRating": 3.9,
+    "reviewCount": 155,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-trya-140x200-madrac",
@@ -80,11 +86,13 @@
     "styleTags": ["modern", "minimal"],
     "materialTags": ["fabric"],
     "priceTier": "premium",
+    "reviewRating": 5.0,
+    "reviewCount": 4,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-limfjorden-nocni-ormaric-svijetli-hrast",
@@ -102,11 +110,13 @@
     "colorTags": ["natural"],
     "materialTags": ["wood"],
     "priceTier": "budget",
+    "reviewRating": 4.5,
+    "reviewCount": 241,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-tapdrup-nocni-ormaric-bijela",
@@ -124,11 +134,13 @@
     "colorTags": ["white"],
     "materialTags": ["wood"],
     "priceTier": "budget",
+    "reviewRating": 4.2,
+    "reviewCount": 146,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-damhus-ormar-100x174-tamnosiva",
@@ -146,11 +158,13 @@
     "colorTags": ["grey"],
     "materialTags": ["fabric"],
     "priceTier": "budget",
+    "reviewRating": 3.7,
+    "reviewCount": 188,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-malm-komoda-3-ladice-bijela",
@@ -168,11 +182,13 @@
     "colorTags": ["white"],
     "materialTags": ["wood"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 825,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-lagkapten-adils-radni-stol-bijela",
@@ -190,11 +206,13 @@
     "colorTags": ["white"],
     "materialTags": ["wood"],
     "priceTier": "budget",
+    "reviewRating": 4.4,
+    "reviewCount": 386,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-flintan-uredska-stolica-crna",
@@ -212,11 +230,13 @@
     "colorTags": ["black"],
     "materialTags": ["fabric", "metal"],
     "priceTier": "budget",
+    "reviewRating": 4.4,
+    "reviewCount": 1300,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-billy-biblioteka-bijela",
@@ -234,11 +254,13 @@
     "colorTags": ["white"],
     "materialTags": ["wood"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 3074,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-kallax-regal-bijela",
@@ -256,11 +278,13 @@
     "colorTags": ["white"],
     "materialTags": ["wood"],
     "priceTier": "standard",
+    "reviewRating": 4.6,
+    "reviewCount": 2012,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-svaneke-podizni-radni-stol-bijela",
@@ -278,10 +302,12 @@
     "colorTags": ["white"],
     "materialTags": ["metal", "wood"],
     "priceTier": "standard",
+    "reviewRating": 4.4,
+    "reviewCount": 67,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   }
 ]

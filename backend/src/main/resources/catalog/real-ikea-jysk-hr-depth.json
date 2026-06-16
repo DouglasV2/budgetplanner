@@ -15,11 +15,13 @@
     "colorTags": ["white"],
     "materialTags": ["fabric", "metal"],
     "priceTier": "budget",
+    "reviewRating": 4.5,
+    "reviewCount": 958,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-fado-stolna-lampa-bijela",
@@ -37,11 +39,13 @@
     "colorTags": ["white"],
     "materialTags": ["glass"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 932,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-stoense-tepih-krem-170x240",
@@ -58,11 +62,13 @@
     "styleTags": ["minimal", "cozy"],
     "colorTags": ["beige"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 5871,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj, IKEA agregira po modelu) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-stoense-tepih-srednje-siva-133x195",
@@ -79,11 +85,13 @@
     "styleTags": ["modern", "minimal"],
     "colorTags": ["grey"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 5871,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj, IKEA agregira po modelu) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-raskog-kolica-crna",
@@ -101,11 +109,13 @@
     "colorTags": ["black"],
     "materialTags": ["metal"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 1016,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-jonstrup-blagovaonska-stolica-siva-natur-hrast",
@@ -123,11 +133,13 @@
     "colorTags": ["grey", "natural"],
     "materialTags": ["fabric", "wood"],
     "priceTier": "budget",
+    "reviewRating": 4.3,
+    "reviewCount": 1197,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-hasla-140x200-madrac",
@@ -144,11 +156,13 @@
     "styleTags": ["modern", "minimal"],
     "materialTags": ["fabric"],
     "priceTier": "budget",
+    "reviewRating": 4.1,
+    "reviewCount": 59,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-millberget-okretna-stolica-murum-zlatno-smeda",
@@ -166,11 +180,13 @@
     "colorTags": ["brown", "gold"],
     "materialTags": ["leather"],
     "priceTier": "budget",
+    "reviewRating": 4.3,
+    "reviewCount": 1760,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-gurli-jastucnica-neizbijeljeno",
@@ -192,7 +208,7 @@
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije nisu dodane: ovaj artikl preusmjerava na listing (vjerojatno ukinut) pa se ne može pouzdano provjeriti. Prije produkcije ponovno provjeri cijenu, sliku, zalihu i poveznicu."
   },
   {
     "externalId": "ikea-hr-gurli-jastucnica-zuta",
@@ -214,6 +230,6 @@
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije nisu dodane: nije bilo moguće pouzdano potvrditi agregat za ovu varijantu. Prije produkcije ponovno provjeri cijenu, sliku, zalihu i poveznicu."
   }
 ]

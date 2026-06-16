@@ -15,11 +15,13 @@
     "colorTags": ["white", "natural"],
     "materialTags": ["wood"],
     "priceTier": "standard",
+    "reviewRating": 4.5,
+    "reviewCount": 639,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-marstrand-o110-bijela-natur",
@@ -37,11 +39,13 @@
     "colorTags": ["white", "natural"],
     "materialTags": ["wood"],
     "priceTier": "standard",
+    "reviewRating": 4.3,
+    "reviewCount": 259,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-bovrup-natur-hrast-bez",
@@ -59,11 +63,13 @@
     "colorTags": ["natural", "beige"],
     "materialTags": ["wood", "fabric"],
     "priceTier": "standard",
+    "reviewRating": 4.6,
+    "reviewCount": 65,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-kanstrup-polica-kotaci-crna",
@@ -81,11 +87,13 @@
     "colorTags": ["black"],
     "materialTags": ["metal"],
     "priceTier": "budget",
+    "reviewRating": 4.6,
+    "reviewCount": 43,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-kanstrup-polica-kotaci-svijetli-pijesak",
@@ -103,11 +111,13 @@
     "colorTags": ["beige"],
     "materialTags": ["metal"],
     "priceTier": "budget",
+    "reviewRating": 4.4,
+    "reviewCount": 147,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-damhus-4-police-tamnosiva",
@@ -124,11 +134,13 @@
     "styleTags": ["modern", "minimal"],
     "colorTags": ["grey"],
     "priceTier": "budget",
+    "reviewRating": 4.2,
+    "reviewCount": 127,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-terpet-2-odjeljka-bijela",
@@ -145,11 +157,13 @@
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
     "priceTier": "standard",
+    "reviewRating": 4.0,
+    "reviewCount": 210,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-elverum-3-police-crna-celik",
@@ -167,10 +181,12 @@
     "colorTags": ["black"],
     "materialTags": ["metal"],
     "priceTier": "budget",
+    "reviewRating": 4.1,
+    "reviewCount": 142,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   }
 ]

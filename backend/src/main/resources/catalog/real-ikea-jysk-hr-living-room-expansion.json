@@ -10,19 +10,16 @@
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "modern",
-      "cozy"
-    ],
+    "roomTags": ["living-room"],
+    "styleTags": ["modern", "cozy"],
     "priceTier": "budget",
+    "reviewRating": 4.5,
+    "reviewCount": 2648,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
     "dataQuality": "partial",
-    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj, IKEA agregira po modelu POÄNG) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-poaeng-fotelja-crno-smeda-gunnared-tamno-siva",
@@ -35,19 +32,16 @@
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "modern",
-      "cozy"
-    ],
+    "roomTags": ["living-room"],
+    "styleTags": ["modern", "cozy"],
     "priceTier": "standard",
+    "reviewRating": 4.5,
+    "reviewCount": 2648,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
     "dataQuality": "partial",
-    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj, IKEA agregira po modelu POÄNG) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-poaeng-fotelja-brezov-furnir-gunnared-tamno-siva",
@@ -60,19 +54,16 @@
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "modern",
-      "cozy"
-    ],
+    "roomTags": ["living-room"],
+    "styleTags": ["modern", "cozy"],
     "priceTier": "standard",
+    "reviewRating": 4.5,
+    "reviewCount": 2648,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
     "dataQuality": "partial",
-    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj, IKEA agregira po modelu POÄNG) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-strandmon-naslonjac-nordvalla-tamno-siva",
@@ -85,19 +76,16 @@
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "classic",
-      "cozy"
-    ],
+    "roomTags": ["living-room"],
+    "styleTags": ["classic", "cozy"],
     "priceTier": "standard",
+    "reviewRating": 4.6,
+    "reviewCount": 2852,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
     "dataQuality": "partial",
-    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
     "externalId": "ikea-hr-strandmon-fotelja-podnoznik-grann-bomstad-tamno-smeda",
@@ -110,18 +98,15 @@
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "classic",
-      "cozy"
-    ],
+    "roomTags": ["living-room"],
+    "styleTags": ["classic", "cozy"],
     "priceTier": "premium",
+    "reviewRating": 4.7,
+    "reviewCount": 20,
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
     "dataQuality": "partial",
-    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   }
 ]

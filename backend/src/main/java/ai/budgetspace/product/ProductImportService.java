@@ -222,6 +222,7 @@ public class ProductImportService {
         applyColorAndMaterialTags(dto, entity);
         // Sprint 10.13: reviews (#2) + market (#3). Market defaults to HR (the launch market).
         if (dto.reviewCount() != null) entity.setReviewCount(dto.reviewCount());
+        if (dto.reviewRating() != null) entity.setReviewRating(dto.reviewRating());
         if (hasText(dto.reviewsUrl())) entity.setReviewsUrl(dto.reviewsUrl().trim());
         entity.setMarket(Markets.normalize(dto.market()));
         entity.setImportedAt(Instant.now().toString());

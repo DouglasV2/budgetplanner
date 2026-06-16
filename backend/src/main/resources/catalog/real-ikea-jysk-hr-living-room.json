@@ -1,6 +1,8 @@
 [
   {
     "externalId": "ikea-hr-kivik-trosjed-tresund-svijetlo-bez",
+    "reviewRating": 4.1,
+    "reviewCount": 518,
     "name": "KIVIK trosjed, Tresund svijetlo bež",
     "retailer": "IKEA",
     "category": "sofa",
@@ -26,6 +28,8 @@
   },
   {
     "externalId": "ikea-hr-glostad-dvosjed-knisa-tamno-siva",
+    "reviewRating": 4.5,
+    "reviewCount": 612,
     "name": "GLOSTAD dvosjed, Knisa tamno siva",
     "retailer": "IKEA",
     "category": "sofa",
@@ -126,6 +130,8 @@
   },
   {
     "externalId": "ikea-hr-ektorp-trosjed-kilanda-svijetlo-bez",
+    "reviewRating": 4.3,
+    "reviewCount": 529,
     "name": "EKTORP trosjed, Kilanda svijetlo bež",
     "retailer": "IKEA",
     "category": "sofa",
@@ -151,6 +157,8 @@
   },
   {
     "externalId": "ikea-hr-friheten-trosjed-skiftebo-tamno-siva",
+    "reviewRating": 4.1,
+    "reviewCount": 1317,
     "name": "FRIHETEN trosjed na razvlačenje, Skiftebo tamno siva",
     "retailer": "IKEA",
     "category": "sofa",
@@ -226,6 +234,8 @@
   },
   {
     "externalId": "ikea-hr-fjaellbo-tv-klupa-crna",
+    "reviewRating": 4.4,
+    "reviewCount": 879,
     "name": "FJÄLLBO TV klupa, crna",
     "retailer": "IKEA",
     "category": "tv-unit",
@@ -251,6 +261,8 @@
   },
   {
     "externalId": "ikea-hr-lack-tv-klupa-bijela-120",
+    "reviewRating": 4.5,
+    "reviewCount": 305,
     "name": "LACK TV klupa, bijela, 120x35x36 cm",
     "retailer": "IKEA",
     "category": "tv-unit",
@@ -276,6 +288,8 @@
   },
   {
     "externalId": "ikea-hr-brimnes-tv-klupa-bijela-180",
+    "reviewRating": 4.5,
+    "reviewCount": 547,
     "name": "BRIMNES TV klupa, bijela, 180x41x53 cm",
     "retailer": "IKEA",
     "category": "tv-unit",
@@ -351,6 +365,8 @@
   },
   {
     "externalId": "ikea-hr-lack-stolic-bijela-90",
+    "reviewRating": 4.5,
+    "reviewCount": 4076,
     "name": "LACK stolić, bijela, 90x55 cm",
     "retailer": "IKEA",
     "category": "table",
@@ -376,6 +392,8 @@
   },
   {
     "externalId": "ikea-hr-vittsjoe-stolic-crno-smeda-staklo",
+    "reviewRating": 4.7,
+    "reviewCount": 699,
     "name": "VITTSJÖ stolić, crno-smeđa/staklo",
     "retailer": "IKEA",
     "category": "table",
@@ -401,6 +419,8 @@
   },
   {
     "externalId": "ikea-hr-gladom-stol-posluzavnik-crna",
+    "reviewRating": 4.7,
+    "reviewCount": 3398,
     "name": "GLADOM stol/poslužavnik, crna",
     "retailer": "IKEA",
     "category": "table",
@@ -426,6 +446,8 @@
   },
   {
     "externalId": "ikea-hr-listerby-stolic-hrastov-furnir",
+    "reviewRating": 3.9,
+    "reviewCount": 69,
     "name": "LISTERBY stolić, hrastov furnir",
     "retailer": "IKEA",
     "category": "table",

@@ -38,7 +38,9 @@ public record ProductDto(
         String sponsorLabel,
         // Sprint 10.13: reviews (#2) + market/currency (#3). reviewsUrl always points somewhere the
         // user can read real reviews (the product page); currency is derived from the market.
+        // reviewRating is the verified average star (display only), null when unknown.
         Integer reviewCount,
+        Double reviewRating,
         String reviewsUrl,
         String market,
         String currency
@@ -73,6 +75,7 @@ public record ProductDto(
                 product.isSponsored(),
                 product.getSponsorLabel(),
                 product.getReviewCount(),
+                product.getReviewRating(),
                 firstNonBlank(product.getReviewsUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),
                 market,
                 Markets.currencyFor(market)
