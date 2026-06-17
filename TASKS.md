@@ -71,6 +71,30 @@ needs `OPENAI_API_KEY`, backend env only).
   reads; the Croatian `plan.name` tier values the UI maps to display keys). Per-market EUR currency formatting
   already worked. Frontend build clean; 0 missing keys. **Next: per-language localisation (DE/IT/SL/FI)** is a
   later step — English is the common language for now.
+
+- **★ Discount / sale tracking + price-drop alerts (owner-requested 2026-06-17, do AFTER EU depth + per-language).**
+  A retention/hook feature: surface real sales and (opt-in) notify a user when a product they care about goes
+  on sale. **Strictly web-verified — never fabricate a discount, a regular price, or a sale window** (same rule
+  as everything else; a fake "−40%" is worse than none).
+  - **Data model (mostly exists):** `Product.originalPrice` already holds the pre-discount price; a product is
+    "on sale" when `price < originalPrice`. Add a `saleEndsAt` (we already read JYSK `priceValidUntil` and the
+    IKEA/Emmezeta promo flags during re-verification) and keep `price` = current, `originalPrice` = regular.
+    The re-verification pass (Sprint 10.27) is the natural place to populate all three.
+  - **Display (plan + product row):** when on sale, show the saving next to the item **both ways** — percent
+    and absolute, e.g. `−40% · ušteda 20 €` / `−40% · save €20`, plus a discreet "Na popustu / On sale" badge
+    and the struck-through `originalPrice`. New i18n keys; reuse the existing `originalPrice` plumbing in
+    `ProductDto`/`Product` type (already flows to the UI). Keep it honest: only show when verified on the live
+    page, with the "provjeri u trgovini" caveat.
+  - **Opt-in price-drop alert:** let a user "watch" a product or a saved plan; a scheduled re-check compares the
+    live price to the stored one and, on a drop, notifies them ("X is on sale now, −Y%"). Needs: a `PriceWatch`
+    entity (productId/externalId + market + target user/session + desired threshold), a re-check job that reuses
+    the deterministic price extractor, and a delivery channel (email first; push later). GDPR: explicit opt-in,
+    easy unsubscribe, store only what's needed.
+  - **Monetisation tie-in (value-first):** sale alerts drive return visits + affiliate conversions, but a
+    sponsored/affiliate item must still never displace the best organic pick (existing invariant). The alert is
+    a genuine user benefit first.
+  - *Done when:* verified sales show the dual % + € saving + badge in plans, and an opted-in user gets a real
+    price-drop notification — with zero fabricated discounts.
 - **Full-catalog re-verification** near launch (all 6 markets, ~665 rows) — same freshness rule as step 3.
 - **First real `RetailerFeed`** (Decathlon/Pevex/Lesnina) → unlocks `home-gym` and retires the last sample
   dependency (`ai.budgetspace.feed` seam already exists; never scrape).
