@@ -1,7 +1,10 @@
 package ai.budgetspace.product;
 
 import ai.budgetspace.dto.ImportSummaryDto;
+import ai.budgetspace.dto.PlanGenerationResponse;
+import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.RetailerProductSnapshotDto;
+import ai.budgetspace.planner.PlannerService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -65,6 +68,44 @@ class HrBreadthCatalogRuntimeTest {
         assertThat(saved).anySatisfy(p -> { assertThat(p.getRetailer()).isEqualTo("IKEA"); assertThat(p.getCategory()).isEqualTo("bed"); });
         assertThat(saved).anySatisfy(p -> { assertThat(p.getRetailer()).isEqualTo("IKEA"); assertThat(p.getCategory()).isEqualTo("mattress"); });
         assertThat(saved).anySatisfy(p -> { assertThat(p.getRetailer()).isEqualTo("IKEA"); assertThat(p.getCategory()).isEqualTo("wardrobe"); });
+    }
+
+    /**
+     * The point of breadth (owner's concern: "with lots of furniture, does the planner pick the right one?").
+     * IKEA HR previously had no bedroom anchors, so an IKEA-preferring bedroom prompt couldn't pick IKEA.
+     * With the breadth catalog the planner's scoring (style/room/price/retailer) now builds a real,
+     * non-partial IKEA bedroom — proving the new rows are reachable AND selected, not just present.
+     */
+    @Test
+    void plannerBuildsANonPartialIkeaBedroomFromTheBreadthCatalog() throws Exception {
+        List<Product> catalog = importedCatalog("/catalog/real-hr-breadth-10-26.json");
+        ProductRepository repo = mock(ProductRepository.class);
+        when(repo.findAll()).thenReturn(catalog);
+        PlannerService planner = new PlannerService(repo);
+
+        PlanGenerationResponse plan = planner.generate(new PlannerInputDto(
+                "Spavaća soba do 1500 €, moderno, najviše IKEA, trebam krevet i madrac.", 1500, "bedroom",
+                "modern", "Zagreb", 20, "multi", List.of("IKEA"), "best-value", "comfort",
+                List.of(), List.of(), List.of(), List.of(), List.of(), 0));
+
+        assertThat(plan.input().roomType()).isEqualTo("bedroom");
+        assertThat(plan.partialPlan()).as("bedroom plan should be complete now IKEA has beds+mattresses").isFalse();
+        List<String> categories = plan.plans().get(0).items().stream().map(i -> i.product().category()).toList();
+        assertThat(categories).contains("bed", "mattress");
+        // The IKEA preference is honoured: at least one IKEA item, and IKEA beds are now reachable.
+        assertThat(plan.plans().get(0).items()).anySatisfy(i -> assertThat(i.product().retailer()).isEqualTo("IKEA"));
+        assertThat(catalog).anySatisfy(p -> { assertThat(p.getRetailer()).isEqualTo("IKEA"); assertThat(p.getCategory()).isEqualTo("bed"); });
+    }
+
+    private List<Product> importedCatalog(String resource) throws Exception {
+        List<Product> saved = new ArrayList<>();
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenAnswer(inv -> saved.stream()
+                .filter(p -> p.getExternalId().equals(inv.getArgument(0))).findFirst());
+        when(repository.save(any(Product.class))).thenAnswer(inv -> { saved.add(inv.getArgument(0)); return inv.getArgument(0); });
+        new RetailerSnapshotImportService(new ProductImportService(repository), new RetailerCatalogAdapter())
+                .importSnapshot(load(resource));
+        return saved;
     }
 
     private List<RetailerProductSnapshotDto> load(String resource) throws Exception {
