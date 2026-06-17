@@ -46,16 +46,20 @@ needs `OPENAI_API_KEY`, backend env only).
    good display size (`?f=xl`). The UI now shows the real photo only when `imageVerified`, else keeps the
    placeholder. **Harvey Norman skipped** (its pages serve a wrong `og:image`). The 34 not imaged are dead
    /drifted URLs → step 3 (see [docs/hr-url-review-10-24.md](docs/hr-url-review-10-24.md)). *Done.*
-5. **[ ] Security review + deploy to Railway + go-live checklist (HR beta).** Security review (keys
-   backend-only, CORS, admin-endpoint guard active in prod, no secrets in logs/`.env.example`, input
-   validation). Railway deploy: managed Postgres, env-based config for keys/feeds, **switch DB off
-   `ddl-auto=create`** (wipes schema every start — add Flyway/Liquibase migrations + backups), HTTPS, build
-   config. Legal/GDPR for a HR consumer app + affiliate/sponsored disclosure copy. *Done when:* a controlled
-   HR beta can go live on Railway safely.
+5. **[ ] Security review + deploy to Railway + go-live checklist.** ⏸️ **DEFERRED by owner (2026-06-17) until
+   the EU catalog is filled** — we want to test across all markets (HR/SI/AT/DE/IT/FI) safely *before* deploy,
+   so don't start Railway/legal until the owner says so. Then: security review (keys backend-only, CORS,
+   admin-endpoint guard active in prod, no secrets in logs/`.env.example`, input validation); Railway deploy
+   (managed Postgres, env-based config for keys/feeds, **switch DB off `ddl-auto=create`** → Flyway/Liquibase
+   migrations + backups, HTTPS, build config); Legal/GDPR + affiliate/sponsored disclosure copy. *Done when:*
+   a controlled beta can go live on Railway safely.
 
-> ⚠️ **Hard prod blocker:** `spring.jpa.hibernate.ddl-auto=create` rebuilds (wipes) the DB on every startup —
-> fine for dev, fatal on Railway. Move to validate + versioned migrations before deploy (step 5).
-> **Then (post-step-5): enable the OpenAI LLM** on the maxed+verified catalog (the deferred phase above).
+> ⚠️ **Hard prod blocker (for when step 5 resumes):** `spring.jpa.hibernate.ddl-auto=create` rebuilds (wipes)
+> the DB on every startup — fine for dev, fatal on Railway. Move to validate + versioned migrations before deploy.
+> **OpenAI LLM is also DEFERRED by owner (2026-06-17) until the EU catalog is filled** — keys cost money to test,
+> and we want a complete multi-market catalog first so prompts can be tested across countries without "no
+> products" runs. Enable it (`BUDGETSPACE_AI_ENABLED=true` + verify `AiUsageTracker` caps + rule-based fallback;
+> `OPENAI_API_KEY` backend env only) only after EU is filled and the owner gives the go-ahead.
 
 ### Further steps (post-HR-beta → full multi-market production)
 

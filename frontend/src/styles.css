@@ -1325,6 +1325,27 @@ textarea:focus {
   padding: 10px 12px;
 }
 
+/* Sprint 10.30 (QoL): a unit suffix (m²) sitting inside the input, mirroring the budget € field. */
+.input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-unit input {
+  width: 100%;
+  padding: 10px 38px 10px 12px;
+}
+
+.input-unit {
+  position: absolute;
+  right: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
 .compact-group,
 .compact-row {
   padding-top: 2px;
@@ -1618,7 +1639,13 @@ textarea:focus {
 
 .planner-panel {
   padding: 0;
-  overflow: hidden;
+  /* Sprint 10.30 (QoL): the form panel scrolls on its own within the sticky column, so the user can
+     reach every field without first scrolling the whole page down to it. The sticky generate bar stays
+     pinned to the bottom of this scroll area. */
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 
 .friendly-form {
@@ -1985,6 +2012,9 @@ textarea {
 
   .planner-panel {
     position: static;
+    /* On stacked mobile the column is full-width, so let it grow with the page instead of trapping scroll. */
+    max-height: none;
+    overflow: visible;
   }
 
   .results-title-bar small {

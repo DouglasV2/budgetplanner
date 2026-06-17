@@ -102,7 +102,7 @@ function buildStoreTripRecommendation(storeCount: number, mainRetailer: Retailer
     base = `Većinu kupuješ u ${mainRetailer}, a plan koristi ${storeCount} ${storesWord(storeCount)}.`;
   }
   if (checkInStoreCount > 0) {
-    base += checkInStoreCount === 1 ? ' Jednu stvar prvo provjeri u trgovini.' : ' Neke stvari prvo provjeri u trgovini.';
+    base += checkInStoreCount === 1 ? ' Jedan komad prvo provjeri u trgovini.' : ' Neke komade prvo provjeri u trgovini.';
   }
   return base;
 }
@@ -133,7 +133,7 @@ export function resolveStoreTrip(plan: FurnishingPlan): StoreTrip {
 
 export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) {
   const storeSections = getRetailerBreakdown(plan).flatMap((entry) => [
-    `${entry.retailer} — ${entry.count} ${entry.count === 1 ? 'stvar' : 'stvari'} — ${formatCurrency(entry.total)}`,
+    `${entry.retailer} — ${entry.count} ${entry.count === 1 ? 'komad' : 'komada'} — ${formatCurrency(entry.total)}`,
     ...entry.items.map((item) => `- ${item.product.name} — ${formatCurrency(item.product.price)} (${shoppingPriorityLabels[item.shoppingPriority ?? 'later']})`),
     ''
   ]);

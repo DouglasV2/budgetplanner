@@ -329,14 +329,17 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           </div>
           <label className="custom-size-input">
             <span>{t('form.exactSizeLabel')}</span>
-            <input
-              aria-label={t('form.roomSizeAriaLabel')}
-              type="number"
-              min="8"
-              max="80"
-              value={input.size}
-              onChange={(event) => onChange({ ...input, size: Number(event.target.value || 0) })}
-            />
+            <span className="input-with-unit">
+              <input
+                aria-label={t('form.roomSizeAriaLabel')}
+                type="number"
+                min="8"
+                max="80"
+                value={input.size}
+                onChange={(event) => onChange({ ...input, size: Number(event.target.value || 0) })}
+              />
+              <span className="input-unit" aria-hidden="true">m²</span>
+            </span>
           </label>
         </div>
 
