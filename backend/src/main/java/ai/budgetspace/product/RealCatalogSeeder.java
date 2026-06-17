@@ -123,6 +123,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-hr-max-10-22.json"
     );
 
+    /**
+     * The catalog resources this seeder imports, exposed (package-private) for build-time guard tests
+     * such as the duplicate-{@code productUrl} check — so a future catalog file is covered automatically.
+     */
+    static List<String> snapshotResources() {
+        return SNAPSHOT_RESOURCES;
+    }
+
     private final ProductRepository productRepository;
     private final RetailerSnapshotImportService snapshotImportService;
     private final ObjectMapper objectMapper;

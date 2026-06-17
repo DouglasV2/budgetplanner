@@ -1481,15 +1481,19 @@
     "imageUrl": "",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
-      "living-room"
+      "living-room",
+      "bedroom",
+      "home-office"
     ],
     "styleTags": [
       "industrial",
       "modern"
     ],
     "priceTier": "budget",
+    "reviewRating": 4.7,
+    "reviewCount": 203,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
@@ -1608,7 +1612,8 @@
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-14",
     "roomTags": [
-      "living-room"
+      "living-room",
+      "kitchen"
     ],
     "styleTags": [
       "industrial",

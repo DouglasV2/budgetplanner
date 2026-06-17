@@ -31,8 +31,9 @@ needs `OPENAI_API_KEY`, backend env only).
    (0 import errors); programmatic dedup dropped 5 already-present URLs. Backend **130 tests, 0 failures**.
 3. **[ ] HR data re-verification before launch.** Re-verify prices + availability across the (now maxed) HR
    catalog; flip confirmed rows `partial → complete`, mark drifted/vanished ones `needs-review`. Use/extend
-   `CatalogHealthService` for a stale-rows report + a re-check cadence. Dedupe the 6 duplicate `productUrl`s
-   (#10b). *Done when:* HR catalog is fresh + `complete` where verified, with a documented cadence.
+   `CatalogHealthService` for a stale-rows report + a re-check cadence. ~~Dedupe the 6 duplicate `productUrl`s
+   (#10b)~~ ✅ **done 2026-06-17 (Sprint 10.23)** — see #10b. *Done when:* HR catalog is fresh + `complete`
+   where verified, with a documented cadence.
 4. **[ ] Product images — fetch every real image we can.** Pull verified product image URLs from the
    reachable retailers (IKEA/JYSK/Emmezeta expose them) for the HR catalog; add an image-verification field;
    show real images only when verified, else keep the labelled "ilustracija" placeholder. **Never fabricate
@@ -66,7 +67,25 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.21 — second-hand marketplace Phase 1 (scaffold, no feed) (current)
+### Sprint 10.23 — catalog hygiene: productUrl dedupe + build-time guards (current)
+- **Dedupe (#10b / road-to-production step 3 start).** Collapsed the 6 rows that shared a retailer
+  `productUrl` under two `externalId`s to one row each: 2× JYSK KANSTRUP cart + TRAPPEDAL (kept the
+  living-room/new-rooms copies the runtime tests reference, removed the `real-hr-kitchen.json` /
+  `real-jysk-hr-depth.json` copies), HASLA mattress, HUGO lamp, TAPDRUP. **Unioned `roomTags`** on the kept
+  rows so coverage held (TRAPPEDAL kept `kitchen`; HUGO kept `bedroom`+`home-office`) — verified each
+  affected runtime test's min-count/category assertions still pass before editing (the living-room file sits
+  exactly at its IKEA=41/JYSK=35 floor, so its rows were preserved, not removed).
+- **HUGO price conflict resolved honestly.** The two copies disagreed (49.99 € vs 25 €). Web-recheck
+  (jysk.hr) showed 25 € is a temporary −50% "Zeleni dani" promo over a **49.99 € regular price**, so the
+  merged row keeps the durable 49.99 € (a promo price would go stale the day it ends; the live link always
+  shows the current price; step-3 re-verification refreshes anyway). Added verified reviews 4.7/203,
+  `lastCheckedAt` 2026-06-17.
+- **Build-time guards** in `StoreLinkIntegrityTest`: `noTwoCatalogProductsShareAProductUrl` +
+  `noTwoCatalogProductsShareAnExternalId`, both loading `RealCatalogSeeder.snapshotResources()` (the
+  authoritative import list) so any future catalog file is covered automatically.
+- Catalog **718 → 712 rows** (33 files); backend **132 tests, 0 failures**. No fabrication, no 403-bypass.
+
+### Sprint 10.21 — second-hand marketplace Phase 1 (scaffold, no feed)
 - Built the data-model + provenance + guard from the 10.17 design (docs/marketplace-sourcing.md §8),
   behind an unconfigured feed (imports nothing — `Njuškalo`/`Facebook Marketplace` are
   `OFFICIAL_FEED_REQUIRED`, carry no products):
@@ -216,11 +235,15 @@ needs `OPENAI_API_KEY`, backend env only).
    `sourceType=marketplace-listing`, each run through `MarketplaceListingFilter`; never scrape) and
    **Phase 3** (separate "Rabljeno" UI section + buyer-beware copy; used items stay out of the new-retail total).
 
-10b. **Catalog hygiene: dedupe duplicate productUrls.** 6 pre-existing rows (from sprints ≤10.16) point
-   the same retailer URL under two `externalId`s (e.g. JYSK KANSTRUP carts in both `real-hr-kitchen.json`
-   and `real-jysk-hr-new-rooms.json`; TRAPPEDAL; a JYSK madrac/lamp/noćni ormarić). Both import as
-   separate rows → redundant catalog entries. Pick one `externalId` per URL and drop the other; add a
-   build-time guard test against duplicate productUrls. Not introduced by 10.17 (its 51 rows add 0 dup URLs).
+10b. **[x] Catalog hygiene: dedupe duplicate productUrls.** ✅ **Done 2026-06-17 (Sprint 10.23).** The 6
+   pre-existing rows that shared a retailer URL under two `externalId`s (2× KANSTRUP cart, TRAPPEDAL, HASLA
+   mattress, HUGO lamp, TAPDRUP) collapsed to one row each (kept the `externalId` referenced by tests,
+   unioned `roomTags` so no room/category coverage was lost). **HUGO had a genuine price conflict** (49.99 €
+   vs 25 €): web-recheck showed 25 € is a temporary −50% "Zeleni dani" promo over a 49.99 € regular price, so
+   the merged row keeps the durable **regular 49.99 €** (+ verified reviews 4.7/203, `lastCheckedAt`
+   2026-06-17). Added two build-time guards in `StoreLinkIntegrityTest` (no duplicate `productUrl`, no
+   duplicate `externalId`) that load the seeder's authoritative resource list so future files are covered.
+   Catalog 718 → **712 rows**; backend **132 tests, 0 failures**.
 10. **Bring blocked retailers online via feeds.** The big chains we probed (Otto beyond rate-limits,
    Wayfair, Home24, Roller, XXXLutz/Kika/Leiner, Momax, Bauhaus, FeroTerm, Lesnina, Decathlon, Pevex,
    Merkur, Dipo) are registered as feed-required — integrate an official/affiliate feed per the
