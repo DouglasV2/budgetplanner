@@ -1,9 +1,16 @@
-// Sprint 10.13 (#3): lightweight i18n foundation. HR is the default; EN is used for the other
-// (EUR) markets for now. This is a starter dictionary for the highest-visibility strings — extend it
-// as more of the UI is localised (most planner copy is still Croatian and is a follow-up).
+// Sprint 10.13 → 10.32: i18n. The inline DICTIONARY holds the source strings in HR + EN; the other market
+// languages (DE/IT/SL/FI) live in per-language JSON files (translated from the EN source) and are merged at
+// lookup time, with English as the fallback for any key a translation is missing.
 import type { Lang } from './markets';
+import de from './messages/de.json';
+import it from './messages/it.json';
+import sl from './messages/sl.json';
+import fi from './messages/fi.json';
 
-type Entry = Record<Lang, string>;
+type Entry = { hr: string; en: string };
+
+// Per-language overlays (key → translated string). Missing keys fall back to English in translate().
+const EXTRA: Partial<Record<Lang, Record<string, string>>> = { de, it, sl, fi };
 
 const DICTIONARY: Record<string, Entry> = {
   'nav.how': { hr: 'Kako radi', en: 'How it works' },
@@ -391,7 +398,11 @@ const DICTIONARY: Record<string, Entry> = {
 
 export function translate(key: string, lang: Lang, params?: Record<string, string | number>): string {
   const entry = DICTIONARY[key];
-  let text = entry ? entry[lang] ?? entry.hr ?? key : key;
+  let text: string;
+  if (lang === 'hr') text = entry?.hr ?? key;
+  else if (lang === 'en') text = entry?.en ?? entry?.hr ?? key;
+  // DE/IT/SL/FI come from the per-language overlay, falling back to English then Croatian then the key.
+  else text = EXTRA[lang]?.[key] ?? entry?.en ?? entry?.hr ?? key;
   if (params) {
     for (const [name, value] of Object.entries(params)) {
       text = text.split(`{${name}}`).join(String(value));

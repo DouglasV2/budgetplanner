@@ -109,7 +109,22 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.31 — EU depth: deepen IT + FI bedroom + home-office (current)
+### Sprint 10.32 — per-language localisation (DE / IT / SL / FI) (current)
+- The app no longer shows English to non-HR markets — each renders in its own language: **HR Croatian, SI
+  Slovenian, AT+DE German, IT Italian, FI Finnish** (English remains the fallback for any missing key).
+- Refactor: `Lang` widened to `hr|en|de|it|sl|fi`; each market's `lang` set accordingly in `markets.ts`. The
+  inline `i18n.ts` DICTIONARY stays the HR+EN source of truth; the four new languages live in
+  `frontend/src/messages/{de,it,sl,fi}.json` (one key→string map each) and are merged in `translate()` with an
+  EN→HR→key fallback chain. `{param}` interpolation unchanged.
+- Translations: extracted the 354 EN source strings, then **4 parallel subagents** (one per language) produced
+  native, informal "du/tu"-tone JSON. Verified every file programmatically: **354/354 keys, 0 missing, 0 extra,
+  0 placeholder mismatches, 0 left identical to English**. Brand names, `m²/€/PDF/AI`, emoji and step numbers
+  preserved.
+- Verified at runtime (vite + preview): switching country flips the whole UI + `<html lang>` — DE "Beschreib,
+  was du willst.", IT "Descrivi cosa vuoi.", SL "Opiši, kaj želiš.", FI "Kerro mitä haluat.", HR unchanged.
+  Frontend build clean (tsc + vite). Next feature (owner-requested): discount / sale tracking + price alerts.
+
+### Sprint 10.31 — EU depth: deepen IT + FI bedroom + home-office
 - IT/FI were thin (IT IKEA-only; bedroom/home-office shallow). Ported **52 verified IKEA rows** (IT 28, FI 24)
   via the global article-number trick to `/it/it/` + `/fi/fi/`: beds, mattresses, nightstands, wardrobes,
   dressers (bedroom) + desks, chairs, storage (home-office). Each row carries the verified tags from its

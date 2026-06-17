@@ -2,7 +2,7 @@
 // Only EUR markets are offered in the UI for now, because the catalog prices are in EUR — adding a
 // non-EUR market (PLN/CZK/…) requires its own verified, currency-correct catalog first.
 // `available` = a real per-market catalog exists today; others are foundation/"coming soon".
-export type Lang = 'hr' | 'en';
+export type Lang = 'hr' | 'en' | 'de' | 'it' | 'sl' | 'fi';
 
 export interface MarketConfig {
   code: string;
@@ -15,15 +15,16 @@ export interface MarketConfig {
 }
 
 // Sprint 10.28: all six EUR markets are now exposed. HR is Croatian; the other markets render in English
-// (the common European language) until per-language localisation (DE/IT/SL/FI) lands. Each has a verified,
-// currency-correct EUR catalog. Sprint 10.30: `flag` for the country picker.
+// Sprint 10.32: each market now renders in its own language (HR Croatian, SI Slovenian, AT/DE German,
+// IT Italian, FI Finnish), with English as the fallback for any missing key. Each has a verified,
+// currency-correct EUR catalog. `flag` drives the country picker.
 export const MARKETS: MarketConfig[] = [
   { code: 'HR', label: 'Hrvatska', currency: 'EUR', locale: 'hr-HR', lang: 'hr', available: true, flag: '🇭🇷' },
-  { code: 'SI', label: 'Slovenija', currency: 'EUR', locale: 'sl-SI', lang: 'en', available: true, flag: '🇸🇮' },
-  { code: 'AT', label: 'Österreich', currency: 'EUR', locale: 'de-AT', lang: 'en', available: true, flag: '🇦🇹' },
-  { code: 'DE', label: 'Deutschland', currency: 'EUR', locale: 'de-DE', lang: 'en', available: true, flag: '🇩🇪' },
-  { code: 'IT', label: 'Italia', currency: 'EUR', locale: 'it-IT', lang: 'en', available: true, flag: '🇮🇹' },
-  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'en', available: true, flag: '🇫🇮' }
+  { code: 'SI', label: 'Slovenija', currency: 'EUR', locale: 'sl-SI', lang: 'sl', available: true, flag: '🇸🇮' },
+  { code: 'AT', label: 'Österreich', currency: 'EUR', locale: 'de-AT', lang: 'de', available: true, flag: '🇦🇹' },
+  { code: 'DE', label: 'Deutschland', currency: 'EUR', locale: 'de-DE', lang: 'de', available: true, flag: '🇩🇪' },
+  { code: 'IT', label: 'Italia', currency: 'EUR', locale: 'it-IT', lang: 'it', available: true, flag: '🇮🇹' },
+  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'fi', available: true, flag: '🇫🇮' }
 ];
 
 // Sprint 10.30: major cities per market for the optional city picker (datalist suggestions; the user can
