@@ -109,7 +109,19 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.30 — QoL pass: form usability + market-aware location & stores (current)
+### Sprint 10.31 — EU depth: deepen IT + FI bedroom + home-office (current)
+- IT/FI were thin (IT IKEA-only; bedroom/home-office shallow). Ported **52 verified IKEA rows** (IT 28, FI 24)
+  via the global article-number trick to `/it/it/` + `/fi/fi/`: beds, mattresses, nightstands, wardrobes,
+  dressers (bedroom) + desks, chairs, storage (home-office). Each row carries the verified tags from its
+  existing catalog twin and a freshly fetched **per-market EUR price** (genuinely differs — e.g. 379 IT / 349
+  FI; 49.95 IT / 59 FI) + **verified `og:image`** (slug-matched, resolves); spot-checked the NORDLI bed photo.
+  `dataQuality=complete`. Coverage now **IT 84 rows (bedroom 26 / office 16) · FI 93 (bedroom 22 / office 16)**.
+- `real-eu-bedroom-office-10-31.json` + `EuBedroomOfficeCatalogRuntimeTest`; backend **137 tests, 0 failures**;
+  catalog **806 rows, 0 duplicate productUrls/externalIds**. No fabrication, no 403-bypass.
+- Remaining EU breadth: SI/AT (IKEA/JYSK) are mid-depth; could add more, but every market now covers the core
+  rooms. Per-language localisation is the next UI step (10.32).
+
+### Sprint 10.30 — QoL pass: form usability + market-aware location & stores
 - **Left sidebar scrolls on its own** (`.planner-panel` max-height + `overflow-y` inside the sticky column),
   so the user reaches every field without scrolling the whole page first; natural flow on mobile.
 - **Room size field**: label → "Kvadratura"/"Floor area" with an **`m²` unit suffix inside the input**

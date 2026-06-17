@@ -129,7 +129,11 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Sprint 10.29: EU depth — fill the IT + FI dining-room gap (both were 0). IKEA dining tables +
             // chairs ported via the global article-number trick to /it/it/ and /fi/fi/; each row's localized
             // name + per-market EUR price + verified og:image confirmed on ikea.com on 2026-06-17.
-            "/catalog/real-eu-dining-10-29.json"
+            "/catalog/real-eu-dining-10-29.json",
+            // Sprint 10.31: EU depth — fill the thin IT + FI bedroom + home-office cells. IKEA beds/mattresses
+            // /nightstands/wardrobes/dressers/desks/chairs/storage ported via the global article-number trick
+            // to /it/it/ and /fi/fi/; localized name + per-market EUR price + verified og:image (2026-06-17).
+            "/catalog/real-eu-bedroom-office-10-31.json"
     );
 
     /**
