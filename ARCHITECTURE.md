@@ -74,6 +74,10 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
 
 ## Invariants (do not break)
 - **Never fabricate** product name/price/URL/image/review. Unverifiable → `needs-review`, image null.
+- **Images: `imageVerified` gates the real photo.** `Product.imageVerified` is true only when `imageUrl` was
+  confirmed on the retailer's live product page (`og:image`, identity-checked, resolves). The UI shows the
+  real photo only then; otherwise it keeps the labelled "ilustracija" category placeholder. `inferDataQuality`
+  treats only a *verified* image as `complete`. HR images sourced in 10.24 (236 rows); never fabricate a URL.
 - AI **off by default**; API keys **backend-only** (never `VITE_*`, README, logs, fixtures, or real
   values in `.env.example`). `.env` git-ignored.
 - `reviewRating`/`reviewCount` are **display-only**, separate from the planner's internal `rating`.

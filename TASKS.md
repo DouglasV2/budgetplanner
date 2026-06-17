@@ -32,12 +32,20 @@ needs `OPENAI_API_KEY`, backend env only).
 3. **[ ] HR data re-verification before launch.** Re-verify prices + availability across the (now maxed) HR
    catalog; flip confirmed rows `partial → complete`, mark drifted/vanished ones `needs-review`. Use/extend
    `CatalogHealthService` for a stale-rows report + a re-check cadence. ~~Dedupe the 6 duplicate `productUrl`s
-   (#10b)~~ ✅ **done 2026-06-17 (Sprint 10.23)** — see #10b. *Done when:* HR catalog is fresh + `complete`
-   where verified, with a documented cadence.
-4. **[ ] Product images — fetch every real image we can.** Pull verified product image URLs from the
-   reachable retailers (IKEA/JYSK/Emmezeta expose them) for the HR catalog; add an image-verification field;
-   show real images only when verified, else keep the labelled "ilustracija" placeholder. **Never fabricate
-   an image URL.** *Done when:* HR products carry verified images where available, placeholder otherwise.
+   (#10b)~~ ✅ **done 2026-06-17 (Sprint 10.23)** — see #10b. **Concrete targets already found** (Sprint 10.24
+   image pass, [docs/hr-url-review-10-24.md](docs/hr-url-review-10-24.md)): **~15 HR rows are DEAD** (URL now
+   301s to a category — e.g. BESTÅ, MÅRUM/STOENSE/TIPHEDE rugs, NYMÅNE/BARLAST/STRANDAD lamps, VITTSJÖ, JYSK
+   VEJLBY/TROSTERUD) → flip `needs-review`; **~18 rows have DRIFTED URLs** (301 to the live canonical page;
+   link still works) → refresh `productUrl` (also unlocks their image). NB: this contradicts "HR just verified
+   16/17 Jun" — step 3 is **not** redundant. *Done when:* HR catalog is fresh + `complete` where verified.
+4. **[x] Product images — fetch every real image we can.** ✅ **Done 2026-06-17 (Sprint 10.24).** Added the
+   `imageVerified` field end to end (Product + DTOs + import + frontend gate; plumbing committed first) and
+   web-verified **236 / 270** reachable HR product images by deterministically reading each product page's
+   `og:image` (raw HTTP, no model → no fabrication), cross-checking product identity (IKEA slug / Emmezeta id /
+   Namjestaj tokens; JYSK host), and confirming every image URL resolves (200 + image/*). IKEA normalised to a
+   good display size (`?f=xl`). The UI now shows the real photo only when `imageVerified`, else keeps the
+   placeholder. **Harvey Norman skipped** (its pages serve a wrong `og:image`). The 34 not imaged are dead
+   /drifted URLs → step 3 (see [docs/hr-url-review-10-24.md](docs/hr-url-review-10-24.md)). *Done.*
 5. **[ ] Security review + deploy to Railway + go-live checklist (HR beta).** Security review (keys
    backend-only, CORS, admin-endpoint guard active in prod, no secrets in logs/`.env.example`, input
    validation). Railway deploy: managed Postgres, env-based config for keys/feeds, **switch DB off
@@ -67,7 +75,27 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.23 — catalog hygiene: productUrl dedupe + build-time guards (current)
+### Sprint 10.24 — verified HR product images (road-to-production step 4) (current)
+- **Plumbing first** (committed separately): `imageVerified` end to end — `Product.image_verified`
+  (`@ColumnDefault false`), `RetailerProductSnapshotDto`/`ImportProductDto` (+ backwards-compatible ctors),
+  `RetailerCatalogAdapter`, `ProductImportService` (set only when an image is present; `inferDataQuality`
+  now needs a *verified* image for `complete`), `ProductDto`, frontend `Product` type + `PlanResults`
+  (real photo + "ilustracija" chip gated on `imageVerified`).
+- **236 / 270 reachable HR images web-verified** (IKEA 112, JYSK 73, Emmezeta 38, Namjestaj.hr 13).
+  Technique (deterministic, fabrication-proof): raw-HTTP GET each product page → regex the `og:image` meta
+  tag (WebFetch drops meta tags, so no model in the loop) → **product-identity cross-check** (IKEA slug ⊂
+  image, Emmezeta id ⊂ image, Namjestaj slug tokens; JYSK host-only as its CDN id is opaque) → confirm the
+  image URL resolves (200 + `image/*`; accept Emmezeta `octet-stream` with an image extension). IKEA
+  normalised to `?f=xl` (page-sourced asset, verified to resolve). Spot-checked 4 images visually — correct
+  products. **No fabrication, no 403-bypass.**
+- **Harvey Norman (14) skipped:** its product pages serve a wrong/generic `og:image` (a "patton" page
+  returns a "plaza" image) — untrustworthy, placeholder kept.
+- **Found 34 stale URLs** (the unimaged ones): ~15 dead (301 → category) + ~18 drifted (301 → live canonical)
+  + ÅRSTID podna→stolna. Documented for step 3 in [docs/hr-url-review-10-24.md](docs/hr-url-review-10-24.md);
+  this contradicts "HR just verified" → step 3 is not redundant.
+- Backend **133 tests, 0 failures**; frontend build clean; dedupe guards still green.
+
+### Sprint 10.23 — catalog hygiene: productUrl dedupe + build-time guards
 - **Dedupe (#10b / road-to-production step 3 start).** Collapsed the 6 rows that shared a retailer
   `productUrl` under two `externalId`s to one row each: 2× JYSK KANSTRUP cart + TRAPPEDAL (kept the
   living-room/new-rooms copies the runtime tests reference, removed the `real-hr-kitchen.json` /
