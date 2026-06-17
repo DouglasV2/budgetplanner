@@ -75,7 +75,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.24 — verified HR product images (road-to-production step 4) (current)
+### Sprint 10.25 — HR URL re-verification: dead → needs-review + drifted URLs refreshed (current)
+- Acted on the 34 stale URLs the 10.24 image pass found (road-to-production step 3, partial):
+  - **16 dead rows → `needs-review`** (URL 301s to a category / a different product — BESTÅ, MÅRUM/STOENSE/
+    TIPHEDE/ÅRENDE rugs, RINGSTA/STRANDAD/NYMÅNE/BARLAST lamps, VITTSJÖ, VANDEROTS/GURLI covers, STOFTMOLN,
+    ÅRSTID podna→stolna, JYSK VEJLBY/TROSTERUD). The planner's verified-only gate now excludes them.
+  - **18 drifted rows → `productUrl` refreshed to the canonical target + web-verified image** (the old URL
+    301s to the live product; JYSK BOVRUP/ELVERUM/VEDDE/LIMFJORDEN/AABENRAA/KRISTOF/BELLE/CIRKELHUSE/OLDEKROG/
+    RINDSHOLM/MARKSKEL, Emmezeta SLAVE/RETRO/SAWA/MAGNOLIA, IKEA ROEDEBY/SOENDRUM). All 18 got images.
+- **Exposed + fixed 2 hidden duplicate products:** canonicalising the drifted URLs made JYSK KRISTOF and
+  JYSK BOVRUP collide with an existing canonical row (same product, 2 externalIds, previously different URL
+  strings so the 10.23 guard missed them). Deduped: kept living-room KRISTOF (that file is at its JYSK floor;
+  merged the dropped row's 3 roomTags + reviews) and new-rooms BOVRUP (its only dining-chair); dropped the
+  redundant depth copies. Updated `HrMaxCatalogRuntimeTest` to allow `needs-review` rows.
+- Catalog **712 → 710 rows**; HR verified images **236 → 252**; backend **133 tests, 0 failures**.
+- **Still open in step 3:** full price + availability re-verification across the (now maxed) HR catalog.
+
+### Sprint 10.24 — verified HR product images (road-to-production step 4)
 - **Plumbing first** (committed separately): `imageVerified` end to end — `Product.image_verified`
   (`@ColumnDefault false`), `RetailerProductSnapshotDto`/`ImportProductDto` (+ backwards-compatible ctors),
   `RetailerCatalogAdapter`, `ProductImportService` (set only when an image is present; `inferDataQuality`

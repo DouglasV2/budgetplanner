@@ -55,8 +55,9 @@
     "retailer": "JYSK",
     "category": "dining-chair",
     "price": 159,
-    "productUrl": "https://jysk.hr/blagovaonica/blagovaonske-stolice/blagovaonska-stolica-bovrup-hrast/bez-tkanina",
-    "imageUrl": "",
+    "productUrl": "https://jysk.hr/blagovaonica/blagovaonske-stolice/blagovaonska-stolica-bovrup-natur-hrast-bez-tkanina",
+    "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/236761",
+    "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
@@ -71,7 +72,7 @@
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
     "externalId": "jysk-hr-kanstrup-polica-kotaci-crna",
@@ -177,8 +178,9 @@
     "retailer": "JYSK",
     "category": "storage",
     "price": 50,
-    "productUrl": "https://jysk.hr/pohranjivanje/namjestaj-za-hodnik/stalci-za-kapute-i-cipele/regal-za-hodnik-elverum-3-police-crna",
-    "imageUrl": "",
+    "productUrl": "https://jysk.hr/hodnik/namjestaj-za-hodnik/stalci-za-kapute-i-cipele/regal-za-hodnik-elverum-3-police-crna-celik",
+    "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/246339",
+    "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
@@ -193,6 +195,6 @@
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   }
 ]

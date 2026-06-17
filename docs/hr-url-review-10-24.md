@@ -1,5 +1,11 @@
 # HR catalog URL review — found during the image pass (Sprint 10.24)
 
+> **STATUS (resolved 2026-06-17, Sprint 10.25):** All 16 dead rows (§A) flipped to `needs-review` (planner
+> now excludes them). All 18 drifted rows (§B) had their `productUrl` refreshed to the canonical target and
+> got a web-verified image. Canonicalising 2 of them exposed 2 hidden duplicate products (JYSK KRISTOF lamp,
+> JYSK BOVRUP chair) — deduped (kept the row each test/file constraint required, dropped the redundant depth
+> copy, merged roomTags/reviews). Remaining step-3 work: full price/stock re-verification of the HR catalog.
+
 While fetching verified product images (step 4), the deterministic fetcher followed each HR product URL
 and recorded where it landed. **34 of 270 reachable HR rows did not yield a verified image because their
 stored `productUrl` no longer resolves to that product.** This is a **step-3 (re-verification)** signal:

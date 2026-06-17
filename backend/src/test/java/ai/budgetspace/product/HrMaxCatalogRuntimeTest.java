@@ -54,8 +54,12 @@ class HrMaxCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).startsWith("https://");
             assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
-            // Verified-only gate: every maximized row must be planner-eligible (sourced, in-stock, etc.).
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product)).as("planner-eligible %s", product.getExternalId()).isTrue();
+            // Verified-only gate: every maximized row must be planner-eligible (sourced, in-stock, etc.) —
+            // except rows flagged `needs-review` by re-verification (Sprint 10.24 found a dead/redirected
+            // URL), which are intentionally held out of the planner until re-sourced.
+            if (!"needs-review".equals(product.getDataQuality())) {
+                assertThat(CatalogSourcePolicy.isPlannerEligible(product)).as("planner-eligible %s", product.getExternalId()).isTrue();
+            }
         });
 
         // The previously-thin cells are now covered.

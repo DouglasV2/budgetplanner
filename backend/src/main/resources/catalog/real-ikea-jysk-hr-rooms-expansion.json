@@ -55,8 +55,9 @@
     "retailer": "JYSK",
     "category": "bed",
     "price": 259,
-    "productUrl": "https://jysk.hr/spavaca-soba/okviri-kreveta/okvir-kreveta-vedde-140x200-divlji-hrast",
-    "imageUrl": "",
+    "productUrl": "https://jysk.hr/spavaca-soba/kreveti/podnice-i-okviri-kreveta/okviri-kreveta/okvir-kreveta-vedde-140x200-divlji",
+    "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/256645",
+    "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
@@ -71,7 +72,7 @@
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
     "externalId": "jysk-hr-trya-140x200-madrac",
@@ -103,8 +104,9 @@
     "retailer": "JYSK",
     "category": "nightstand",
     "price": 55,
-    "productUrl": "https://jysk.hr/spavaca-soba/nocni-ormarici/nocni-ormaric-limfjorden-2-ladice-boja-svijetli-hrast",
-    "imageUrl": "",
+    "productUrl": "https://jysk.hr/spavaca-soba/nocni-ormarici/nocni-ormaric-limfjorden-2-ladice-svijetli-hrast-boja",
+    "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/255955",
+    "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-15",
@@ -119,7 +121,7 @@
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
     "externalId": "jysk-hr-tapdrup-nocni-ormaric-bijela",

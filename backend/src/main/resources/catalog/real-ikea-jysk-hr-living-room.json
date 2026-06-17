@@ -373,8 +373,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-lack-stolic-bijela-90",
@@ -562,8 +562,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-stoense-tepih-blijedoroza-170x240",
@@ -587,8 +587,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-tiphede-tepih-prirodna-crna",
@@ -612,8 +612,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-arende-tepih-visoki-flor-krem",
@@ -637,8 +637,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-stoense-tepih-krem-50426802",
@@ -688,8 +688,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-arstid-podna-lampa-mjed-bijela",
@@ -713,8 +713,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-strandad-podna-lampa-bijela-crna",
@@ -738,8 +738,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-lauters-podna-lampa-jasen-bijela",
@@ -789,8 +789,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-barlast-podna-lampa-crna-bijela",
@@ -814,8 +814,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-kallax-regal-bijela-77x147",
@@ -891,8 +891,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-vanderots-jastucnica-bijela",
@@ -916,8 +916,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-roedeby-pladanj-bambus",
@@ -925,8 +925,9 @@
     "retailer": "IKEA",
     "category": "decor",
     "price": 9.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/roedeby-pladanj-za-naslon-za-ruke-bambus-40417577/",
-    "imageUrl": "",
+    "productUrl": "https://www.ikea.com/hr/hr/p/roedeby-pladanj-naslon-za-ruke-bambus-40417577/",
+    "imageUrl": "https://www.ikea.com/hr/hr/images/products/roedeby-pladanj-naslon-za-ruke-bambus__0976295_pe813137_s5.jpg?f=xl",
+    "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-14",
@@ -942,7 +943,7 @@
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
     "externalId": "jysk-hr-trosjed-andrup-ovalni-bez",
@@ -992,8 +993,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "jysk-hr-fotelja-udsbjerg-siva",
@@ -1303,8 +1304,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "jysk-hr-stolic-nielshave-travertin",
@@ -1501,13 +1502,17 @@
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
     "lastCheckedAt": "2026-06-14",
     "roomTags": [
-      "living-room"
+      "living-room",
+      "bedroom",
+      "home-office"
     ],
     "styleTags": [
       "industrial",
       "modern"
     ],
     "priceTier": "budget",
+    "reviewRating": 4.8,
+    "reviewCount": 400,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",

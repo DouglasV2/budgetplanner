@@ -215,8 +215,8 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
-    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije nisu dodane: ovaj artikl preusmjerava na listing (vjerojatno ukinut) pa se ne može pouzdano provjeriti. Prije produkcije ponovno provjeri cijenu, sliku, zalihu i poveznicu."
+    "dataQuality": "needs-review",
+    "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije nisu dodane: ovaj artikl preusmjerava na listing (vjerojatno ukinut) pa se ne može pouzdano provjeriti. Prije produkcije ponovno provjeri cijenu, sliku, zalihu i poveznicu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-gurli-jastucnica-zuta",
