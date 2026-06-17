@@ -29,6 +29,14 @@ public class Product {
     @Column(name = "original_price", precision = 10, scale = 2)
     private BigDecimal originalPrice;
 
+    // --- Sprint 10.33: discount / sale tracking. A product is "on sale" only when a verified
+    // originalPrice (the regular price) is strictly greater than the current price. saleEndsAt is the
+    // verified end of the promo window (e.g. JYSK `priceValidUntil`, ISO date/datetime) so we can show
+    // the shopper how long the deal lasts and never imply a stale discount. Null = no known sale window.
+    // We never fabricate a discount: both fields are populated only from a live, web-verified page.
+    @Column(name = "sale_ends_at", length = 40)
+    private String saleEndsAt;
+
     @Column(name = "style_tags", nullable = false)
     private String styleTags;
 
@@ -174,6 +182,8 @@ public class Product {
     public void setPrice(BigDecimal price) { this.price = price; }
     public BigDecimal getOriginalPrice() { return originalPrice; }
     public void setOriginalPrice(BigDecimal originalPrice) { this.originalPrice = originalPrice; }
+    public String getSaleEndsAt() { return saleEndsAt; }
+    public void setSaleEndsAt(String saleEndsAt) { this.saleEndsAt = saleEndsAt; }
     public String getStyleTags() { return styleTags; }
     public void setStyleTags(String styleTags) { this.styleTags = styleTags; }
     public String getRoomTags() { return roomTags; }

@@ -153,7 +153,9 @@
     "name": "Ormar za cipele TERPET 2 odjeljka bijela",
     "retailer": "JYSK",
     "category": "storage",
-    "price": 139,
+    "price": 110,
+    "originalPrice": 139,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/pohranjivanje/elementi-za-obucu/ormar-za-cipele-terpet-2-odjeljka-bijela",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/246378",
     "imageVerified": true,
@@ -163,14 +165,14 @@
     "roomTags": ["hallway"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
-    "priceTier": "standard",
+    "priceTier": "budget",
     "reviewRating": 4.0,
     "reviewCount": 210,
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −21% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 139 €, JSON-LD price=akcijska 110 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-elverum-3-police-crna-celik",
@@ -178,6 +180,8 @@
     "retailer": "JYSK",
     "category": "storage",
     "price": 50,
+    "originalPrice": 64.99,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/hodnik/namjestaj-za-hodnik/stalci-za-kapute-i-cipele/regal-za-hodnik-elverum-3-police-crna-celik",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/246339",
     "imageVerified": true,
@@ -195,6 +199,6 @@
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
+    "dataQualityNotes": "Akcija −23% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 64.99 €, JSON-LD price=akcijska 50 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   }
 ]

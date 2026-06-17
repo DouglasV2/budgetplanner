@@ -49,12 +49,17 @@ public record RetailerProductSnapshotDto(
         Double reviewRating,
         // Sprint 10.23 (road-to-production step 4): true when imageUrl was verified on the live product
         // page (og:image / main gallery image). Null/false = unverified → the UI keeps the placeholder.
-        Boolean imageVerified
+        Boolean imageVerified,
+        // Sprint 10.33: discount / sale tracking. originalPrice is the verified regular price (the
+        // product is "on sale" only when price < originalPrice); saleEndsAt is the verified promo end
+        // (e.g. JYSK priceValidUntil). Both null unless web-verified on the live page — never fabricated.
+        BigDecimal originalPrice,
+        String saleEndsAt
 ) {
     /**
      * Backwards-compatible constructor for snapshots prepared before Sprint 10.7. Colour/material,
-     * reviews, market and image-verification default to empty; the import pipeline derives
-     * colour/material from the name.
+     * reviews, market, image-verification and sale fields default to empty; the import pipeline
+     * derives colour/material from the name.
      */
     public RetailerProductSnapshotDto(
             String externalId, String name, String retailer, String category, BigDecimal price,
@@ -65,6 +70,7 @@ public record RetailerProductSnapshotDto(
     ) {
         this(externalId, name, retailer, category, price, productUrl, imageUrl, availabilityStatus,
                 deliveryNote, lastCheckedAt, roomTags, styleTags, priceTier, sourceType, sourceName,
-                sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null, null);
+                sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null, null,
+                null, null);
     }
 }

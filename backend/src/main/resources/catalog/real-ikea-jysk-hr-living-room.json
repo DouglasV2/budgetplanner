@@ -950,7 +950,9 @@
     "name": "Trosjed ANDRUP ovalni bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 399,
+    "price": 315,
+    "originalPrice": 399,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-andrup-ovalni-bez-tkanina",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264033",
     "imageVerified": true,
@@ -969,7 +971,7 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −21% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 399 €, JSON-LD price=akcijska 315 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-trosjed-vejlby-tamnosiva",
@@ -1053,7 +1055,9 @@
     "name": "Fotelja LYNGAA bež tkanina",
     "retailer": "JYSK",
     "category": "chair",
-    "price": 215.0,
+    "price": 215,
+    "originalPrice": 299,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/dnevni-boravak/fotelje/fotelja-bez-lyngaa-odvojiva-navlaka-bez-tkanina",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/263939",
     "imageVerified": true,
@@ -1072,7 +1076,7 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −28% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 299 €, JSON-LD price=akcijska 215 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-podesiva-fotelja-vejlby-svijetli-pijesak",
@@ -1105,7 +1109,9 @@
     "name": "TV-stalak FAVRBO boja svijetli hrast/bijela",
     "retailer": "JYSK",
     "category": "tv-unit",
-    "price": 135.0,
+    "price": 135,
+    "originalPrice": 189,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/dnevni-boravak/stalci-za-tv/tv-stalak-favrbo-boja-svijetli-hrast-bijela",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/267142",
     "imageVerified": true,
@@ -1124,14 +1130,16 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −29% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 189 €, JSON-LD price=akcijska 135 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-tv-stalak-dense-topli-hrast-crna",
     "name": "TV-stalak DENSE 2 vrata 1 ladica topli hrast boja/crna",
     "retailer": "JYSK",
     "category": "tv-unit",
-    "price": 129.0,
+    "price": 100,
+    "originalPrice": 129,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/dnevni-boravak/stalci-za-tv/tv-stalak-dense-2-vrata-1-ladica-topli-hrast-boja-crna",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/237596",
     "imageVerified": true,
@@ -1145,12 +1153,12 @@
       "industrial",
       "modern"
     ],
-    "priceTier": "standard",
+    "priceTier": "budget",
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −22% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 129 €, JSON-LD price=akcijska 100 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-tv-stalak-astrup-crna",
@@ -1183,7 +1191,9 @@
     "name": "TV-stalak EVETOFTE boja svijetli hrast",
     "retailer": "JYSK",
     "category": "tv-unit",
-    "price": 110.0,
+    "price": 110,
+    "originalPrice": 139,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/dnevni-boravak/stalci-za-tv/tv-stalak-evetofte-boja-svijetli-hrast",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/267134",
     "imageVerified": true,
@@ -1202,7 +1212,7 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −21% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 139 €, JSON-LD price=akcijska 110 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-tv-stalak-limfjorden-bijela",
@@ -1312,7 +1322,9 @@
     "name": "Stolić NIELSHAVE Ø55 boja travertin",
     "retailer": "JYSK",
     "category": "table",
-    "price": 64.99,
+    "price": 40,
+    "originalPrice": 64.99,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/dnevni-boravak/stolici-za-kavu-i-pomocni-stolici/stolic-nielshave-o55-boja-travertin",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/263835",
     "imageVerified": true,
@@ -1331,7 +1343,7 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −38% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 64.99 €, JSON-LD price=akcijska 40 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-stolic-lunde-bijela-kava",
@@ -1494,7 +1506,9 @@
     "name": "Podna lampa KRISTOF Ø35xV145 cm čelik",
     "retailer": "JYSK",
     "category": "lighting",
-    "price": 30.0,
+    "price": 30,
+    "originalPrice": 54.99,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/kucanstvo/rasvjeta/svjetiljke/podna-lampa-kristof-o35xv145-cm-celik",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/243693",
     "imageVerified": true,
@@ -1517,14 +1531,16 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −45% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 54.99 €, JSON-LD price=akcijska 30 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-podna-lampa-hugo-crna",
     "name": "Podna lampa HUGO V154cm crna",
     "retailer": "JYSK",
     "category": "lighting",
-    "price": 49.99,
+    "price": 25,
+    "originalPrice": 49.99,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/kucanstvo/rasvjeta/svjetiljke/podna-lampa-hugo-v154cm-crna",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/243688",
     "imageVerified": true,
@@ -1547,7 +1563,7 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −50% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 49.99 €, JSON-LD price=akcijska 25 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-podna-lampa-dani-smeda",
@@ -1555,6 +1571,8 @@
     "retailer": "JYSK",
     "category": "lighting",
     "price": 27.5,
+    "originalPrice": 49.99,
+    "saleEndsAt": "2026-06-21",
     "productUrl": "https://jysk.hr/kucanstvo/rasvjeta/svjetiljke/podna-lampa-dani-v54cm-smeda",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/243687",
     "imageVerified": true,
@@ -1573,7 +1591,7 @@
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
+    "dataQualityNotes": "Akcija −45% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 49.99 €, JSON-LD price=akcijska 27.5 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
   },
   {
     "externalId": "jysk-hr-podna-lampa-hansson-crna",

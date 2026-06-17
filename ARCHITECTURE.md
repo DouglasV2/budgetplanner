@@ -77,7 +77,13 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   [docs/marketplace-sourcing.md](docs/marketplace-sourcing.md).
 
 ## Invariants (do not break)
-- **Never fabricate** product name/price/URL/image/review. Unverifiable → `needs-review`, image null.
+- **Never fabricate** product name/price/URL/image/review **or a discount** (regular price / sale %, / sale
+  window). Unverifiable → `needs-review`, image null, no sale shown. A fake "−40%" is worse than none.
+- **Sale tracking (Sprint 10.33).** `Product.originalPrice` = verified regular price, `Product.saleEndsAt` =
+  verified promo-window end (ISO date, e.g. JYSK `priceValidUntil`); a row is "on sale" only when
+  `price < originalPrice`. Both flow through `ProductDto` to the UI, which shows the dual %/€ saving + struck
+  price + "On sale" badge — and hides the discount once `saleEndsAt` passes. Populated from live pages only
+  (JYSK: `priceAmount`=regular, JSON-LD `price`=promo). Unverifiable → omit.
 - **Images: `imageVerified` gates the real photo.** `Product.imageVerified` is true only when `imageUrl` was
   confirmed on the retailer's live product page (`og:image`, identity-checked, resolves). The UI shows the
   real photo only then; otherwise it keeps the labelled "ilustracija" category placeholder. `inferDataQuality`

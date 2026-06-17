@@ -76,15 +76,17 @@ needs `OPENAI_API_KEY`, backend env only).
   A retention/hook feature: surface real sales and (opt-in) notify a user when a product they care about goes
   on sale. **Strictly web-verified — never fabricate a discount, a regular price, or a sale window** (same rule
   as everything else; a fake "−40%" is worse than none).
-  - **Data model (mostly exists):** `Product.originalPrice` already holds the pre-discount price; a product is
-    "on sale" when `price < originalPrice`. Add a `saleEndsAt` (we already read JYSK `priceValidUntil` and the
-    IKEA/Emmezeta promo flags during re-verification) and keep `price` = current, `originalPrice` = regular.
-    The re-verification pass (Sprint 10.27) is the natural place to populate all three.
-  - **Display (plan + product row):** when on sale, show the saving next to the item **both ways** — percent
-    and absolute, e.g. `−40% · ušteda 20 €` / `−40% · save €20`, plus a discreet "Na popustu / On sale" badge
-    and the struck-through `originalPrice`. New i18n keys; reuse the existing `originalPrice` plumbing in
-    `ProductDto`/`Product` type (already flows to the UI). Keep it honest: only show when verified on the live
-    page, with the "provjeri u trgovini" caveat.
+  - **Data model.** ✅ **Done (Sprint 10.33).** Added `Product.saleEndsAt` end to end (entity + snapshot/import
+    DTOs + adapter — which previously hard-coded `originalPrice=null`! — + `ProductDto` → frontend `Product`
+    type); import now validates `originalPrice>0` and a parseable `saleEndsAt`. `price` = current, `originalPrice`
+    = regular, a product is "on sale" when `price < originalPrice`. **Populated 24 real verified JYSK HR sales**
+    (deterministic live read: `priceAmount` = regular, JSON-LD `price` = promo, `priceValidUntil` = window) —
+    e.g. HUGO lamp 49.99→25 (−50%), EGEBY 69.99→35, until 2026-06-21. No fabrication.
+  - **Display (product row).** ✅ **Done (Sprint 10.33).** On a verified sale the product row shows the saving
+    **both ways** (`−40% · ušteda 20 €` / `−40% · save €20`), a discreet "Na popustu / On sale" badge and the
+    struck-through `originalPrice`, plus a "vrijedi do {date}" window. New i18n keys (`results.saleSaving`,
+    `results.saleEnds`, `results.regularPrice`) in all 6 languages. Honest guard: the discount is hidden once
+    `saleEndsAt` has passed (an expired promo is a false claim → freshness caveat takes over).
   - **Opt-in price-drop alert:** let a user "watch" a product or a saved plan; a scheduled re-check compares the
     live price to the stored one and, on a drop, notifies them ("X is on sale now, −Y%"). Needs: a `PriceWatch`
     entity (productId/externalId + market + target user/session + desired threshold), a re-check job that reuses
@@ -109,7 +111,31 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.32 — per-language localisation (DE / IT / SL / FI) (current)
+### Sprint 10.33 — discount / sale tracking: data model + verified sales + dual saving display (current)
+- **Data model (`saleEndsAt` end to end).** Added `Product.saleEndsAt` (ISO date, the verified promo-window
+  end) through the whole pipeline: `RetailerProductSnapshotDto` + `ImportProductDto` (+ back-compat ctors),
+  `RetailerCatalogAdapter` (which had been **discarding `originalPrice` — passing `null`** — now wired),
+  `ProductImportService` (stores it + validates `originalPrice>0` and a parseable `saleEndsAt`), `ProductDto`
+  → frontend `Product` type. `price` = current, `originalPrice` = regular; "on sale" ⇔ `price < originalPrice`.
+- **24 real verified JYSK HR sales populated.** Deterministic live read of each JYSK HR product page
+  (`priceAmount` = regular → `originalPrice`; JSON-LD `price` = promo → `price`; `priceValidUntil` = window →
+  `saleEndsAt`); only rows where promo < regular. Examples: HUGO lamp 49.99→25 (−50%, the famous 10.23 case),
+  EGEBY 69.99→35, ANDRUP sofa 399→315, MARKSKEL table 429→215 — all valid until 2026-06-21 (one row with a
+  schema.org +1yr default window kept its discount but no end date). `priceTier` recomputed from the new price.
+  **No fabrication, no 403-bypass.**
+- **Dual saving display (PlanResults product row).** Verified sale → struck-through regular price next to the
+  current price, a discreet "Na popustu / On sale" badge, `−X% · ušteda Y €`, and a "vrijedi do {date}" window.
+  New i18n keys (`results.saleSaving`/`results.saleEnds`/`results.regularPrice`) in HR+EN + de/it/sl/fi (parity
+  checked). Honest guard: once `saleEndsAt` passes, the discount is hidden (no stale "−40%").
+- **Verified:** backend **139 tests, 0 failures** (+`SaleCatalogRuntimeTest`: whole catalog imports clean, every
+  on-sale row has `originalPrice>price` + parseable `saleEndsAt` + planner-eligible + DTO round-trip; EGEBY
+  anchor). Frontend build clean; i18n parity 0 issues. Live full stack: `/api/products` and a generated
+  living-room plan both carry `originalPrice`+`saleEndsAt`; the planner naturally **selects** the cheaper
+  on-sale items. Catalog **806 rows, 0 parse errors, 0 dup URLs/ids**.
+- **Next:** opt-in `PriceWatch` + scheduled re-check job (reusing the deterministic extractor) + a
+  `PriceWatchNotifier` seam (log-only default, email provider later) + GDPR opt-in/unsubscribe (Sprint 10.34).
+
+### Sprint 10.32 — per-language localisation (DE / IT / SL / FI)
 - The app no longer shows English to non-HR markets — each renders in its own language: **HR Croatian, SI
   Slovenian, AT+DE German, IT Italian, FI Finnish** (English remains the fallback for any missing key).
 - Refactor: `Lang` widened to `hr|en|de|it|sl|fi`; each market's `lang` set accordingly in `markets.ts`. The

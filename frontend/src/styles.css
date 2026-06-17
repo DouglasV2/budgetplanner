@@ -1548,6 +1548,34 @@ textarea:focus {
   font-weight: 800;
 }
 
+/* Sprint 10.33: discount / sale tracking. The regular price is struck through next to the current price;
+   a discreet "On sale" badge + the dual percent/euro saving sit in the meta line. Greens read as savings. */
+.original-price {
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.meta-line .sale-chip {
+  background: rgba(102, 120, 95, 0.18);
+  color: #3f563a;
+  font-weight: 800;
+}
+
+.meta-line .sale-saving {
+  background: rgba(102, 120, 95, 0.1);
+  color: #33502d;
+  font-weight: 800;
+}
+
+.meta-line .sale-ends {
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .reviews-link {
   color: var(--ink);
   font-weight: 760;

@@ -349,6 +349,11 @@ const DICTIONARY: Record<string, Entry> = {
   'results.illustrationTitle': { hr: 'Nemamo stvarnu fotografiju ovog proizvoda — prikazana je ilustracija kategorije.', en: 'We don\'t have an actual photo of this product — a category illustration is shown.' },
   'results.illustrationChip': { hr: 'ilustracija', en: 'illustration' },
   'results.onSale': { hr: 'Akcija', en: 'On sale' },
+  // Sprint 10.33: discount / sale tracking. The saving is shown both ways (percent + euro). {amount} and
+  // {price} are already-formatted currency strings; {percent} is an integer. Only shown for verified sales.
+  'results.saleSaving': { hr: '−{percent}% · ušteda {amount}', en: '−{percent}% · save {amount}' },
+  'results.saleEnds': { hr: 'akcija do {date}', en: 'ends {date}' },
+  'results.regularPrice': { hr: 'Redovna cijena {price}', en: 'Regular price {price}' },
   'results.kept': { hr: 'Zadržano', en: 'Kept' },
   'results.whyThis': { hr: 'Zašto ovo?', en: 'Why this?' },
   'results.openInStore': { hr: 'Otvori u trgovini', en: 'Open in store' },

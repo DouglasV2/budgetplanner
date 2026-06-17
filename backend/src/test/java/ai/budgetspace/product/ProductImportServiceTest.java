@@ -142,7 +142,7 @@ class ProductImportServiceTest {
                 "https://example.com/image.jpg", "https://example.com/product", "in-stock",
                 null, java.time.LocalDate.now().toString(), "standard", null,
                 null, null, null, null, null,
-                null, null, null, null, null, null, true);
+                null, null, null, null, null, null, true, null);
 
         service.importProducts(List.of(dto));
 

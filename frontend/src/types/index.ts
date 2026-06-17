@@ -77,6 +77,10 @@ export interface Product {
   category: ProductCategory;
   price: number;
   originalPrice?: number;
+  // Sprint 10.33: discount / sale tracking. A product is "on sale" only when a verified originalPrice
+  // (the regular price) is strictly greater than price. saleEndsAt (ISO date) is the verified promo end
+  // window (e.g. JYSK priceValidUntil); absent = no known deadline. Never fabricated.
+  saleEndsAt?: string;
   styleTags: string[];
   roomTags: RoomType[];
   imageUrl?: string;

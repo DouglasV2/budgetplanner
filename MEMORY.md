@@ -23,8 +23,14 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
 - **Value-first monetization.** Core plan free; affiliate/sponsored fields exist but `affiliateUrl`
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
-## Current state (as of 2026-06-16)
-- Backend tests: **130 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16).
+## Current state (as of 2026-06-17)
+- Backend tests: **139 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31).
+- **Sale tracking (Sprint 10.33).** `Product.saleEndsAt` added end to end; the adapter now wires `originalPrice`
+  (it previously discarded it → `null`). A row is "on sale" when `price < originalPrice`; the UI shows the dual
+  %/€ saving + struck price + "On sale" badge + "vrijedi do {date}", hidden once `saleEndsAt` passes. **24 real
+  JYSK HR sales** populated by a deterministic live read (`priceAmount`=regular, JSON-LD `price`=promo,
+  `priceValidUntil`=window) — never fabricated. The JYSK promo/regular split is the reusable extractor for the
+  upcoming `PriceWatch` re-check job (10.34). EGEBY 69.99→35, HUGO 49.99→25 — valid until 2026-06-21.
 - Catalog snapshot files: **718 web-verified rows** across 33 files (seeded total ~770 incl. data.sql
   samples). IKEA is the bulk. Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +

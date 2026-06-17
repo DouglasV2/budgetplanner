@@ -46,7 +46,10 @@ public record ProductDto(
         String currency,
         // Sprint 10.23 (step 4): true when imageUrl is a verified product photo; the UI shows the real
         // image only then, otherwise it keeps the labelled "ilustracija" category placeholder.
-        boolean imageVerified
+        boolean imageVerified,
+        // Sprint 10.33: verified promo window end (e.g. JYSK priceValidUntil). With originalPrice (which
+        // already flows above) the UI shows the dual % + € saving; null = no known sale window.
+        String saleEndsAt
 ) {
     public static ProductDto from(Product product) {
         String market = Markets.normalize(product.getMarket());
@@ -82,7 +85,8 @@ public record ProductDto(
                 firstNonBlank(product.getReviewsUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),
                 market,
                 Markets.currencyFor(market),
-                product.isImageVerified()
+                product.isImageVerified(),
+                product.getSaleEndsAt()
         );
     }
 

@@ -182,6 +182,9 @@ public class ProductImportService {
         entity.setCategory(ProductTaxonomy.normalizeCategory(dto.category()).orElse(dto.category().trim()));
         entity.setPrice(dto.price());
         if (dto.originalPrice() != null) entity.setOriginalPrice(dto.originalPrice());
+        // Sprint 10.33: verified promo window. Only stored when present; the planner/UI treats the row
+        // as "on sale" only when originalPrice > price, so a saleEndsAt without a real discount is inert.
+        if (hasText(dto.saleEndsAt())) entity.setSaleEndsAt(dto.saleEndsAt().trim());
         entity.setStyleTags(joinCanonicalStyles(dto.styleTags()));
         entity.setRoomTags(joinCanonicalRooms(dto.roomTags()));
         if (hasText(dto.imageUrl())) {
@@ -308,6 +311,15 @@ public class ProductImportService {
 
         if (dto.price() == null || dto.price().compareTo(BigDecimal.ZERO) <= 0) {
             errors.add(error(rowNumber, externalId, "Cijena mora biti veća od 0."));
+        }
+        // Sprint 10.33: a sale must be honest. originalPrice (the regular price) must be a positive
+        // number; saleEndsAt must be a real date. We do not reject originalPrice <= price here (the row
+        // is simply not "on sale"), but a fabricated/garbage value is rejected.
+        if (dto.originalPrice() != null && dto.originalPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add(error(rowNumber, externalId, "originalPrice mora biti veća od 0."));
+        }
+        if (hasText(dto.saleEndsAt()) && !ProductTaxonomy.isParseableDate(dto.saleEndsAt())) {
+            errors.add(error(rowNumber, externalId, "saleEndsAt mora biti datum, npr. 2026-06-21 ili ISO vrijeme."));
         }
 
         if (dto.styleTags() == null || dto.styleTags().stream().noneMatch(this::hasText)) {

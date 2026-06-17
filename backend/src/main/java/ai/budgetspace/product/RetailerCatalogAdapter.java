@@ -29,7 +29,7 @@ public class RetailerCatalogAdapter {
                 snapshot.retailer(),
                 snapshot.category(),
                 snapshot.price(),
-                null,
+                snapshot.originalPrice(),
                 snapshot.styleTags(),
                 snapshot.roomTags(),
                 snapshot.imageUrl(),
@@ -50,7 +50,8 @@ public class RetailerCatalogAdapter {
                 snapshot.reviewsUrl(),
                 snapshot.market(),
                 snapshot.reviewRating(),
-                snapshot.imageVerified()
+                snapshot.imageVerified(),
+                snapshot.saleEndsAt()
         );
     }
 

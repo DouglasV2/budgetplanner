@@ -295,6 +295,43 @@ function reviewsUrl(product: Product) {
   return url.startsWith('http') ? url : '';
 }
 
+interface SaleInfo {
+  percent: number;
+  amount: number;
+  original: number;
+  endsAt?: string;
+}
+
+// Sprint 10.33: a verified sale. A product counts as "on sale" only when it carries a verified
+// originalPrice (the regular price) strictly above the current price — the % and € saving are both
+// derived from those verified numbers, never fabricated. If a saleEndsAt window exists and has already
+// passed, we deliberately do NOT show the discount (an expired promo would be a false claim); the normal
+// "provjeri cijenu u trgovini" freshness caveat then takes over.
+function saleInfo(product: Product): SaleInfo | null {
+  const original = product.originalPrice;
+  if (typeof original !== 'number' || !(original > product.price)) return null;
+  if (product.saleEndsAt && saleWindowEnded(product.saleEndsAt)) return null;
+  const amount = original - product.price;
+  const percent = Math.round((amount / original) * 100);
+  if (percent <= 0) return null;
+  return { percent, amount, original, endsAt: product.saleEndsAt };
+}
+
+function saleWindowEnded(saleEndsAt: string): boolean {
+  const parsed = new Date(saleEndsAt.length >= 10 ? saleEndsAt.slice(0, 10) : saleEndsAt);
+  if (Number.isNaN(parsed.getTime())) return false; // unparseable → don't suppress on that basis
+  parsed.setHours(23, 59, 59, 999);
+  return Date.now() > parsed.getTime();
+}
+
+function formatSaleEndDate(saleEndsAt: string): string {
+  const parsed = new Date(saleEndsAt.length >= 10 ? saleEndsAt.slice(0, 10) : saleEndsAt);
+  if (Number.isNaN(parsed.getTime())) return '';
+  const dd = String(parsed.getDate()).padStart(2, '0');
+  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+  return `${dd}.${mm}.${parsed.getFullYear()}`;
+}
+
 const STALE_AFTER_DAYS = 14;
 
 // Freshness v0: if we last checked this product too long ago (or never), the price and
@@ -664,6 +701,7 @@ export function PlanResults({
                   const reviewsHref = reviewsUrl(product);
                   const market = marketBadge(product);
                   const illustration = usesFallbackImage(product);
+                  const sale = saleInfo(product);
                   return (
                     <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
                       <img
@@ -675,7 +713,14 @@ export function PlanResults({
                       <div className="product-info">
                         <div className="product-title-line">
                           <strong>{product.name}</strong>
-                          <span>{formatCurrency(product.price)}</span>
+                          <span>
+                            {formatCurrency(product.price)}
+                            {sale && (
+                              <s className="original-price" title={t('results.regularPrice', { price: formatCurrency(sale.original) })}>
+                                {formatCurrency(sale.original)}
+                              </s>
+                            )}
+                          </span>
                         </div>
                         <div className="meta-line">
                           <span>{product.retailer}</span>
@@ -693,7 +738,21 @@ export function PlanResults({
                               {t('results.illustrationChip')}
                             </span>
                           )}
-                          {product.originalPrice && <span>{t('results.onSale')}</span>}
+                          {sale && (
+                            <span className="sale-chip" title={t('results.regularPrice', { price: formatCurrency(sale.original) })}>
+                              {t('results.onSale')}
+                            </span>
+                          )}
+                          {sale && (
+                            <span className="sale-saving">
+                              {t('results.saleSaving', { percent: sale.percent, amount: formatCurrency(sale.amount) })}
+                            </span>
+                          )}
+                          {sale?.endsAt && (
+                            <span className="sale-ends" title={t('results.checkPriceInStore')}>
+                              {t('results.saleEnds', { date: formatSaleEndDate(sale.endsAt) })}
+                            </span>
+                          )}
                           {locked && <span>{t('results.kept')}</span>}
                         </div>
                         <small className="product-shop-note">{priceTierLabel(t, product)} · {productCheckLabel(t, product)}</small>
