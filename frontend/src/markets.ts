@@ -11,19 +11,35 @@ export interface MarketConfig {
   locale: string;
   lang: Lang;
   available: boolean;
+  flag: string;
 }
 
 // Sprint 10.28: all six EUR markets are now exposed. HR is Croatian; the other markets render in English
 // (the common European language) until per-language localisation (DE/IT/SL/FI) lands. Each has a verified,
-// currency-correct EUR catalog.
+// currency-correct EUR catalog. Sprint 10.30: `flag` for the country picker.
 export const MARKETS: MarketConfig[] = [
-  { code: 'HR', label: 'Hrvatska', currency: 'EUR', locale: 'hr-HR', lang: 'hr', available: true },
-  { code: 'SI', label: 'Slovenija', currency: 'EUR', locale: 'sl-SI', lang: 'en', available: true },
-  { code: 'AT', label: 'Österreich', currency: 'EUR', locale: 'de-AT', lang: 'en', available: true },
-  { code: 'DE', label: 'Deutschland', currency: 'EUR', locale: 'de-DE', lang: 'en', available: true },
-  { code: 'IT', label: 'Italia', currency: 'EUR', locale: 'it-IT', lang: 'en', available: true },
-  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'en', available: true }
+  { code: 'HR', label: 'Hrvatska', currency: 'EUR', locale: 'hr-HR', lang: 'hr', available: true, flag: '🇭🇷' },
+  { code: 'SI', label: 'Slovenija', currency: 'EUR', locale: 'sl-SI', lang: 'en', available: true, flag: '🇸🇮' },
+  { code: 'AT', label: 'Österreich', currency: 'EUR', locale: 'de-AT', lang: 'en', available: true, flag: '🇦🇹' },
+  { code: 'DE', label: 'Deutschland', currency: 'EUR', locale: 'de-DE', lang: 'en', available: true, flag: '🇩🇪' },
+  { code: 'IT', label: 'Italia', currency: 'EUR', locale: 'it-IT', lang: 'en', available: true, flag: '🇮🇹' },
+  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'en', available: true, flag: '🇫🇮' }
 ];
+
+// Sprint 10.30: major cities per market for the optional city picker (datalist suggestions; the user can
+// always type a different city). Kept in sync with the prompt city-detection patterns below.
+export const CITIES_BY_MARKET: Record<string, string[]> = {
+  HR: ['Zagreb', 'Split', 'Rijeka', 'Osijek', 'Zadar', 'Pula', 'Slavonski Brod', 'Karlovac', 'Varaždin', 'Šibenik', 'Dubrovnik', 'Sisak'],
+  SI: ['Ljubljana', 'Maribor', 'Celje', 'Kranj', 'Koper', 'Velenje', 'Novo Mesto', 'Ptuj'],
+  AT: ['Wien', 'Graz', 'Linz', 'Salzburg', 'Innsbruck', 'Klagenfurt', 'Villach', 'Wels'],
+  DE: ['Berlin', 'München', 'Hamburg', 'Köln', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dresden', 'Hannover'],
+  IT: ['Roma', 'Milano', 'Napoli', 'Torino', 'Palermo', 'Genova', 'Bologna', 'Firenze', 'Venezia', 'Verona'],
+  FI: ['Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu', 'Turku', 'Jyväskylä', 'Lahti'],
+};
+
+export function citiesForMarket(code?: string): string[] {
+  return CITIES_BY_MARKET[(code ?? 'HR').toUpperCase()] ?? [];
+}
 
 export function marketConfig(code?: string): MarketConfig {
   return MARKETS.find((market) => market.code === (code ?? 'HR')) ?? MARKETS[0];

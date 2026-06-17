@@ -85,7 +85,25 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.29 — EU depth: fill the IT + FI dining-room gap (current)
+### Sprint 10.30 — QoL pass: form usability + market-aware location & stores (current)
+- **Left sidebar scrolls on its own** (`.planner-panel` max-height + `overflow-y` inside the sticky column),
+  so the user reaches every field without scrolling the whole page first; natural flow on mobile.
+- **Room size field**: label → "Kvadratura"/"Floor area" with an **`m²` unit suffix inside the input**
+  (mirrors the budget `€` field); humanised the count word "stvar/stvari" → "komad/komada" (EN keeps item/s).
+- **Country picker with flags + per-country city combobox** replaces the free location text field: a
+  flag-prefixed `<select>` (🇭🇷🇸🇮🇦🇹🇩🇪🇮🇹🇫🇮) drives the market, and a `datalist`-backed city input
+  suggests that country's cities while still allowing free entry (`CITIES_BY_MARKET` in markets.ts). Header
+  market `<select>` also shows flags now (both stay in sync).
+- **Market-aware store list**: the "Where do you want to shop" pills now show only the stores that actually
+  have products in the selected country (`retailersByMarket`: HR=IKEA/JYSK/Emmezeta/Harvey Norman/Namjestaj;
+  DE=+Otto/Segmüller/Poco; IT=IKEA-only; …). Switching country resets the selection to that market's stores
+  (so e.g. IT never keeps an HR-only store → empty plan). **This unlocks the previously-unreachable Harvey
+  Norman / Namjestaj.hr / Otto / Segmüller / Poco products** — the form only ever sent the fixed 6 retailers,
+  so the backend (which already knows all 11) never received them. Expanded the `Retailer` TS type to match.
+- Verified at runtime (vite + preview eval): country flags, IT→[IKEA] store reset, Italian city list, header
+  sync all correct. Frontend build clean; 0 missing i18n keys.
+
+### Sprint 10.29 — EU depth: fill the IT + FI dining-room gap
 - Measured EU coverage by market×room: SI/AT/DE solid; **IT (51 rows, IKEA-only) and FI (65) had
   `dining-room=0`** — their dining-room plans were empty. Filled it with verified IKEA dining tables + chairs
   ported via the global article-number trick to `/it/it/` and `/fi/fi/` (the number resolves regardless of

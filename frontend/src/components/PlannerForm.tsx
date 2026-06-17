@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FurnishingLevel, OptimizationGoal, PlannerInput, ProductCategory, Retailer, RoomType, StyleType } from '../types';
-import { categoryLabels, formatCurrency, retailers } from '../utils/planner';
+import { categoryLabels, formatCurrency, retailersForMarket } from '../utils/planner';
+import { MARKETS, citiesForMarket } from '../markets';
 import { useLocale } from '../LocaleContext';
 
 interface PlannerFormProps {
@@ -170,9 +171,9 @@ function applyTemplate(input: PlannerInput, template: Partial<PlannerInput>, pro
   };
 }
 
-function selectedShopMode(input: PlannerInput) {
+function selectedShopMode(input: PlannerInput, marketRetailers: Retailer[]) {
   if (input.retailerMode === 'single') return 'one-store';
-  if (input.selectedRetailers.length === retailers.length) return 'best-combo';
+  if (marketRetailers.length > 0 && marketRetailers.every((retailer) => input.selectedRetailers.includes(retailer))) return 'best-combo';
   return 'choose-stores';
 }
 
@@ -208,9 +209,11 @@ function categoriesFromText(value: string): ProductCategory[] {
 }
 
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
-  const { t } = useLocale();
+  const { t, market, setMarket } = useLocale();
   const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
-  const shopMode = selectedShopMode(input);
+  const marketRetailers = retailersForMarket(market);
+  const shopMode = selectedShopMode(input, marketRetailers);
+  const cityExample = citiesForMarket(market)[0] ?? '';
   const visibleCategoryOptions = visibleCategories(input);
   const alreadyHaveText = input.alreadyHaveCategories.map((category) => categoryLabels[category]).join(", ");
 
@@ -373,10 +376,39 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             <small className="field-help">{t(styles.find((style) => style.value === input.style)?.hint ?? '')}</small>
           </label>
           <label>
-            <span>{t('form.locationLabel')}</span>
-            <input aria-label={t('form.locationAriaLabel')} value={input.location} onChange={(event) => onChange({ ...input, location: event.target.value })} />
-            <small className="field-help">{t('form.locationHelp')}</small>
+            <span>{t('form.countryLabel')}</span>
+            <select
+              className="country-select"
+              value={market}
+              aria-label={t('form.countryLabel')}
+              onChange={(event) => setMarket(event.target.value)}
+            >
+              {MARKETS.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.flag} {option.label}
+                </option>
+              ))}
+            </select>
+            <small className="field-help">{t('form.countryHelp')}</small>
           </label>
+        </div>
+
+        <div className="control-block city-block">
+          <span className="friendly-label">{t('form.cityLabel')}</span>
+          <input
+            className="city-input"
+            list="city-suggestions"
+            aria-label={t('form.cityAriaLabel')}
+            value={input.location}
+            placeholder={t('form.cityPlaceholder', { example: cityExample })}
+            onChange={(event) => onChange({ ...input, location: event.target.value })}
+          />
+          <datalist id="city-suggestions">
+            {citiesForMarket(market).map((city) => (
+              <option key={city} value={city} />
+            ))}
+          </datalist>
+          <small className="field-help">{t('form.locationHelp')}</small>
         </div>
       </div>
 
@@ -388,7 +420,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           <button
             type="button"
             className={shopMode === 'best-combo' ? 'shop-mode active' : 'shop-mode'}
-            onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: retailers, optimizationGoal: 'best-value' })}
+            onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: marketRetailers, optimizationGoal: 'best-value' })}
           >
             <strong>{t('form.shopBestComboTitle')}</strong>
             <span>{t('form.shopBestComboDescription')}</span>
@@ -396,7 +428,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           <button
             type="button"
             className={shopMode === 'one-store' ? 'shop-mode active' : 'shop-mode'}
-            onClick={() => onChange({ ...input, retailerMode: 'single', selectedRetailers: [input.selectedRetailers[0] ?? 'IKEA'], optimizationGoal: 'least-stores' })}
+            onClick={() => onChange({ ...input, retailerMode: 'single', selectedRetailers: [marketRetailers.find((retailer) => input.selectedRetailers.includes(retailer)) ?? marketRetailers[0] ?? 'IKEA'], optimizationGoal: 'least-stores' })}
           >
             <strong>{t('form.shopOneStoreTitle')}</strong>
             <span>{t('form.shopOneStoreDescription')}</span>
@@ -404,7 +436,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           <button
             type="button"
             className={shopMode === 'choose-stores' ? 'shop-mode active' : 'shop-mode'}
-            onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: input.selectedRetailers.length ? input.selectedRetailers : ['IKEA', 'JYSK'] })}
+            onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: input.selectedRetailers.length ? input.selectedRetailers : marketRetailers.slice(0, 2) })}
           >
             <strong>{t('form.shopChooseStoresTitle')}</strong>
             <span>{t('form.shopChooseStoresDescription')}</span>
@@ -412,7 +444,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
 
         <div className="retailer-pills friendly-pills">
-          {retailers.map((retailer) => {
+          {marketRetailers.map((retailer) => {
             const active = input.selectedRetailers.includes(retailer);
             return (
               <button type="button" key={retailer} className={active ? 'pill active' : 'pill'} onClick={() => onChange(setRetailer(input, retailer))}>

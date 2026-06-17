@@ -1,4 +1,17 @@
-export type Retailer = 'IKEA' | 'JYSK' | 'Pevex' | 'Decathlon' | 'Emmezeta' | 'Lesnina';
+export type Retailer =
+  | 'IKEA'
+  | 'JYSK'
+  | 'Pevex'
+  | 'Decathlon'
+  | 'Emmezeta'
+  | 'Lesnina'
+  // Sprint 10.30: retailers that actually have verified products in some markets (mirrors the backend
+  // PlannerService.RETAILERS list) so the store picker can offer them per country.
+  | 'Harvey Norman'
+  | 'Namjestaj.hr'
+  | 'Otto'
+  | 'Segmüller'
+  | 'Poco';
 
 export type RoomType =
   | 'living-room'

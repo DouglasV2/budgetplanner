@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
-import { formatCurrency, roomLabels, styleLabels } from '../utils/planner';
+import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
 import { detectMarketFromText, marketConfig } from '../markets';
 import { PlannerForm } from './PlannerForm';
@@ -162,7 +162,15 @@ export function Planner() {
   // Sprint 10.13 (#3): keep the request's market in sync with the selected country so the backend
   // filters the catalog and the totals are formatted in that market's currency.
   useEffect(() => {
-    setInput((current) => (current.market === market ? current : { ...current, market }));
+    setInput((current) => {
+      if (current.market === market) return current;
+      // Sprint 10.30: when the country changes, keep only the stores that exist in the new market and
+      // fall back to that market's stores if none of the previous picks are available — so switching to
+      // e.g. IT never leaves an HR-only store selected (which would yield an empty plan).
+      const allowed = retailersForMarket(market);
+      const kept = current.selectedRetailers.filter((retailer) => allowed.includes(retailer));
+      return { ...current, market, selectedRetailers: kept.length ? kept : allowed };
+    });
   }, [market]);
 
   useEffect(() => {

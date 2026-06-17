@@ -3,6 +3,24 @@ import { marketConfig } from '../markets';
 
 export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon', 'Lesnina'];
 
+// Sprint 10.30: which retailers actually have verified products per market (mirrors the catalog + the
+// backend PlannerService.RETAILERS list). The store picker offers these per selected country, and the
+// "best combo" mode selects exactly them — so a plan never silently includes a store with no local
+// products, and the previously-unreachable Harvey Norman / Namjestaj.hr / Otto / Segmüller / Poco
+// products now become selectable in their markets.
+export const retailersByMarket: Record<string, Retailer[]> = {
+  HR: ['IKEA', 'JYSK', 'Emmezeta', 'Harvey Norman', 'Namjestaj.hr'],
+  SI: ['IKEA', 'JYSK', 'Harvey Norman'],
+  AT: ['IKEA', 'JYSK'],
+  DE: ['IKEA', 'JYSK', 'Otto', 'Segmüller', 'Poco'],
+  IT: ['IKEA'],
+  FI: ['IKEA', 'JYSK'],
+};
+
+export function retailersForMarket(code?: string): Retailer[] {
+  return retailersByMarket[(code ?? 'HR').toUpperCase()] ?? ['IKEA', 'JYSK'];
+}
+
 export const categoryLabels: Record<ProductCategory, string> = {
   sofa: 'Sofa / kauč',
   chair: 'Stolica',

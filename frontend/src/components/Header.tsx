@@ -20,7 +20,7 @@ export function Header() {
           <select value={market} onChange={(event) => setMarket(event.target.value)}>
             {MARKETS.map((option) => (
               <option key={option.code} value={option.code}>
-                {option.label}
+                {option.flag} {option.label}
               </option>
             ))}
           </select>
