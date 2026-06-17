@@ -45,6 +45,11 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
 - **ai/** — `LlmClient` (+ `OpenAiLlmClient`/`AnthropicLlmClient`), `LlmClientFactory`, `LlmProperties`,
   `AiUsageTracker` (monthly-USD + per-day + per-session caps). Off by default.
 - **saved/**, **tracking/** — saved plans; product-click / plan-feedback events.
+- **pricewatch/** — opt-in price-drop alerts (Sprint 10.34): `PriceWatch` entity + `POST /api/price-watch`
+  (explicit GDPR consent, idempotent) + one-click unsubscribe; a scheduled `PriceWatchRecheckService`
+  (**off by default**, `budgetspace.price-watch.recheck-enabled`) that reuses a deterministic `LivePriceProbe`
+  (raw HTTP + JSON-LD price) and a `PriceWatchNotifier` **seam** (`LoggingPriceWatchNotifier` default via
+  `@ConditionalOnMissingBean`; a real email provider plugs in via backend env — no committed creds).
 - **config/** — `CorsConfig` (allows the frontend origin + `X-BudgetSpace-Session` header),
   `AdminEndpointGuardFilter` (hides admin/collector/import endpoints in prod), `GlobalExceptionHandler`.
 

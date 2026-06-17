@@ -24,13 +24,20 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-17)
-- Backend tests: **139 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31).
+- Backend tests: **154 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31, 139 in 10.33).
 - **Sale tracking (Sprint 10.33).** `Product.saleEndsAt` added end to end; the adapter now wires `originalPrice`
   (it previously discarded it → `null`). A row is "on sale" when `price < originalPrice`; the UI shows the dual
   %/€ saving + struck price + "On sale" badge + "vrijedi do {date}", hidden once `saleEndsAt` passes. **24 real
   JYSK HR sales** populated by a deterministic live read (`priceAmount`=regular, JSON-LD `price`=promo,
-  `priceValidUntil`=window) — never fabricated. The JYSK promo/regular split is the reusable extractor for the
-  upcoming `PriceWatch` re-check job (10.34). EGEBY 69.99→35, HUGO 49.99→25 — valid until 2026-06-21.
+  `priceValidUntil`=window) — never fabricated. EGEBY 69.99→35, HUGO 49.99→25 — valid until 2026-06-21.
+- **Price-drop alerts (Sprint 10.34).** New `ai.budgetspace.pricewatch` package: `PriceWatch` entity + opt-in
+  `POST /api/price-watch` (explicit consent → 400 otherwise, idempotent) + unsubscribe; `PriceWatchRecheckService`
+  (@Scheduled, **off by default** via `budgetspace.price-watch.recheck-enabled`) reuses a deterministic
+  `LivePriceProbe` (raw HTTP + JSON-LD price — same approach as the sourcing scans). Delivery is a
+  `PriceWatchNotifier` **seam** (log-only `LoggingPriceWatchNotifier` default via `@ConditionalOnMissingBean`;
+  real email provider plugs in via backend env later — owner deferred, like OpenAI/Railway). Alert rule: ≥5% drop,
+  ≤1/product/7-days, never re-notify same/higher price. GDPR: consent + 1-click unsubscribe + store only the email.
+  **To go live:** wire an email provider + flip `recheck-enabled` on.
 - Catalog snapshot files: **718 web-verified rows** across 33 files (seeded total ~770 incl. data.sql
   samples). IKEA is the bulk. Recent: 10.17 +51 (HR bathroom/hallway/kitchen); 10.18 +104 (SI/AT/DE
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +

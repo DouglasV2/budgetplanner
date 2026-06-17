@@ -24,6 +24,7 @@ import {
   styleLabels
 } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
+import { watchProduct } from '../api/client';
 
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
 
@@ -496,12 +497,59 @@ export function PlanResults({
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const [dislikeProductId, setDislikeProductId] = useState<string | null>(null);
+  // Sprint 10.34: opt-in price-drop watch (one inline form open at a time).
+  const [watchProductId, setWatchProductId] = useState<string | null>(null);
+  const [watchEmail, setWatchEmail] = useState('');
+  const [watchConsent, setWatchConsent] = useState(false);
+  const [watchSubmitting, setWatchSubmitting] = useState(false);
+  const [watchStatus, setWatchStatus] = useState<{ id: string; type: 'ok' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     setSelectedPlanId(preferredPlanId(plans, input));
     setExpandedProductId(null);
     setDislikeProductId(null);
+    setWatchProductId(null);
+    setWatchStatus(null);
   }, [plans, input.optimizationGoal, input.furnishingLevel]);
+
+  function openWatchForm(productId: string) {
+    setWatchProductId(watchProductId === productId ? null : productId);
+    setWatchStatus(null);
+    setWatchEmail('');
+    setWatchConsent(false);
+  }
+
+  async function submitWatch(product: Product) {
+    if (!watchConsent) {
+      setWatchStatus({ id: product.id, type: 'error', message: t('results.watchConsentRequired') });
+      return;
+    }
+    setWatchSubmitting(true);
+    try {
+      const res = await watchProduct({
+        email: watchEmail.trim(),
+        externalId: product.externalId || product.id,
+        market: product.market,
+        consent: true
+      });
+      setWatchStatus({
+        id: product.id,
+        type: 'ok',
+        message: res.alreadyWatching ? t('results.watchAlready') : t('results.watchSuccess', { email: res.email })
+      });
+      setWatchProductId(null);
+      setWatchEmail('');
+      setWatchConsent(false);
+    } catch (error) {
+      setWatchStatus({
+        id: product.id,
+        type: 'error',
+        message: error instanceof Error ? error.message : t('results.watchError')
+      });
+    } finally {
+      setWatchSubmitting(false);
+    }
+  }
 
   async function copyPlan(plan: FurnishingPlan) {
     const text = formatPlanForSharing(plan, input);
@@ -782,6 +830,9 @@ export function PlanResults({
                           <button type="button" onClick={() => onToggleLock(product.id)}>
                             {locked ? t('results.release') : t('results.keep')}
                           </button>
+                          <button type="button" className="watch-price-button" aria-expanded={watchProductId === product.id} onClick={() => openWatchForm(product.id)}>
+                            {t('results.watchPrice')}
+                          </button>
                         </div>
                         {expanded && (
                           <div className="replacement-menu" aria-label={t('results.replacementMenuLabel')}>
@@ -799,6 +850,34 @@ export function PlanResults({
                               </div>
                             )}
                           </div>
+                        )}
+                        {watchProductId === product.id && (
+                          <div className="price-watch-form" aria-label={t('results.watchTitle')}>
+                            <span className="price-watch-title">{t('results.watchTitle')}</span>
+                            <input
+                              type="email"
+                              className="price-watch-email"
+                              value={watchEmail}
+                              onChange={(event) => setWatchEmail(event.target.value)}
+                              placeholder={t('results.watchEmailPlaceholder')}
+                              aria-label={t('results.watchEmailPlaceholder')}
+                            />
+                            <label className="price-watch-consent">
+                              <input type="checkbox" checked={watchConsent} onChange={(event) => setWatchConsent(event.target.checked)} />
+                              <span>{t('results.watchConsent')}</span>
+                            </label>
+                            <div className="price-watch-actions">
+                              <button type="button" className="price-watch-submit" onClick={() => submitWatch(product)} disabled={watchSubmitting}>
+                                {watchSubmitting ? t('results.watchSubmitting') : t('results.watchSubmit')}
+                              </button>
+                              <button type="button" onClick={() => setWatchProductId(null)}>{t('results.watchCancel')}</button>
+                            </div>
+                          </div>
+                        )}
+                        {watchStatus?.id === product.id && (
+                          <small className={watchStatus.type === 'ok' ? 'price-watch-status ok' : 'price-watch-status error'}>
+                            {watchStatus.message}
+                          </small>
                         )}
                       </div>
                     </div>

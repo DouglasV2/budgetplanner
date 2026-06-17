@@ -1576,6 +1576,70 @@ textarea:focus {
   font-weight: 600;
 }
 
+/* Sprint 10.34: opt-in price-drop watch — a discreet inline form on the product row. */
+.price-watch-form {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(31, 29, 26, 0.12);
+  border-radius: 12px;
+  background: rgba(102, 120, 95, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price-watch-title {
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+.price-watch-email {
+  padding: 9px 11px;
+  border: 1px solid rgba(31, 29, 26, 0.18);
+  border-radius: 9px;
+  font: inherit;
+  max-width: 320px;
+}
+
+.price-watch-consent {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.price-watch-consent input {
+  margin-top: 3px;
+  flex: 0 0 auto;
+}
+
+.price-watch-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.price-watch-submit {
+  background: var(--orange, #ec7a2e);
+  color: #fff;
+  border: none;
+}
+
+.price-watch-status {
+  display: block;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.price-watch-status.ok {
+  color: #33502d;
+}
+
+.price-watch-status.error {
+  color: #9a3412;
+}
+
 .reviews-link {
   color: var(--ink);
   font-weight: 760;

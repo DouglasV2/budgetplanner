@@ -87,16 +87,23 @@ needs `OPENAI_API_KEY`, backend env only).
     struck-through `originalPrice`, plus a "vrijedi do {date}" window. New i18n keys (`results.saleSaving`,
     `results.saleEnds`, `results.regularPrice`) in all 6 languages. Honest guard: the discount is hidden once
     `saleEndsAt` has passed (an expired promo is a false claim → freshness caveat takes over).
-  - **Opt-in price-drop alert:** let a user "watch" a product or a saved plan; a scheduled re-check compares the
-    live price to the stored one and, on a drop, notifies them ("X is on sale now, −Y%"). Needs: a `PriceWatch`
-    entity (productId/externalId + market + target user/session + desired threshold), a re-check job that reuses
-    the deterministic price extractor, and a delivery channel (email first; push later). GDPR: explicit opt-in,
-    easy unsubscribe, store only what's needed.
+  - **Opt-in price-drop alert.** ✅ **Done (Sprint 10.34).** `PriceWatch` entity (externalId + market +
+    retailer + email + baseline + threshold + consent + unsubscribe token), `POST /api/price-watch` (explicit
+    consent required → 400 otherwise; idempotent per email+product) + `GET /api/price-watch/unsubscribe`,
+    a scheduled `PriceWatchRecheckService` that reuses a deterministic `LivePriceProbe` (raw HTTP + JSON-LD
+    price), and a `PriceWatchNotifier` **seam** with a log-only default (`@ConditionalOnMissingBean`) — a real
+    email provider plugs in later via backend env (owner decision: seam now). Aggressiveness (owner decision):
+    ≥5% drop, ≤1 alert/product/cooldown (7 days), never re-notify the same/higher price. The re-check trigger is
+    OFF by default (`budgetspace.price-watch.recheck-enabled=false`) so nothing fetches by surprise. GDPR:
+    explicit opt-in, one-click unsubscribe, stores only email + product + threshold + consent timestamp. A
+    product-row "Watch price" form (email + consent) wires it to the UI.
   - **Monetisation tie-in (value-first):** sale alerts drive return visits + affiliate conversions, but a
     sponsored/affiliate item must still never displace the best organic pick (existing invariant). The alert is
     a genuine user benefit first.
-  - *Done when:* verified sales show the dual % + € saving + badge in plans, and an opted-in user gets a real
-    price-drop notification — with zero fabricated discounts.
+  - *Done when:* ✅ verified sales show the dual % + € saving + badge in plans (10.33), and an opted-in user can
+    watch a product and (when the re-check + a provider are enabled) gets a real price-drop notification (10.34)
+    — with zero fabricated discounts. **Remaining before live alerts:** wire a real email provider + flip
+    `recheck-enabled` on (the seam + logic are done and tested).
 - **Full-catalog re-verification** near launch (all 6 markets, ~665 rows) — same freshness rule as step 3.
 - **First real `RetailerFeed`** (Decathlon/Pevex/Lesnina) → unlocks `home-gym` and retires the last sample
   dependency (`ai.budgetspace.feed` seam already exists; never scrape).
@@ -111,7 +118,32 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.33 — discount / sale tracking: data model + verified sales + dual saving display (current)
+### Sprint 10.34 — opt-in price-drop alerts: PriceWatch + re-check job + notifier seam + GDPR (current)
+- **`PriceWatch` entity + endpoints.** New `ai.budgetspace.pricewatch` package: entity (externalId + market +
+  retailer + denormalised product snapshot + email + baseline price + threshold + consent timestamp + active +
+  unsubscribe token + last-notified guard), `PriceWatchRepository`, `PriceWatchService` (validates explicit
+  consent + email + a real link-bearing product; idempotent per email+product), `PriceWatchController`
+  (`POST /api/price-watch`, `GET /api/price-watch/unsubscribe`).
+- **Re-check job.** `PriceWatchRecheckService` (@Scheduled, `@EnableScheduling`) reuses a deterministic
+  `LivePriceProbe` (raw HTTP + browser UA + JSON-LD `offers.price`, the same approach that sourced the sales;
+  empty → skip, never invent a price). Alert rule (owner decision): notify only on a verified drop ≥ the watch
+  threshold (default 5%), at most once per product per cooldown (7 days), and never re-notify the same/higher
+  price. **Trigger OFF by default** (`budgetspace.price-watch.recheck-enabled=false`) so no surprise outbound
+  fetches; the logic is fully exercisable via `runRecheck(...)`.
+- **Delivery seam (owner decision: seam now, provider later).** `PriceWatchNotifier` interface +
+  `LoggingPriceWatchNotifier` default wired via `@ConditionalOnMissingBean` (logs a masked alert, sends nothing).
+  A real email provider (SMTP / SendGrid / Postmark) plugs in later as another bean via backend env — **no
+  credentials committed**, mirroring the `RetailerFeed` / `LlmClient` seams.
+- **GDPR.** Explicit opt-in (consent flag required or 400), one-click unsubscribe token in every alert, store
+  only what an alert needs (email + product + threshold + consent timestamp). Email masked in logs.
+- **Frontend opt-in.** A discreet "Watch price" form on each product row (email + consent checkbox with plain
+  consent copy) → `POST /api/price-watch`; HR+EN + de/it/sl/fi (parity checked). GDPR copy drafted for owner review.
+- **Verified:** backend **154 tests, 0 failures** (+`PriceWatchServiceTest` 7, +`PriceWatchRecheckServiceTest`
+  8: drop/threshold/cooldown/re-notify-guard/probe-unavailable). Frontend build clean; i18n 368 keys/lang, 0
+  issues. Live full stack: app boots clean with scheduling + the notifier seam; `POST /api/price-watch` creates
+  (threshold 5, baseline = current price), de-dupes (`alreadyWatching`), and rejects no-consent / bad-email with 400.
+
+### Sprint 10.33 — discount / sale tracking: data model + verified sales + dual saving display
 - **Data model (`saleEndsAt` end to end).** Added `Product.saleEndsAt` (ISO date, the verified promo-window
   end) through the whole pipeline: `RetailerProductSnapshotDto` + `ImportProductDto` (+ back-compat ctors),
   `RetailerCatalogAdapter` (which had been **discarding `originalPrice` — passing `null`** — now wired),
