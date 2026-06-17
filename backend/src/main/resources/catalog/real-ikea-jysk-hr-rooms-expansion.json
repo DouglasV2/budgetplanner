@@ -10,7 +10,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bathroom"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -21,7 +21,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -35,7 +35,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bathroom"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -46,7 +46,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -60,7 +60,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "classic"],
     "colorTags": ["brown", "natural"],
@@ -71,7 +71,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
@@ -85,7 +85,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "minimal"],
     "materialTags": ["fabric"],
@@ -95,7 +95,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -109,7 +109,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["natural"],
@@ -120,7 +120,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
@@ -134,7 +134,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -145,7 +145,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -159,7 +159,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["grey"],
@@ -170,7 +170,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -184,7 +184,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -195,7 +195,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -209,7 +209,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["home-office"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -220,7 +220,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -234,7 +234,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["home-office"],
     "styleTags": ["modern", "industrial"],
     "colorTags": ["black"],
@@ -245,7 +245,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -259,7 +259,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["home-office", "living-room"],
     "styleTags": ["minimal", "classic"],
     "colorTags": ["white"],
@@ -270,7 +270,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -284,7 +284,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room", "home-office"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -295,7 +295,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -309,7 +309,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["home-office"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -320,7 +320,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR rooms pilot",
     "sourceReference": "ikea-jysk-hr-rooms-expansion-10-11",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za sobe; naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   }
 ]

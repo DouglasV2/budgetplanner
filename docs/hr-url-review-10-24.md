@@ -4,7 +4,17 @@
 > now excludes them). All 18 drifted rows (§B) had their `productUrl` refreshed to the canonical target and
 > got a web-verified image. Canonicalising 2 of them exposed 2 hidden duplicate products (JYSK KRISTOF lamp,
 > JYSK BOVRUP chair) — deduped (kept the row each test/file constraint required, dropped the redundant depth
-> copy, merged roomTags/reviews). Remaining step-3 work: full price/stock re-verification of the HR catalog.
+> copy, merged roomTags/reviews).
+>
+> **STATUS (step 3 CLOSED 2026-06-17, Sprint 10.27):** Full HR price/stock re-verification done — every one of
+> the 301 `partial` HR rows was re-checked on its live page (deterministic: raw-HTTP → JSON-LD/`priceAmount`/
+> displayed-€). **279 confirmed** (stored price still on the page), **22 price-updated** to the verified current
+> price (JYSK regular `priceAmount`, not the promo — HUGO precedent; spot-checked the big swings), **0 newly
+> dead**. All re-checked rows got `lastCheckedAt=2026-06-17`; rows with a verified image flipped `partial →
+> complete`. HR catalog now: **287 complete / 14 partial (Harvey Norman, no images) / 16 needs-review (the dead
+> rows above)**. HR data is launch-ready. Re-check cadence: re-run the price/stock pass before launch and then
+> on the catalog freshness window (`ProductTaxonomy.isStale`); `CatalogHealthService` already reports stale +
+> dataQuality counts.
 
 While fetching verified product images (step 4), the deterministic fetcher followed each HR product URL
 and recorded where it landed. **34 of 270 reachable HR rows did not yield a verified image because their

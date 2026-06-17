@@ -10,7 +10,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["dining-room"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white", "natural"],
@@ -21,7 +21,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -35,7 +35,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["dining-room"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white", "natural"],
@@ -46,7 +46,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -60,7 +60,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["dining-room"],
     "styleTags": ["cozy", "modern"],
     "colorTags": ["natural", "beige"],
@@ -71,7 +71,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
@@ -85,7 +85,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["kitchen"],
     "styleTags": ["industrial", "modern"],
     "colorTags": ["black"],
@@ -96,7 +96,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -110,7 +110,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["kitchen"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["beige"],
@@ -121,7 +121,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -135,7 +135,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["hallway"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["grey"],
@@ -145,7 +145,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -159,7 +159,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["hallway"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -169,7 +169,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -183,7 +183,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["hallway"],
     "styleTags": ["industrial", "modern"],
     "colorTags": ["black"],
@@ -194,7 +194,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR new-rooms pilot",
     "sourceReference": "jysk-hr-new-rooms-pilot-10-7",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot za nove sobe; naziv, cijena i product URL provjereni na jysk.hr 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   }
 ]

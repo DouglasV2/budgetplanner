@@ -10,7 +10,7 @@
     "imageVerified": true,
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["modern", "cozy"],
     "priceTier": "budget",
@@ -19,7 +19,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj, IKEA agregira po modelu POÄNG) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -33,7 +33,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["modern", "cozy"],
     "priceTier": "standard",
@@ -42,7 +42,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj, IKEA agregira po modelu POÄNG) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -56,7 +56,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["modern", "cozy"],
     "priceTier": "standard",
@@ -65,7 +65,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj, IKEA agregira po modelu POÄNG) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -79,7 +79,7 @@
     "imageVerified": true,
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["classic", "cozy"],
     "priceTier": "standard",
@@ -88,7 +88,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -102,7 +102,7 @@
     "imageVerified": true,
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["classic", "cozy"],
     "priceTier": "premium",
@@ -111,7 +111,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot (10.5 web-verified)",
     "sourceReference": "ikea-jysk-hr-living-room-expansion-10-5",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Sprint 10.5 ručno web-verificiran proizvod: potvrđen naziv, cijena i živi product URL. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije finalne produkcije zamijeniti službenim feedom za aktualnu cijenu, sliku i zalihu."
   }
 ]

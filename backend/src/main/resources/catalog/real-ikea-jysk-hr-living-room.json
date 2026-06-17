@@ -12,7 +12,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -24,7 +24,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -40,7 +40,7 @@
     "imageVerified": true,
     "availabilityStatus": "limited",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -52,7 +52,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -66,7 +66,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -78,7 +78,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -92,7 +92,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -104,7 +104,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -118,7 +118,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -130,7 +130,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -146,7 +146,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -158,7 +158,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -168,13 +168,13 @@
     "name": "FRIHETEN trosjed na razvlačenje, Skiftebo tamno siva",
     "retailer": "IKEA",
     "category": "sofa",
-    "price": 499.0,
+    "price": 399,
     "productUrl": "https://www.ikea.com/hr/hr/p/friheten-trosjed-na-razvlacenje-skiftebo-tamno-siva-50341148/",
     "imageUrl": "https://www.ikea.com/hr/hr/images/products/friheten-trosjed-na-razvlacenje-skiftebo-tamno-siva__0525504_pe644868_s5.jpg?f=xl",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -182,11 +182,11 @@
       "modern",
       "minimal"
     ],
-    "priceTier": "premium",
+    "priceTier": "standard",
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -200,7 +200,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -212,7 +212,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -226,7 +226,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -238,7 +238,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -254,7 +254,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -266,7 +266,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -282,7 +282,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -294,7 +294,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -310,7 +310,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -322,7 +322,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -336,7 +336,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -348,7 +348,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -389,7 +389,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -401,7 +401,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -417,7 +417,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -429,7 +429,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -445,7 +445,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -457,7 +457,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -473,7 +473,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -485,7 +485,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -493,13 +493,13 @@
     "name": "LACK stolić, bijela, 118x78 cm",
     "retailer": "IKEA",
     "category": "table",
-    "price": 29.99,
+    "price": 39.99,
     "productUrl": "https://www.ikea.com/hr/hr/p/lack-stolic-bijela-80449901/",
     "imageUrl": "https://www.ikea.com/hr/hr/images/products/lack-stolic-bijela__0750651_pe746801_s5.jpg?f=xl",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -511,7 +511,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -525,7 +525,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -537,7 +537,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -645,13 +645,13 @@
     "name": "STOENSE tepih, niski flor, krem",
     "retailer": "IKEA",
     "category": "rug",
-    "price": 79.99,
+    "price": 29.99,
     "productUrl": "https://www.ikea.com/hr/hr/p/stoense-tepih-niski-flor-krem-50426802/",
     "imageUrl": "https://www.ikea.com/hr/hr/images/products/stoense-tepih-niski-flor-krem__0624419_pe691827_s5.jpg?f=xl",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -663,7 +663,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -752,7 +752,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -764,7 +764,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -822,13 +822,13 @@
     "name": "KALLAX regal, bijela",
     "retailer": "IKEA",
     "category": "storage",
-    "price": 59.99,
+    "price": 69.99,
     "productUrl": "https://www.ikea.com/hr/hr/p/kallax-regal-bijela-80275887/",
     "imageUrl": "https://www.ikea.com/hr/hr/images/products/kallax-regal-bijela__0644757_pe702939_s5.jpg?f=xl",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -840,7 +840,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -848,13 +848,13 @@
     "name": "KALLAX regal, bijela, 147x147 cm",
     "retailer": "IKEA",
     "category": "storage",
-    "price": 99.99,
+    "price": 109,
     "productUrl": "https://www.ikea.com/hr/hr/p/kallax-regal-bijela-30275861/",
     "imageUrl": "https://www.ikea.com/hr/hr/images/products/kallax-regal-bijela__0644546_pe702768_s5.jpg?f=xl",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -866,7 +866,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -924,13 +924,13 @@
     "name": "RÖDEBY pladanj za naslon za ruke, bambus",
     "retailer": "IKEA",
     "category": "decor",
-    "price": 9.99,
+    "price": 12.99,
     "productUrl": "https://www.ikea.com/hr/hr/p/roedeby-pladanj-naslon-za-ruke-bambus-40417577/",
     "imageUrl": "https://www.ikea.com/hr/hr/images/products/roedeby-pladanj-naslon-za-ruke-bambus__0976295_pe813137_s5.jpg?f=xl",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -942,7 +942,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
   },
   {
@@ -950,13 +950,13 @@
     "name": "Trosjed ANDRUP ovalni bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 550.0,
+    "price": 399,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-andrup-ovalni-bez-tkanina",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264033",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -964,11 +964,11 @@
       "modern",
       "cozy"
     ],
-    "priceTier": "premium",
+    "priceTier": "standard",
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1001,13 +1001,13 @@
     "name": "Fotelja UDSBJERG siva tkanina/hrast",
     "retailer": "JYSK",
     "category": "chair",
-    "price": 139.0,
+    "price": 149,
     "productUrl": "https://jysk.hr/dnevni-boravak/fotelje/fotelja-udsbjerg-siva-tkanina-hrast",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/256443",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1019,7 +1019,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1027,13 +1027,13 @@
     "name": "Fotelja UDSBJERG bež tkanina/hrast",
     "retailer": "JYSK",
     "category": "chair",
-    "price": 139.0,
+    "price": 159,
     "productUrl": "https://jysk.hr/dnevni-boravak/fotelje/fotelja-udsbjerg-bez-tkanina-hrast",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/237487",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1045,7 +1045,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1059,7 +1059,7 @@
     "imageVerified": true,
     "availabilityStatus": "limited",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1071,7 +1071,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1085,7 +1085,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1097,7 +1097,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1111,7 +1111,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1123,7 +1123,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1137,7 +1137,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1149,7 +1149,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1163,7 +1163,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1175,7 +1175,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1189,7 +1189,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1201,7 +1201,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1209,13 +1209,13 @@
     "name": "TV-stalak LIMFJORDEN 2 ladice 1 vrata bijela",
     "retailer": "JYSK",
     "category": "tv-unit",
-    "price": 115.0,
+    "price": 165,
     "productUrl": "https://jysk.hr/dnevni-boravak/stalci-za-tv/tv-stalak-limfjorden-2-ladice-1-vrata-bijela",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/263795",
     "imageVerified": true,
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1223,11 +1223,11 @@
       "minimal",
       "classic"
     ],
-    "priceTier": "budget",
+    "priceTier": "standard",
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1241,7 +1241,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1253,7 +1253,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1267,7 +1267,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1279,7 +1279,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1318,7 +1318,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1330,7 +1330,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1344,7 +1344,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1356,7 +1356,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1364,13 +1364,13 @@
     "name": "Tepih LINGON 140x200 natur",
     "retailer": "JYSK",
     "category": "rug",
-    "price": 39.99,
+    "price": 35,
     "productUrl": "https://jysk.hr/kucanstvo/tepisi/veliki-tepisi/tepih-lingon-140x200-natur",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/268985",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1382,7 +1382,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1390,13 +1390,13 @@
     "name": "Tepih BIRK 140x200 siva",
     "retailer": "JYSK",
     "category": "rug",
-    "price": 69.99,
+    "price": 80,
     "productUrl": "https://jysk.hr/kucanstvo/tepisi/veliki-tepisi/tepih-birk-140x200-siva",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/270249",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1408,7 +1408,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1416,13 +1416,13 @@
     "name": "Tepih ODON 135x190 krem",
     "retailer": "JYSK",
     "category": "rug",
-    "price": 79.99,
+    "price": 119,
     "productUrl": "https://jysk.hr/kucanstvo/tepisi/veliki-tepisi/tepih-odon-135x190-krem",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/270245",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1434,7 +1434,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1442,13 +1442,13 @@
     "name": "Tepih LUCERNE 140x200 bež",
     "retailer": "JYSK",
     "category": "rug",
-    "price": 99.99,
+    "price": 149,
     "productUrl": "https://jysk.hr/kucanstvo/tepisi/veliki-tepisi/tepih-lucerne-140x200-bez",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/262162",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1456,11 +1456,11 @@
       "classic",
       "cozy"
     ],
-    "priceTier": "budget",
+    "priceTier": "standard",
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1468,13 +1468,13 @@
     "name": "Tepih MOGOP 140x200 natur",
     "retailer": "JYSK",
     "category": "rug",
-    "price": 89.99,
+    "price": 119,
     "productUrl": "https://jysk.hr/kucanstvo/tepisi/veliki-tepisi/tepih-mogop-140x200-natur",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/245124",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1486,7 +1486,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1500,7 +1500,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room",
       "bedroom",
@@ -1516,7 +1516,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1546,7 +1546,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1560,7 +1560,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1572,7 +1572,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1580,13 +1580,13 @@
     "name": "Podna lampa HANSSON V155cm crna",
     "retailer": "JYSK",
     "category": "lighting",
-    "price": 49.99,
+    "price": 20,
     "productUrl": "https://jysk.hr/kucanstvo/rasvjeta/svjetiljke/podna-lampa-hansson-v155cm-crna",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/243689",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1598,7 +1598,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1606,13 +1606,13 @@
     "name": "Lampa na baterije MEJSE Ø14xV17 cm svijetlosmeđa",
     "retailer": "JYSK",
     "category": "lighting",
-    "price": 15.0,
+    "price": 9,
     "productUrl": "https://jysk.hr/vrt/vrtna-rasvjeta/lampe-i-fenjeri/lampa-na-baterije-mejse-o14xv17-cm-svijetlosmeda",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/278142",
     "imageVerified": true,
     "availabilityStatus": "check-store",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1624,7 +1624,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1632,13 +1632,13 @@
     "name": "Zidni modul SKALS polica za knjige divlji natur hrast boja",
     "retailer": "JYSK",
     "category": "storage",
-    "price": 55.0,
+    "price": 45,
     "productUrl": "https://jysk.hr/pohranjivanje/police-za-knjige/zidni-modul-skals-polica-za-knjige-divlji-natur-hrast-boja",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/245788",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1650,7 +1650,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1664,7 +1664,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room",
       "kitchen"
@@ -1677,7 +1677,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1691,7 +1691,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1703,7 +1703,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1717,7 +1717,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1729,7 +1729,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1737,13 +1737,13 @@
     "name": "Polični element ASTRUP 6 polica crna",
     "retailer": "JYSK",
     "category": "storage",
-    "price": 79.99,
+    "price": 32.5,
     "productUrl": "https://jysk.hr/pohranjivanje/police-za-knjige/policni-element-astrup-6-polica-crna",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/236838",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1755,7 +1755,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1769,7 +1769,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1781,7 +1781,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1789,13 +1789,13 @@
     "name": "Zidni sat ASKILD Ø30cm smeđa",
     "retailer": "JYSK",
     "category": "decor",
-    "price": 10.0,
+    "price": 9,
     "productUrl": "https://jysk.hr/kucanstvo/dekoracija/satovi/zidni-sat-askild-o30cm-smeda",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/249596",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1807,7 +1807,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1821,7 +1821,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1833,7 +1833,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
@@ -1847,7 +1847,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": [
       "living-room"
     ],
@@ -1859,7 +1859,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR production pilot",
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   }
 ]

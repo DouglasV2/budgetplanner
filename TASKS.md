@@ -29,15 +29,15 @@ needs `OPENAI_API_KEY`, backend env only).
    (Emmezeta/Harvey Norman/Namjestaj.hr: corner sofas, beds, wardrobes, sideboards, dining sets across budget→
    premium). HR sourced rows 237→**290**; every planner-flow cell now ≥1. No 403-bypass. `HrMaxCatalogRuntimeTest`
    (0 import errors); programmatic dedup dropped 5 already-present URLs. Backend **130 tests, 0 failures**.
-3. **[ ] HR data re-verification before launch.** Re-verify prices + availability across the (now maxed) HR
-   catalog; flip confirmed rows `partial → complete`, mark drifted/vanished ones `needs-review`. Use/extend
-   `CatalogHealthService` for a stale-rows report + a re-check cadence. ~~Dedupe the 6 duplicate `productUrl`s
-   (#10b)~~ ✅ **done 2026-06-17 (Sprint 10.23)** — see #10b. **Concrete targets already found** (Sprint 10.24
-   image pass, [docs/hr-url-review-10-24.md](docs/hr-url-review-10-24.md)): **~15 HR rows are DEAD** (URL now
-   301s to a category — e.g. BESTÅ, MÅRUM/STOENSE/TIPHEDE rugs, NYMÅNE/BARLAST/STRANDAD lamps, VITTSJÖ, JYSK
-   VEJLBY/TROSTERUD) → flip `needs-review`; **~18 rows have DRIFTED URLs** (301 to the live canonical page;
-   link still works) → refresh `productUrl` (also unlocks their image). NB: this contradicts "HR just verified
-   16/17 Jun" — step 3 is **not** redundant. *Done when:* HR catalog is fresh + `complete` where verified.
+3. **[x] HR data re-verification before launch.** ✅ **Done 2026-06-17 (Sprints 10.25 + 10.27).** 10.25 fixed
+   the URLs (16 dead → `needs-review`, 18 drifted → refreshed + imaged). 10.27 re-verified price+stock on every
+   one of the 301 `partial` HR rows on its live page (deterministic raw-HTTP: JSON-LD / JYSK `priceAmount` /
+   displayed €): **279 confirmed, 22 price-updated** (to the verified current regular price — HUGO precedent,
+   big swings spot-checked), 0 newly dead. All got `lastCheckedAt=2026-06-17`; imaged rows flipped
+   `partial → complete`. **HR now: 287 complete / 14 partial (Harvey Norman, no images) / 16 needs-review** →
+   launch-ready. Cadence: re-run before launch + on the `isStale` window; `CatalogHealthService` reports it.
+   Sub-parts: dedupe #10b ✅ (10.23); dead/drift URLs ✅ (10.25,
+   [docs/hr-url-review-10-24.md](docs/hr-url-review-10-24.md)); price/stock re-verify ✅ (10.27).
 4. **[x] Product images — fetch every real image we can.** ✅ **Done 2026-06-17 (Sprint 10.24).** Added the
    `imageVerified` field end to end (Product + DTOs + import + frontend gate; plumbing committed first) and
    web-verified **236 / 270** reachable HR product images by deterministically reading each product page's
@@ -75,7 +75,22 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.26 — HR catalog breadth: more options per anchor category (current)
+### Sprint 10.27 — full HR price/stock re-verification (closes road-to-production step 3) (current)
+- Re-verified **all 301 `partial` HR rows** on their live product pages — deterministic raw-HTTP (no model):
+  JSON-LD `price` / JYSK `priceAmount` (the regular price, *not* the time-limited promo) / displayed €,
+  plus a redirect→category dead-check and a non-IKEA schema.org OutOfStock check (IKEA stock is JS-lazy-loaded,
+  so its static "OutOfStock" is a template artefact — ignored).
+- **279 confirmed** (stored price still on the page) → `lastCheckedAt=2026-06-17`, flipped `partial→complete`
+  where the row has a verified image. **22 price-updated** to the verified current price (e.g. JYSK ANDRUP
+  regular 550→399, IKEA LACK 29.99→39.99, KALLAX 59.99→69.99, Emmezeta EVORA 1079.99→1349.99); recomputed
+  `priceTier`; spot-checked every big swing on the live page (JYSK `priceAmount`=regular, IKEA SKU price). The
+  initial run flagged 32 JYSK "drifts" that were actually a site-wide promo — adding `priceAmount` (regular)
+  resolved them (HUGO precedent: keep the regular price, never the promo). **0 newly dead.**
+- HR catalog now **287 complete / 14 partial (Harvey Norman — no images) / 16 needs-review (dead, from 10.25)**
+  → **launch-ready**. `CatalogHealthService` already reports stale + dataQuality counts (re-check cadence).
+- Backend **135 tests, 0 failures**; zero-churn line-edits (416/416). No fabrication, no 403-bypass.
+
+### Sprint 10.26 — HR catalog breadth: more options per anchor category
 - Owner asked for more HR furniture; new retailers are all JS-priced/403 (10.24 probe), so added **breadth
   from the verified retailers** instead. Filled real anchor gaps — **IKEA HR had ZERO beds/mattresses/
   wardrobes/nightstands** (only JYSK/Emmezeta did) — plus more desks/office-chairs/sofas/coffee-tables/

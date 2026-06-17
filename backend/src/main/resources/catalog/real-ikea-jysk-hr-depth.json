@@ -10,7 +10,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room", "bedroom", "home-office", "dining-room"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["white"],
@@ -21,7 +21,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -35,7 +35,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom", "home-office", "living-room"],
     "styleTags": ["minimal", "classic"],
     "colorTags": ["white"],
@@ -46,7 +46,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -60,7 +60,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room", "bedroom", "dining-room"],
     "styleTags": ["minimal", "cozy"],
     "colorTags": ["beige"],
@@ -70,7 +70,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj, IKEA agregira po modelu) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -84,7 +84,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room", "bedroom", "dining-room"],
     "styleTags": ["modern", "minimal"],
     "colorTags": ["grey"],
@@ -94,7 +94,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj, IKEA agregira po modelu) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -108,7 +108,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["kitchen"],
     "styleTags": ["industrial", "modern"],
     "colorTags": ["black"],
@@ -119,7 +119,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -133,7 +133,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["dining-room"],
     "styleTags": ["modern", "cozy"],
     "colorTags": ["grey", "natural"],
@@ -144,7 +144,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -158,7 +158,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "minimal"],
     "materialTags": ["fabric"],
@@ -168,7 +168,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "JYSK HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na jysk.hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -182,7 +182,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["home-office"],
     "styleTags": ["classic", "modern"],
     "colorTags": ["brown", "gold"],
@@ -193,7 +193,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije (ocjena + broj) provjerene na ikea.com/hr 2026-06-16. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -229,7 +229,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room", "bedroom", "dining-room"],
     "styleTags": ["boho", "cozy"],
     "colorTags": ["yellow"],
@@ -238,7 +238,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "IKEA HR depth pilot",
     "sourceReference": "ikea-jysk-hr-catalog-depth-10-12",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot (dubina kataloga); naziv, cijena i product URL provjereni 2026-06-15. Recenzije nisu dodane: nije bilo moguće pouzdano potvrditi agregat za ovu varijantu. Prije produkcije ponovno provjeri cijenu, sliku, zalihu i poveznicu."
   }
 ]

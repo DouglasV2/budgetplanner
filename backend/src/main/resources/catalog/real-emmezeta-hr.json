@@ -10,7 +10,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["classic", "modern"],
     "colorTags": ["brown"],
@@ -19,7 +19,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "Emmezeta HR pilot",
     "sourceReference": "emmezeta-hr-pilot-10-13",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot; naziv, cijena i product URL provjereni na emmezeta.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -27,13 +27,13 @@
     "name": "Evora trosjed s ležajem mint 276x137x71cm",
     "retailer": "Emmezeta",
     "category": "sofa",
-    "price": 1079.99,
+    "price": 1349.99,
     "productUrl": "https://www.emmezeta.hr/evora-trosjed-s-lezajem-mint-276x137x71cm-643824.html",
     "imageUrl": "https://s3.emmezeta.hr/media/catalog/product/6/4/643824-evora-trosjed-s-lezajem-mint-276x137x71-cm_1.jpg",
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["modern", "cozy"],
     "colorTags": ["green"],
@@ -42,7 +42,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "Emmezeta HR pilot",
     "sourceReference": "emmezeta-hr-pilot-10-13",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot; naziv, cijena i product URL provjereni na emmezeta.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -56,7 +56,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["living-room"],
     "styleTags": ["modern", "minimal"],
     "materialTags": ["wood"],
@@ -64,7 +64,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "Emmezeta HR pilot",
     "sourceReference": "emmezeta-hr-pilot-10-13",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot; naziv, cijena i product URL provjereni na emmezeta.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   },
   {
@@ -78,7 +78,7 @@
     "imageVerified": true,
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-15",
+    "lastCheckedAt": "2026-06-17",
     "roomTags": ["bedroom"],
     "styleTags": ["modern", "minimal"],
     "materialTags": ["wood"],
@@ -86,7 +86,7 @@
     "sourceType": "retailer-snapshot",
     "sourceName": "Emmezeta HR pilot",
     "sourceReference": "emmezeta-hr-pilot-10-13",
-    "dataQuality": "partial",
+    "dataQuality": "complete",
     "dataQualityNotes": "Ručni snapshot; naziv, cijena i product URL provjereni na emmezeta.hr 2026-06-15. Prije produkcije ponovno provjeri cijenu, sliku i zalihu."
   }
 ]
