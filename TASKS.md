@@ -210,6 +210,16 @@ needs `OPENAI_API_KEY`, backend env only).
 | DE | Otto, Segmüller, Poco | Wayfair (closed in DE), Home24 (403), Roller (JS-only) |
 | AT | — | Kika, Leiner, Momax, XXXLutz (403/TLS/refused) |
 
+**Re-probe 2026-06-17 (Sprint 10.24) — more HR shops, looking for new importable retailers:** none usable.
+- **Reachable but JS-only prices → feed-required:** `mojnamjestaj.hr` ("Moj namještaj"; static name + `og:image`,
+  but WooCommerce price element is empty in static HTML — JS-rendered), `vitapur.hr` (bedding/home; shows leftover
+  `Kn`/`0,00 €` placeholders), `prima-namjestaj.hr` (homepage 200, prices still JS — confirms 10.16).
+- **403 / Cloudflare "Just a moment…":** `moemax.hr` (Mömax), `sancta-domenica.hr`, `mraz.hr`, `lesnina.hr`.
+- **Not furniture / dead domains:** `top-shop.hr` (now real-estate), `mobelix.com` (for sale), several mis-guessed `.hr`.
+- **Conclusion:** the directly-importable HR universe stays IKEA / JYSK / Emmezeta / Harvey Norman / Namjestaj.hr.
+  Everything else is JS-priced or WAF-blocked → an official/partner feed (we never bypass 403 or fabricate a JS price).
+  Default `CatalogSourcePolicy.statusFor` already treats these unvetted names as `OFFICIAL_FEED_REQUIRED`.
+
 ### Sprint 10.15 — production catalog depth
 - Web-verified **~150 new products** across retailers × markets (no fabrication; each verified on the
   live public product page, `sourceType=public-product-page`):
