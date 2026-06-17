@@ -81,7 +81,19 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.28 — European app: expose + localise EU markets (EN for non-HR) (current)
+### Sprint 10.29 — EU depth: fill the IT + FI dining-room gap (current)
+- Measured EU coverage by market×room: SI/AT/DE solid; **IT (51 rows, IKEA-only) and FI (65) had
+  `dining-room=0`** — their dining-room plans were empty. Filled it with verified IKEA dining tables + chairs
+  ported via the global article-number trick to `/it/it/` and `/fi/fi/` (the number resolves regardless of
+  slug language): **9 rows** (IT 5: NORDEN, DANDERYD, ODGER×2, ROSENTORP; FI 4 — one ODGER redirected to a
+  category in FI and was correctly dropped). Each row's localised name + **per-market EUR price** (DANDERYD
+  139 IT / 149 FI; ODGER 60 IT / 99 FI — verified, not copied) + a **verified `og:image`** confirmed on
+  ikea.com; spot-checked the NORDEN photo. `dataQuality=complete` (name+price+url+verified image, fresh).
+  `real-eu-dining-10-29.json` + `EuDiningCatalogRuntimeTest`; backend **136 tests, 0 failures**.
+- **Remaining EU depth (follow-up):** IT/FI are still IKEA-only and thin on bedroom/home-office; SI/AT/DE are
+  reasonably covered. More breadth per market = the same number-trick / web-verify rule, scoped per owner.
+
+### Sprint 10.28 — European app: expose + localise EU markets (EN for non-HR)
 - **Exposed all six EUR markets** (`markets.ts` `available:true` for SI/AT/DE/IT/FI, HR already on) so the
   country picker offers the whole EUR region — the app is European, not HR-only. Each already had a verified
   EUR catalog (IKEA/JYSK from sprints 10.13–10.20), so plans render immediately.

@@ -125,7 +125,11 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // wardrobes/nightstands/dressers — previously absent — plus more desks/office chairs/sofas/coffee
             // tables/TV units; JYSK + Emmezeta beds/wardrobes/dining/dressers). Each row web-verified 2026-06-17
             // (name + EUR price from JSON-LD for IKEA/JYSK, spot-checked for Emmezeta) with a verified og:image.
-            "/catalog/real-hr-breadth-10-26.json"
+            "/catalog/real-hr-breadth-10-26.json",
+            // Sprint 10.29: EU depth — fill the IT + FI dining-room gap (both were 0). IKEA dining tables +
+            // chairs ported via the global article-number trick to /it/it/ and /fi/fi/; each row's localized
+            // name + per-market EUR price + verified og:image confirmed on ikea.com on 2026-06-17.
+            "/catalog/real-eu-dining-10-29.json"
     );
 
     /**
