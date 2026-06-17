@@ -1,11 +1,14 @@
+import { useLocale } from '../LocaleContext';
+
 export function Footer() {
+  const { t } = useLocale();
   return (
     <footer className="footer shell">
       <div>
         <strong>BudgetSpace</strong>
-        <p>Planer koji iz budžeta i želja slaže konkretan popis za kupnju.</p>
+        <p>{t('footer.tagline')}</p>
       </div>
-      <a href="#top">Natrag gore ↑</a>
+      <a href="#top">{t('footer.backToTop')}</a>
     </footer>
   );
 }

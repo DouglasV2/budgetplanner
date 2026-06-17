@@ -2,35 +2,35 @@
 // framed around "planning more rooms", and there is no real checkout yet (pilot pricing).
 import { useLocale } from '../LocaleContext';
 
-const tiers = [
-  {
-    name: 'Free',
-    tagline: 'Probaj AI planiranje',
-    price: '0 €',
-    features: ['AI plan za tvoju sobu', 'Nekoliko AI generiranja mjesečno', 'Osnovne preporuke proizvoda'],
-    note: 'Već koristiš',
-    highlight: false
-  },
-  {
-    name: 'Pro',
-    tagline: 'Za one koji planiraju više soba',
-    price: 'Uskoro',
-    features: ['Više AI planova', 'Neograničeno spremanje planova', 'Usporedba proizvoda', 'PDF popis za kupnju'],
-    note: 'Pilot — javi se za rani pristup',
-    highlight: true
-  },
-  {
-    name: 'Pro+',
-    tagline: 'Za detaljnije planiranje',
-    price: 'Uskoro',
-    features: ['Planiranje više soba', 'Naprednija AI analiza', 'Prioritetne značajke', 'Analiza slike sobe (kasnije)'],
-    note: 'Pilot — javi se za rani pristup',
-    highlight: false
-  }
-];
-
 export function Monetization() {
   const { t } = useLocale();
+  const tiers = [
+    {
+      name: 'Free',
+      tagline: t('pricing.freeTagline'),
+      price: '0 €',
+      features: [t('pricing.freeF1'), t('pricing.freeF2'), t('pricing.freeF3')],
+      note: t('pricing.freeNote'),
+      highlight: false
+    },
+    {
+      name: 'Pro',
+      tagline: t('pricing.proTagline'),
+      price: t('pricing.soon'),
+      features: [t('pricing.proF1'), t('pricing.proF2'), t('pricing.proF3'), t('pricing.proF4')],
+      note: t('pricing.pilotNote'),
+      highlight: true
+    },
+    {
+      name: 'Pro+',
+      tagline: t('pricing.proPlusTagline'),
+      price: t('pricing.soon'),
+      features: [t('pricing.proPlusF1'), t('pricing.proPlusF2'), t('pricing.proPlusF3'), t('pricing.proPlusF4')],
+      note: t('pricing.pilotNote'),
+      highlight: false
+    }
+  ];
+
   return (
     <section className="section shell pricing-section" id="pricing">
       <div className="section-heading">
@@ -55,9 +55,7 @@ export function Monetization() {
           </article>
         ))}
       </div>
-      <p className="pricing-footnote">
-        Preporuke proizvoda biramo prema tvom budžetu i stilu — partnerski linkovi, kad ih bude, neće mijenjati koji je proizvod najbolji za tebe.
-      </p>
+      <p className="pricing-footnote">{t('pricing.footnote')}</p>
     </section>
   );
 }

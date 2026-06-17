@@ -1,24 +1,25 @@
+import { useLocale } from '../LocaleContext';
+
 export function Hero() {
+  const { t } = useLocale();
   return (
     <section className="hero shell" id="top">
       <div className="hero-copy">
-        <div className="eyebrow">Planer kupnje za dom</div>
-        <h1>Opremi dnevni boravak unutar budžeta — bez izgubljenih sati po webshopovima.</h1>
-        <p>
-          Napiši što želiš opremiti, koliki ti je budžet i koje trgovine preferiraš. BudgetSpace složi konkretan popis za kupnju iz trgovina poput IKEA, JYSK, Pevex, Emmezeta, Decathlon i Lesnina.
-        </p>
+        <div className="eyebrow">{t('hero.eyebrow')}</div>
+        <h1>{t('hero.heading')}</h1>
+        <p>{t('hero.subheading')}</p>
         <div className="hero-actions">
-          <a className="primary-button" href="#planner">Isprobaj planer</a>
-          <a className="secondary-button" href="#how">Vidi kako radi</a>
+          <a className="primary-button" href="#planner">{t('hero.tryPlanner')}</a>
+          <a className="secondary-button" href="#how">{t('hero.seeHow')}</a>
         </div>
         <div className="trust-row">
-          <span>⚡ Plan u manje od minute</span>
-          <span>🛒 Direktni linkovi na proizvode</span>
-          <span>💶 Ukupna cijena odmah</span>
+          <span>{t('hero.trustSpeed')}</span>
+          <span>{t('hero.trustLinks')}</span>
+          <span>{t('hero.trustTotal')}</span>
         </div>
       </div>
-      <div className="hero-card" aria-label="Primjer plana za kupnju">
-        <div className="floating-badge">Preporučeni plan</div>
+      <div className="hero-card" aria-label={t('hero.cardAria')}>
+        <div className="floating-badge">{t('hero.recommendedPlan')}</div>
         <div className="room-preview">
           <div className="sofa" />
           <div className="rug" />
@@ -27,15 +28,15 @@ export function Hero() {
         </div>
         <div className="mini-plan">
           <div>
-            <span>Budžet</span>
+            <span>{t('hero.budget')}</span>
             <strong>1.500 €</strong>
           </div>
           <div>
-            <span>Ukupno</span>
+            <span>{t('hero.total')}</span>
             <strong>1.427 €</strong>
           </div>
           <div>
-            <span>Poklapanje</span>
+            <span>{t('hero.match')}</span>
             <strong>94%</strong>
           </div>
         </div>

@@ -11,38 +11,38 @@ interface PlannerFormProps {
 }
 
 const rooms: Array<{ value: RoomType; label: string; icon: string; hint: string }> = [
-  { value: 'living-room', label: 'Dnevni boravak', icon: '🛋️', hint: 'kauč, TV komoda, tepih' },
-  { value: 'home-office', label: 'Radni kutak', icon: '💻', hint: 'stol, stolica, rasvjeta' },
-  { value: 'bedroom', label: 'Spavaća soba', icon: '🛏️', hint: 'krevet, ormar, lampe' },
-  { value: 'home-gym', label: 'Kućna teretana', icon: '🏋️', hint: 'oprema, spremanje, podloga' },
-  { value: 'dining-room', label: 'Blagovaonica', icon: '🍽️', hint: 'stol, stolice, rasvjeta' },
-  { value: 'kitchen', label: 'Kuhinja', icon: '🍳', hint: 'kolica, polica, rasvjeta' },
-  { value: 'hallway', label: 'Hodnik', icon: '🚪', hint: 'ormar za cipele, polica' },
-  { value: 'bathroom', label: 'Kupaonica', icon: '🛁', hint: 'ormarić, polica (uskoro)' }
+  { value: 'living-room', label: 'form.roomLivingRoomLabel', icon: '🛋️', hint: 'form.roomLivingRoomHint' },
+  { value: 'home-office', label: 'form.roomHomeOfficeLabel', icon: '💻', hint: 'form.roomHomeOfficeHint' },
+  { value: 'bedroom', label: 'form.roomBedroomLabel', icon: '🛏️', hint: 'form.roomBedroomHint' },
+  { value: 'home-gym', label: 'form.roomHomeGymLabel', icon: '🏋️', hint: 'form.roomHomeGymHint' },
+  { value: 'dining-room', label: 'form.roomDiningRoomLabel', icon: '🍽️', hint: 'form.roomDiningRoomHint' },
+  { value: 'kitchen', label: 'form.roomKitchenLabel', icon: '🍳', hint: 'form.roomKitchenHint' },
+  { value: 'hallway', label: 'form.roomHallwayLabel', icon: '🚪', hint: 'form.roomHallwayHint' },
+  { value: 'bathroom', label: 'form.roomBathroomLabel', icon: '🛁', hint: 'form.roomBathroomHint' }
 ];
 
 const styles: Array<{ value: StyleType; label: string; hint: string }> = [
-  { value: 'surprise', label: 'Nisam siguran, predloži mi', hint: 'najbolje ako ne znaš stilove' },
-  { value: 'bright', label: 'Svijetlo i prozračno', hint: 'svijetle boje, lagan osjećaj' },
-  { value: 'warm', label: 'Toplo i domaće', hint: 'ugodnije, mekše, više tekstura' },
-  { value: 'modern', label: 'Moderno i uredno', hint: 'čiste linije, praktično' },
-  { value: 'minimal', label: 'Jednostavno i čisto', hint: 'bez puno detalja' },
-  { value: 'classic', label: 'Klasično', hint: 'sigurno i dugoročno' },
-  { value: 'industrial', label: 'Tamno / industrijski', hint: 'crni metal, drvo, jači kontrast' },
-  { value: 'boho', label: 'Boho / prirodno', hint: 'drvo, tepisi, biljke, opušteno' }
+  { value: 'surprise', label: 'form.styleSurpriseLabel', hint: 'form.styleSurpriseHint' },
+  { value: 'bright', label: 'form.styleBrightLabel', hint: 'form.styleBrightHint' },
+  { value: 'warm', label: 'form.styleWarmLabel', hint: 'form.styleWarmHint' },
+  { value: 'modern', label: 'form.styleModernLabel', hint: 'form.styleModernHint' },
+  { value: 'minimal', label: 'form.styleMinimalLabel', hint: 'form.styleMinimalHint' },
+  { value: 'classic', label: 'form.styleClassicLabel', hint: 'form.styleClassicHint' },
+  { value: 'industrial', label: 'form.styleIndustrialLabel', hint: 'form.styleIndustrialHint' },
+  { value: 'boho', label: 'form.styleBohoLabel', hint: 'form.styleBohoHint' }
 ];
 
 const furnishingLevels: Array<{ value: FurnishingLevel; label: string; description: string }> = [
-  { value: 'basic', label: 'Osnovno', description: 'prvo najvažniji komadi' },
-  { value: 'comfort', label: 'Udobnije', description: 'baza + stvari koje čine prostor ugodnijim' },
-  { value: 'complete', label: 'Kompletno', description: 'dodaj i detalje ako budžet drži' }
+  { value: 'basic', label: 'form.furnishingBasicLabel', description: 'form.furnishingBasicDescription' },
+  { value: 'comfort', label: 'form.furnishingComfortLabel', description: 'form.furnishingComfortDescription' },
+  { value: 'complete', label: 'form.furnishingCompleteLabel', description: 'form.furnishingCompleteDescription' }
 ];
 
 const optimizationGoals: Array<{ value: OptimizationGoal; label: string; description: string }> = [
-  { value: 'best-value', label: 'Najbolji omjer', description: 'dobar izgled bez bacanja novca' },
-  { value: 'lowest-price', label: 'Što jeftinije', description: 'čuvaj budžet koliko god možeš' },
-  { value: 'least-stores', label: 'Što manje trgovina', description: 'manje dostava i manje obilazaka' },
-  { value: 'style-match', label: 'Što ljepše', description: 'prednost imaju skladniji proizvodi' }
+  { value: 'best-value', label: 'form.goalBestValueLabel', description: 'form.goalBestValueDescription' },
+  { value: 'lowest-price', label: 'form.goalLowestPriceLabel', description: 'form.goalLowestPriceDescription' },
+  { value: 'least-stores', label: 'form.goalLeastStoresLabel', description: 'form.goalLeastStoresDescription' },
+  { value: 'style-match', label: 'form.goalStyleMatchLabel', description: 'form.goalStyleMatchDescription' }
 ];
 
 const categoryOrder: ProductCategory[] = [
@@ -72,20 +72,20 @@ const categoryOrderByRoom: Record<RoomType, ProductCategory[]> = {
 };
 
 const sizePresets = [
-  { label: 'Ne znam', size: 20, description: 'aplikacija uzme sigurnu procjenu' },
-  { label: 'Mala', size: 12, description: 'garsonijera ili manji kutak' },
-  { label: 'Srednja', size: 20, description: 'tipična soba u stanu' },
-  { label: 'Velika', size: 32, description: 'veći dnevni boravak' }
+  { label: 'form.sizeUnknownLabel', size: 20, description: 'form.sizeUnknownDescription' },
+  { label: 'form.sizeSmallLabel', size: 12, description: 'form.sizeSmallDescription' },
+  { label: 'form.sizeMediumLabel', size: 20, description: 'form.sizeMediumDescription' },
+  { label: 'form.sizeLargeLabel', size: 32, description: 'form.sizeLargeDescription' }
 ];
 
 const budgetPresets = [700, 1000, 1500, 2500];
 
-const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<PlannerInput> }> = [
+const starterTemplates: Array<{ title: string; subtitle: string; promptKey: string; input: Partial<PlannerInput> }> = [
   {
-    title: 'Dnevni boravak do 1500 €',
-    subtitle: 'kauč, TV komoda, tepih, stolić, rasvjeta',
+    title: 'form.templateLivingRoomTitle',
+    subtitle: 'form.templateLivingRoomSubtitle',
+    promptKey: 'form.templateLivingRoomPrompt',
     input: {
-      prompt: 'Imam 1500 € za dnevni boravak u Zagrebu. Želim svijetli i prozračni stil, preferiram IKEA i JYSK. Trebam kauč, TV komodu, klub stolić, tepih i lampu.',
       budget: 1500,
       roomType: 'living-room',
       style: 'bright',
@@ -98,10 +98,10 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
     }
   },
   {
-    title: 'Radni kutak do 800 €',
-    subtitle: 'stol, stolica, polica i rasvjeta',
+    title: 'form.templateHomeOfficeTitle',
+    subtitle: 'form.templateHomeOfficeSubtitle',
+    promptKey: 'form.templateHomeOfficePrompt',
     input: {
-      prompt: 'Imam 800 € za radni kutak. Želim jednostavan i uredan radni prostor, može IKEA, JYSK i Pevex. Trebam radni stol, stolicu, policu i lampu.',
       budget: 800,
       roomType: 'home-office',
       style: 'minimal',
@@ -114,10 +114,10 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
     }
   },
   {
-    title: 'Kućna teretana do 1200 €',
-    subtitle: 'Decathlon + Pevex oprema za početak',
+    title: 'form.templateHomeGymTitle',
+    subtitle: 'form.templateHomeGymSubtitle',
+    promptKey: 'form.templateHomeGymPrompt',
     input: {
-      prompt: 'Imam 1200 € za kućnu teretanu. Želim praktičan prostor za vježbanje, preferiram Decathlon i Pevex. Trebam osnovnu opremu, spremanje i rasvjetu.',
       budget: 1200,
       roomType: 'home-gym',
       style: 'modern',
@@ -130,10 +130,10 @@ const starterTemplates: Array<{ title: string; subtitle: string; input: Partial<
     }
   },
   {
-    title: 'Samo IKEA dnevni boravak',
-    subtitle: 'jedna trgovina, manje logistike',
+    title: 'form.templateIkeaOnlyTitle',
+    subtitle: 'form.templateIkeaOnlySubtitle',
+    promptKey: 'form.templateIkeaOnlyPrompt',
     input: {
-      prompt: 'Imam 1800 € za dnevni boravak i želim sve iz IKEA-e. Želim svijetli, uredan stil. Već imam TV, trebam ostatak prostora.',
       budget: 1800,
       roomType: 'living-room',
       style: 'bright',
@@ -161,10 +161,11 @@ function setRetailer(input: PlannerInput, retailer: Retailer) {
   return { ...input, selectedRetailers: nextRetailers.length ? nextRetailers : [retailer] };
 }
 
-function applyTemplate(input: PlannerInput, template: Partial<PlannerInput>): PlannerInput {
+function applyTemplate(input: PlannerInput, template: Partial<PlannerInput>, prompt: string): PlannerInput {
   return {
     ...input,
     ...template,
+    prompt,
     lockedProductIds: []
   };
 }
@@ -222,39 +223,39 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
       }}
     >
       <div className="form-step prompt-card prompt-first-card">
-        <div className="step-kicker">1. Opiši želju</div>
+        <div className="step-kicker">{t('form.stepDescribeKicker')}</div>
         <div className="prompt-topline">
           <div>
-            <h3>Što želiš opremiti?</h3>
-            <p>Napiši normalno, kao da šalješ poruku prijatelju. Ne moraš znati stručne izraze.</p>
+            <h3>{t('form.describeHeading')}</h3>
+            <p>{t('form.describeIntro')}</p>
           </div>
-          <span className="ai-chip">Najlakše</span>
+          <span className="ai-chip">{t('form.easiestChip')}</span>
         </div>
         <label>
-          <span>Ovdje napiši želju</span>
+          <span>{t('form.promptLabel')}</span>
           <textarea
-            aria-label="Opis prostora i želja"
+            aria-label={t('form.promptAriaLabel')}
             rows={7}
             value={input.prompt}
-            placeholder="Npr. Imam 1500 € za dnevni boravak. Želim svijetli i prozračni stil, ne želim obilaziti puno trgovina i već imam TV."
+            placeholder={t('form.promptPlaceholder')}
             onChange={(event) => onChange({ ...input, prompt: event.target.value })}
           />
         </label>
         <button className="generate-button" type="submit" disabled={isLoading}>
           {isLoading ? t('planner.generating') : t('planner.generate')}
-          <span>dobiješ popis proizvoda i ukupnu cijenu</span>
+          <span>{t('form.generateHint')}</span>
         </button>
       </div>
 
       <div className="form-step starter-template-panel">
-        <div className="step-kicker">Brzi početak</div>
-        <h3>Ne znaš što napisati?</h3>
-        <p>Odaberi primjer pa ga po želji promijeni.</p>
+        <div className="step-kicker">{t('form.quickStartKicker')}</div>
+        <h3>{t('form.quickStartHeading')}</h3>
+        <p>{t('form.quickStartIntro')}</p>
         <div className="template-grid">
           {starterTemplates.map((template) => (
-            <button type="button" className="template-card" key={template.title} onClick={() => onChange(applyTemplate(input, template.input))}>
-              <strong>{template.title}</strong>
-              <span>{template.subtitle}</span>
+            <button type="button" className="template-card" key={template.title} onClick={() => onChange(applyTemplate(input, template.input, t(template.promptKey)))}>
+              <strong>{t(template.title)}</strong>
+              <span>{t(template.subtitle)}</span>
             </button>
           ))}
         </div>
@@ -262,20 +263,20 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
 
       <details className="advanced-settings">
         <summary>
-          <span>Detaljnije postavke</span>
-          <small>Budžet, soba, trgovine i želje — nije obavezno. Najčešće je dovoljan opis gore; AI ovo izvuče iz njega.</small>
+          <span>{t('form.advancedSummary')}</span>
+          <small>{t('form.advancedSummaryHint')}</small>
         </summary>
 
       <div className="form-step easy-controls">
-        <div className="step-kicker">Podesi ako želiš</div>
-        <h3>Osnovne stvari</h3>
-        <p>Ovo možeš preskočiti ako si sve napisao gore.</p>
+        <div className="step-kicker">{t('form.adjustKicker')}</div>
+        <h3>{t('form.basicsHeading')}</h3>
+        <p>{t('form.basicsIntro')}</p>
 
         <div className="control-block budget-block">
-          <span className="friendly-label">Koliko želiš potrošiti?</span>
+          <span className="friendly-label">{t('form.budgetLabel')}</span>
           <label className="budget-input-wrap">
             <input
-              aria-label="Koliko želiš potrošiti"
+              aria-label={t('form.budgetAriaLabel')}
               type="number"
               min="100"
               step="50"
@@ -284,7 +285,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             />
             <span>€</span>
           </label>
-          <div className="budget-presets" aria-label="Brzi odabir budžeta">
+          <div className="budget-presets" aria-label={t('form.budgetPresetsAriaLabel')}>
             {budgetPresets.map((budget) => (
               <button type="button" key={budget} className={input.budget === budget ? 'preset active' : 'preset'} onClick={() => onChange({ ...input, budget })}>
                 {formatCurrency(budget)}
@@ -294,7 +295,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
 
         <div className="control-block">
-          <span className="friendly-label">Što opremaš?</span>
+          <span className="friendly-label">{t('form.whatFurnishLabel')}</span>
           <div className="choice-grid rooms friendly-rooms">
             {rooms.map((room) => (
               <button
@@ -304,15 +305,15 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 onClick={() => onChange({ ...input, roomType: room.value })}
               >
                 <span>{room.icon}</span>
-                <strong>{room.label}</strong>
-                <small>{room.hint}</small>
+                <strong>{t(room.label)}</strong>
+                <small>{t(room.hint)}</small>
               </button>
             ))}
           </div>
         </div>
 
         <div className="control-block">
-          <span className="friendly-label">Koliko je velika prostorija?</span>
+          <span className="friendly-label">{t('form.roomSizeLabel')}</span>
           <div className="size-grid">
             {sizePresets.map((preset) => (
               <button
@@ -321,15 +322,15 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 className={input.size === preset.size ? 'size-card active' : 'size-card'}
                 onClick={() => onChange({ ...input, size: preset.size })}
               >
-                <strong>{preset.label}</strong>
-                <span>{preset.description}</span>
+                <strong>{t(preset.label)}</strong>
+                <span>{t(preset.description)}</span>
               </button>
             ))}
           </div>
           <label className="custom-size-input">
-            <span>Točno u m² ako znaš</span>
+            <span>{t('form.exactSizeLabel')}</span>
             <input
-              aria-label="Veličina prostorije"
+              aria-label={t('form.roomSizeAriaLabel')}
               type="number"
               min="8"
               max="80"
@@ -340,8 +341,8 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
 
         <div className="control-block">
-          <span className="friendly-label">Koliko kompletno želiš opremiti?</span>
-          <div className="furnishing-level-grid" role="group" aria-label="Razina opremanja">
+          <span className="friendly-label">{t('form.furnishingLevelLabel')}</span>
+          <div className="furnishing-level-grid" role="group" aria-label={t('form.furnishingLevelAriaLabel')}>
             {furnishingLevels.map((level) => (
               <button
                 type="button"
@@ -349,8 +350,8 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 className={input.furnishingLevel === level.value ? 'level-card active' : 'level-card'}
                 onClick={() => onChange({ ...input, furnishingLevel: level.value })}
               >
-                <strong>{level.label}</strong>
-                <span>{level.description}</span>
+                <strong>{t(level.label)}</strong>
+                <span>{t(level.description)}</span>
               </button>
             ))}
           </div>
@@ -358,52 +359,52 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
 
         <div className="form-row compact-row">
           <label>
-            <span>Kakav izgled želiš?</span>
+            <span>{t('form.styleLabel')}</span>
             <select value={input.style} onChange={(event) => onChange({ ...input, style: event.target.value as StyleType })}>
               {styles.map((style) => (
                 <option key={style.value} value={style.value}>
-                  {style.label}
+                  {t(style.label)}
                 </option>
               ))}
             </select>
-            <small className="field-help">{styles.find((style) => style.value === input.style)?.hint}</small>
+            <small className="field-help">{t(styles.find((style) => style.value === input.style)?.hint ?? '')}</small>
           </label>
           <label>
-            <span>Grad ili država</span>
-            <input aria-label="Lokacija" value={input.location} onChange={(event) => onChange({ ...input, location: event.target.value })} />
-            <small className="field-help">Koristimo ovo kasnije za dostupnost i trgovine u blizini.</small>
+            <span>{t('form.locationLabel')}</span>
+            <input aria-label={t('form.locationAriaLabel')} value={input.location} onChange={(event) => onChange({ ...input, location: event.target.value })} />
+            <small className="field-help">{t('form.locationHelp')}</small>
           </label>
         </div>
       </div>
 
       <div className="form-step shopping-step">
-        <div className="step-kicker">3. Kupnja</div>
-        <h3>Gdje želiš kupovati?</h3>
-        <p>Najjednostavnije je pustiti aplikaciji da kombinira, ali možeš ograničiti trgovine.</p>
-        <div className="shop-mode-grid" role="group" aria-label="Odabir trgovina">
+        <div className="step-kicker">{t('form.stepShoppingKicker')}</div>
+        <h3>{t('form.shoppingHeading')}</h3>
+        <p>{t('form.shoppingIntro')}</p>
+        <div className="shop-mode-grid" role="group" aria-label={t('form.shopModeAriaLabel')}>
           <button
             type="button"
             className={shopMode === 'best-combo' ? 'shop-mode active' : 'shop-mode'}
             onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: retailers, optimizationGoal: 'best-value' })}
           >
-            <strong>Svejedno mi je</strong>
-            <span>Složi najbolju kombinaciju iz svih trgovina.</span>
+            <strong>{t('form.shopBestComboTitle')}</strong>
+            <span>{t('form.shopBestComboDescription')}</span>
           </button>
           <button
             type="button"
             className={shopMode === 'one-store' ? 'shop-mode active' : 'shop-mode'}
             onClick={() => onChange({ ...input, retailerMode: 'single', selectedRetailers: [input.selectedRetailers[0] ?? 'IKEA'], optimizationGoal: 'least-stores' })}
           >
-            <strong>Jedna trgovina</strong>
-            <span>Manje dostava, manje obilazaka.</span>
+            <strong>{t('form.shopOneStoreTitle')}</strong>
+            <span>{t('form.shopOneStoreDescription')}</span>
           </button>
           <button
             type="button"
             className={shopMode === 'choose-stores' ? 'shop-mode active' : 'shop-mode'}
             onClick={() => onChange({ ...input, retailerMode: 'multi', selectedRetailers: input.selectedRetailers.length ? input.selectedRetailers : ['IKEA', 'JYSK'] })}
           >
-            <strong>Sam odabirem</strong>
-            <span>Odaberi trgovine koje ti odgovaraju.</span>
+            <strong>{t('form.shopChooseStoresTitle')}</strong>
+            <span>{t('form.shopChooseStoresDescription')}</span>
           </button>
         </div>
 
@@ -420,10 +421,10 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
       </div>
 
       <div className="form-step">
-        <div className="step-kicker">4. Želje</div>
-        <h3>Što je bitno?</h3>
+        <div className="step-kicker">{t('form.stepWishesKicker')}</div>
+        <h3>{t('form.wishesHeading')}</h3>
         <div className="field-group compact-group">
-          <span className="friendly-label">Što obavezno trebaš?</span>
+          <span className="friendly-label">{t('form.mustHaveLabel')}</span>
           <div className="category-pills friendly-pills">
             {visibleCategoryOptions.map((category) => (
               <button
@@ -445,14 +446,14 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
 
         <div className="field-group compact-group already-have-group">
-          <span className="friendly-label">Što već imaš?</span>
-          <p className="field-help inline-help">Označi samo ako stvarno ne želiš da ti to ponovno nudimo.</p>
+          <span className="friendly-label">{t('form.alreadyHaveLabel')}</span>
+          <p className="field-help inline-help">{t('form.alreadyHaveHelp')}</p>
           <label className="already-have-text-input">
-            <span>Upiši ako je lakše</span>
+            <span>{t('form.alreadyHaveInputLabel')}</span>
             <input
-              aria-label="Što već imaš"
+              aria-label={t('form.alreadyHaveAriaLabel')}
               value={alreadyHaveFreeText}
-              placeholder="npr. kauč, TV, radni stol"
+              placeholder={t('form.alreadyHavePlaceholder')}
               onChange={(event) => {
                 const value = event.target.value;
                 setAlreadyHaveFreeText(value);
@@ -468,7 +469,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           </label>
           {input.alreadyHaveCategories.length > 0 && (
             <div className="existing-assets-note">
-              <strong>Nećemo ponovno nuditi:</strong> {alreadyHaveText}
+              <strong>{t('form.wontOfferAgain')}</strong> {alreadyHaveText}
             </div>
           )}
           <div className="category-pills muted-pills friendly-pills">
@@ -492,7 +493,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </div>
 
         <div className="field-group compact-group">
-          <span className="friendly-label">Što ti je najvažnije?</span>
+          <span className="friendly-label">{t('form.mostImportantLabel')}</span>
           <div className="optimization-grid friendly-goals">
             {optimizationGoals.map((goal) => (
               <button
@@ -501,8 +502,8 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 className={input.optimizationGoal === goal.value ? 'goal-card active' : 'goal-card'}
                 onClick={() => onChange({ ...input, optimizationGoal: goal.value })}
               >
-                <strong>{goal.label}</strong>
-                <span>{goal.description}</span>
+                <strong>{t(goal.label)}</strong>
+                <span>{t(goal.description)}</span>
               </button>
             ))}
           </div>
@@ -513,7 +514,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
       <div className="sticky-generate-bar">
         <button className="generate-button" type="submit" disabled={isLoading}>
           {isLoading ? t('planner.generating') : t('planner.generate')}
-          <span>{formatCurrency(input.budget)} budžet</span>
+          <span>{t('form.budgetBarHint', { amount: formatCurrency(input.budget) })}</span>
         </button>
       </div>
     </form>

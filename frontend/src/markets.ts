@@ -13,13 +13,16 @@ export interface MarketConfig {
   available: boolean;
 }
 
+// Sprint 10.28: all six EUR markets are now exposed. HR is Croatian; the other markets render in English
+// (the common European language) until per-language localisation (DE/IT/SL/FI) lands. Each has a verified,
+// currency-correct EUR catalog.
 export const MARKETS: MarketConfig[] = [
   { code: 'HR', label: 'Hrvatska', currency: 'EUR', locale: 'hr-HR', lang: 'hr', available: true },
-  { code: 'SI', label: 'Slovenija', currency: 'EUR', locale: 'sl-SI', lang: 'en', available: false },
-  { code: 'AT', label: 'Österreich', currency: 'EUR', locale: 'de-AT', lang: 'en', available: false },
-  { code: 'DE', label: 'Deutschland', currency: 'EUR', locale: 'de-DE', lang: 'en', available: false },
-  { code: 'IT', label: 'Italia', currency: 'EUR', locale: 'it-IT', lang: 'en', available: false },
-  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'en', available: false }
+  { code: 'SI', label: 'Slovenija', currency: 'EUR', locale: 'sl-SI', lang: 'en', available: true },
+  { code: 'AT', label: 'Österreich', currency: 'EUR', locale: 'de-AT', lang: 'en', available: true },
+  { code: 'DE', label: 'Deutschland', currency: 'EUR', locale: 'de-DE', lang: 'en', available: true },
+  { code: 'IT', label: 'Italia', currency: 'EUR', locale: 'it-IT', lang: 'en', available: true },
+  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'en', available: true }
 ];
 
 export function marketConfig(code?: string): MarketConfig {

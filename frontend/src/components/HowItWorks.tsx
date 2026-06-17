@@ -1,25 +1,19 @@
+import { useLocale } from '../LocaleContext';
+
 export function HowItWorks() {
+  const { t } = useLocale();
   const steps = [
-    {
-      title: '1. Opišeš što želiš',
-      text: 'Napišeš prostoriju, budžet, stil i trgovine koje želiš. Nema dugog ispunjavanja forme.'
-    },
-    {
-      title: '2. Dobiješ konkretne proizvode',
-      text: 'Prvo vidiš najvažnije komade, ukupnu cijenu i trgovine. Detalji idu niže.'
-    },
-    {
-      title: '3. Dobiješ popis za kupnju',
-      text: 'Vidiš ukupnu cijenu, trošak po trgovini, proizvode i linkove gdje ih možeš otvoriti.'
-    }
+    { title: t('how.step1Title'), text: t('how.step1Text') },
+    { title: t('how.step2Title'), text: t('how.step2Text') },
+    { title: t('how.step3Title'), text: t('how.step3Text') }
   ];
 
   return (
     <section className="section shell" id="how">
       <div className="section-heading">
-        <span className="eyebrow">Kako radi</span>
-        <h2>Od ideje do shopping liste u par klikova.</h2>
-        <p>Ne dobiješ samo lijepu ideju za sobu, nego što kupiti, gdje i koliko ukupno košta.</p>
+        <span className="eyebrow">{t('how.eyebrow')}</span>
+        <h2>{t('how.heading')}</h2>
+        <p>{t('how.subheading')}</p>
       </div>
       <div className="steps-grid">
         {steps.map((step) => (

@@ -42,21 +42,23 @@ interface PlanResultsProps {
   partialNotice?: string | null;
 }
 
-const effortLabels = {
-  Low: 'Jednostavno',
-  Medium: 'Umjereno',
-  High: 'Više trgovina'
+type Translate = (key: string, params?: Record<string, string | number>) => string;
+
+const effortLabelKeys: Record<string, string> = {
+  Low: 'results.effortLow',
+  Medium: 'results.effortMedium',
+  High: 'results.effortHigh'
 };
 
-const feedbackOptions: Array<{ value: PlanFeedback; label: string }> = [
-  { value: 'useful', label: 'Korisno' },
-  { value: 'too-expensive', label: 'Preskupo' },
-  { value: 'wrong-style', label: 'Ne sviđa mi se izgled' },
-  { value: 'too-many-stores', label: 'Previše trgovina' }
+const feedbackOptions: Array<{ value: PlanFeedback; labelKey: string }> = [
+  { value: 'useful', labelKey: 'results.feedbackUseful' },
+  { value: 'too-expensive', labelKey: 'results.feedbackTooExpensive' },
+  { value: 'wrong-style', labelKey: 'results.feedbackWrongStyle' },
+  { value: 'too-many-stores', labelKey: 'results.feedbackTooManyStores' }
 ];
 
-function labelCategories(categories: ProductCategory[]) {
-  if (!categories.length) return 'nema posebnih oznaka';
+function labelCategories(t: Translate, categories: ProductCategory[]) {
+  if (!categories.length) return t('results.noSpecialTags');
   return categories.map((category) => categoryLabels[category]).join(', ');
 }
 
@@ -73,30 +75,18 @@ const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
   bathroom: ['storage', 'lighting', 'decor']
 };
 
-const TIER_LABELS: Record<string, string> = {
-  'Najbolji izbor': 'Udobnije',
-  'Najjeftinije': 'Osnovno',
-  'Ljepša verzija': 'Kompletno'
+const TIER_LABEL_KEYS: Record<string, string> = {
+  'Najbolji izbor': 'results.tierComfort',
+  'Najjeftinije': 'results.tierBasic',
+  'Ljepša verzija': 'results.tierComplete'
 };
 
 const STEP_ORDER = ['buy-first', 'add-comfort', 'later'] as const;
 
 const STEP_TEXT = {
-  'buy-first': {
-    title: '1. Najvažnije za početak',
-    shortTitle: 'Najvažnije',
-    description: 'Ovo su komadi koji najviše nose prostor i cijeli plan.'
-  },
-  'add-comfort': {
-    title: '2. Za ugodniji prostor',
-    shortTitle: 'Ugodnije',
-    description: 'Ovo daje topliji i dovršeniji osjećaj, ali ne mora biti prva odluka.'
-  },
-  later: {
-    title: '3. Može kasnije',
-    shortTitle: 'Može kasnije',
-    description: 'Ovo je lijepo imati, ali mirno može pričekati ako želiš čuvati budžet.'
-  }
+  'buy-first': { titleKey: 'results.stepBuyFirstTitle' },
+  'add-comfort': { titleKey: 'results.stepAddComfortTitle' },
+  later: { titleKey: 'results.stepLaterTitle' }
 };
 
 const CORE_BY_ROOM: Record<RoomType, ProductCategory[]> = {
@@ -172,14 +162,26 @@ function missingForRoom(plan: FurnishingPlan, input: PlannerInput) {
   );
 }
 
-function defaultSummary(plan: FurnishingPlan, input: PlannerInput) {
+function defaultSummary(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
   const room = roomLabels[input.roomType];
   const firstStep = purchaseSteps(plan, input.roomType)[0];
   const firstItems = firstStep?.items
     .slice(0, 3)
     .map((item) => categoryLabels[item.product.category].toLowerCase())
     .join(', ');
-  return `Za ${formatCurrency(input.budget)} najviše smisla imaju ${firstItems || 'osnovni komadi'} za ${room}. Plan koristi ${plan.retailersUsed.length === 1 ? 'jednu trgovinu' : `${plan.retailersUsed.length} trgovine`} i ${plan.total <= input.budget ? 'ostaje unutar budžeta' : 'treba još smanjiti da bude sigurniji'}.`;
+  const stores = plan.retailersUsed.length === 1
+    ? t('results.summaryOneStore')
+    : t('results.summaryManyStores', { count: plan.retailersUsed.length });
+  const status = plan.total <= input.budget
+    ? t('results.summaryWithinBudget')
+    : t('results.summaryNeedsTrim');
+  return t('results.defaultSummary', {
+    budget: formatCurrency(input.budget),
+    items: firstItems || t('results.basicPieces'),
+    room,
+    stores,
+    status
+  });
 }
 
 function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
@@ -192,16 +194,16 @@ function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   return plans.find((plan) => plan.name === preferredName)?.id ?? plans.find((plan) => plan.name === 'Najbolji izbor')?.id ?? plans[0].id;
 }
 
-function firstBuyText(steps: ReturnType<typeof purchaseSteps>) {
+function firstBuyText(t: Translate, steps: ReturnType<typeof purchaseSteps>) {
   const first = steps.find((step) => step.priority === 'buy-first') ?? steps[0];
   const items = first?.items
     .slice(0, 3)
     .map((item) => categoryLabels[item.product.category].toLowerCase())
     .join(', ');
-  return items || 'osnovne komade';
+  return items || t('results.basicPiecesAcc');
 }
 
-function laterText(steps: ReturnType<typeof purchaseSteps>) {
+function laterText(t: Translate, steps: ReturnType<typeof purchaseSteps>) {
   const later = steps.find((step) => step.priority === 'later');
   if (later?.items.length) {
     return later.items
@@ -210,29 +212,29 @@ function laterText(steps: ReturnType<typeof purchaseSteps>) {
       .join(', ');
   }
   const comfort = steps.find((step) => step.priority === 'add-comfort');
-  return comfort?.items[0] ? categoryLabels[comfort.items[0].product.category].toLowerCase() : 'sitnice';
+  return comfort?.items[0] ? categoryLabels[comfort.items[0].product.category].toLowerCase() : t('results.smallStuff');
 }
 
-function decisionLabel(plan: FurnishingPlan, input: PlannerInput) {
+function decisionLabel(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
   const difference = input.budget - plan.total;
-  if (difference < 0) return 'Još nije idealno';
-  if (difference >= input.budget * 0.12) return 'Isplativo i sigurno';
-  return 'Isplativo, ali blizu budžeta';
+  if (difference < 0) return t('results.decisionNotIdeal');
+  if (difference >= input.budget * 0.12) return t('results.decisionWorthSafe');
+  return t('results.decisionWorthClose');
 }
 
-function decisionHeadline(plan: FurnishingPlan, input: PlannerInput, steps: ReturnType<typeof purchaseSteps>) {
-  const first = firstBuyText(steps);
-  const later = laterText(steps);
+function decisionHeadline(t: Translate, plan: FurnishingPlan, input: PlannerInput, steps: ReturnType<typeof purchaseSteps>) {
+  const first = firstBuyText(t, steps);
+  const later = laterText(t, steps);
   if (plan.total > input.budget) {
-    return `Plan je dobar, ali još treba smanjiti ${formatCurrency(plan.total - input.budget)}.`;
+    return t('results.decisionHeadlineOver', { amount: formatCurrency(plan.total - input.budget) });
   }
-  return `Za ${formatCurrency(input.budget)} najisplativije je fokusirati se na ${first}; ${later} može čekati.`;
+  return t('results.decisionHeadlineFocus', { budget: formatCurrency(input.budget), first, later });
 }
 
-function shortBudgetText(plan: FurnishingPlan, input: PlannerInput) {
+function shortBudgetText(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
   const difference = input.budget - plan.total;
-  if (difference >= 0) return `Ostaje ${formatCurrency(difference)}`;
-  return `${formatCurrency(Math.abs(difference))} iznad`;
+  if (difference >= 0) return t('results.budgetRemains', { amount: formatCurrency(difference) });
+  return t('results.budgetOver', { amount: formatCurrency(Math.abs(difference)) });
 }
 
 
@@ -275,17 +277,17 @@ function productUrl(product: Product) {
 // catalog recorded (average star + count) and link out to the store so the shopper can read the real
 // reviews and judge for themselves (incl. availability). reviewRating is display-only and separate
 // from the planner's internal `rating`.
-function reviewSummary(product: Product): string {
+function reviewSummary(t: Translate, product: Product): string {
   const hasRating = typeof product.reviewRating === 'number' && product.reviewRating > 0;
   const hasCount = typeof product.reviewCount === 'number' && product.reviewCount > 0;
   if (hasRating && hasCount) return `★ ${product.reviewRating!.toFixed(1)} (${product.reviewCount})`;
   if (hasRating) return `★ ${product.reviewRating!.toFixed(1)}`;
-  if (hasCount) return `★ ${product.reviewCount} recenzija`;
+  if (hasCount) return t('results.reviewCountOnly', { count: product.reviewCount! });
   return '';
 }
 
-function hasReviews(product: Product) {
-  return reviewSummary(product) !== '';
+function hasReviews(t: Translate, product: Product) {
+  return reviewSummary(t, product) !== '';
 }
 
 function reviewsUrl(product: Product) {
@@ -306,50 +308,51 @@ function isStaleProduct(product: Product) {
   return ageDays > STALE_AFTER_DAYS;
 }
 
-function availabilityLabel(product: Product) {
+function availabilityLabel(t: Translate, product: Product) {
   const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
-  if (status === 'unavailable') return 'Trenutno nedostupno';
-  if (status === 'limited' || status === 'check-store') return 'Provjeri u trgovini';
-  if (status === 'in-stock') return isStaleProduct(product) ? 'Provjeri u trgovini' : 'Dostupno';
-  return 'Provjeri u trgovini';
+  if (status === 'unavailable') return t('results.availUnavailable');
+  if (status === 'limited' || status === 'check-store') return t('results.availCheckStore');
+  if (status === 'in-stock') return isStaleProduct(product) ? t('results.availCheckStore') : t('results.availInStock');
+  return t('results.availCheckStore');
 }
 
-function priceTierLabel(product: Product) {
+function priceTierLabel(t: Translate, product: Product) {
   const tier = product.priceTier;
-  if (tier === 'budget') return 'Povoljnija opcija';
-  if (tier === 'premium') return 'Jača opcija';
-  return 'Standardna opcija';
+  if (tier === 'budget') return t('results.priceTierBudget');
+  if (tier === 'premium') return t('results.priceTierPremium');
+  return t('results.priceTierStandard');
 }
 
-function productCheckLabel(product: Product) {
+function productCheckLabel(t: Translate, product: Product) {
   const status = product.availabilityStatus || (product.inStock === false ? 'unavailable' : 'in-stock');
-  if (status === 'limited' || status === 'check-store') return 'Provjeri u trgovini prije kupnje';
-  if (isStaleProduct(product)) return 'Provjeri cijenu i dostupnost u trgovini.';
-  return 'Cijenu provjeri u trgovini';
+  if (status === 'limited' || status === 'check-store') return t('results.checkStoreBeforeBuy');
+  if (isStaleProduct(product)) return t('results.checkPriceAvailability');
+  return t('results.checkPriceInStore');
 }
 
-function itemsCountText(count: number) {
-  if (count === 1) return '1 stvar';
-  return `${count} stvari`;
+function itemsCountText(t: Translate, count: number) {
+  if (count === 1) return t('results.itemCountOne');
+  return t('results.itemCountMany', { count });
 }
 
 function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: PlannerInput }) {
+  const { t } = useLocale();
   const trip = resolveStoreTrip(plan);
   const budgetDifference = input.budget - plan.total;
   const budgetText = budgetDifference >= 0
-    ? `Ostaje ${formatCurrency(budgetDifference)}`
-    : `${formatCurrency(Math.abs(budgetDifference))} iznad budžeta`;
+    ? t('results.budgetRemains', { amount: formatCurrency(budgetDifference) })
+    : t('results.budgetOverBudget', { amount: formatCurrency(Math.abs(budgetDifference)) });
   const breakdown = getRetailerBreakdown(plan);
   const leadText = trip.storeCount > 0
-    ? `Sve bitno možeš kupiti u ${storeCountText(trip.storeCount)} za ${formatCurrency(plan.total)}.`
-    : 'Dodaj barem jedan glavni komad da složimo popis.';
+    ? t('results.shoppingListLead', { stores: storeCountText(trip.storeCount), total: formatCurrency(plan.total) })
+    : t('results.shoppingListLeadEmpty');
 
   return (
-    <section className="shopping-list-card" aria-label="Popis za kupnju">
+    <section className="shopping-list-card" aria-label={t('results.shoppingListTitle')}>
       <div className="shopping-list-head">
         <div>
-          <span>Popis za kupnju</span>
-          <strong>{plan.items.length} proizvoda · {storeCountText(trip.storeCount)}</strong>
+          <span>{t('results.shoppingListTitle')}</span>
+          <strong>{t('results.productsCount', { count: plan.items.length })} · {storeCountText(trip.storeCount)}</strong>
           <small>{budgetText}</small>
         </div>
         <strong>{formatCurrency(plan.total)}</strong>
@@ -359,7 +362,7 @@ function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: Planne
         {breakdown.map((entry) => (
           <div className="shopping-list-group" key={entry.retailer}>
             <div className="shopping-list-group-title">
-              <span>{entry.retailer} — {itemsCountText(entry.count)}</span>
+              <span>{entry.retailer} — {itemsCountText(t, entry.count)}</span>
               <strong>{formatCurrency(entry.total)}</strong>
             </div>
             <ul>
@@ -367,7 +370,7 @@ function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: Planne
                 <li key={item.product.id}>
                   <span>{item.product.name}</span>
                   {isCheckInStore(item.product)
-                    ? <small className="check-store-tag">Provjeri u trgovini</small>
+                    ? <small className="check-store-tag">{t('results.availCheckStore')}</small>
                     : <small>{shoppingPriorityLabels[priorityForItem(item, input.roomType)]}</small>}
                   <strong>{formatCurrency(item.product.price)}</strong>
                 </li>
@@ -381,52 +384,54 @@ function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: Planne
 }
 
 function UnderstandingSummary({ input }: { input: PlannerInput }) {
+  const { t } = useLocale();
   return (
     <details className="understood-card compact-understood-card">
       <summary>
-        <span>Što smo uzeli u obzir</span>
+        <span>{t('results.consideredTitle')}</span>
         <strong>{formatCurrency(input.budget)} · {roomLabels[input.roomType]} · {styleLabels[input.style]}</strong>
       </summary>
       <div className="understood-grid">
         <div>
-          <span>Prostorija</span>
+          <span>{t('results.fieldRoom')}</span>
           <strong>{roomLabels[input.roomType]}</strong>
         </div>
         <div>
-          <span>Izgled</span>
+          <span>{t('results.fieldStyle')}</span>
           <strong>{styleLabels[input.style]}</strong>
         </div>
         <div>
-          <span>Veličina</span>
+          <span>{t('results.fieldSize')}</span>
           <strong>{input.size} m²</strong>
         </div>
         <div>
-          <span>Razina</span>
+          <span>{t('results.fieldLevel')}</span>
           <strong>{furnishingLevelLabels[input.furnishingLevel ?? 'comfort']}</strong>
         </div>
         <div>
-          <span>Trgovine</span>
-          <strong>{input.retailerMode === 'single' ? `samo ${input.selectedRetailers[0]}` : input.selectedRetailers.join(' + ')}</strong>
+          <span>{t('results.fieldStores')}</span>
+          <strong>{input.retailerMode === 'single' ? t('results.onlyRetailer', { name: input.selectedRetailers[0] }) : input.selectedRetailers.join(' + ')}</strong>
         </div>
       </div>
       <div className="understood-tags">
-        <span>Obavezno: {labelCategories(input.mustHaveCategories)}</span>
-        <span>Već imaš: {labelCategories(input.alreadyHaveCategories)}</span>
-        {input.lockedProductIds.length > 0 && <span>Zadržavaš: {input.lockedProductIds.length} proizvoda</span>}
+        <span>{t('results.mustHaveLabel', { categories: labelCategories(t, input.mustHaveCategories) })}</span>
+        <span>{t('results.alreadyHaveLabel', { categories: labelCategories(t, input.alreadyHaveCategories) })}</span>
+        {input.lockedProductIds.length > 0 && <span>{t('results.keepingLabel', { count: input.lockedProductIds.length })}</span>}
       </div>
     </details>
   );
 }
 
 function ResultShell({ children }: { children: ReactNode }) {
+  const { t } = useLocale();
   return (
     <div className="results-shell">
       <div className="results-title-bar">
         <div>
-          <span className="step-kicker">Rezultat</span>
-          <h3>Tvoj plan za kupnju</h3>
+          <span className="step-kicker">{t('results.resultKicker')}</span>
+          <h3>{t('results.resultHeading')}</h3>
         </div>
-        <small>U 10 sekundi treba biti jasno što dobivaš, koliko košta i što je najisplativije.</small>
+        <small>{t('results.resultSubtitle')}</small>
       </div>
       {children}
     </div>
@@ -492,10 +497,10 @@ export function PlanResults({
       <ResultShell>
         <div className="plans-column state-panel">
           <div className="empty-state error-state">
-            <span>Nešto ne radi</span>
-            <h3>Nismo uspjeli složiti plan.</h3>
+            <span>{t('results.errorBadge')}</span>
+            <h3>{t('results.errorHeading')}</h3>
             <p>{error}</p>
-            <small>Probaj ponovno za koju minutu ili provjeri je li aplikacija pokrenuta.</small>
+            <small>{t('results.errorHint')}</small>
           </div>
         </div>
       </ResultShell>
@@ -507,9 +512,9 @@ export function PlanResults({
       <ResultShell>
         <div className="plans-column state-panel">
           <div className="empty-state loading-state">
-            <span>Slažemo plan</span>
-            <h3>Tražimo što se stvarno isplati kupiti...</h3>
-            <p>Prvo gledamo glavne komade, zatim udobnost, pa detalje samo ako budžet drži.</p>
+            <span>{t('results.loadingBadge')}</span>
+            <h3>{t('results.loadingHeading')}</h3>
+            <p>{t('results.loadingText')}</p>
           </div>
         </div>
       </ResultShell>
@@ -521,12 +526,12 @@ export function PlanResults({
       <ResultShell>
         <div className="plans-column state-panel">
           <div className="empty-state friendly-empty-state decision-empty-state">
-            <span>Spremno</span>
-            <h3>Ovdje ćeš odmah vidjeti što se isplati.</h3>
-            <p>Ovdje će se pojaviti tvoj plan za kupnju: proizvodi, cijene i popis po trgovinama.</p>
+            <span>{t('results.emptyBadge')}</span>
+            <h3>{t('results.emptyHeading')}</h3>
+            <p>{t('results.emptyText')}</p>
             <div className="empty-example">
-              <strong>Dobit ćeš:</strong>
-              <span>konkretne proizvode · ukupnu cijenu · popis za kupnju</span>
+              <strong>{t('results.emptyGetLabel')}</strong>
+              <span>{t('results.emptyGetItems')}</span>
             </div>
           </div>
         </div>
@@ -544,7 +549,9 @@ export function PlanResults({
   const showBudgetBlock = repairTips.length > 0 || budgetTight;
   const missing = missingForRoom(selectedPlan, input);
   const steps = purchaseSteps(selectedPlan, input.roomType);
-  const tier = TIER_LABELS[selectedPlan.name] ?? furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
+  const tier = TIER_LABEL_KEYS[selectedPlan.name]
+    ? t(TIER_LABEL_KEYS[selectedPlan.name])
+    : furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
   const selectedFeedback = feedbackByPlan[selectedPlan.id];
   const primaryStep = steps.find((step) => step.priority === 'buy-first') ?? steps[0];
 
@@ -552,7 +559,7 @@ export function PlanResults({
     <ResultShell>
       {partialNotice && (
         <div className="partial-plan-note" role="status">
-          <strong>Plan je djelomičan</strong>
+          <strong>{t('results.partialPlan')}</strong>
           <span>{partialNotice}</span>
         </div>
       )}
@@ -560,10 +567,10 @@ export function PlanResults({
         <article className="plan-card focused-plan-card decision-plan-card" key={selectedPlan.id}>
           <div className="decision-card">
             <div className="decision-topline">
-              <span>{decisionLabel(selectedPlan, input)}</span>
+              <span>{decisionLabel(t, selectedPlan, input)}</span>
               <strong>{selectedPlan.name}</strong>
             </div>
-            <h3>{decisionHeadline(selectedPlan, input, steps)}</h3>
+            <h3>{decisionHeadline(t, selectedPlan, input, steps)}</h3>
             {summaryBullets.length > 0 ? (
               <ul className="purchase-summary">
                 {summaryBullets.map((line) => (
@@ -571,27 +578,27 @@ export function PlanResults({
                 ))}
               </ul>
             ) : (
-              <p>{selectedPlan.advisorNote || defaultSummary(selectedPlan, input)}</p>
+              <p>{selectedPlan.advisorNote || defaultSummary(t, selectedPlan, input)}</p>
             )}
 
-            <div className="decision-metrics" aria-label="Najvažnije o planu">
+            <div className="decision-metrics" aria-label={t('results.planKeyInfo')}>
               <div>
-                <span>Ukupno</span>
+                <span>{t('results.totalLabel')}</span>
                 <strong>{formatCurrency(selectedPlan.total)}</strong>
               </div>
               <div>
-                <span>{overBudget ? 'Treba smanjiti' : 'Sigurnost'}</span>
-                <strong className={overBudget ? 'over-text' : ''}>{shortBudgetText(selectedPlan, input)}</strong>
+                <span>{overBudget ? t('results.needToReduce') : t('results.safety')}</span>
+                <strong className={overBudget ? 'over-text' : ''}>{shortBudgetText(t, selectedPlan, input)}</strong>
               </div>
               <div>
-                <span>Trgovine</span>
+                <span>{t('results.storesLabel')}</span>
                 <strong>{selectedPlan.retailersUsed.length || 0}</strong>
               </div>
             </div>
 
             {showBudgetBlock && (
               <div className="budget-pressure-strip">
-                <strong>Budžet je tijesan</strong>
+                <strong>{t('results.budgetTight')}</strong>
                 {repairTips.length > 0 ? (
                   <ul>
                     {repairTips.map((tip) => (
@@ -601,8 +608,8 @@ export function PlanResults({
                 ) : (
                   <span>
                     {overBudget
-                      ? 'Prvo preskoči stvari iz “Može kasnije”, pa provjeri ima li jeftinija opcija za najskuplji komad.'
-                      : 'Ostaje malo prostora — kreni s najvažnijim stvarima, detalji mogu kasnije.'}
+                      ? t('results.budgetTightOver')
+                      : t('results.budgetTightUnder')}
                   </span>
                 )}
               </div>
@@ -618,20 +625,20 @@ export function PlanResults({
 
             {primaryStep && (
               <div className="first-buy-strip">
-                <span>Najvažnije u planu</span>
+                <span>{t('results.mostImportantInPlan')}</span>
                 <strong>{primaryStep.items.map((item) => item.product.name).join(' + ')}</strong>
               </div>
             )}
 
             <div className="decision-actions">
               <button className="plan-button primary-copy-button" type="button" onClick={() => copyPlan(selectedPlan)}>
-                {copiedPlanId === selectedPlan.id ? 'Popis kopiran ✓' : 'Kopiraj popis za kupnju'}
+                {copiedPlanId === selectedPlan.id ? t('results.listCopied') : t('results.copyShoppingList')}
               </button>
               <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, false)} disabled={savingPlanId === selectedPlan.id}>
-                {savingPlanId === selectedPlan.id ? 'Spremam...' : 'Spremi u moje planove'}
+                {savingPlanId === selectedPlan.id ? t('results.saving') : t('results.saveToMyPlans')}
               </button>
               <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, true)} disabled={savingPlanId === selectedPlan.id}>
-                Kopiraj link
+                {t('results.copyLink')}
               </button>
             </div>
           </div>
@@ -639,13 +646,13 @@ export function PlanResults({
 
           <div className="items-list step-items-list">
             <div className="result-section-heading">
-              <span>Proizvodi u ovom planu</span>
-              <p>Prvo vidiš konkretne proizvode. Zamjene otvori samo ako ti nešto ne odgovara.</p>
+              <span>{t('results.productsInPlan')}</span>
+              <p>{t('results.productsInPlanHint')}</p>
             </div>
             {steps.map((step) => (
               <section className="step-product-section" key={step.priority}>
                 <div className="step-product-section-title">
-                  <span>{step.title}</span>
+                  <span>{t(step.titleKey)}</span>
                   <strong>{formatCurrency(step.subtotal)}</strong>
                 </div>
                 {step.items.map((item) => {
@@ -661,7 +668,7 @@ export function PlanResults({
                     <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
                       <img
                         src={productImage(product)}
-                        alt={illustration ? `${product.name} — ilustracija (nije stvarna fotografija proizvoda)` : product.name}
+                        alt={illustration ? t('results.imageIllustrationAlt', { name: product.name }) : product.name}
                         loading="lazy"
                         onError={(event) => handleProductImageError(event, product.category)}
                       />
@@ -672,64 +679,64 @@ export function PlanResults({
                         </div>
                         <div className="meta-line">
                           <span>{product.retailer}</span>
-                          {market && <span title={`Tržište / katalog: ${market}`}>Tržište: {market}</span>}
+                          {market && <span title={t('results.marketCatalogTitle', { market })}>{t('results.marketLabel', { market })}</span>}
                           <span>{categoryLabels[product.category]}</span>
                           <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
-                          <span>{availabilityLabel(product)}</span>
-                          {hasReviews(product) && (
-                            <span className="review-chip" title="Prosječna ocjena i broj recenzija u trgovini (provjereno)">
-                              {reviewSummary(product)}
+                          <span>{availabilityLabel(t, product)}</span>
+                          {hasReviews(t, product) && (
+                            <span className="review-chip" title={t('results.reviewChipTitle')}>
+                              {reviewSummary(t, product)}
                             </span>
                           )}
                           {illustration && (
-                            <span title="Nemamo stvarnu fotografiju ovog proizvoda — prikazana je ilustracija kategorije.">
-                              ilustracija
+                            <span title={t('results.illustrationTitle')}>
+                              {t('results.illustrationChip')}
                             </span>
                           )}
-                          {product.originalPrice && <span>Akcija</span>}
-                          {locked && <span>Zadržano</span>}
+                          {product.originalPrice && <span>{t('results.onSale')}</span>}
+                          {locked && <span>{t('results.kept')}</span>}
                         </div>
-                        <small className="product-shop-note">{priceTierLabel(product)} · {productCheckLabel(product)}</small>
+                        <small className="product-shop-note">{priceTierLabel(t, product)} · {productCheckLabel(t, product)}</small>
                         {product.deliveryNote && <small className="product-delivery-note">{product.deliveryNote}</small>}
                         <div className="product-reason-box compact-reason-box">
-                          <span>{item.shoppingRole || 'Zašto ovo?'}</span>
+                          <span>{item.shoppingRole || t('results.whyThis')}</span>
                           <p>{reason}</p>
                         </div>
                         <div className="product-actions decision-product-actions">
                           {openUrl ? (
                             <a href={openUrl} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
-                              Otvori u trgovini
+                              {t('results.openInStore')}
                             </a>
                           ) : (
-                            <button type="button" disabled title="Link proizvoda nije dostupan.">
-                              Link proizvoda nije dostupan
+                            <button type="button" disabled title={t('results.productLinkUnavailableTitle')}>
+                              {t('results.productLinkUnavailable')}
                             </button>
                           )}
-                          {hasReviews(product) && reviewsHref && (
+                          {hasReviews(t, product) && reviewsHref && (
                             <a className="reviews-link" href={reviewsHref} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
                               {t('product.reviews')} ↗
                             </a>
                           )}
                           <button type="button" onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>
-                            {expanded ? 'Sakrij zamjene' : 'Promijeni'}
+                            {expanded ? t('results.hideReplacements') : t('results.change')}
                           </button>
                           <button type="button" onClick={() => onToggleLock(product.id)}>
-                            {locked ? 'Pusti' : 'Zadrži'}
+                            {locked ? t('results.release') : t('results.keep')}
                           </button>
                         </div>
                         {expanded && (
-                          <div className="replacement-menu" aria-label="Odaberi što želiš promijeniti">
-                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>Nađi jeftinije</button>
-                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>Nađi ljepše</button>
-                            <button type="button" onClick={() => setDislikeProductId(dislikeProductId === product.id ? null : product.id)}>Ne sviđa mi se</button>
-                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>Ne treba mi ovo</button>
+                          <div className="replacement-menu" aria-label={t('results.replacementMenuLabel')}>
+                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>{t('results.findCheaper')}</button>
+                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>{t('results.findNicer')}</button>
+                            <button type="button" onClick={() => setDislikeProductId(dislikeProductId === product.id ? null : product.id)}>{t('results.dontLikeIt')}</button>
+                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>{t('results.dontNeedThis')}</button>
                             {dislikeProductId === product.id && (
                               <div className="dislike-reasons">
-                                <span>Što ne odgovara?</span>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>Preskupo je</button>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>Želim ljepši stil</button>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')}>Pokaži drugu opciju</button>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>Ne treba mi ta stvar</button>
+                                <span>{t('results.whatsWrong')}</span>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>{t('results.tooExpensive')}</button>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>{t('results.wantNicerStyle')}</button>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')}>{t('results.showAnother')}</button>
+                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>{t('results.dontNeedThatItem')}</button>
                               </div>
                             )}
                           </div>
@@ -746,8 +753,8 @@ export function PlanResults({
 
           <details className="alternate-plans-panel">
             <summary>
-              <span>Želiš drugačije?</span>
-              <strong>Usporedi jeftiniju ili ljepšu verziju</strong>
+              <span>{t('results.wantDifferent')}</span>
+              <strong>{t('results.compareVersions')}</strong>
             </summary>
             <div className="plan-choice-grid compact-plan-choice-grid">
               {plans.map((plan) => {
@@ -757,7 +764,7 @@ export function PlanResults({
                   <button type="button" key={plan.id} className={active ? 'plan-choice-card active' : 'plan-choice-card'} onClick={() => setSelectedPlanId(plan.id)}>
                     <span>{plan.name}</span>
                     <strong>{formatCurrency(plan.total)}</strong>
-                    <small>{planOverBudget ? `${formatCurrency(plan.total - input.budget)} iznad budžeta` : `${formatCurrency(input.budget - plan.total)} ostaje`}</small>
+                    <small>{planOverBudget ? t('results.overBudgetAmount', { amount: formatCurrency(plan.total - input.budget) }) : t('results.remainsAmount', { amount: formatCurrency(input.budget - plan.total) })}</small>
                   </button>
                 );
               })}
@@ -766,13 +773,13 @@ export function PlanResults({
 
           <details className="secondary-info-panel">
             <summary>
-              <span>Detalji plana</span>
-              <strong>Zašto je ovo odabrano i gdje ide novac</strong>
+              <span>{t('results.planDetails')}</span>
+              <strong>{t('results.planDetailsSub')}</strong>
             </summary>
 
             <div className="plan-summary-box">
-              <span>Što dobivaš za ovaj budžet</span>
-              <p>{selectedPlan.summary || defaultSummary(selectedPlan, input)}</p>
+              <span>{t('results.whatYouGet')}</span>
+              <p>{selectedPlan.summary || defaultSummary(t, selectedPlan, input)}</p>
               <small>{selectedPlan.budgetStatus}</small>
             </div>
 
@@ -780,35 +787,35 @@ export function PlanResults({
               <div>
                 <span className="plan-label">{selectedPlan.label}</span>
                 <h3>{selectedPlan.name}</h3>
-                {tier && <small className="plan-tier">{tier} oprema</small>}
+                {tier && <small className="plan-tier">{t('results.tierEquipment', { tier })}</small>}
               </div>
               <div className={overBudget ? 'total over' : 'total'}>{formatCurrency(selectedPlan.total)}</div>
             </div>
 
             <div className="plan-explainer-grid">
               <div>
-                <span>Za koga je ovo dobro?</span>
-                <p>{selectedPlan.goodFor || 'Dobro ako želiš brz, realan plan bez previše ručnog traženja po trgovinama.'}</p>
+                <span>{t('results.whoIsThisFor')}</span>
+                <p>{selectedPlan.goodFor || t('results.whoIsThisForDefault')}</p>
               </div>
               <div>
-                <span>Na što treba paziti?</span>
+                <span>{t('results.whatToWatch')}</span>
                 <p>{selectedPlan.tradeoff || selectedPlan.description}</p>
               </div>
             </div>
 
-            <div className="tradeoff-panel" aria-label="Savjeti za budžet">
+            <div className="tradeoff-panel" aria-label={t('results.budgetTips')}>
               <div className="tradeoff-card save">
-                <span>Kako spustiti cijenu</span>
+                <span>{t('results.howToLowerPrice')}</span>
                 <ul>
-                  {(selectedPlan.savingTips?.length ? selectedPlan.savingTips : ['Ako je budžet tijesan, prvo odgodi detalje i čuvaj novac za glavne komade.']).map((tip) => (
+                  {(selectedPlan.savingTips?.length ? selectedPlan.savingTips : [t('results.savingTipDefault')]).map((tip) => (
                     <li key={tip}>{tip}</li>
                   ))}
                 </ul>
               </div>
               <div className="tradeoff-card upgrade">
-                <span>Ako možeš dodati još malo</span>
+                <span>{t('results.ifYouCanAddMore')}</span>
                 <ul>
-                  {(selectedPlan.upgradeTips?.length ? selectedPlan.upgradeTips : ['Najviše se osjeti nadogradnja rasvjete, tepiha ili glavnog komada koji koristiš svaki dan.']).map((tip) => (
+                  {(selectedPlan.upgradeTips?.length ? selectedPlan.upgradeTips : [t('results.upgradeTipDefault')]).map((tip) => (
                     <li key={tip}>{tip}</li>
                   ))}
                 </ul>
@@ -817,47 +824,47 @@ export function PlanResults({
 
             <div className="score-row enhanced-score-row">
               <div>
-                <span>Koliko prati želje</span>
+                <span>{t('results.scoreFit')}</span>
                 <strong>{selectedPlan.fitScore}%</strong>
               </div>
               <div>
-                <span>Usklađen izgled</span>
+                <span>{t('results.scoreStyle')}</span>
                 <strong>{selectedPlan.styleConsistency}%</strong>
               </div>
               <div>
-                <span>Kupnja</span>
-                <strong>{effortLabels[selectedPlan.shoppingEffort]}</strong>
+                <span>{t('results.scoreShopping')}</span>
+                <strong>{t(effortLabelKeys[selectedPlan.shoppingEffort])}</strong>
               </div>
               <div>
-                <span>Broj proizvoda</span>
+                <span>{t('results.scoreItemCount')}</span>
                 <strong>{selectedPlan.items.length}</strong>
               </div>
             </div>
 
             <div className="retailer-breakdown">
-              <div className="breakdown-title">Trošak po trgovini</div>
+              <div className="breakdown-title">{t('results.costPerStore')}</div>
               {breakdown.map((entry) => (
                 <div className="breakdown-row" key={entry.retailer}>
                   <span>{entry.retailer}</span>
                   <strong>{formatCurrency(entry.total)}</strong>
-                  <small>{entry.count} proizvoda</small>
+                  <small>{t('results.productsCount', { count: entry.count })}</small>
                 </div>
               ))}
             </div>
 
             {missing.length > 0 && (
               <div className="missing-box improved-missing-box">
-                <strong>Preskočeno za sada</strong>
-                <p>Ovo nije ušlo jer bi moglo probiti budžet ili trenutno nema dovoljno dobru opciju u katalogu:</p>
+                <strong>{t('results.skippedForNow')}</strong>
+                <p>{t('results.skippedForNowText')}</p>
                 <ul className="missing-list">
                   {missing.map((category) => (
                     <li key={category}>
                       <span>{categoryLabels[category]}</span>
-                      <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>Dodaj u ljepšu verziju</button>
+                      <button type="button" onClick={() => onQuickAction('nicer', selectedPlan)}>{t('results.addToNicerVersion')}</button>
                     </li>
                   ))}
                 </ul>
-                <small>Ovo ti pomaže odvojiti što kupiti sada, a što mirno može čekati kasnije.</small>
+                <small>{t('results.skippedForNowHint')}</small>
               </div>
             )}
           </details>
@@ -865,11 +872,11 @@ export function PlanResults({
           <UnderstandingSummary input={input} />
 
           <div className="feedback-card compact-feedback-card">
-            <span>Je li ovaj plan dobar?</span>
+            <span>{t('results.isPlanGood')}</span>
             <div className="feedback-buttons">
               {feedbackOptions.map((option) => (
                 <button type="button" key={option.value} className={selectedFeedback === option.value ? 'active' : ''} onClick={() => sendFeedback(selectedPlan.id, option.value)}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </button>
               ))}
             </div>

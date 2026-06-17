@@ -59,8 +59,14 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ### Further steps (post-HR-beta → full multi-market production)
 
-- **Expose + localize EU markets**: flip `available:true` in `frontend/src/markets.ts` for SI/AT/DE/IT/FI and
-  translate the non-HR UI (currently `lang:'en'`); confirm per-market currency formatting end-to-end.
+- **[x] Expose + localize EU markets** ✅ **Done 2026-06-17 (Sprint 10.28).** Flipped `available:true` for
+  SI/AT/DE/IT/FI in `markets.ts` (all six EUR markets now in the picker) and **fully localised the UI to English
+  for every non-HR market** (HR stays Croatian): ~270 strings moved into the `i18n.ts` dictionary (hr+en) with
+  `{param}` interpolation; the two large surfaces (`PlanResults`, `PlannerForm`) localised via subagents, the
+  rest by hand. Backend-directed strings stay HR on purpose (quick-action prompt suffixes the rule-based parser
+  reads; the Croatian `plan.name` tier values the UI maps to display keys). Per-market EUR currency formatting
+  already worked. Frontend build clean; 0 missing keys. **Next: per-language localisation (DE/IT/SL/FI)** is a
+  later step — English is the common language for now.
 - **Full-catalog re-verification** near launch (all 6 markets, ~665 rows) — same freshness rule as step 3.
 - **First real `RetailerFeed`** (Decathlon/Pevex/Lesnina) → unlocks `home-gym` and retires the last sample
   dependency (`ai.budgetspace.feed` seam already exists; never scrape).
@@ -75,7 +81,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.27 — full HR price/stock re-verification (closes road-to-production step 3) (current)
+### Sprint 10.28 — European app: expose + localise EU markets (EN for non-HR) (current)
+- **Exposed all six EUR markets** (`markets.ts` `available:true` for SI/AT/DE/IT/FI, HR already on) so the
+  country picker offers the whole EUR region — the app is European, not HR-only. Each already had a verified
+  EUR catalog (IKEA/JYSK from sprints 10.13–10.20), so plans render immediately.
+- **Full English localisation for non-HR markets** (HR unchanged): extended the `i18n.ts` dictionary from ~13
+  to ~340 keys (hr+en), added `{param}` interpolation to `translate()`/`t()`, and replaced ~270 hardcoded
+  Croatian UI strings across Hero/HowItWorks/StatsStrip/Footer/Monetization/Planner/SavedPlansInbox/PlannerForm/
+  PlanResults with `t('key')`. The two big files (PlanResults ~130 strings, PlannerForm ~120) were localised by
+  parallel subagents returning strict key→{hr,en} JSON that I merged + build-verified.
+- **Deliberately left HR** (not display): the quick-action prompt suffixes appended for the rule-based backend
+  parser, and the Croatian `plan.name` tier values (`Najbolji izbor`/`Najjeftinije`/`Ljepša verzija`) the UI
+  maps to display keys. The example prompt is seeded per-market language (EN version is city-less so it doesn't
+  trip market auto-detection).
+- Frontend build clean (tsc + vite); cross-checked **0 `t()` keys missing** from the dictionary. Per-language
+  localisation (DE/IT/SL/FI) is the next UI step; English is the common language for now.
+
+### Sprint 10.27 — full HR price/stock re-verification (closes road-to-production step 3)
 - Re-verified **all 301 `partial` HR rows** on their live product pages — deterministic raw-HTTP (no model):
   JSON-LD `price` / JYSK `priceAmount` (the regular price, *not* the time-limited promo) / displayed €,
   plus a redirect→category dead-check and a non-IKEA schema.org OutOfStock check (IKEA stock is JS-lazy-loaded,

@@ -74,6 +74,7 @@ function SavedPlansInbox({
   onOpen: (plan: SavedPlanResponse) => void;
   onFavorite: (plan: SavedPlanResponse) => void;
 }) {
+  const { t } = useLocale();
   const filteredPlans = useMemo(() => {
     const query = search.trim().toLowerCase();
     if (!query) return plans.slice(0, 8);
@@ -86,42 +87,42 @@ function SavedPlansInbox({
     <details className="saved-plans-inbox">
       <summary>
         <div>
-          <span>Moji planovi</span>
-          <strong>{plans.length} spremljeno · {plans.filter((plan) => plan.favorite).length} favorita</strong>
+          <span>{t('saved.title')}</span>
+          <strong>{t('saved.countLine', { saved: plans.length, favorites: plans.filter((plan) => plan.favorite).length })}</strong>
         </div>
-        <small>Otvori kad želiš nastaviti kasnije.</small>
+        <small>{t('saved.openLater')}</small>
       </summary>
       <div className="saved-plans-toolbar">
         <label>
-          <span>Pretraži moje planove</span>
-          <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Pretraži moje planove" />
+          <span>{t('saved.search')}</span>
+          <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder={t('saved.search')} />
         </label>
       </div>
       <div className="saved-plans-list">
         {filteredPlans.map((savedPlan) => {
-          const stores = savedPlan.plan.retailersUsed.join(' + ') || 'trgovine nisu zapisane';
+          const stores = savedPlan.plan.retailersUsed.join(' + ') || t('saved.noStores');
           return (
             <article className={savedPlan.favorite ? 'saved-plan-card favorite' : 'saved-plan-card'} key={savedPlan.id}>
               <div>
-                <span>{savedPlan.favorite ? 'Favorit' : 'Spremljeno'} · {formatSavedDate(savedPlan.createdAt)}</span>
+                <span>{savedPlan.favorite ? t('saved.favorite') : t('saved.saved')} · {formatSavedDate(savedPlan.createdAt)}</span>
                 <strong>{roomLabels[savedPlan.input.roomType]}</strong>
-                <small>{formatCurrency(savedPlan.plan.total)} · {savedPlan.plan.items.length} proizvoda · {stores}</small>
+                <small>{t('saved.metaLine', { price: formatCurrency(savedPlan.plan.total), count: savedPlan.plan.items.length, stores })}</small>
               </div>
               <div className="saved-plan-actions">
                 <button
                   type="button"
                   className={savedPlan.favorite ? 'favorite-toggle active' : 'favorite-toggle'}
                   onClick={() => onFavorite(savedPlan)}
-                  aria-label={savedPlan.favorite ? 'Makni iz favorita' : 'Dodaj u favorite'}
+                  aria-label={savedPlan.favorite ? t('saved.removeFavorite') : t('saved.addFavorite')}
                 >
-                  {savedPlan.favorite ? '★ Favorit' : '☆ Označi'}
+                  {savedPlan.favorite ? t('saved.favoriteStar') : t('saved.markStar')}
                 </button>
-                <button type="button" onClick={() => onOpen(savedPlan)}>Otvori</button>
+                <button type="button" onClick={() => onOpen(savedPlan)}>{t('saved.open')}</button>
               </div>
             </article>
           );
         })}
-        {!filteredPlans.length && <p className="saved-empty">Nema spremljenog plana za taj pojam.</p>}
+        {!filteredPlans.length && <p className="saved-empty">{t('saved.emptySearch')}</p>}
       </div>
     </details>
   );
@@ -129,7 +130,9 @@ function SavedPlansInbox({
 
 export function Planner() {
   const { market, config, setMarket, t } = useLocale();
-  const [input, setInput] = useState<PlannerInput>({ ...initialInput, market });
+  // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
+  // the active market's language (the user can then edit freely).
+  const [input, setInput] = useState<PlannerInput>(() => ({ ...initialInput, prompt: t('planner.examplePrompt'), market }));
   const [plans, setPlans] = useState<FurnishingPlan[]>([]);
   const [savedPlans, setSavedPlans] = useState<SavedPlanResponse[]>([]);
   const [savedSearch, setSavedSearch] = useState('');
@@ -171,9 +174,9 @@ export function Planner() {
       .then((savedPlan) => {
         setInput(savedPlan.input);
         setPlans([savedPlan.plan]);
-        setNotice('Učitan je spremljeni plan. Možeš ga kopirati, mijenjati ili složiti novu verziju.');
+        setNotice(t('planner.noticeLoaded'));
       })
-      .catch(() => setError('Nisam našao spremljeni plan. Možda je link pogrešan ili server nije pokrenut.'))
+      .catch(() => setError(t('planner.errorNotFound')))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -209,9 +212,9 @@ export function Planner() {
       setAnalysis(response.intentAnalysis ?? null);
       const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
       if (!hasAnyItems) {
-        setPartialNotice('Nema dovoljno proizvoda za ovaj zahtjev. Pokušaj povećati budžet ili ukloniti ograničenje trgovine.');
+        setPartialNotice(t('planner.partialNone'));
       } else {
-        setPartialNotice(response.partialPlan ? (response.catalogWarning ?? 'Nemamo još dovoljno proizvoda za kompletan plan. Ovo je najbolja dostupna kombinacija.') : null);
+        setPartialNotice(response.partialPlan ? (response.catalogWarning ?? t('planner.partialBest')) : null);
       }
       setGenerationCount((count) => count + 1);
       // Sprint 10.8: fetch the design-assistant description. Non-blocking: if it fails the plan still shows.
@@ -222,7 +225,7 @@ export function Planner() {
       setError(
         apiError instanceof Error
           ? apiError.message
-          : 'Plan trenutno nije dostupan. Probaj ponovno za koju minutu.'
+          : t('planner.errorUnavailable')
       );
     } finally {
       setIsLoading(false);
@@ -241,7 +244,7 @@ export function Planner() {
       const updatedPlan = await replaceProduct(plan, input, productId, changeType);
       setPlans((currentPlans) => currentPlans.map((currentPlan) => (currentPlan.id === planId ? updatedPlan : currentPlan)));
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : 'Nisam uspio zamijeniti proizvod. Probaj ponovno.');
+      setError(apiError instanceof Error ? apiError.message : t('planner.errorReplace'));
     }
   }
 
@@ -261,10 +264,10 @@ export function Planner() {
 
     if (copyLink) {
       await navigator.clipboard.writeText(url);
-      setNotice('Link za plan je kopiran. Plan je spremljen i možeš ga naći u Mojim planovima.');
+      setNotice(t('planner.noticeLinkCopied'));
     } else {
       window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
-      setNotice('Plan je spremljen u Moje planove. Možeš ga kasnije pretražiti ili označiti kao favorit.');
+      setNotice(t('planner.noticeSaved'));
     }
 
     return url;
@@ -276,7 +279,7 @@ export function Planner() {
 
   async function handleFeedback(planId: string, feedback: PlanFeedback) {
     await sendPlanFeedback(planId, feedback);
-    setNotice('Hvala — ova reakcija nam govori što treba popraviti u sljedećem planu.');
+    setNotice(t('planner.noticeFeedback'));
   }
 
   function openSavedPlan(savedPlan: SavedPlanResponse) {
@@ -286,7 +289,7 @@ export function Planner() {
     setDesign(null);
     setAnalysis(null);
     window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
-    setNotice('Otvoren je spremljeni plan. Možeš ga odmah kopirati, prilagoditi ili složiti novu verziju.');
+    setNotice(t('planner.noticeOpened'));
   }
 
   async function toggleSavedFavorite(savedPlan: SavedPlanResponse) {
@@ -294,7 +297,7 @@ export function Planner() {
       const updatedPlan = await setSavedPlanFavorite(savedPlan.id, !savedPlan.favorite);
       setSavedPlans((currentPlans) => currentPlans.map((plan) => (plan.id === updatedPlan.id ? updatedPlan : plan)));
     } catch {
-      setNotice('Nisam uspio promijeniti favorit. Probaj ponovno za koju minutu.');
+      setNotice(t('planner.errorFavorite'));
     }
   }
 
@@ -351,7 +354,7 @@ export function Planner() {
           <p>{t('planner.subheading')}</p>
         </div>
         <div className="demo-status">
-          <span>Složeno planova</span>
+          <span>{t('planner.plansBuilt')}</span>
           <strong>{generationCount}</strong>
         </div>
       </div>
@@ -391,24 +394,24 @@ export function Planner() {
       </div>
 
       {analysis && plans.length > 0 && (analysis.userGoalSummary || (analysis.missingImportantInfo?.length ?? 0) > 0) && (
-        <section className="ai-insight-card" aria-label="Što je AI razumio">
+        <section className="ai-insight-card" aria-label={t('planner.aiInsightAria')}>
           <div className="ai-insight-head">
-            <span>{analysis.aiUsed ? 'AI je razumio tvoju želju' : 'Što smo razumjeli iz opisa'}</span>
+            <span>{analysis.aiUsed ? t('planner.aiUnderstood') : t('planner.weUnderstood')}</span>
           </div>
           {analysis.userGoalSummary && <p className="ai-insight-summary">{analysis.userGoalSummary}</p>}
           {(analysis.missingImportantInfo?.length ?? 0) > 0 && (
             <p className="ai-insight-unsure">
-              Nismo sigurni oko: {analysis.missingImportantInfo!.join(', ')}. Možeš doraditi opis ili podesiti polja lijevo.
+              {t('planner.unsure', { list: analysis.missingImportantInfo!.join(', ') })}
             </p>
           )}
         </section>
       )}
 
       {design && plans.length > 0 && (
-        <section className="design-assistant-card" aria-label="Dizajn asistent">
+        <section className="design-assistant-card" aria-label={t('planner.designAria')}>
           <div className="design-assistant-head">
-            <span>Dizajn asistent</span>
-            <small>Kratki opis tvog plana (uskoro generiran pomoću AI modela).</small>
+            <span>{t('planner.designTitle')}</span>
+            <small>{t('planner.designHint')}</small>
           </div>
           <p className="design-assistant-summary">{design.summary}</p>
           {design.highlights.length > 0 && (

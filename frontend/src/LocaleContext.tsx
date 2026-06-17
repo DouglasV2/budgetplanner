@@ -11,7 +11,7 @@ interface LocaleContextValue {
   market: string;
   config: MarketConfig;
   setMarket: (market: string) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -38,7 +38,10 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     setMarketState(marketConfig(next).code);
   }, []);
 
-  const t = useCallback((key: string) => translate(key, config.lang), [config.lang]);
+  const t = useCallback(
+    (key: string, params?: Record<string, string | number>) => translate(key, config.lang, params),
+    [config.lang]
+  );
 
   const value = useMemo<LocaleContextValue>(() => ({ market: config.code, config, setMarket, t }), [config, setMarket, t]);
 

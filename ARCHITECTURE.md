@@ -5,7 +5,10 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
 **local, web-verified product catalog**.
 
 ## Stack & dev ports
-- **Frontend**: React + Vite + TypeScript (`frontend/`). Dev served on **http://localhost:5180**.
+- **Frontend**: React + Vite + TypeScript (`frontend/`). Dev served on **http://localhost:5180**. All six EUR
+  markets are exposed in the picker (`markets.ts`); UI is localised via `i18n.ts` (`t('key', params)`) — HR is
+  Croatian, every other market renders in **English** (per-language DE/IT/SL/FI is a later step). Keys that map
+  backend `plan.name` tiers or feed the rule-based prompt parser stay Croatian on purpose.
 - **Backend**: Spring Boot 3.3.5, Java 17/21 (`backend/`). REST API on **http://localhost:8090**.
 - **DB**: PostgreSQL 16 (docker) on 5432. `ddl-auto=create` → schema rebuilt each start; `data.sql`
   seeds samples, then `RealCatalogSeeder` imports verified catalog snapshots.

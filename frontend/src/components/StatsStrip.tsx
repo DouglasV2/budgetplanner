@@ -1,9 +1,12 @@
+import { useLocale } from '../LocaleContext';
+
 export function StatsStrip() {
+  const { t } = useLocale();
   const stats = [
-    { value: '3', label: 'prijedloga po upitu' },
-    { value: '5+', label: 'trgovina u katalogu' },
-    { value: '€', label: 'budžet je uvijek vidljiv' },
-    { value: 'Link', label: 'plan se može podijeliti' }
+    { value: '3', label: t('stats.suggestions') },
+    { value: '5+', label: t('stats.stores') },
+    { value: '€', label: t('stats.budgetVisible') },
+    { value: 'Link', label: t('stats.shareable') }
   ];
 
   return (
