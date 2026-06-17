@@ -75,7 +75,25 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.25 — HR URL re-verification: dead → needs-review + drifted URLs refreshed (current)
+### Sprint 10.26 — HR catalog breadth: more options per anchor category (current)
+- Owner asked for more HR furniture; new retailers are all JS-priced/403 (10.24 probe), so added **breadth
+  from the verified retailers** instead. Filled real anchor gaps — **IKEA HR had ZERO beds/mattresses/
+  wardrobes/nightstands** (only JYSK/Emmezeta did) — plus more desks/office-chairs/sofas/coffee-tables/
+  TV-units, and JYSK + Emmezeta beds/wardrobes/dining/dressers. **+35 web-verified rows**
+  (`real-hr-breadth-10-26.json`); catalog **710 → 745**, HR verified images **252 → 287**.
+- Method: 3 sonnet subagents discovered + verified candidates (name/price/URL/tags) avoiding existing SKUs;
+  then a **deterministic verification pass I ran**: fetch each URL (drop if it 301s to a category — caught 2
+  drifted JYSK URLs), confirm `og:image` identity + that it resolves, and **take the price from JSON-LD for
+  IKEA/JYSK (authoritative — every candidate price matched, 0 corrections)**; Emmezeta prices spot-checked
+  on live pages (Ottowa 449.99, Bergen 898.99 ✓). Recomputed `priceTier`, normalised tags, deduped vs the
+  committed catalog (0 dup URLs/ids). Spot-checked images visually (KLEPPSTAD bed, Ottowa sofa — correct).
+- Every breadth row is planner-eligible **and** carries a verified image. Price spread budget 13 / standard
+  16 / premium 6. `HrBreadthCatalogRuntimeTest`; backend **134 tests, 0 failures**. No fabrication, no 403-bypass.
+- **Planner selection scales** (owner's concern): `PlannerService` scores each candidate by style/room/price/
+  colour/material/store/reviews, so more options = a better best-match, not confusion — provided tags are rich
+  (they are). Bigger "knows which to recommend" gains come from the deferred OpenAI layer (post-HR phase).
+
+### Sprint 10.25 — HR URL re-verification: dead → needs-review + drifted URLs refreshed
 - Acted on the 34 stale URLs the 10.24 image pass found (road-to-production step 3, partial):
   - **16 dead rows → `needs-review`** (URL 301s to a category / a different product — BESTÅ, MÅRUM/STOENSE/
     TIPHEDE/ÅRENDE rugs, RINGSTA/STRANDAD/NYMÅNE/BARLAST lamps, VITTSJÖ, VANDEROTS/GURLI covers, STOFTMOLN,

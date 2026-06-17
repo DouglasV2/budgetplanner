@@ -120,7 +120,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // room/category cells (dining-room lighting/storage/decor, home-office storage/rug/decor,
             // kitchen storage/decor, hallway lighting, bathroom mirrors) + non-IKEA breadth (Emmezeta,
             // Harvey Norman, Namjestaj.hr) for price/style diversity. All web-verified 2026-06-17.
-            "/catalog/real-hr-max-10-22.json"
+            "/catalog/real-hr-max-10-22.json",
+            // Sprint 10.26: HR catalog breadth — more options per anchor category (IKEA HR beds/mattresses/
+            // wardrobes/nightstands/dressers — previously absent — plus more desks/office chairs/sofas/coffee
+            // tables/TV units; JYSK + Emmezeta beds/wardrobes/dining/dressers). Each row web-verified 2026-06-17
+            // (name + EUR price from JSON-LD for IKEA/JYSK, spot-checked for Emmezeta) with a verified og:image.
+            "/catalog/real-hr-breadth-10-26.json"
     );
 
     /**
