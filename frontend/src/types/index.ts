@@ -67,6 +67,9 @@ export interface Product {
   styleTags: string[];
   roomTags: RoomType[];
   imageUrl?: string;
+  // Sprint 10.23: true only when imageUrl was verified on the retailer's live product page. The UI
+  // shows the real photo only then; otherwise it keeps the labelled "ilustracija" category placeholder.
+  imageVerified?: boolean;
   productUrl?: string;
   availabilityStatus?: AvailabilityStatus | string;
   deliveryNote?: string;

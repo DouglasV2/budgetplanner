@@ -129,14 +129,41 @@ class ProductImportServiceTest {
     }
 
     @Test
-    void inferredDataQualityIsCompleteWhenLinkImageAndRecentCheckExist() {
+    void inferredDataQualityIsCompleteWhenLinkVerifiedImageAndRecentCheckExist() {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
         when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
         ProductImportService service = new ProductImportService(repository);
 
+        // canonical constructor with imageVerified=true (Sprint 10.23): a confirmed photo -> complete.
         ImportProductDto dto = new ImportProductDto(
                 null, "infer-1", "TV komoda hrast efekt", "JYSK", "tv-unit",
+                BigDecimal.valueOf(159), null, List.of("modern"), List.of("living-room"),
+                "https://example.com/image.jpg", "https://example.com/product", "in-stock",
+                null, java.time.LocalDate.now().toString(), "standard", null,
+                null, null, null, null, null,
+                null, null, null, null, null, null, true);
+
+        service.importProducts(List.of(dto));
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue().getDataQuality()).isEqualTo("complete");
+        assertThat(captor.getValue().isImageVerified()).isTrue();
+        assertThat(captor.getValue().getSourceType()).isEqualTo("manual");
+    }
+
+    @Test
+    void inferredDataQualityStaysPartialWhenImageIsNotVerified() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        // Same link + image + fresh check, but the image is NOT verified -> must stay partial, never
+        // imply complete data from a placeholder/unconfirmed image (Sprint 10.23 honesty rule).
+        ImportProductDto dto = new ImportProductDto(
+                null, "infer-2", "TV komoda hrast efekt", "JYSK", "tv-unit",
                 BigDecimal.valueOf(159), null, List.of("modern"), List.of("living-room"),
                 "https://example.com/image.jpg", "https://example.com/product", "in-stock",
                 null, java.time.LocalDate.now().toString(), "standard", null,
@@ -146,8 +173,8 @@ class ProductImportServiceTest {
 
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
         verify(repository).save(captor.capture());
-        assertThat(captor.getValue().getDataQuality()).isEqualTo("complete");
-        assertThat(captor.getValue().getSourceType()).isEqualTo("manual");
+        assertThat(captor.getValue().getDataQuality()).isEqualTo("partial");
+        assertThat(captor.getValue().isImageVerified()).isFalse();
     }
 
     @Test

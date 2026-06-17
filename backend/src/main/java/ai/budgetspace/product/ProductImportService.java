@@ -187,6 +187,8 @@ public class ProductImportService {
         if (hasText(dto.imageUrl())) {
             entity.setImageUrl(dto.imageUrl().trim());
             entity.setImage(dto.imageUrl().trim());
+            // Only honour the verified flag when there is actually an image to verify; never fabricate.
+            entity.setImageVerified(Boolean.TRUE.equals(dto.imageVerified()));
         }
         if (hasText(dto.productUrl())) {
             entity.setProductUrl(dto.productUrl().trim());
@@ -272,13 +274,14 @@ public class ProductImportService {
         if (entity.getDataQualityNotes() == null) entity.setDataQualityNotes("");
     }
 
-    // When the source did not declare a quality, infer it: a product with a real link, image
-    // and a recent check is "complete"; otherwise "partial".
+    // When the source did not declare a quality, infer it: a product with a real link, a *verified*
+    // image and a recent check is "complete"; otherwise "partial". A fallback/unverified image must not
+    // count as complete data (Sprint 10.23) — only a confirmed product photo does.
     private String inferDataQuality(Product entity) {
         boolean hasUrl = hasText(entity.getProductUrl());
-        boolean hasImage = hasText(entity.getImageUrl());
+        boolean hasVerifiedImage = entity.isImageVerified() && hasText(entity.getImageUrl());
         boolean fresh = !ProductTaxonomy.isStale(entity.getLastCheckedAt());
-        return hasUrl && hasImage && fresh ? "complete" : "partial";
+        return hasUrl && hasVerifiedImage && fresh ? "complete" : "partial";
     }
 
     private List<ImportErrorDto> validate(ImportProductDto dto, int rowNumber) {

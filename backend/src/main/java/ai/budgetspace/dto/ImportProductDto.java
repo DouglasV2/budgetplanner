@@ -46,9 +46,12 @@ public record ImportProductDto(
         String market,
         // Sprint 10.13 (#2, go-wide): verified average star rating, display only (separate from the
         // planner's internal `rating`). Null = unknown.
-        Double reviewRating
+        Double reviewRating,
+        // Sprint 10.23 (road-to-production step 4): true when imageUrl was verified on the live product
+        // page. Null/false = unverified → the UI keeps the placeholder; never fabricate an image URL.
+        Boolean imageVerified
 ) {
-    /** Backwards-compatible constructor (pre-10.7): no colour/material, reviews or market. */
+    /** Backwards-compatible constructor (pre-10.7): no colour/material, reviews, market or image-verify. */
     public ImportProductDto(
             String id, String externalId, String name, String retailer, String category,
             BigDecimal price, BigDecimal originalPrice, List<String> styleTags, List<String> roomTags,
@@ -58,10 +61,10 @@ public record ImportProductDto(
     ) {
         this(id, externalId, name, retailer, category, price, originalPrice, styleTags, roomTags,
                 imageUrl, productUrl, availabilityStatus, deliveryNote, lastCheckedAt, priceTier, note,
-                sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null);
+                sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null, null);
     }
 
-    /** Backwards-compatible constructor (10.7-10.12): colour/material but no reviews or market. */
+    /** Backwards-compatible constructor (10.7-10.12): colour/material but no reviews, market or image-verify. */
     public ImportProductDto(
             String id, String externalId, String name, String retailer, String category,
             BigDecimal price, BigDecimal originalPrice, List<String> styleTags, List<String> roomTags,
@@ -73,6 +76,6 @@ public record ImportProductDto(
         this(id, externalId, name, retailer, category, price, originalPrice, styleTags, roomTags,
                 imageUrl, productUrl, availabilityStatus, deliveryNote, lastCheckedAt, priceTier, note,
                 sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes,
-                colorTags, materialTags, null, null, null, null);
+                colorTags, materialTags, null, null, null, null, null);
     }
 }

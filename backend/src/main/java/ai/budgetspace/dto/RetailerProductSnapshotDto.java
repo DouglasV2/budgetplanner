@@ -46,11 +46,15 @@ public record RetailerProductSnapshotDto(
         String market,
         // Sprint 10.13 (#2, go-wide): verified average star rating for display only (separate from the
         // planner's internal `rating`). Null = unknown.
-        Double reviewRating
+        Double reviewRating,
+        // Sprint 10.23 (road-to-production step 4): true when imageUrl was verified on the live product
+        // page (og:image / main gallery image). Null/false = unverified → the UI keeps the placeholder.
+        Boolean imageVerified
 ) {
     /**
      * Backwards-compatible constructor for snapshots prepared before Sprint 10.7. Colour/material,
-     * reviews and market default to empty; the import pipeline derives colour/material from the name.
+     * reviews, market and image-verification default to empty; the import pipeline derives
+     * colour/material from the name.
      */
     public RetailerProductSnapshotDto(
             String externalId, String name, String retailer, String category, BigDecimal price,
@@ -61,6 +65,6 @@ public record RetailerProductSnapshotDto(
     ) {
         this(externalId, name, retailer, category, price, productUrl, imageUrl, availabilityStatus,
                 deliveryNote, lastCheckedAt, roomTags, styleTags, priceTier, sourceType, sourceName,
-                sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null);
+                sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null, null);
     }
 }

@@ -150,6 +150,15 @@ public class Product {
     @Column(name = "seller_location", length = 120)
     private String sellerLocation;
 
+    // --- Sprint 10.23 (road-to-production step 4): verified product image. True only when the image URL
+    // was confirmed on the retailer's live product page (og:image / main gallery image). The UI shows the
+    // real photo only when this is true; otherwise it keeps the labelled "ilustracija" category placeholder.
+    // We never fabricate an image URL, so imageUrl is populated only when verified. ColumnDefault so legacy
+    // /sample inserts (which omit this column) stay valid, exactly like sponsored/secondHand.
+    @Column(name = "image_verified", nullable = false)
+    @ColumnDefault("false")
+    private boolean imageVerified;
+
     public Product() {
     }
 
@@ -231,4 +240,6 @@ public class Product {
     public void setConditionLabel(String conditionLabel) { this.conditionLabel = conditionLabel; }
     public String getSellerLocation() { return sellerLocation; }
     public void setSellerLocation(String sellerLocation) { this.sellerLocation = sellerLocation; }
+    public boolean isImageVerified() { return imageVerified; }
+    public void setImageVerified(boolean imageVerified) { this.imageVerified = imageVerified; }
 }

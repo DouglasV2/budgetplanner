@@ -49,7 +49,8 @@ public class RetailerCatalogAdapter {
                 snapshot.reviewCount(),
                 snapshot.reviewsUrl(),
                 snapshot.market(),
-                snapshot.reviewRating()
+                snapshot.reviewRating(),
+                snapshot.imageVerified()
         );
     }
 

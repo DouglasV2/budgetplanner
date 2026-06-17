@@ -237,14 +237,18 @@ function shortBudgetText(plan: FurnishingPlan, input: PlannerInput) {
 
 
 function productImage(product: Product) {
-  return product.imageUrl || product.image || FALLBACK_IMAGES[product.category];
+  // Sprint 10.23: show the real retailer photo only when it was verified on the live product page;
+  // otherwise use a generic category image (clearly flagged as an illustration below).
+  return product.imageVerified && product.imageUrl
+    ? product.imageUrl
+    : FALLBACK_IMAGES[product.category];
 }
 
-// Sprint 10.14: honesty about images. When the catalog has no real product image we fall back to a
-// generic category photo — we must never imply it is the actual product, so we flag it as an
-// illustration (alt text + a discreet chip). We never invent an imageUrl.
+// Sprint 10.14/10.23: honesty about images. We show the real product photo only when it is verified
+// (imageVerified). Otherwise we fall back to a generic category photo and must never imply it is the
+// actual product, so we flag it as an illustration (alt text + a discreet chip). We never invent an URL.
 function usesFallbackImage(product: Product) {
-  return !(product.imageUrl || product.image);
+  return !(product.imageVerified && product.imageUrl);
 }
 
 // Sprint 10.14: clearly show the market when a product is from another country's catalog (e.g. SI).

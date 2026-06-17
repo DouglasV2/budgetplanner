@@ -43,7 +43,10 @@ public record ProductDto(
         Double reviewRating,
         String reviewsUrl,
         String market,
-        String currency
+        String currency,
+        // Sprint 10.23 (step 4): true when imageUrl is a verified product photo; the UI shows the real
+        // image only then, otherwise it keeps the labelled "ilustracija" category placeholder.
+        boolean imageVerified
 ) {
     public static ProductDto from(Product product) {
         String market = Markets.normalize(product.getMarket());
@@ -78,7 +81,8 @@ public record ProductDto(
                 product.getReviewRating(),
                 firstNonBlank(product.getReviewsUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),
                 market,
-                Markets.currencyFor(market)
+                Markets.currencyFor(market),
+                product.isImageVerified()
         );
     }
 
