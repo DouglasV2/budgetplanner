@@ -2,7 +2,7 @@
 // Only EUR markets are offered in the UI for now, because the catalog prices are in EUR — adding a
 // non-EUR market (PLN/CZK/…) requires its own verified, currency-correct catalog first.
 // `available` = a real per-market catalog exists today; others are foundation/"coming soon".
-export type Lang = 'hr' | 'en' | 'de' | 'it' | 'sl' | 'fi';
+export type Lang = 'hr' | 'en' | 'de' | 'it' | 'sl' | 'fi' | 'fr';
 
 export interface MarketConfig {
   code: string;
@@ -24,7 +24,9 @@ export const MARKETS: MarketConfig[] = [
   { code: 'AT', label: 'Österreich', currency: 'EUR', locale: 'de-AT', lang: 'de', available: true, flag: '🇦🇹' },
   { code: 'DE', label: 'Deutschland', currency: 'EUR', locale: 'de-DE', lang: 'de', available: true, flag: '🇩🇪' },
   { code: 'IT', label: 'Italia', currency: 'EUR', locale: 'it-IT', lang: 'it', available: true, flag: '🇮🇹' },
-  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'fi', available: true, flag: '🇫🇮' }
+  { code: 'FI', label: 'Suomi', currency: 'EUR', locale: 'fi-FI', lang: 'fi', available: true, flag: '🇫🇮' },
+  // Sprint 10.35: France — EUR, fully French-localised, verified IKEA catalog (IKEA-only, no JYSK in FR).
+  { code: 'FR', label: 'France', currency: 'EUR', locale: 'fr-FR', lang: 'fr', available: true, flag: '🇫🇷' }
 ];
 
 // Sprint 10.30: major cities per market for the optional city picker (datalist suggestions; the user can
@@ -36,6 +38,7 @@ export const CITIES_BY_MARKET: Record<string, string[]> = {
   DE: ['Berlin', 'München', 'Hamburg', 'Köln', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dresden', 'Hannover'],
   IT: ['Roma', 'Milano', 'Napoli', 'Torino', 'Palermo', 'Genova', 'Bologna', 'Firenze', 'Venezia', 'Verona'],
   FI: ['Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu', 'Turku', 'Jyväskylä', 'Lahti'],
+  FR: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'],
 };
 
 export function citiesForMarket(code?: string): string[] {
@@ -81,6 +84,7 @@ const MARKET_DETECTION: Array<{ market: string; pattern: RegExp }> = [
   { market: 'DE', pattern: /\b(njemack\w*|deutschland|germany|berlin|munchen|munich|hamburg|koln|cologne|frankfurt|stuttgart|dresden|leipzig)\b/ },
   { market: 'IT', pattern: /\b(italij\w*|italia|italy|\brim\b|roma|rome|milano|milan|napulj|napoli|torino|firenze|venecij\w*|venezia)\b/ },
   { market: 'FI', pattern: /\b(finsk\w*|finland|suomi|helsink\w*|espoo|tampere|turku|oulu)\b/ },
+  { market: 'FR', pattern: /\b(francusk\w*|france|pariz\w*|paris|marseille|lyon|toulouse|\bnica\b|nice|nantes|strasbourg|bordeaux|lille|montpellier)\b/ },
   { market: 'HR', pattern: /\b(hrvatsk\w*|croatia|zagreb\w*|split\w*|rijek\w*|osijek|zadar|pula|dubrovnik|varazdin|karlovac|sisak)\b/ }
 ];
 

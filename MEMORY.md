@@ -23,8 +23,13 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
 - **Value-first monetization.** Core plan free; affiliate/sponsored fields exist but `affiliateUrl`
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
-## Current state (as of 2026-06-17)
-- Backend tests: **154 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31, 139 in 10.33).
+## Current state (as of 2026-06-18)
+- Backend tests: **156 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31, 139 in 10.33, 154 in 10.34).
+- **France (Sprint 10.35).** 7th market: FR added to `Markets.java` + `markets.ts` (flag, cities, prompt
+  detection, IKEA-only retailer list) and **fully French-localised** (`messages/fr.json`, 368 keys, parity-checked).
+  First IKEA FR catalog: **72 verified rows** (`real-ikea-fr-rooms.json`) ported from the IKEA IT set via the
+  global article-number trick to `/fr/fr/` — French name (og:title) + per-market EUR price (JSON-LD) + verified
+  og:image read off ikea.com/fr (KIVIK + MARKUS images spot-checked). IKEA-only (no JYSK in France).
 - **Sale tracking (Sprint 10.33).** `Product.saleEndsAt` added end to end; the adapter now wires `originalPrice`
   (it previously discarded it → `null`). A row is "on sale" when `price < originalPrice`; the UI shows the dual
   %/€ saving + struck price + "On sale" badge + "vrijedi do {date}", hidden once `saleEndsAt` passes. **24 real
@@ -43,7 +48,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI.** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (10.35, IKEA-only).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
   ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets

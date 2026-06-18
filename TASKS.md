@@ -118,7 +118,27 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.34 — opt-in price-drop alerts: PriceWatch + re-check job + notifier seam + GDPR (current)
+### Sprint 10.35 — new market: France (FR), fully French-localised IKEA catalog (current)
+- **7th market.** Added FR to `Markets.java` (EUR) + `markets.ts` (flag 🇫🇷, `available:true`, Paris/Lyon/…
+  cities, prompt market-detection) + `retailersByMarket` (IKEA-only — no JYSK in France). `Lang` widened to
+  include `'fr'`.
+- **Full French localisation.** `frontend/src/messages/fr.json` (368 keys = same set as it.json), native
+  informal "tu" tone, produced by a subagent and **verified programmatically**: 0 missing, 0 extra, 0
+  placeholder mismatches, 0 empty; brands/units/emoji/step-numbers preserved. Wired into `i18n.ts` `EXTRA`.
+- **First IKEA France catalog — 72 verified rows** (`real-ikea-fr-rooms.json`). Ported the IKEA Italy set via
+  the global article-number trick to `/fr/fr/`; each row's **French name** (og:title), **per-market EUR price**
+  (JSON-LD — genuinely different: KIVIK 749 FR vs 629 ES vs 549 NL) and **verified og:image** read off
+  ikea.com/fr on 2026-06-18. 9 SKUs not carried in FR were dropped (redirect-to-category / no price). Covers
+  living-room/bedroom/home-office/kitchen/bathroom/hallway/dining; KIVIK + MARKUS images spot-checked visually.
+  No fabrication, no 403-bypass. Registered in `RealCatalogSeeder`; `IkeaFranceCatalogRuntimeTest` (import clean
+  + planner builds a non-partial FR plan).
+- **Why France & how the next markets were chosen.** Live-probed 8 eurozone candidates (IKEA number-trick):
+  FR/ES/NL/PT/SK = 5/5 fetchable; BE 3/5, IE 2/5 (partial); GR not viable (franchise on `ikea.gr`). France was
+  picked first (biggest, fully fetchable). ES/NL/PT/SK remain the obvious next EUR markets (NL/SK also have JYSK).
+- **Verified:** backend **156 tests, 0 failures** (+`IkeaFranceCatalogRuntimeTest`); frontend build clean;
+  fr.json parity 0 issues; catalog **878 rows, 0 dup URLs/externalIds**.
+
+### Sprint 10.34 — opt-in price-drop alerts: PriceWatch + re-check job + notifier seam + GDPR
 - **`PriceWatch` entity + endpoints.** New `ai.budgetspace.pricewatch` package: entity (externalId + market +
   retailer + denormalised product snapshot + email + baseline price + threshold + consent timestamp + active +
   unsubscribe token + last-notified guard), `PriceWatchRepository`, `PriceWatchService` (validates explicit

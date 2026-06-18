@@ -133,7 +133,11 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Sprint 10.31: EU depth — fill the thin IT + FI bedroom + home-office cells. IKEA beds/mattresses
             // /nightstands/wardrobes/dressers/desks/chairs/storage ported via the global article-number trick
             // to /it/it/ and /fi/fi/; localized name + per-market EUR price + verified og:image (2026-06-17).
-            "/catalog/real-eu-bedroom-office-10-31.json"
+            "/catalog/real-eu-bedroom-office-10-31.json",
+            // Sprint 10.35: France (FR) — first IKEA FR catalog, ported from the IKEA IT set via the global
+            // article-number trick to /fr/fr/. Each row's French name (og:title) + per-market EUR price
+            // (JSON-LD) + verified og:image read off ikea.com/fr on 2026-06-18. IKEA-only (no JYSK in FR).
+            "/catalog/real-ikea-fr-rooms.json"
     );
 
     /**
