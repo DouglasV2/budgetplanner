@@ -24,12 +24,12 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **177 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 172 in 10.43, 173 in 10.44, 175 in 10.45). Catalog **1623 rows**.
+- Backend tests: **177 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 172 in 10.43, 173 in 10.44, 175 in 10.45). Catalog **1641 rows**.
 - **Scandinavia (Sprint 10.46) — first NON-EUR markets: NO/SE/DK.** The app was never really EUR-locked: each
   `MarketConfig` already had `currency`+`locale` and `formatCurrency` already used `Intl.NumberFormat`, so NOK/
   SEK/DKK "just worked" once a local-currency catalog existed (**no FX** — a plan uses one market's catalog vs a
   budget in the same currency). Sourced **IKEA NO 47/SE 52/DK 53** (number-trick → `/no/no/ /se/sv/ /dk/da/`,
-  per-market JSON-LD `price`+`priceCurrency`, all imaged) + **JYSK NO 32/SE 31/DK 32** (static pages; sale only
+  per-market JSON-LD `price`+`priceCurrency`, all imaged) + **JYSK NO 32/SE 31/DK 50** (static pages; sale only
   when `priceValidUntil` confirms — 6 real SE promos). `Markets.java` +NO (SE/DK pre-existed); markets.ts +NO/SE/
   DK (NOK/SEK/DKK, flags, cities, detection) + `Lang` no/sv/da; natively localised (`messages/{no,sv,da}.json`,
   368 keys, parity-checked). Fixed 2 EUR-assuming strings + StatsStrip now shows the market's currency symbol.

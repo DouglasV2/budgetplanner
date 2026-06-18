@@ -128,9 +128,9 @@ needs `OPENAI_API_KEY`, backend env only).
   - **IKEA NO 47 / SE 52 / DK 53** — number-trick (`/no/no/`, `/se/sv/`, `/dk/da/`) from the HR article numbers
     (global across markets); per-market JSON-LD `price` + `priceCurrency` (NOK/SEK/DKK) + localized og:title name
     + verified og:image, all 152 imaged. Per-currency price tiers (≈EUR thresholds × FX).
-  - **JYSK NO 32 / SE 31 / DK 32** — static product pages (URLs discovered by 3 subagents, then deterministic
+  - **JYSK NO 32 / SE 31 / DK 50** — static product pages (URLs discovered by subagents, then deterministic
     fetch): JSON-LD `price` = current, `priceAmount` = regular, **sale shown only when `priceValidUntil`
-    confirms a window** (6 real SE promos auto-detected, e.g. KOKKEDAL chair 425 was 849 SEK). All 95 imaged.
+    confirms a window** (6 real SE promos auto-detected, e.g. KOKKEDAL chair 425 was 849 SEK). All 113 imaged.
 - **Backend:** `Markets.java` +NO (SE/DK already present); 6 catalog files registered in `RealCatalogSeeder`.
   IKEA/JYSK were already `DIRECT_VERIFIED`, so no policy change. `ScandinaviaCatalogRuntimeTest` (currency wiring
   + per-market import + planner-eligibility + honest-sale guard).
@@ -138,8 +138,8 @@ needs `OPENAI_API_KEY`, backend env only).
   `retailersByMarket` NO/SE/DK = IKEA+JYSK. **Natively localised** — `messages/{no,sv,da}.json` (368 keys each,
   parity-checked, translated by 3 subagents from the EN source) lazy-loaded like the rest. Fixed 2 EUR-assuming
   strings to currency-generic; `StatsStrip` now shows the active market's currency symbol (€/kr) not a hardcoded €.
-- **Verified:** backend tests green; frontend build clean (new no/sv/da chunks, main still ~77 kB gzip);
-  catalog **1623 rows, 0 dups** (+247 Scandi). The app now spans **14 markets / 13 UI languages**.
+- **Verified:** backend **177 tests, 0 failures**; frontend build clean (new no/sv/da chunks, main still ~77 kB
+  gzip); catalog **1641 rows, 0 dups** (+265 Scandi). The app now spans **14 markets / 13 UI languages**.
 - **Next clean follow-up:** PL/CZ/HU/RO (non-EUR, same recipe — IKEA number-trick + JYSK where static-priced).
 
 ### Sprint 10.45 — depth: Portugal (Moviflor) + Slovakia (Nábytok); Finland feed-required; Germany deferred
