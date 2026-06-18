@@ -33,6 +33,8 @@ public final class Markets {
             Map.entry("SK", new MarketInfo("SK", "EUR", "sk-SK")),
             // Sprint 10.39: Spain — EUR, verified IKEA catalog (IKEA-only; no JYSK in ES).
             Map.entry("ES", new MarketInfo("ES", "EUR", "es-ES")),
+            // Sprint 10.41: Portugal — EUR, verified IKEA catalog (IKEA-only; no JYSK in PT).
+            Map.entry("PT", new MarketInfo("PT", "EUR", "pt-PT")),
             Map.entry("PL", new MarketInfo("PL", "PLN", "pl-PL")),
             Map.entry("CZ", new MarketInfo("CZ", "CZK", "cs-CZ")),
             Map.entry("HU", new MarketInfo("HU", "HUF", "hu-HU")),

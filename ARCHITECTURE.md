@@ -5,10 +5,10 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
 **local, web-verified product catalog**.
 
 ## Stack & dev ports
-- **Frontend**: React + Vite + TypeScript (`frontend/`). Dev served on **http://localhost:5180**. Ten EUR
+- **Frontend**: React + Vite + TypeScript (`frontend/`). Dev served on **http://localhost:5180**. Eleven EUR
   markets are exposed in the picker (`markets.ts`); UI is localised per market via `i18n.ts` (`t('key', params)`)
   — **HR Croatian, SI Slovenian, AT/DE German, IT Italian, FI Finnish, FR French, NL Dutch, SK Slovak, ES
-  Spanish**, English as the fallback (market `SK`/lang `sk` = Slovakia ≠ market `SI`/lang `sl` = Slovenia).
+  Spanish, PT Portuguese**, English as the fallback (market `SK`/lang `sk` = Slovakia ≠ market `SI`/lang `sl` = Slovenia).
   HR+EN are the inline dictionary; the rest live in `src/messages/{lang}.json`, **lazy-loaded** (Sprint 10.40):
   `import.meta.glob` code-splits each into its own chunk that `LocaleProvider` fetches on demand, so the main
   bundle (~77 kB gzip) no longer grows per market. `translate()` is a plain key lookup (English fallback until
@@ -78,7 +78,7 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   STALE / sample. Full rules: [docs/sourcing-policy.md](docs/sourcing-policy.md).
 - **Markets with data**: HR (deep — every room); SI/AT/DE/IT/FI (IKEA: living-room/bedroom/home-office +
   bathroom/hallway/kitchen, SI/AT/DE also dining); **FR (IKEA all core rooms — 10.35; + Camif breadth — 10.36)**;
-  **NL (IKEA + JYSK — 10.37)**; **SK (IKEA + JYSK — 10.38)**; **ES (IKEA — 10.39)**; JYSK adds hallway/kitchen
+  **NL (IKEA + JYSK — 10.37)**; **SK (IKEA + JYSK — 10.38)**; **ES (IKEA — 10.39)**; **PT (IKEA — 10.41)**; JYSK adds hallway/kitchen
   for SI/DE/FI + the full NL/SK catalogs (JYSK AT pending — jysk.at gates stock behind JS; no JYSK in FR/ES;
   jysk.nl/jysk.sk static-priced).
   PL/CZ/HU/RO/SE/DK exist in `Markets` but have **no catalog** → empty plan (non-EUR — deferred until the UI

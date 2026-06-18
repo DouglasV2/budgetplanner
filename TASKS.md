@@ -118,7 +118,22 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.40 — i18n lazy-load: per-language chunks (frontend perf) (current)
+### Sprint 10.41 — new market: Portugal (PT), Portuguese-localised IKEA (current)
+- **11th market** (same recipe as ES/FR — IKEA-only, no JYSK in Portugal). Added PT to `Markets.java` +
+  `markets.ts` (flag 🇵🇹, Lisboa/Porto/… cities, prompt detection) + `retailersByMarket` (PT = IKEA). `Lang` += `'pt'`.
+- **Full European-Portuguese localisation.** `frontend/src/messages/pt.json` (368 keys, native pt-PT informal "tu"
+  — "casa de banho", "secretária", "roupeiro", "ecrã"), parity-checked (0 missing/extra/placeholder-mismatch/empty).
+  **No `i18n.ts` edit** — the 10.40 `import.meta.glob` auto-discovered `pt.json` and code-split it into its own
+  chunk (the main bundle did not grow).
+- **IKEA PT — 73 verified rows** (`real-ikea-pt-rooms.json`): IKEA Italy set ported via the article-number trick
+  to `/pt/pt/` (Portuguese name + per-market EUR price — NORDLI 469 PT — + verified og:image, ikea.com/pt
+  2026-06-18). `PortugalCatalogRuntimeTest`.
+- **Verified:** backend **166 tests, 0 failures**; frontend build clean (main bundle unchanged at ~77 kB gzip —
+  PT is its own chunk); pt.json parity 0 issues; catalog **1287 rows, 0 dup URLs/externalIds**. No fabrication.
+- **Markets now: HR, SI, AT, DE, IT, FI, FR, NL, SK, ES, PT** (11 EUR). The "fully fetchable" EUR set from the
+  10.35 probe is now exhausted; further EUR depth (BE/IE partial) or non-EUR (PL/CZ/HU/RO/SE/DK, need currency UI).
+
+### Sprint 10.40 — i18n lazy-load: per-language chunks (frontend perf)
 - **Bundle no longer grows per market.** The per-language `messages/*.json` overlays were all statically imported
   and bundled (the main JS hit ~126 kB gzip with 9 languages). Replaced the static imports with
   `import.meta.glob('./messages/*.json')` so Vite **code-splits each language into its own chunk**, fetched on

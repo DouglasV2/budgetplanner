@@ -24,7 +24,11 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **164 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 154 in 10.34, 156 in 10.35, 157 in 10.36, 159 in 10.37, 161 in 10.38). Catalog **1214 rows**.
+- Backend tests: **166 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 156 in 10.35, 157 in 10.36, 159 in 10.37, 161 in 10.38, 164 in 10.39). Catalog **1287 rows**.
+- **Portugal (Sprint 10.41).** 11th market (ES recipe): PT added (Markets.java + markets.ts + Portuguese
+  `messages/pt.json`, 368 keys, parity-checked) with **IKEA PT 73 rows** (IT-set number-trick → `/pt/pt/`;
+  IKEA-only, no JYSK in PT; NORDLI 469 PT). Thanks to the 10.40 lazy-load, **no `i18n.ts` edit was needed** and
+  the main JS bundle did not grow. `PortugalCatalogRuntimeTest`.
 - **Spain + perf (Sprint 10.39).** 10th market: ES added (Markets.java + markets.ts + Spanish `messages/es.json`,
   368 keys, parity-checked) with **IKEA ES 68 rows** (IT-set number-trick → `/es/es/`; IKEA-only, no JYSK in ES;
   KIVIK 629 ES vs 749 FR vs 549 NL). **Perf:** `PlannerService.marketCatalog()` was calling
@@ -78,7 +82,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37), SK (IKEA + JYSK 10.38), ES (IKEA 10.39).** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37), SK (IKEA + JYSK 10.38), ES (IKEA 10.39), PT (IKEA 10.41).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
   ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets

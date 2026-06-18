@@ -153,7 +153,10 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-jysk-sk-rooms.json",
             // Sprint 10.39: Spain — IKEA ES (IT-set number-trick → /es/es/, Spanish name + per-market EUR price
             // + verified og:image, 2026-06-18). IKEA-only (no JYSK in Spain), like FR/IT.
-            "/catalog/real-ikea-es-rooms.json"
+            "/catalog/real-ikea-es-rooms.json",
+            // Sprint 10.41: Portugal — IKEA PT (IT-set number-trick → /pt/pt/, Portuguese name + per-market EUR
+            // price + verified og:image, 2026-06-18). IKEA-only (no JYSK in Portugal).
+            "/catalog/real-ikea-pt-rooms.json"
     );
 
     /**
