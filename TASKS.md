@@ -118,7 +118,20 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.39 — new market Spain (ES) + plan-generation perf optimization (current)
+### Sprint 10.40 — i18n lazy-load: per-language chunks (frontend perf) (current)
+- **Bundle no longer grows per market.** The per-language `messages/*.json` overlays were all statically imported
+  and bundled (the main JS hit ~126 kB gzip with 9 languages). Replaced the static imports with
+  `import.meta.glob('./messages/*.json')` so Vite **code-splits each language into its own chunk**, fetched on
+  demand by `ensureLangLoaded` (called from `LocaleProvider` when the market's language changes).
+- **Result:** main bundle **~126 → 77 kB gzip** (~40% smaller); each language is a separate ~7.7 kB-gzip chunk
+  loaded only when that market is selected. HR (the default) downloads zero language chunks (HR/EN are inline).
+- **Behaviour:** `translate()` stays synchronous and falls back to English until the active language's chunk
+  arrives; `LocaleProvider` bumps a `langReady` counter on load so consumers re-render with the translations.
+- **Bonus:** adding a market now needs **no `i18n.ts` edit** — the glob auto-discovers the new `{lang}.json`.
+- **Verified:** frontend build clean; the build output shows the split (`index` main chunk + one chunk per
+  language). i18n parity scripts (which read the JSON directly) unaffected.
+
+### Sprint 10.39 — new market Spain (ES) + plan-generation perf optimization
 - **10th market.** Added ES to `Markets.java` + `markets.ts` (flag 🇪🇸, Madrid/Barcelona/… cities, prompt
   detection) + `retailersByMarket` (ES = IKEA only — no JYSK in Spain, like FR/IT). `Lang` += `'es'`.
 - **Full Spanish localisation.** `frontend/src/messages/es.json` (368 keys, native informal "tú"), parity-checked

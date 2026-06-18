@@ -2,7 +2,7 @@
 // translator for the market's language, and keeps the currency formatter in sync.
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { marketConfig, marketFromBrowser, type MarketConfig } from './markets';
-import { translate } from './i18n';
+import { ensureLangLoaded, translate } from './i18n';
 import { setFormattingMarket } from './utils/planner';
 
 const STORAGE_KEY = 'budgetspace.market';
@@ -25,6 +25,9 @@ function readInitialMarket(): string {
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [market, setMarketState] = useState<string>(readInitialMarket);
   const config = useMemo(() => marketConfig(market), [market]);
+  // Sprint 10.40: the active language's overlay is lazy-loaded; bump this once its chunk arrives so every
+  // t() consumer re-renders with the translated strings (until then they show the English fallback).
+  const [langReady, setLangReady] = useState(0);
 
   useEffect(() => {
     setFormattingMarket(config.code);
@@ -34,13 +37,22 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     }
   }, [config]);
 
+  useEffect(() => {
+    let cancelled = false;
+    void ensureLangLoaded(config.lang).then(() => {
+      if (!cancelled) setLangReady((version) => version + 1);
+    });
+    return () => { cancelled = true; };
+  }, [config.lang]);
+
   const setMarket = useCallback((next: string) => {
     setMarketState(marketConfig(next).code);
   }, []);
 
   const t = useCallback(
     (key: string, params?: Record<string, string | number>) => translate(key, config.lang, params),
-    [config.lang]
+    // langReady is a deliberate dependency: re-create t (→ re-render consumers) once the overlay loads.
+    [config.lang, langReady]
   );
 
   const value = useMemo<LocaleContextValue>(() => ({ market: config.code, config, setMarket, t }), [config, setMarket, t]);

@@ -9,9 +9,10 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   markets are exposed in the picker (`markets.ts`); UI is localised per market via `i18n.ts` (`t('key', params)`)
   — **HR Croatian, SI Slovenian, AT/DE German, IT Italian, FI Finnish, FR French, NL Dutch, SK Slovak, ES
   Spanish**, English as the fallback (market `SK`/lang `sk` = Slovakia ≠ market `SI`/lang `sl` = Slovenia).
-  HR+EN are the inline dictionary; the rest live in `src/messages/{lang}.json` and merge in `translate()`
-  (a plain key lookup, no per-call merge). Keys that map backend `plan.name` tiers or feed the rule-based
-  prompt parser stay Croatian on purpose.
+  HR+EN are the inline dictionary; the rest live in `src/messages/{lang}.json`, **lazy-loaded** (Sprint 10.40):
+  `import.meta.glob` code-splits each into its own chunk that `LocaleProvider` fetches on demand, so the main
+  bundle (~77 kB gzip) no longer grows per market. `translate()` is a plain key lookup (English fallback until
+  the chunk loads). Keys that map backend `plan.name` tiers or feed the rule-based prompt parser stay Croatian.
 - **Backend**: Spring Boot 3.3.5, Java 17/21 (`backend/`). REST API on **http://localhost:8090**.
 - **DB**: PostgreSQL 16 (docker) on 5432. `ddl-auto=create` → schema rebuilt each start; `data.sql`
   seeds samples, then `RealCatalogSeeder` imports verified catalog snapshots.

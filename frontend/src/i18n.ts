@@ -1,20 +1,35 @@
-// Sprint 10.13 → 10.32: i18n. The inline DICTIONARY holds the source strings in HR + EN; the other market
-// languages (DE/IT/SL/FI) live in per-language JSON files (translated from the EN source) and are merged at
-// lookup time, with English as the fallback for any key a translation is missing.
+// Sprint 10.13 → 10.40: i18n. The inline DICTIONARY holds the source strings in HR + EN; every other market
+// language lives in a per-language JSON file (translated from the EN source). English is the fallback for any
+// key a translation is missing.
+//
+// Sprint 10.40 (perf): those per-language overlays are now LAZY-loaded. `import.meta.glob` code-splits each
+// `messages/*.json` into its own chunk, fetched on demand via `ensureLangLoaded` (LocaleProvider calls it when
+// the market's language changes). So the initial bundle ships only the app + HR/EN strings and no longer grows
+// with every new market; `translate()` reads from the loaded cache and falls back to English until the active
+// language's chunk has arrived.
 import type { Lang } from './markets';
-import de from './messages/de.json';
-import it from './messages/it.json';
-import sl from './messages/sl.json';
-import fi from './messages/fi.json';
-import fr from './messages/fr.json';
-import nl from './messages/nl.json';
-import sk from './messages/sk.json';
-import es from './messages/es.json';
 
 type Entry = { hr: string; en: string };
 
-// Per-language overlays (key → translated string). Missing keys fall back to English in translate().
-const EXTRA: Partial<Record<Lang, Record<string, string>>> = { de, it, sl, fi, fr, nl, sk, es };
+const overlayLoaders = import.meta.glob('./messages/*.json') as Record<
+  string,
+  () => Promise<{ default: Record<string, string> }>
+>;
+const loadedOverlays: Partial<Record<Lang, Record<string, string>>> = {};
+
+// Load (once) the overlay chunk for a language. hr/en need no overlay; an unknown lang is a no-op. Errors are
+// swallowed so a failed chunk fetch degrades to the English fallback instead of breaking the UI.
+export async function ensureLangLoaded(lang: Lang): Promise<void> {
+  if (lang === 'hr' || lang === 'en' || loadedOverlays[lang]) return;
+  const loader = overlayLoaders[`./messages/${lang}.json`];
+  if (!loader) return;
+  try {
+    const mod = await loader();
+    loadedOverlays[lang] = mod.default;
+  } catch {
+    /* keep falling back to English */
+  }
+}
 
 const DICTIONARY: Record<string, Entry> = {
   'nav.how': { hr: 'Kako radi', en: 'How it works' },
@@ -426,8 +441,8 @@ export function translate(key: string, lang: Lang, params?: Record<string, strin
   let text: string;
   if (lang === 'hr') text = entry?.hr ?? key;
   else if (lang === 'en') text = entry?.en ?? entry?.hr ?? key;
-  // DE/IT/SL/FI come from the per-language overlay, falling back to English then Croatian then the key.
-  else text = EXTRA[lang]?.[key] ?? entry?.en ?? entry?.hr ?? key;
+  // Other languages come from the lazy-loaded overlay (English until its chunk loads), then Croatian, then key.
+  else text = loadedOverlays[lang]?.[key] ?? entry?.en ?? entry?.hr ?? key;
   if (params) {
     for (const [name, value] of Object.entries(params)) {
       text = text.split(`{${name}}`).join(String(value));

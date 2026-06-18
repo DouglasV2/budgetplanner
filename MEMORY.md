@@ -32,6 +32,10 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   snapshot cache (`allProducts()`) so a request loads the catalog **once** (guarded by `PlannerCatalogCacheTest`:
   findAll ≤2 per generate). Safe because products are immutable post-seed (admin import is the only runtime
   writer, off in prod). The frontend `translate()` is already a plain key lookup (no per-call merge).
+- **i18n lazy-load (Sprint 10.40).** Per-language `messages/*.json` are now code-split via `import.meta.glob` and
+  fetched on demand by `LocaleProvider` (English fallback until the chunk loads). Main JS bundle ~126 → **77 kB
+  gzip** and **stops growing per market**. Bonus: adding a market needs **no `i18n.ts` edit** — the glob
+  auto-discovers the new `{lang}.json`.
 - **Slovakia (Sprint 10.38).** 9th market (NL's twin recipe): SK added to `Markets.java` + `markets.ts` (flag,
   cities, detection, retailers IKEA+JYSK) and **fully Slovak-localised** (`messages/sk.json`, 368 keys, parity-
   checked). **IKEA SK 72 rows** (IT-set number-trick → `/sk/sk/`) + **JYSK SK 38 rows** (jysk.sk, same static
