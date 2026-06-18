@@ -141,7 +141,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Sprint 10.36: France non-IKEA breadth — Camif (camif.fr), the one major FR chain that serves
             // the price in static HTML (JSON-LD / visible €). 46 web-verified rows across all core rooms;
             // every other big FR chain (Conforama/But/Maisons du Monde/La Redoute/…) is anti-bot → feed-required.
-            "/catalog/real-camif-fr.json"
+            "/catalog/real-camif-fr.json",
+            // Sprint 10.37: Netherlands — IKEA NL ported from the IKEA IT set via the article-number trick to
+            // /nl/nl/ (Dutch name + per-market EUR price + verified og:image, ikea.com/nl 2026-06-18), plus
+            // JYSK NL (jysk.nl is reachable + serves static prices, unlike jysk.at). NL = IKEA + JYSK.
+            "/catalog/real-ikea-nl-rooms.json",
+            "/catalog/real-jysk-nl-rooms.json"
     );
 
     /**

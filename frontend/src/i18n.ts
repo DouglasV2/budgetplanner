@@ -7,11 +7,12 @@ import it from './messages/it.json';
 import sl from './messages/sl.json';
 import fi from './messages/fi.json';
 import fr from './messages/fr.json';
+import nl from './messages/nl.json';
 
 type Entry = { hr: string; en: string };
 
 // Per-language overlays (key → translated string). Missing keys fall back to English in translate().
-const EXTRA: Partial<Record<Lang, Record<string, string>>> = { de, it, sl, fi, fr };
+const EXTRA: Partial<Record<Lang, Record<string, string>>> = { de, it, sl, fi, fr, nl };
 
 const DICTIONARY: Record<string, Entry> = {
   'nav.how': { hr: 'Kako radi', en: 'How it works' },

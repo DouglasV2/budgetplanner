@@ -27,6 +27,8 @@ public final class Markets {
             Map.entry("FI", new MarketInfo("FI", "EUR", "fi-FI")),
             // Sprint 10.35: France — EUR, verified IKEA catalog.
             Map.entry("FR", new MarketInfo("FR", "EUR", "fr-FR")),
+            // Sprint 10.37: Netherlands — EUR, verified IKEA + JYSK catalog.
+            Map.entry("NL", new MarketInfo("NL", "EUR", "nl-NL")),
             Map.entry("PL", new MarketInfo("PL", "PLN", "pl-PL")),
             Map.entry("CZ", new MarketInfo("CZ", "CZK", "cs-CZ")),
             Map.entry("HU", new MarketInfo("HU", "HUF", "hu-HU")),

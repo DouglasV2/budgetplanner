@@ -5,11 +5,11 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
 **local, web-verified product catalog**.
 
 ## Stack & dev ports
-- **Frontend**: React + Vite + TypeScript (`frontend/`). Dev served on **http://localhost:5180**. Seven EUR
+- **Frontend**: React + Vite + TypeScript (`frontend/`). Dev served on **http://localhost:5180**. Eight EUR
   markets are exposed in the picker (`markets.ts`); UI is localised per market via `i18n.ts` (`t('key', params)`)
-  — **HR Croatian, SI Slovenian, AT/DE German, IT Italian, FI Finnish, FR French**, English as the fallback.
-  HR+EN are the inline dictionary; DE/IT/SL/FI/FR live in `src/messages/{lang}.json` and merge in `translate()`.
-  Keys that map backend `plan.name` tiers or feed the rule-based prompt parser stay Croatian on purpose.
+  — **HR Croatian, SI Slovenian, AT/DE German, IT Italian, FI Finnish, FR French, NL Dutch**, English as the
+  fallback. HR+EN are the inline dictionary; DE/IT/SL/FI/FR/NL live in `src/messages/{lang}.json` and merge in
+  `translate()`. Keys that map backend `plan.name` tiers or feed the rule-based prompt parser stay Croatian.
 - **Backend**: Spring Boot 3.3.5, Java 17/21 (`backend/`). REST API on **http://localhost:8090**.
 - **DB**: PostgreSQL 16 (docker) on 5432. `ddl-auto=create` → schema rebuilt each start; `data.sql`
   seeds samples, then `RealCatalogSeeder` imports verified catalog snapshots.
@@ -75,7 +75,8 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   STALE / sample. Full rules: [docs/sourcing-policy.md](docs/sourcing-policy.md).
 - **Markets with data**: HR (deep — every room); SI/AT/DE/IT/FI (IKEA: living-room/bedroom/home-office +
   bathroom/hallway/kitchen, SI/AT/DE also dining); **FR (IKEA all core rooms — 10.35; + Camif breadth — 10.36)**;
-  JYSK adds hallway/kitchen for SI/DE/FI (JYSK AT pending — jysk.at gates stock behind JS; no JYSK in FR).
+  **NL (IKEA + JYSK — 10.37)**; JYSK adds hallway/kitchen for SI/DE/FI + the full NL catalog (JYSK AT pending —
+  jysk.at gates stock behind JS; no JYSK in FR; jysk.nl is reachable + static-priced).
   PL/CZ/HU/RO/SE/DK exist in `Markets` but have **no catalog** → empty plan (non-EUR — deferred until the UI
   handles their currency; `markets.ts` is EUR-only). IKEA/JYSK verified per market (prices differ per country —
   never copied across markets). Emmezeta = HR only.

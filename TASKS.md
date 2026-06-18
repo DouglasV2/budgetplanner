@@ -118,7 +118,25 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.36 — France non-IKEA breadth: Camif + FR retailer assessment (current)
+### Sprint 10.37 — new market: Netherlands (NL), Dutch-localised IKEA + JYSK (current)
+- **8th market, two retailers.** Added NL to `Markets.java` + `markets.ts` (flag 🇳🇱, `available:true`,
+  Amsterdam/Rotterdam/… cities, prompt detection) + `retailersByMarket` (NL = IKEA + JYSK). `Lang` += `'nl'`.
+- **Full Dutch localisation.** `frontend/src/messages/nl.json` (368 keys = same set as fr.json), native informal
+  "je/jij" tone, subagent-produced + **verified programmatically** (0 missing/extra/placeholder-mismatch/empty).
+  Wired into `i18n.ts` `EXTRA`.
+- **IKEA NL — 78 verified rows** (`real-ikea-nl-rooms.json`): IKEA Italy set ported via the article-number trick
+  to `/nl/nl/` (Dutch name + per-market EUR price + verified og:image, ikea.com/nl 2026-06-18).
+- **JYSK NL — 34 verified rows** (`real-jysk-nl-rooms.json`): jysk.nl is reachable + serves static prices
+  (unlike jysk.at). Same fields as jysk.hr (priceAmount = regular, JSON-LD price = current, priceValidUntil).
+  **5 rows carry a real near-term promo** (price=current + originalPrice + saleEndsAt — e.g. HUNDIGE 449→325 until
+  2026-06-30); the rest store the durable regular price. jysk.nl quirk: **no og:title** → name from JSON-LD
+  `name`/`<title>`/slug. HUNDIGE sofa image spot-checked.
+- **Verified:** backend **159 tests, 0 failures** (+`NetherlandsCatalogRuntimeTest`: both retailers import clean
+  + planner builds a non-partial NL plan); frontend build clean; nl.json parity 0 issues; catalog **1036 rows,
+  0 dup URLs/externalIds**. No fabrication, no 403-bypass.
+- **Next:** SK (Slovakia — IKEA number-trick + JYSK, like NL), then the other EUR markets (ES/PT) when wanted.
+
+### Sprint 10.36 — France non-IKEA breadth: Camif + FR retailer assessment
 - **Probed the major French furniture chains** (raw-HTTP, browser UA, 2026-06-18). Result mirrors the 10.16
   pattern — almost all are anti-bot or JS-only:
   - **Anti-bot (DataDome/Cloudflare 403) → `OFFICIAL_FEED_REQUIRED`:** Conforama, **But** (intermittent

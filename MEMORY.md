@@ -24,7 +24,13 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **157 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31, 139 in 10.33, 154 in 10.34, 156 in 10.35).
+- Backend tests: **159 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31, 139 in 10.33, 154 in 10.34, 156 in 10.35, 157 in 10.36). Catalog **1036 rows**.
+- **Netherlands (Sprint 10.37).** 8th market: NL added to `Markets.java` + `markets.ts` (flag, cities, detection,
+  retailers IKEA+JYSK) and **fully Dutch-localised** (`messages/nl.json`, 368 keys, parity-checked). Two
+  catalogs: **IKEA NL 78 rows** (`real-ikea-nl-rooms.json`, IT-set number-trick → `/nl/nl/`) + **JYSK NL 34 rows**
+  (`real-jysk-nl-rooms.json`, from jysk.nl — reachable + static prices, unlike jysk.at; 5 rows carry a real
+  near-term promo with originalPrice+saleEndsAt). All 112 rows verified images (HUNDIGE sofa spot-checked).
+  jysk.nl gotcha: **no og:title** → name from JSON-LD `name`/`<title>`/slug; price = priceAmount (regular).
 - **France retailers (Sprint 10.36).** Probed the major FR furniture chains: **only Camif (camif.fr) is
   directly verifiable** (price in static HTML — JSON-LD `offers.price` / visible €). Sourced **46 web-verified
   Camif rows** (`real-camif-fr.json`) across all core furniture categories (sofa/bed/table/storage/wardrobe/
@@ -56,7 +62,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36).** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
   ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets
@@ -64,7 +70,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   differ: KALLAX 169 DE / 189 AT / 199 SI / 179 HR). Other countries in `Markets` (IT/FI/PL/CZ/HU/RO/
   SE/DK) have **no catalog** → empty plan (expected).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
-  - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE), Emmezeta (HR), **Harvey Norman (HR/SI),
+  - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE/FI/NL), Emmezeta (HR), **Harvey Norman (HR/SI),
     Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36)**.
   - Registered but **feed-required** (403/anti-bot/JS-only/out-of-scope → no products yet): Decathlon,
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
