@@ -118,7 +118,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.37 — new market: Netherlands (NL), Dutch-localised IKEA + JYSK (current)
+### Sprint 10.38 — new market: Slovakia (SK), Slovak-localised IKEA + JYSK (current)
+- **9th market, two retailers** (same recipe as NL). Added SK to `Markets.java` + `markets.ts` (flag 🇸🇰,
+  `available:true`, Bratislava/Košice/… cities, prompt detection) + `retailersByMarket` (SK = IKEA + JYSK).
+  `Lang` += `'sk'`. **Note the SK/SI + sk/sl distinction** (Slovakia/Slovak ≠ Slovenia/Slovenian).
+- **Full Slovak localisation.** `frontend/src/messages/sk.json` (368 keys = same set as nl.json), native informal
+  "tykanie" tone + correct diacritics, subagent-produced + **verified programmatically** (0 missing/extra/
+  placeholder-mismatch/empty). Wired into `i18n.ts` `EXTRA`.
+- **IKEA SK — 72 verified rows** (`real-ikea-sk-rooms.json`): IKEA Italy set ported via the article-number trick
+  to `/sk/sk/` (Slovak name + per-market EUR price + verified og:image, ikea.com/sk 2026-06-18).
+- **JYSK SK — 38 verified rows** (`real-jysk-sk-rooms.json`): jysk.sk, same static price structure as jysk.nl/hr
+  (priceAmount = regular, JSON-LD = current). **3 rows carry a real near-term promo** (ANDRUP 429→300, HEDEHUSENE
+  369→285, VEMMELEV 499→350, until 2026-06-30). ANDRUP sofa image spot-checked.
+- **Verified:** backend **161 tests, 0 failures** (+`SlovakiaCatalogRuntimeTest`); frontend build clean; sk.json
+  parity 0 issues; catalog **1146 rows, 0 dup URLs/externalIds**. No fabrication, no 403-bypass.
+- **Next EUR markets when wanted:** ES, PT (IKEA-only, like FR/IT — both 5/5 fetchable in the 10.35 probe).
+
+### Sprint 10.37 — new market: Netherlands (NL), Dutch-localised IKEA + JYSK
 - **8th market, two retailers.** Added NL to `Markets.java` + `markets.ts` (flag 🇳🇱, `available:true`,
   Amsterdam/Rotterdam/… cities, prompt detection) + `retailersByMarket` (NL = IKEA + JYSK). `Lang` += `'nl'`.
 - **Full Dutch localisation.** `frontend/src/messages/nl.json` (368 keys = same set as fr.json), native informal
