@@ -161,13 +161,19 @@ When a compliant feed exists:
    & FB Marketplace). `MarketplaceFeed` (extends `RetailerFeed`) + `ConfigBackedMarketplaceFeed` (unconfigured) +
    `MarketplaceFeedProperties` (env `budgetspace.marketplace-feeds.<name>.url`, blank) + `MarketplaceFeedConfig`
    (one placeholder bean per marketplace, consumed by `RetailerFeedImporter`). `MarketplaceFeedSeamTest`.
-3. **Phase 2b (next, when a source is chosen):** integrate the first **compliant** source — recommended **eBay
-   Browse API** (free key via backend env; used furniture, by location) or a Njuškalo partner/affiliate export.
-   The real `MarketplaceFeed` maps rows to `sourceType=marketplace-listing` + `secondHand=true` + `condition` +
-   `location`, each run through `MarketplaceListingFilter` before import (needs the §3 columns through the
-   snapshot DTO). FB Marketplace only via an authorised Commerce API. Never scrape.
-4. **Phase 3:** UI section ("Rabljeno") + trust/safety copy + freshness monitoring; used items kept out of
-   the new-retail plan total.
+3. **Phase 2b (Sprint 10.51):** ✅ done (backend) — **eBay Browse API** is the first compliant source.
+   `EbayBrowseFeed` (OAuth client-credentials + `item_summary/search`, furniture category + `conditions=USED`,
+   per-market local filter) maps rows to `sourceType=marketplace-listing` + `secondHand=true` + `conditionLabel`
+   + `sellerLocation`, each run through `MarketplaceListingFilter.shouldDrop` before import. The §3 columns now
+   flow through the snapshot DTO → import → entity → `ProductDto` (closes §8.5). The planner excludes `secondHand`
+   from every plan/total (`PlannerService.marketCatalog`) and surfaces matches in
+   `PlanGenerationResponse.secondHandSuggestions`. Credentials are env-only
+   (`budgetspace.marketplace-feeds.ebay.client-id/client-secret`); the feed is dormant (no network) until set.
+   eBay runs local sites only in **DE/IT/AT/FR/NL/ES**, so the other markets keep their placeholders; FB
+   Marketplace still needs an authorised Commerce API. Never scrape. **Pending:** live smoke test once the key is
+   active (+ tune the furniture category id/query against real responses), then the Phase 3 UI.
+4. **Phase 3 (next, Sprint 10.52):** the frontend "Rabljeno" section + trust/safety copy + freshness monitoring;
+   used items kept out of the new-retail plan total (the backend already guarantees this).
 
 ## 10. Open questions
 

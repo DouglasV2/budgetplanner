@@ -40,9 +40,12 @@ class MarketplaceFeedSeamTest {
     void marketplaceConfigWiresOneUnconfiguredPlaceholderPerMarketplace() {
         MarketplaceFeedProperties properties = new MarketplaceFeedProperties(new StandardEnvironment());
         MarketplaceFeedConfig config = new MarketplaceFeedConfig();
+        // Sprint 10.51: eBay is now the real EbayBrowseFeed (its own env-backed properties); unconfigured here
+        // → still dormant, so it satisfies the same placeholder contract as the rest.
+        EbayBrowseFeedProperties ebayProperties = new EbayBrowseFeedProperties(new StandardEnvironment());
         List<RetailerFeed> feeds = List.of(
                 config.njuskaloMarketplaceFeed(properties), config.facebookMarketplaceFeed(properties),
-                config.ebayMarketplaceFeed(properties), config.bolhaMarketplaceFeed(properties),
+                config.ebayMarketplaceFeed(ebayProperties), config.bolhaMarketplaceFeed(properties),
                 config.willhabenMarketplaceFeed(properties), config.kleinanzeigenMarketplaceFeed(properties),
                 config.subitoMarketplaceFeed(properties), config.toriMarketplaceFeed(properties),
                 config.leboncoinMarketplaceFeed(properties), config.marktplaatsMarketplaceFeed(properties),

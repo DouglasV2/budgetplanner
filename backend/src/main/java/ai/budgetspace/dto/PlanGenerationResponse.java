@@ -15,15 +15,33 @@ public record PlanGenerationResponse(
         List<String> missingImportantCategories,
         String catalogWarning,
         // Sprint 10.10: how the prompt was understood (AI or rule-based). Null on older call paths.
-        PlannerIntentAnalysisDto intentAnalysis
+        PlannerIntentAnalysisDto intentAnalysis,
+        // Sprint 10.51: matched second-hand ("Rabljeno") listings for the request — a separate, optional
+        // block the UI shows under the new-retail plans. Shared across all three plan tiers (it is tied to
+        // the room, not the budget tier) and NEVER counted into any plan total. Empty when no marketplace
+        // feed is configured or nothing matches. See docs/marketplace-sourcing.md §5.
+        List<ProductDto> secondHandSuggestions
 ) {
-    /** Backwards-compatible constructor (pre-10.10) — no intent analysis attached. */
+    /** Null-safe: second-hand suggestions are always a list, never null, for the frontend. */
+    public PlanGenerationResponse {
+        secondHandSuggestions = secondHandSuggestions == null ? List.of() : secondHandSuggestions;
+    }
+
+    /** Backwards-compatible constructor (pre-10.10) — no intent analysis, no second-hand block. */
     public PlanGenerationResponse(PlannerInputDto input, List<FurnishingPlanDto> plans, boolean partialPlan,
                                   List<String> missingImportantCategories, String catalogWarning) {
-        this(input, plans, partialPlan, missingImportantCategories, catalogWarning, null);
+        this(input, plans, partialPlan, missingImportantCategories, catalogWarning, null, List.of());
+    }
+
+    /** Sprint 10.51 — built with second-hand suggestions but before the prompt analysis is attached. */
+    public PlanGenerationResponse(PlannerInputDto input, List<FurnishingPlanDto> plans, boolean partialPlan,
+                                  List<String> missingImportantCategories, String catalogWarning,
+                                  List<ProductDto> secondHandSuggestions) {
+        this(input, plans, partialPlan, missingImportantCategories, catalogWarning, null, secondHandSuggestions);
     }
 
     public PlanGenerationResponse withAnalysis(PlannerIntentAnalysisDto analysis) {
-        return new PlanGenerationResponse(input, plans, partialPlan, missingImportantCategories, catalogWarning, analysis);
+        return new PlanGenerationResponse(input, plans, partialPlan, missingImportantCategories, catalogWarning,
+                analysis, secondHandSuggestions);
     }
 }

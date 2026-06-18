@@ -49,7 +49,13 @@ public record ProductDto(
         boolean imageVerified,
         // Sprint 10.33: verified promo window end (e.g. JYSK priceValidUntil). With originalPrice (which
         // already flows above) the UI shows the dual % + € saving; null = no known sale window.
-        String saleEndsAt
+        String saleEndsAt,
+        // Sprint 10.51: second-hand marketplace fields (docs/marketplace-sourcing.md §3). secondHand=true
+        // drives the separate "Rabljeno" UI section; the planner already keeps these out of every plan
+        // total. conditionLabel = seller's stated condition; sellerLocation = city/region for pickup.
+        boolean secondHand,
+        String conditionLabel,
+        String sellerLocation
 ) {
     public static ProductDto from(Product product) {
         String market = Markets.normalize(product.getMarket());
@@ -86,7 +92,10 @@ public record ProductDto(
                 market,
                 Markets.currencyFor(market),
                 product.isImageVerified(),
-                product.getSaleEndsAt()
+                product.getSaleEndsAt(),
+                product.isSecondHand(),
+                product.getConditionLabel(),
+                product.getSellerLocation()
         );
     }
 

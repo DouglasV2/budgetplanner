@@ -230,6 +230,12 @@ public class ProductImportService {
         if (dto.reviewRating() != null) entity.setReviewRating(dto.reviewRating());
         if (hasText(dto.reviewsUrl())) entity.setReviewsUrl(dto.reviewsUrl().trim());
         entity.setMarket(Markets.normalize(dto.market()));
+        // Sprint 10.51: second-hand marketplace fields. secondHand is only ever set true (a marketplace
+        // feed), never flipped back to false on re-import; conditionLabel/sellerLocation are the seller's
+        // stated condition + city, stored verbatim (never guessed). See docs/marketplace-sourcing.md §3.
+        if (Boolean.TRUE.equals(dto.secondHand())) entity.setSecondHand(true);
+        if (hasText(dto.conditionLabel())) entity.setConditionLabel(dto.conditionLabel().trim());
+        if (hasText(dto.sellerLocation())) entity.setSellerLocation(dto.sellerLocation().trim());
         entity.setImportedAt(Instant.now().toString());
     }
 

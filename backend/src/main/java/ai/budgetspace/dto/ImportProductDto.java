@@ -52,7 +52,13 @@ public record ImportProductDto(
         Boolean imageVerified,
         // Sprint 10.33: verified end of the promo window (e.g. JYSK priceValidUntil). Paired with
         // originalPrice (the regular price) to express a sale; null unless web-verified.
-        String saleEndsAt
+        String saleEndsAt,
+        // Sprint 10.51: second-hand marketplace fields, carried through to the entity (docs/marketplace-sourcing.md
+        // §3/§8.5). secondHand=true keeps a used listing out of the plan total; conditionLabel is the seller's
+        // stated condition; sellerLocation is the city/region. Null on every retail import.
+        Boolean secondHand,
+        String conditionLabel,
+        String sellerLocation
 ) {
     /** Backwards-compatible constructor (pre-10.7): no colour/material, reviews, market or image-verify. */
     public ImportProductDto(
@@ -64,7 +70,7 @@ public record ImportProductDto(
     ) {
         this(id, externalId, name, retailer, category, price, originalPrice, styleTags, roomTags,
                 imageUrl, productUrl, availabilityStatus, deliveryNote, lastCheckedAt, priceTier, note,
-                sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null, null, null);
+                sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     /** Backwards-compatible constructor (10.7-10.12): colour/material but no reviews, market or image-verify. */
@@ -79,6 +85,6 @@ public record ImportProductDto(
         this(id, externalId, name, retailer, category, price, originalPrice, styleTags, roomTags,
                 imageUrl, productUrl, availabilityStatus, deliveryNote, lastCheckedAt, priceTier, note,
                 sourceType, sourceName, sourceReference, dataQuality, dataQualityNotes,
-                colorTags, materialTags, null, null, null, null, null, null);
+                colorTags, materialTags, null, null, null, null, null, null, null, null, null);
     }
 }

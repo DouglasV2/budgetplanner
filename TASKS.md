@@ -118,6 +118,33 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.51 — "Rabljeno" backend: eBay Browse feed + second-hand pipeline (current)
+- Owner gave the go-ahead for eBay; the developer key is pending (~1 business day) but is **not a blocker** —
+  the feed ships **dormant** (the existing unconfigured-feed pattern *is* the placeholder) and the whole pipeline
+  it plugs into is built + tested now. When the key lands: set 2 env vars + restart → live smoke test.
+- **§3 plumbing end-to-end:** `secondHand` / `conditionLabel` / `sellerLocation` now flow
+  `RetailerProductSnapshotDto → ImportProductDto → RetailerCatalogAdapter → ProductImportService → Product →
+  ProductDto` (the entity already had the columns; the snapshot/import chain didn't carry them — the §3/§8.5 gap).
+- **Budget-safety (a real bug, fixed):** a used eBay row (retailer `eBay`=feed-required, sourceType
+  `marketplace-listing` ∈ FEED_SOURCE_TYPES) would have passed `isPlannerEligible` and **inflated the budget
+  total**. Fixed at one chokepoint — `PlannerService.marketCatalog` now excludes `secondHand`, so a used item can
+  never enter any plan or total. The provenance gate stayed intact (a fed listing still counts as verified).
+- **Separate block:** `PlanGenerationResponse.secondHandSuggestions` — room+market-matched used listings (short
+  24h marketplace freshness window), shared across all 3 plan tiers, **never summed into a total**.
+- **`EbayBrowseFeed`** (implements `MarketplaceFeed`): OAuth client-credentials + Browse `item_summary/search`
+  (furniture category, `conditions=USED`, per-market local filter), maps to `secondHand=true` /
+  `marketplace-listing` rows with stated condition + seller city, every row through
+  `MarketplaceListingFilter.shouldDrop` before return. Credentials from env only
+  (`budgetspace.marketplace-feeds.ebay.client-id/client-secret`) — dormant, no network, until set. Replaces the
+  eBay placeholder bean. Multilingual furniture classifier (unmappable → drop, no fabrication).
+- **eBay reality:** local marketplaces only in **DE/IT/AT/FR/NL/ES** — HR/SI/FI/NO/SE/DK/SK/PT have no eBay site
+  and keep their own placeholders. Localized sold markers added (verkauft/vendu/venduto/vendido/verkocht…).
+- **Tests:** `EbayBrowseFeedTest` (fixture, no creds) — dormancy, market allow-list, mapping drops
+  sold/unpriced/unclassifiable, and end-to-end §5 (used imported `secondHand=true`, excluded from every plan
+  total, surfaced separately). **Backend 185 tests, 0 failures.**
+- **Next:** the frontend "Rabljeno" section (Sprint 10.52) renders `secondHandSuggestions` with a condition
+  badge, location, "cijena okvirna" + buyer-beware disclaimer + link — stays empty until the key feeds data.
+
 ### Sprint 10.50 — human copy + premium UX polish (less "ChatGPT wrapper") (current)
 - Owner: make it feel like a real interior designer, not an AI explaining its algorithm; modern readable font;
   fix the broken "Prati cijenu" modal.

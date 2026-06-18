@@ -51,7 +51,19 @@ public final class MarketplaceListingFilter {
             "uklonjeno",      // removed
             "izbrisano",      // deleted
             "isteklo",        // expired
-            "gotovo"          // done/finished
+            "gotovo",         // done/finished
+            // Sprint 10.51: localized sold/reserved markers for eBay's markets (DE/IT/FR/ES/NL), so a feed in
+            // those languages drops a sold/reserved ad just like the HR/EN ones above. Accent-stripped to match.
+            "verkauft",       // DE sold
+            "reserviert",     // DE reserved
+            "vendu",          // FR sold (vendu/vendue/vendus)
+            "reserve",        // FR réservé (accent-stripped) / EN reserve(d)
+            "venduto",        // IT sold (m.)
+            "venduta",        // IT sold (f.)
+            "vendido",        // ES sold (m.)
+            "vendida",        // ES sold (f.)
+            "verkocht",       // NL sold
+            "gereserveerd"    // NL reserved
     );
 
     private MarketplaceListingFilter() {

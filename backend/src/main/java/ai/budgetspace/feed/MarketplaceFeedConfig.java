@@ -28,9 +28,14 @@ public class MarketplaceFeedConfig {
         return placeholder("Facebook Marketplace", null, properties);
     }
 
+    /**
+     * Sprint 10.51: the real eBay Browse API feed — the first compliant "Rabljeno" source. It replaces the
+     * eBay placeholder but behaves identically until an operator sets the eBay App ID + Cert ID in the
+     * environment ({@link EbayBrowseFeedProperties}): dormant, no network call, imports nothing. Never scraped.
+     */
     @Bean
-    public RetailerFeed ebayMarketplaceFeed(MarketplaceFeedProperties properties) {
-        return placeholder("eBay", null, properties); // public Browse API — the realistic first source
+    public RetailerFeed ebayMarketplaceFeed(EbayBrowseFeedProperties ebayProperties) {
+        return new EbayBrowseFeed(ebayProperties);
     }
 
     @Bean

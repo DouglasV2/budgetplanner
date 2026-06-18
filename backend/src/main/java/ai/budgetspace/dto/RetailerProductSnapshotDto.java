@@ -54,12 +54,20 @@ public record RetailerProductSnapshotDto(
         // product is "on sale" only when price < originalPrice); saleEndsAt is the verified promo end
         // (e.g. JYSK priceValidUntil). Both null unless web-verified on the live page — never fabricated.
         BigDecimal originalPrice,
-        String saleEndsAt
+        String saleEndsAt,
+        // Sprint 10.51: second-hand marketplace fields (docs/marketplace-sourcing.md §3). secondHand=true
+        // marks a used listing from a compliant marketplace feed (e.g. eBay Browse) — it drives the separate
+        // "Rabljeno" UI section and is kept out of the plan total. conditionLabel is the seller's STATED
+        // condition (never guessed); sellerLocation is the city/region (pickup distance, no precise address).
+        // All null on every retail snapshot — only a marketplace feed sets them.
+        Boolean secondHand,
+        String conditionLabel,
+        String sellerLocation
 ) {
     /**
      * Backwards-compatible constructor for snapshots prepared before Sprint 10.7. Colour/material,
-     * reviews, market, image-verification and sale fields default to empty; the import pipeline
-     * derives colour/material from the name.
+     * reviews, market, image-verification, sale and second-hand fields default to empty; the import
+     * pipeline derives colour/material from the name.
      */
     public RetailerProductSnapshotDto(
             String externalId, String name, String retailer, String category, BigDecimal price,
@@ -71,6 +79,6 @@ public record RetailerProductSnapshotDto(
         this(externalId, name, retailer, category, price, productUrl, imageUrl, availabilityStatus,
                 deliveryNote, lastCheckedAt, roomTags, styleTags, priceTier, sourceType, sourceName,
                 sourceReference, dataQuality, dataQualityNotes, null, null, null, null, null, null, null,
-                null, null);
+                null, null, null, null, null);
     }
 }

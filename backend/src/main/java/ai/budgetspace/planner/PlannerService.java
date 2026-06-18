@@ -2,6 +2,7 @@ package ai.budgetspace.planner;
 
 import ai.budgetspace.dto.*;
 import ai.budgetspace.product.CatalogSourcePolicy;
+import ai.budgetspace.product.MarketplaceListingFilter;
 import ai.budgetspace.product.Markets;
 import ai.budgetspace.product.Product;
 import ai.budgetspace.product.ProductRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,8 +115,40 @@ public class PlannerService {
         List<String> missingImportant = missingImportantCategories(input);
         boolean partial = !missingImportant.isEmpty();
         String catalogWarning = partial ? buildCatalogWarning(missingImportant) : null;
+        List<ProductDto> secondHand = secondHandSuggestions(input);
         logPlanSummary(input, plans, missingImportant);
-        return new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning);
+        return new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning, secondHand);
+    }
+
+    // Sprint 10.51: the separate "Rabljeno" block. Used marketplace listings matched to the request's room +
+    // market, kept entirely out of every plan (CatalogSourcePolicy.isPlannerEligible already excludes
+    // second-hand) and therefore out of every total. Freshness uses the SHORT marketplace window
+    // (MarketplaceListingFilter, 24h) — a used listing goes stale fast — not the 14-day retail window. We
+    // require a real listing URL + a stated condition (never guessed) and a sourceReference (so no sample
+    // rows). Empty until a marketplace feed (e.g. eBay Browse) is configured. See docs/marketplace-sourcing.md §5.
+    private static final int MAX_SECOND_HAND_SUGGESTIONS = 6;
+
+    private List<ProductDto> secondHandSuggestions(PlannerInputDto input) {
+        if (input == null) return List.of();
+        String market = Markets.normalize(input.market());
+        String room = input.roomType();
+        Instant now = Instant.now();
+        return allProducts().stream()
+                .filter(Product::isSecondHand)
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> product.getMarket() == null || product.getMarket().isBlank()
+                        || product.getMarket().equalsIgnoreCase(market))
+                .filter(product -> hasTag(product.getRoomTags(), room))
+                .filter(product -> hasContent(product.getSourceReference()))
+                .filter(product -> hasContent(product.getProductUrl()))
+                .filter(product -> hasContent(product.getConditionLabel()))
+                .filter(product -> !MarketplaceListingFilter.isStale(product.getLastCheckedAt(), now))
+                .sorted(Comparator
+                        .comparingInt((Product product) -> styleMatches(product, input.style()) ? 1 : 0).reversed()
+                        .thenComparing(Product::getPrice))
+                .limit(MAX_SECOND_HAND_SUGGESTIONS)
+                .map(ProductDto::from)
+                .toList();
     }
 
     // Observability: one line per generated plan so an operator can see the planner is producing
@@ -1176,6 +1210,12 @@ public class PlannerService {
         List<Product> all = allProducts();
         return all.stream()
                 .filter(CatalogSourcePolicy::isPlannerEligible)
+                // Sprint 10.51: a second-hand marketplace listing is never a plan pick — different trust/freshness
+                // model (single-unit, ephemeral, "used"). It is surfaced only in the separate "Rabljeno" block via
+                // secondHandSuggestions and must never enter a plan or the budget total. This is the single
+                // chokepoint every pick path streams from (pickBest / pickReplacement / cheapest / coverage /
+                // missingImportant), so one guard here covers them all. See docs/marketplace-sourcing.md §5.
+                .filter(product -> !product.isSecondHand())
                 .filter(product -> product.getMarket() == null || product.getMarket().isBlank()
                         || product.getMarket().equalsIgnoreCase(market))
                 .toList();

@@ -51,7 +51,11 @@ public class RetailerCatalogAdapter {
                 snapshot.market(),
                 snapshot.reviewRating(),
                 snapshot.imageVerified(),
-                snapshot.saleEndsAt()
+                snapshot.saleEndsAt(),
+                // Sprint 10.51: carry the second-hand marketplace fields through to import.
+                snapshot.secondHand(),
+                snapshot.conditionLabel(),
+                snapshot.sellerLocation()
         );
     }
 
