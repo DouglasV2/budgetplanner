@@ -147,6 +147,8 @@ export function Planner() {
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
   const [design, setDesign] = useState<DesignAssistant | null>(null);
   const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
+  // Sprint 10.51: the separate "Rabljeno" (second-hand) suggestions — kept entirely out of every plan total.
+  const [secondHand, setSecondHand] = useState<Product[]>([]);
   // Sprint 10.13 (#3): reversible "we picked your country from the prompt" note.
   const [marketNote, setMarketNote] = useState<string | null>(null);
 
@@ -196,6 +198,7 @@ export function Planner() {
       .then((savedPlan) => {
         setInput(savedPlan.input);
         setPlans([savedPlan.plan]);
+        setSecondHand([]);
         setNotice(t('planner.noticeLoaded'));
       })
       .catch(() => setError(t('planner.errorNotFound')))
@@ -226,12 +229,14 @@ export function Planner() {
     setPartialNotice(null);
     setDesign(null);
     setAnalysis(null);
+    setSecondHand([]);
 
     try {
       const response = await generatePlan(effectiveInput);
       setInput({ ...response.input, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
       setPlans(response.plans);
       setAnalysis(response.intentAnalysis ?? null);
+      setSecondHand(response.secondHandSuggestions ?? []);
       const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
       if (!hasAnyItems) {
         setPartialNotice(t('planner.partialNone'));
@@ -307,6 +312,7 @@ export function Planner() {
   function openSavedPlan(savedPlan: SavedPlanResponse) {
     setInput(savedPlan.input);
     setPlans([savedPlan.plan]);
+    setSecondHand([]);
     setPartialNotice(null);
     setDesign(null);
     setAnalysis(null);
@@ -402,6 +408,7 @@ export function Planner() {
         <PlanResults
           plans={plans}
           input={input}
+          secondHandSuggestions={secondHand}
           onReplace={handleReplace}
           onToggleLock={handleToggleLock}
           lockedProductIds={input.lockedProductIds}

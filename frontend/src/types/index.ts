@@ -139,6 +139,12 @@ export interface Product {
   reviewsUrl?: string;
   market?: string;
   currency?: string;
+  // Sprint 10.51: second-hand marketplace fields (docs/marketplace-sourcing.md §3). secondHand=true marks a
+  // used listing shown in the separate "Rabljeno" block — never counted into a plan/budget total.
+  // conditionLabel = the seller's stated condition; sellerLocation = city/region for pickup distance.
+  secondHand?: boolean;
+  conditionLabel?: string;
+  sellerLocation?: string;
 }
 
 // Sprint 10.10: structured understanding of the user's prompt (AI or rule-based).

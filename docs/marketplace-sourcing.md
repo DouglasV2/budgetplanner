@@ -172,8 +172,12 @@ When a compliant feed exists:
    eBay runs local sites only in **DE/IT/AT/FR/NL/ES**, so the other markets keep their placeholders; FB
    Marketplace still needs an authorised Commerce API. Never scrape. **Pending:** live smoke test once the key is
    active (+ tune the furniture category id/query against real responses), then the Phase 3 UI.
-4. **Phase 3 (next, Sprint 10.52):** the frontend "Rabljeno" section + trust/safety copy + freshness monitoring;
-   used items kept out of the new-retail plan total (the backend already guarantees this).
+4. **Phase 3 (Sprint 10.52):** ✅ done (UI built) — the frontend `SecondHandSection` renders
+   `PlanGenerationResponse.secondHandSuggestions` in a distinct "Rabljeno" block (condition badge, seller city,
+   "≈ cijena okvirna · provjeri dostupnost", buyer-beware disclaimer, link to the live listing). Used items are
+   kept out of the new-retail plan total (the backend already guarantees this) and the section renders nothing
+   until a feed runs. **Pending:** the live look once the eBay key feeds data; freshness monitoring/UI for an
+   aging used row beyond the 24h window.
 
 ## 10. Open questions
 

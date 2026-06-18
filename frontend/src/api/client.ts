@@ -10,6 +10,9 @@ export interface PlanGenerationResponse {
   catalogWarning?: string | null;
   // Sprint 10.10: how the prompt was understood (AI or rule-based).
   intentAnalysis?: PlannerIntentAnalysis | null;
+  // Sprint 10.51: matched second-hand ("Rabljeno") listings — a separate block shown under the new-retail
+  // plans, never counted into any plan total. Empty when no marketplace feed is configured or nothing matches.
+  secondHandSuggestions?: Product[];
 }
 
 // Stable per-browser id so the backend can apply per-session AI usage limits. No PII.

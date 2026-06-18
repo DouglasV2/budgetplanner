@@ -41,6 +41,8 @@ interface PlanResultsProps {
   isLoading?: boolean;
   error?: string | null;
   partialNotice?: string | null;
+  // Sprint 10.51: matched second-hand listings, shown in a separate "Rabljeno" block (never in any total).
+  secondHandSuggestions?: Product[];
 }
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
@@ -421,6 +423,74 @@ function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: Planne
   );
 }
 
+// Sprint 10.51: the separate "Rabljeno" (second-hand) block. Used marketplace listings (e.g. eBay) shown as
+// an optional, clearly-labelled alternative under the new-retail plan — NEVER counted into any plan total.
+// Honest by design: a "≈" asking price (negotiable), the seller's stated condition, the city, a buyer-beware
+// disclaimer, and a link straight to the live listing (availability is the seller's to confirm, not ours).
+function SecondHandSection({
+  products,
+  planId,
+  onProductClick
+}: {
+  products: Product[];
+  planId: string;
+  onProductClick: (planId: string, product: Product) => void;
+}) {
+  const { t } = useLocale();
+  if (!products.length) return null;
+  return (
+    <section className="second-hand-section" aria-label={t('results.secondHandTitle')}>
+      <div className="second-hand-head">
+        <span className="second-hand-kicker">{t('results.secondHandKicker')}</span>
+        <strong>{t('results.secondHandTitle')}</strong>
+        <small>{t('results.secondHandSubtitle')}</small>
+      </div>
+      <p className="second-hand-disclaimer">{t('results.secondHandDisclaimer')}</p>
+      <div className="second-hand-grid">
+        {products.map((product) => {
+          const openUrl = productUrl(product);
+          const market = marketBadge(product);
+          const condition = (product.conditionLabel ?? '').trim();
+          const location = (product.sellerLocation ?? '').trim();
+          return (
+            <article className="second-hand-card" key={product.id}>
+              <img
+                src={productImage(product)}
+                alt={t('results.imageIllustrationAlt', { name: product.name })}
+                loading="lazy"
+                onError={(event) => handleProductImageError(event, product.category)}
+              />
+              <div className="second-hand-info">
+                <strong className="second-hand-name">{product.name}</strong>
+                <div className="meta-line">
+                  <span>{product.retailer}</span>
+                  {market && <span title={t('results.marketCatalogTitle', { market })}>{t('results.marketLabel', { market })}</span>}
+                  <span>{categoryLabels[product.category]}</span>
+                  {condition && <span className="condition-chip" title={t('results.secondHandConditionTitle')}>{condition}</span>}
+                </div>
+                {location && <small className="second-hand-location">{t('results.secondHandLocation', { location })}</small>}
+                <div className="second-hand-price">
+                  <strong>{t('results.secondHandApproxPrice', { price: formatCurrency(product.price) })}</strong>
+                  <small>{t('results.secondHandPriceNote')}</small>
+                </div>
+                <div className="product-actions second-hand-actions">
+                  {openUrl ? (
+                    <a href={openUrl} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(planId, product)}>
+                      {t('results.secondHandOpenListing')}
+                    </a>
+                  ) : (
+                    <button type="button" disabled title={t('results.productLinkUnavailableTitle')}>{t('results.productLinkUnavailable')}</button>
+                  )}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function UnderstandingSummary({ input }: { input: PlannerInput }) {
   const { t } = useLocale();
   return (
@@ -488,7 +558,8 @@ export function PlanResults({
   onFeedback,
   isLoading = false,
   error = null,
-  partialNotice = null
+  partialNotice = null,
+  secondHandSuggestions = []
 }: PlanResultsProps) {
   const { t } = useLocale();
   const [copiedPlanId, setCopiedPlanId] = useState<string | null>(null);
@@ -888,6 +959,8 @@ export function PlanResults({
           </div>
 
           <ShoppingListCard plan={selectedPlan} input={input} />
+
+          <SecondHandSection products={secondHandSuggestions} planId={selectedPlan.id} onProductClick={onProductClick} />
 
           <details className="alternate-plans-panel">
             <summary>

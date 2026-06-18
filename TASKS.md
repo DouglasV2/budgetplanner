@@ -118,6 +118,20 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.52 — "Rabljeno" frontend: the separate second-hand section (current)
+- The visible half of 10.51: renders `PlanGenerationResponse.secondHandSuggestions` in a distinct "Rabljeno"
+  block under the new-retail plan, **never mixed into a total**.
+- **Threaded** `secondHandSuggestions`: `api/client` response type → `Planner` state (cleared on every path —
+  reset, saved-plan, shared-plan) → `PlanResults` prop. `Product` type gained
+  `secondHand`/`conditionLabel`/`sellerLocation` (mirrors the backend DTO).
+- **New `SecondHandSection`** (`PlanResults`): warm-tinted card visually separate from the plan, with a
+  condition badge, seller city, "≈ cijena okvirna / approx. price · check availability", a buyer-beware
+  disclaimer (private listing, negotiable, confirm with the seller, BudgetSpace doesn't handle the deal), and a
+  link straight to the live listing. Placeholder image stays (eBay seller photos aren't shown until display
+  rights are confirmed — `imageVerified=false`).
+- **i18n:** 9 new hr+en keys; a warm amber condition chip + section styles. Renders nothing until a feed runs,
+  so today's UI is unchanged and it lights up the moment the eBay key feeds data. Frontend build clean (tsc + vite).
+
 ### Sprint 10.51 — "Rabljeno" backend: eBay Browse feed + second-hand pipeline (current)
 - Owner gave the go-ahead for eBay; the developer key is pending (~1 business day) but is **not a blocker** —
   the feed ships **dormant** (the existing unconfigured-feed pattern *is* the placeholder) and the whole pipeline

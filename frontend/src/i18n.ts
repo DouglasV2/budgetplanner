@@ -373,6 +373,17 @@ const DICTIONARY: Record<string, Entry> = {
   'results.saleSaving': { hr: '−{percent}% · ušteda {amount}', en: '−{percent}% · save {amount}' },
   'results.saleEnds': { hr: 'akcija do {date}', en: 'ends {date}' },
   'results.regularPrice': { hr: 'Redovna cijena {price}', en: 'Regular price {price}' },
+  // Sprint 10.51: the separate "Rabljeno" (second-hand) block. Used marketplace listings (e.g. eBay) shown as
+  // an optional alternative — never part of any plan total. Honest, buyer-beware copy; {location}/{price} interpolate.
+  'results.secondHandKicker': { hr: 'Rabljeno u blizini', en: 'Second-hand nearby' },
+  'results.secondHandTitle': { hr: 'Slično, ali rabljeno', en: 'Similar pieces, used' },
+  'results.secondHandSubtitle': { hr: 'Nije uračunato u budžet plana — zasebna, povoljnija opcija ako ti odgovara.', en: 'Not counted in the plan\'s budget — a separate, cheaper option if it suits you.' },
+  'results.secondHandDisclaimer': { hr: 'Privatni oglasi. Cijena je okvirna i obično se dogovara; dostupnost i stanje provjeri izravno s prodavateljem prije nego kreneš. BudgetSpace ne posreduje u transakciji.', en: 'Private listings. Prices are approximate and usually negotiable; confirm availability and condition with the seller before you travel. BudgetSpace doesn\'t handle the transaction.' },
+  'results.secondHandConditionTitle': { hr: 'Stanje koje je naveo prodavatelj', en: 'Condition stated by the seller' },
+  'results.secondHandLocation': { hr: '📍 {location}', en: '📍 {location}' },
+  'results.secondHandApproxPrice': { hr: '≈ {price}', en: '≈ {price}' },
+  'results.secondHandPriceNote': { hr: 'cijena okvirna · provjeri dostupnost', en: 'approx. price · check availability' },
+  'results.secondHandOpenListing': { hr: 'Otvori oglas ↗', en: 'Open listing ↗' },
   // Sprint 10.34: opt-in price-drop watch. GDPR-minimal: explicit consent, says exactly what we store,
   // one-click unsubscribe. {email} is the address the user typed back to them.
   'results.watchPrice': { hr: 'Prati cijenu', en: 'Watch price' },
