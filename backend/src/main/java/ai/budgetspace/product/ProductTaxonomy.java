@@ -65,6 +65,21 @@ public final class ProductTaxonomy {
             // prices + og:image on product pages, web-verifiable per product like IKEA/JYSK.
             "Moviflor",
             "Nábytok",
+            // Sprint 10.48: retail re-sweep — more verified static-priced retailers per market (JSON-LD /
+            // PrestaShop itemprop / Shopify / visible €). Conforama (listed below) flips to verified for IT.
+            "Svijetnamještaja",
+            "Svetpohištva",
+            "Interio",
+            "Masku",
+            "Lovely Meubles",
+            "JOM",
+            "Sítio do Móvel",
+            "Miroytengo",
+            "Merkamueble",
+            "Muebles BOOM",
+            "Pronto Wonen",
+            "Drevona",
+            "ASKO Nábytok",
             // Known/targeted but currently feed-required (403/anti-bot/JS-only or out-of-scope). Registered
             // so the system is aware of them and a feed can target them later; they carry no products yet.
             "Momax",

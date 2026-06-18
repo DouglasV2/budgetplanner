@@ -176,7 +176,22 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-ikea-se-rooms.json",
             "/catalog/real-jysk-se-rooms.json",
             "/catalog/real-ikea-dk-rooms.json",
-            "/catalog/real-jysk-dk-rooms.json"
+            "/catalog/real-jysk-dk-rooms.json",
+            // Sprint 10.48: retail re-sweep — more verified static-priced retailers per market (JSON-LD /
+            // PrestaShop itemprop / Shopify / visible €). Scandi non-IKEA + Westwing dropped (JS-rendered →
+            // unreliable prices, never shipped). HR Svijetnamještaja, SI Svetpohištva, IT Conforama,
+            // AT Interio, FI Masku, FR Lovely Meubles, PT JOM + Sítio do Móvel, ES Miroytengo + Merkamueble +
+            // Muebles BOOM, NL Pronto Wonen, SK Drevona + ASKO Nábytok.
+            "/catalog/real-hr-retailers-2.json",
+            "/catalog/real-si-retailers-2.json",
+            "/catalog/real-it-retailers-2.json",
+            "/catalog/real-at-retailers-2.json",
+            "/catalog/real-fi-retailers-2.json",
+            "/catalog/real-fr-retailers-2.json",
+            "/catalog/real-pt-retailers-2.json",
+            "/catalog/real-es-retailers-2.json",
+            "/catalog/real-nl-retailers-2.json",
+            "/catalog/real-sk-retailers-2.json"
     );
 
     /**

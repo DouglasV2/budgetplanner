@@ -63,7 +63,8 @@ class CamifFranceCatalogRuntimeTest {
 
         // Camif is registered as a verified (non-feed) retailer; its big-chain peers are feed-required.
         assertThat(CatalogSourcePolicy.isFeedRequired("Camif")).isFalse();
-        assertThat(CatalogSourcePolicy.isFeedRequired("Conforama")).isTrue();
+        // Sprint 10.48: Conforama flipped to verified (conforama.it serves static prices); other FR chains stay feed-required.
+        assertThat(CatalogSourcePolicy.isFeedRequired("Maisons du Monde")).isTrue();
         assertThat(CatalogSourcePolicy.isFeedRequired("But")).isTrue();
 
         // Spans the core furniture categories (sofa/bed/table/storage at minimum).

@@ -28,7 +28,10 @@ public class PlannerService {
             // Sprint 10.44: Netherlands — Leen Bakker + Kwantum (verified products).
             "Leen Bakker", "Kwantum",
             // Sprint 10.45: depth — Moviflor (PT) + Nábytok (SK) (verified products).
-            "Moviflor", "Nábytok");
+            "Moviflor", "Nábytok",
+            // Sprint 10.48: retail re-sweep — more verified retailers across HR/SI/IT/AT/FI/FR/PT/ES/NL/SK.
+            "Svijetnamještaja", "Svetpohištva", "Conforama", "Interio", "Masku", "Lovely Meubles", "JOM",
+            "Sítio do Móvel", "Miroytengo", "Merkamueble", "Muebles BOOM", "Pronto Wonen", "Drevona", "ASKO Nábytok");
 
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.ofEntries(
             Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor")),

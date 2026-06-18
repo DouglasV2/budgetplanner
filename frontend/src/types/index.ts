@@ -22,7 +22,22 @@ export type Retailer =
   | 'Kwantum'
   // Sprint 10.45: depth — Portugal + Slovakia
   | 'Moviflor'
-  | 'Nábytok';
+  | 'Nábytok'
+  // Sprint 10.48: retail re-sweep — more verified retailers per market
+  | 'Svijetnamještaja'
+  | 'Svetpohištva'
+  | 'Conforama'
+  | 'Interio'
+  | 'Masku'
+  | 'Lovely Meubles'
+  | 'JOM'
+  | 'Sítio do Móvel'
+  | 'Miroytengo'
+  | 'Merkamueble'
+  | 'Muebles BOOM'
+  | 'Pronto Wonen'
+  | 'Drevona'
+  | 'ASKO Nábytok';
 
 export type RoomType =
   | 'living-room'

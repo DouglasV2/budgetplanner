@@ -24,7 +24,17 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **177 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 172 in 10.43, 173 in 10.44, 175 in 10.45). Catalog **1641 rows**.
+- Backend tests: **178 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 175 in 10.45, 177 in 10.46/10.47). Catalog **1840 rows**.
+- **Retail re-sweep (Sprint 10.48) — retail broadly maximised.** Probed fresh non-IKEA/JYSK candidates across all
+  markets; **+13 verified retailers / +199 products** (`real-<market>-retailers-2.json`, all MANUAL_VERIFIED_ONLY):
+  HR Svijetnamještaja, SI Svetpohištva, IT **Conforama** (conforama.it JSON-LD — flipped from FR-feed-required;
+  IT now 1→2!), AT Interio, FI Masku (AT+FI got their first non-IKEA/JYSK), FR Lovely Meubles, PT JOM + Sítio do
+  Móvel, ES Miroytengo + Merkamueble + Muebles BOOM, NL Pronto Wonen, SK Drevona + ASKO Nábytok. **Dropped as
+  JS-rendered junk** (never ship fabricated prices — Mio `26 SEK`, ILVA `1 DKK`, Westwing `1.34 €`): all Scandi
+  non-IKEA (Bohus/Møbelringen/Mio/Em Home/Trademax/ILVA) + Westwing (DE/NL). Sourcer now tries JSON-LD →
+  `product:price:amount`/`itemprop=price` → visible (€/kr/`:-`/`,-`), charset-aware, per-currency tiers, junk
+  filter (<unit floor / Westwing / U+FFFD). **Marketplace (Njuškalo):** scaffold already solves volume/selection/
+  sold-guard; blocker = a compliant feed (no Njuškalo API, never scrape) → recommend eBay Browse API first.
 - **Scandinavia (Sprint 10.46) — first NON-EUR markets: NO/SE/DK.** The app was never really EUR-locked: each
   `MarketConfig` already had `currency`+`locale` and `formatCurrency` already used `Intl.NumberFormat`, so NOK/
   SEK/DKK "just worked" once a local-currency catalog existed (**no FX** — a plan uses one market's catalog vs a
@@ -122,7 +132,10 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
   - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE/FI/NL/SK), Emmezeta (HR), **Harvey Norman (HR/SI),
     Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36), Kenay Home/Banak Importa (ES — 10.43),
-    Leen Bakker/Kwantum (NL — 10.44), Moviflor (PT — 10.45), Nábytok (SK — 10.45)**.
+    Leen Bakker/Kwantum (NL — 10.44), Moviflor (PT — 10.45), Nábytok (SK — 10.45), **and the 10.48 re-sweep:
+    Svijetnamještaja (HR), Svetpohištva (SI), Conforama (IT), Interio (AT), Masku (FI), Lovely Meubles (FR),
+    JOM + Sítio do Móvel (PT), Miroytengo + Merkamueble + Muebles BOOM (ES), Pronto Wonen (NL), Drevona +
+    ASKO Nábytok (SK)**.
   - Registered but **feed-required** (403/anti-bot/JS-only/out-of-scope → no products yet): Decathlon,
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
     Home24, Roller, Kika, Leiner, XXXLutz, **Sotka (FI — JS-only, 10.45)**. (Most big chains are bot-blocked

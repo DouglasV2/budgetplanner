@@ -31,17 +31,18 @@ export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Deca
 // products, and the previously-unreachable Harvey Norman / Namjestaj.hr / Otto / Segmüller / Poco
 // products now become selectable in their markets.
 export const retailersByMarket: Record<string, Retailer[]> = {
-  HR: ['IKEA', 'JYSK', 'Emmezeta', 'Harvey Norman', 'Namjestaj.hr'],
-  SI: ['IKEA', 'JYSK', 'Harvey Norman'],
-  AT: ['IKEA', 'JYSK'],
+  // Sprint 10.48: retail re-sweep added one or more verified retailers to most markets.
+  HR: ['IKEA', 'JYSK', 'Emmezeta', 'Harvey Norman', 'Namjestaj.hr', 'Svijetnamještaja'],
+  SI: ['IKEA', 'JYSK', 'Harvey Norman', 'Svetpohištva'],
+  AT: ['IKEA', 'JYSK', 'Interio'],
   DE: ['IKEA', 'JYSK', 'Otto', 'Segmüller', 'Poco'],
-  IT: ['IKEA'],
-  FI: ['IKEA', 'JYSK'],
-  FR: ['IKEA', 'Camif'],
-  NL: ['IKEA', 'JYSK', 'Leen Bakker', 'Kwantum'],
-  SK: ['IKEA', 'JYSK', 'Nábytok'],
-  ES: ['IKEA', 'Kenay Home', 'Banak Importa'],
-  PT: ['IKEA', 'Moviflor'],
+  IT: ['IKEA', 'Conforama'],
+  FI: ['IKEA', 'JYSK', 'Masku'],
+  FR: ['IKEA', 'Camif', 'Lovely Meubles'],
+  NL: ['IKEA', 'JYSK', 'Leen Bakker', 'Kwantum', 'Pronto Wonen'],
+  SK: ['IKEA', 'JYSK', 'Nábytok', 'Drevona', 'ASKO Nábytok'],
+  ES: ['IKEA', 'Kenay Home', 'Banak Importa', 'Miroytengo', 'Merkamueble', 'Muebles BOOM'],
+  PT: ['IKEA', 'Moviflor', 'JOM', 'Sítio do Móvel'],
   // Sprint 10.46: Scandinavia — IKEA + JYSK, prices in the national currency.
   NO: ['IKEA', 'JYSK'],
   SE: ['IKEA', 'JYSK'],

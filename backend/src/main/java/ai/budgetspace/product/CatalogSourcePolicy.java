@@ -87,6 +87,20 @@ public final class CatalogSourcePolicy {
         // Sprint 10.45: depth — Moviflor (PT) + Nábytok (SK) serve static prices + og:image (verified).
         map.put("Moviflor", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Nábytok", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.48: retail re-sweep — verified static-priced retailers (JSON-LD / PrestaShop / Shopify / €).
+        map.put("Svijetnamještaja", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Svetpohištva", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Interio", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Masku", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Lovely Meubles", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("JOM", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Sítio do Móvel", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Miroytengo", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Merkamueble", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Muebles BOOM", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Pronto Wonen", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Drevona", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("ASKO Nábytok", SourcingStatus.MANUAL_VERIFIED_ONLY);
         // Re-confirmed 2026-06-16: blocked (403/anti-bot/unreachable) or unusable for direct import
         // (JS-only prices / out-of-scope catalog) → only an official/partner feed may populate them.
         map.put("Momax", SourcingStatus.OFFICIAL_FEED_REQUIRED);
@@ -104,7 +118,8 @@ public final class CatalogSourcePolicy {
         map.put("XXXLutz", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.36: major French chains probed 2026-06-18 — anti-bot (DataDome/Cloudflare 403) or
         // JS-only. Not bypassed → feed-required (Camif above is the one directly-verifiable FR retailer).
-        map.put("Conforama", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.48: conforama.IT serves JSON-LD prices (verified, has IT products); conforama.FR stays anti-bot.
+        map.put("Conforama", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("But", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Maisons du Monde", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("La Redoute", SourcingStatus.OFFICIAL_FEED_REQUIRED);

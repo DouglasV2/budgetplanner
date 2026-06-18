@@ -118,7 +118,36 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.47 — i18n coverage fix (dynamic labels) + UI/UX redesign (current)
+### Sprint 10.48 — retail re-sweep: +13 verified retailers (maximise per-market depth) (current)
+- Owner: "go through our countries again, find more retail stores, pull the maximum." 4 scout agents probed
+  fresh candidates across all 14 markets (does the product page serve the price in **static HTML** — JSON-LD /
+  PrestaShop `itemprop` / Shopify / visible €/kr — or is it 403/JS-only?), then 4 URL-discovery agents gathered
+  ~10-19 category-spread product URLs per usable retailer, then a hardened multi-currency sourcer fetched each.
+- **+13 clean new retailers, +199 verified products** (`real-<market>-retailers-2.json`), all `MANUAL_VERIFIED_ONLY`:
+  **HR Svijetnamještaja (15), SI Svetpohištva (13), IT Conforama (16), AT Interio (18), FI Masku (19),
+  FR Lovely Meubles (14), PT JOM (12) + Sítio do Móvel (14), ES Miroytengo (12) + Merkamueble (12) +
+  Muebles BOOM (13), NL Pronto Wonen (13), SK Drevona (13) + ASKO Nábytok (15).** Notable: **IT 1→2 retailers**
+  (first non-IKEA!), **AT + FI gained their first non-IKEA/JYSK** retailer. **Conforama flipped** from
+  feed-required → verified (conforama.IT serves JSON-LD; conforama.FR stays anti-bot).
+- **Dropped (honest, never ship fabricated prices):** the Scandinavian non-IKEA chains (Bohus, Møbelringen, Mio,
+  Em Home, Trademax, ILVA) and Westwing (DE/NL) — they're **JS-rendered SPAs**; broad sourcing produced garbage
+  (Mio all `26 SEK`, ILVA all `1 DKK`, Westwing-NL `1.34 €`). Confirmed via per-row price sanity, deleted.
+  NO/SE/DK stay IKEA+JYSK. (Muebles BOOM + ASKO are price-verified but image-partial → labelled placeholder.)
+- **Sourcer hardened:** price = JSON-LD `offers.price` → `product:price:amount`/`itemprop=price` → visible
+  (€ / kr / `:-` / `,-`), charset-aware decode, per-currency tiers, junk filter (drop < 25 unit, Westwing, U+FFFD).
+- Registered across `ProductTaxonomy` + `CatalogSourcePolicy` + `PlannerService.RETAILERS` + `RealCatalogSeeder`
+  + frontend `Retailer` type + `retailersByMarket`. `RetailSweepCatalogRuntimeTest` (all 13 import + eligible +
+  registered); fixed `CamifFranceCatalogRuntimeTest` (Conforama no longer feed-required).
+- **Verified:** backend tests green; frontend build clean; catalog **1840 rows, 0 dups** (+199).
+- **Retail depth now (verified, with products):** HR 6 · ES 6 · SK 5 · DE 5 · NL 5 · SI 4 · PT 4 · FR 3 · IT 2 ·
+  AT 2 · FI 2 · NO/SE/DK 2 (IKEA+JYSK). **Retail is now broadly maximised** for deterministically-fetchable stores.
+- **Marketplace (Njuškalo) — answered, pending a data-source decision.** The 10.21 scaffold already solves the
+  owner's 3 worries: volume → a *filtered feed*, not scraping; which items → category/location/condition filter;
+  sold-guard → `MarketplaceListingFilter` (`SOLD_MARKERS` + 24h staleness + planner-exclusion). The only blocker
+  is a **compliant source** — Njuškalo has no open API + we never scrape. Recommendation: **eBay Browse API** as
+  the first real "Rabljeno" source (or a Njuškalo partnership). Phase-2 `MarketplaceFeed` build awaits that call.
+
+### Sprint 10.47 — i18n coverage fix (dynamic labels) + UI/UX redesign
 - **Translation audit (owner: "are translations applied on every part, for every country?").** The static
   chrome was fully translated, but **dynamic domain labels were hardcoded Croatian** in `utils/planner.ts` and
   leaked into all 12 non-HR markets: category names (on every product), room/style/level/priority labels, the

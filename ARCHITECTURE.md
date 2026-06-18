@@ -70,7 +70,9 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   - `DIRECT_VERIFIED` (pages fetchable + hand-verified, in collector allowlist): IKEA, JYSK
   - `MANUAL_VERIFIED_ONLY` (verified, link-out, have products): Emmezeta, Harvey Norman, Namjestaj.hr,
     Otto, Segmüller, Poco, **Camif** (FR, 10.36), **Kenay Home + Banak Importa** (ES, 10.43), **Leen Bakker +
-    Kwantum** (NL, 10.44), **Moviflor** (PT, 10.45), **Nábytok** (SK, 10.45)
+    Kwantum** (NL, 10.44), **Moviflor** (PT, 10.45), **Nábytok** (SK, 10.45), **+13 from the 10.48 retail
+    re-sweep** (Svijetnamještaja HR, Svetpohištva SI, Conforama IT, Interio AT, Masku FI, Lovely Meubles FR,
+    JOM + Sítio do Móvel PT, Miroytengo + Merkamueble + Muebles BOOM ES, Pronto Wonen NL, Drevona + ASKO Nábytok SK)
   - `OFFICIAL_FEED_REQUIRED` (403/anti-bot/JS-only/out-of-scope → only an official/partner feed, no
     products yet): Decathlon, Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus,
     FeroTerm, Merkur, Dipo, Wayfair, Home24, Roller, Kika, Leiner, XXXLutz, **Conforama, But, Maisons du
