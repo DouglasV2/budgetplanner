@@ -61,6 +61,10 @@ public final class ProductTaxonomy {
             // Sprint 10.44: Netherlands — Leen Bakker + Kwantum serve static prices on product pages.
             "Leen Bakker",
             "Kwantum",
+            // Sprint 10.45: depth — Moviflor (moviflor.pt, PT) + Nábytok (nabytok.sk, SK) serve static
+            // prices + og:image on product pages, web-verifiable per product like IKEA/JYSK.
+            "Moviflor",
+            "Nábytok",
             // Known/targeted but currently feed-required (403/anti-bot/JS-only or out-of-scope). Registered
             // so the system is aware of them and a feed can target them later; they carry no products yet.
             "Momax",
@@ -89,6 +93,9 @@ public final class ProductTaxonomy {
             // Sprint 10.43: Spain — Muebles La Fábrica's product pages reset the connection (anti-bot),
             // though its homepage is reachable → feed-required.
             "Muebles La Fabrica",
+            // Sprint 10.45: Finland — Sotka (sotka.fi) renders product prices client-side (JS-only); the
+            // static HTML carries no price → feed-required.
+            "Sotka",
             // Sprint 10.21: second-hand consumer marketplaces. Feed/API-only (OFFICIAL_FEED_REQUIRED) —
             // never scraped; carry no products until a compliant feed exists. See docs/marketplace-sourcing.md.
             "Njuškalo",

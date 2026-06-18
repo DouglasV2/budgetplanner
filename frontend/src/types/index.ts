@@ -19,7 +19,10 @@ export type Retailer =
   | 'Banak Importa'
   // Sprint 10.44: Netherlands
   | 'Leen Bakker'
-  | 'Kwantum';
+  | 'Kwantum'
+  // Sprint 10.45: depth — Portugal + Slovakia
+  | 'Moviflor'
+  | 'Nábytok';
 
 export type RoomType =
   | 'living-room'

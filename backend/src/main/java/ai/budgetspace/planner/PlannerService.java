@@ -26,7 +26,9 @@ public class PlannerService {
             // Sprint 10.43: Spain — Kenay Home + Banak Importa (verified products).
             "Kenay Home", "Banak Importa",
             // Sprint 10.44: Netherlands — Leen Bakker + Kwantum (verified products).
-            "Leen Bakker", "Kwantum");
+            "Leen Bakker", "Kwantum",
+            // Sprint 10.45: depth — Moviflor (PT) + Nábytok (SK) (verified products).
+            "Moviflor", "Nábytok");
 
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.ofEntries(
             Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor")),

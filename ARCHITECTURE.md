@@ -67,12 +67,12 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   - `DIRECT_VERIFIED` (pages fetchable + hand-verified, in collector allowlist): IKEA, JYSK
   - `MANUAL_VERIFIED_ONLY` (verified, link-out, have products): Emmezeta, Harvey Norman, Namjestaj.hr,
     Otto, Segmüller, Poco, **Camif** (FR, 10.36), **Kenay Home + Banak Importa** (ES, 10.43), **Leen Bakker +
-    Kwantum** (NL, 10.44)
+    Kwantum** (NL, 10.44), **Moviflor** (PT, 10.45), **Nábytok** (SK, 10.45)
   - `OFFICIAL_FEED_REQUIRED` (403/anti-bot/JS-only/out-of-scope → only an official/partner feed, no
     products yet): Decathlon, Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus,
     FeroTerm, Merkur, Dipo, Wayfair, Home24, Roller, Kika, Leiner, XXXLutz, **Conforama, But, Maisons du
     Monde, La Redoute, Fly, Habitat, Cdiscount, Vente-unique** (FR chains — DataDome/Cloudflare, 10.36),
-    **Muebles La Fábrica** (ES — product pages reset the connection, 10.43)
+    **Muebles La Fábrica** (ES — product pages reset the connection, 10.43), **Sotka** (FI — JS-only prices, 10.45)
   - Adding a retailer = add to `ProductTaxonomy.SUPPORTED_RETAILERS` + `CatalogSourcePolicy` status
     (+ `PlannerService.RETAILERS` if it has products). Most big chains are bot-blocked (confirmed by
     probing) → they wait for a feed.
@@ -83,7 +83,7 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   STALE / sample. Full rules: [docs/sourcing-policy.md](docs/sourcing-policy.md).
 - **Markets with data**: HR (deep — every room); SI/AT/DE/IT/FI (IKEA: living-room/bedroom/home-office +
   bathroom/hallway/kitchen, SI/AT/DE also dining); **FR (IKEA all core rooms — 10.35; + Camif breadth — 10.36)**;
-  **NL (IKEA + JYSK — 10.37; + Leen Bakker/Kwantum — 10.44)**; **SK (IKEA + JYSK — 10.38)**; **ES (IKEA — 10.39; + Kenay Home/Banak Importa — 10.43)**; **PT (IKEA — 10.41)**; JYSK adds hallway/kitchen
+  **NL (IKEA + JYSK — 10.37; + Leen Bakker/Kwantum — 10.44)**; **SK (IKEA + JYSK — 10.38; + Nábytok — 10.45)**; **ES (IKEA — 10.39; + Kenay Home/Banak Importa — 10.43)**; **PT (IKEA — 10.41; + Moviflor — 10.45)**; JYSK adds hallway/kitchen
   for SI/DE/FI + the full NL/SK catalogs (JYSK AT pending — jysk.at gates stock behind JS; no JYSK in FR/ES;
   jysk.nl/jysk.sk static-priced).
   PL/CZ/HU/RO/SE/DK exist in `Markets` but have **no catalog** → empty plan (non-EUR — deferred until the UI

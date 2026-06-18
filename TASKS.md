@@ -118,7 +118,34 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.44 — Netherlands depth: Leen Bakker + Kwantum (current)
+### Sprint 10.45 — depth: Portugal (Moviflor) + Slovakia (Nábytok); Finland feed-required; Germany deferred (current)
+- Closing out the retailer-depth push (ES→NL→DE→PT→FI→**SK**) so every market has more than IKEA/JYSK where a
+  non-IKEA retailer is deterministically fetchable. Outcomes for the last three:
+  - **PT — Moviflor (moviflor.pt): 20 web-verified rows** (`real-pt-retailers.json`), all with a verified
+    og:image, across 10 categories (sofa/chair/table/dining/wardrobe/dresser/desk/storage/tv-unit). **Encoding
+    fix:** Moviflor serves **windows-1252**, so `fetch().text()` (UTF-8) was mangling Portuguese accents into
+    U+FFFD (`Sof�`); the sourcer now decodes per the page's declared charset → `Sofá de Canto Rochester` etc.,
+    0 replacement chars. Spot-checked the sofa image (1.5 MB PNG, HTTP 200).
+  - **SK — Nábytok (nabytok.sk): 11 web-verified rows** (`real-sk-retailers.json`), all with a verified og:image,
+    across sofa/chair/bed/dresser/storage/tv-unit (UTF-8, Slovak diacritics intact). Price from visible €.
+  - **FI — Sotka (sotka.fi): not sourceable.** Product pages render the price **client-side (JS-only)** — the
+    static HTML carries no price (`og:title` is a generic category label, no JSON-LD price) → registered
+    `OFFICIAL_FEED_REQUIRED`. FI keeps IKEA + JYSK (no new non-IKEA/JYSK catalog).
+  - **DE — deferred.** Already the deepest market (IKEA + JYSK + Otto + Segmüller + Poco). The two reachable
+    candidates underwhelmed: Roller exposes no og:image / Product JSON-LD (0 verifiable images) and Möbel Boss's
+    image URLs were sparse/stale (≈10/42) → adding mostly-placeholder rows is low value. Not registered.
+- Registered Moviflor + Nábytok `MANUAL_VERIFIED_ONLY` and Sotka `OFFICIAL_FEED_REQUIRED` across `ProductTaxonomy`
+  + `CatalogSourcePolicy` (+ `PlannerService.RETAILERS` & `RealCatalogSeeder` for the two with products) + frontend
+  `Retailer` type + `retailersByMarket` (PT = IKEA + Moviflor; SK = IKEA + JYSK + Nábytok). Honest current price
+  only (no fabricated discount); image only when the live og:image resolved. `PtRetailersCatalogRuntimeTest` +
+  `SkRetailersCatalogRuntimeTest` (+ `CatalogSourcePolicyTest` extended for all three).
+- **Verified:** backend **175 tests, 0 failures**; frontend build clean; catalog **1376 rows, 0 dups**.
+- **Depth now:** HR 5 retailers; DE 5; NL 4; HR/SI/ES 3-ish; SK 3 (IKEA/JYSK/Nábytok); PT 2 (IKEA/Moviflor);
+  FR 2 (IKEA/Camif). AT/IT remain IKEA-only — every other non-IKEA chain probed there is anti-bot (feed-required).
+- **Next (clean follow-ups):** Scandinavia (NO/SE/DK) needs the UI to handle non-EUR currency first (`markets.ts`
+  is EUR-only) — a currency feature, not a sourcing one. Big bot-blocked chains wait for official feeds.
+
+### Sprint 10.44 — Netherlands depth: Leen Bakker + Kwantum
 - Continuing the retailer-depth push (ES→**NL**→DE→PT→FI→SK). Both Dutch candidates are sourceable:
   **Leen Bakker (18) + Kwantum (12) = 30 web-verified rows** (`real-nl-retailers.json`): price from JSON-LD /
   visible €, name from og:title (entity-decoded), verified og:image where it resolved (20/30; the rest are

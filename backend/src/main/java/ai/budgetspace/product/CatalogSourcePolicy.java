@@ -84,6 +84,9 @@ public final class CatalogSourcePolicy {
         // Sprint 10.44: Netherlands — Leen Bakker + Kwantum (static-priced product pages, verified).
         map.put("Leen Bakker", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Kwantum", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.45: depth — Moviflor (PT) + Nábytok (SK) serve static prices + og:image (verified).
+        map.put("Moviflor", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Nábytok", SourcingStatus.MANUAL_VERIFIED_ONLY);
         // Re-confirmed 2026-06-16: blocked (403/anti-bot/unreachable) or unusable for direct import
         // (JS-only prices / out-of-scope catalog) → only an official/partner feed may populate them.
         map.put("Momax", SourcingStatus.OFFICIAL_FEED_REQUIRED);
@@ -111,6 +114,8 @@ public final class CatalogSourcePolicy {
         map.put("Vente-unique", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.43: Spain — homepage reachable but product pages reset the connection (anti-bot).
         map.put("Muebles La Fabrica", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.45: Finland — Sotka (sotka.fi) renders product prices client-side (JS-only) → feed-required.
+        map.put("Sotka", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.21: second-hand consumer marketplaces. ToS-protected, no open product API, anti-bot —
         // populated only by a compliant official/partner feed (sourceType=marketplace-listing), never
         // scraped. See docs/marketplace-sourcing.md.

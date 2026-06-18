@@ -24,11 +24,18 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **173 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 161 in 10.38, 164 in 10.39, 166 in 10.41, 171 in 10.42, 172 in 10.43). Catalog **1345 rows**.
-- **Retailer depth — production-ready goal (owner-requested 10.43+).** Per market, add every deterministically-
-  fetchable non-IKEA/JYSK retailer; the rest → feed-required. Homepage probe (2026-06-18) mapped ~9 candidates
-  across ES/NL/DE/PT/FI/SK; **AT + IT have none reachable** (all anti-bot) → stay as-is. Working order:
-  **ES (10.43, Kenay+Banak) → NL (10.44, Leen Bakker+Kwantum)** → DE → PT → FI → SK.
+- Backend tests: **175 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 161 in 10.38, 164 in 10.39, 166 in 10.41, 171 in 10.42, 172 in 10.43, 173 in 10.44). Catalog **1376 rows**.
+- **Retailer depth — production-ready goal (owner-requested 10.43+) — push COMPLETE.** Per market, add every
+  deterministically-fetchable non-IKEA/JYSK retailer; the rest → feed-required. Homepage probe (2026-06-18)
+  mapped ~9 candidates across ES/NL/DE/PT/FI/SK; **AT + IT have none reachable** (all anti-bot) → stay as-is.
+  Worked the whole order **ES (10.43) → NL (10.44) → DE → PT → FI → SK (all 10.45)**: ES Kenay+Banak, NL Leen
+  Bakker+Kwantum, **PT Moviflor (20), SK Nábytok (11)** sourced; **FI Sotka = feed-required (JS-only prices)**;
+  **DE deferred** (already 5 retailers; Roller has no og:image, Möbel Boss images sparse/stale → low value).
+- **Sprint 10.45 depth (PT/SK/FI).** **PT Moviflor: 20 rows, all images** (`real-pt-retailers.json`).
+  **Encoding gotcha:** Moviflor serves **windows-1252**, not UTF-8 — `fetch().text()` mangled Portuguese accents
+  to U+FFFD (`Sof�`); fix = decode per the page's declared charset (header/`<meta charset>`). **SK Nábytok: 11
+  rows, all images** (`real-sk-retailers.json`, UTF-8, Slovak diacritics intact; price from visible €). **Sotka
+  (FI) → feed-required.** PT = IKEA + Moviflor; SK = IKEA + JYSK + Nábytok.
 - **Spain depth (Sprint 10.43).** Added **Kenay Home (14) + Banak Importa (14) = 28 verified rows**
   (`real-es-retailers.json`, price from JSON-LD/visible €, og:image, honest current price only). **Muebles La
   Fábrica → feed-required** (homepage reachable but product pages reset the connection / anti-bot). ES is now
@@ -96,7 +103,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37), SK (IKEA + JYSK 10.38), ES (IKEA + Kenay + Banak 10.39/10.43), PT (IKEA 10.41).** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37 + Leen Bakker/Kwantum 10.44), SK (IKEA + JYSK 10.38 + Nábytok 10.45), ES (IKEA + Kenay + Banak 10.39/10.43), PT (IKEA 10.41 + Moviflor 10.45).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
   ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets
@@ -106,10 +113,11 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
   - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE/FI/NL/SK), Emmezeta (HR), **Harvey Norman (HR/SI),
     Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36), Kenay Home/Banak Importa (ES — 10.43),
-    Leen Bakker/Kwantum (NL — 10.44)**.
+    Leen Bakker/Kwantum (NL — 10.44), Moviflor (PT — 10.45), Nábytok (SK — 10.45)**.
   - Registered but **feed-required** (403/anti-bot/JS-only/out-of-scope → no products yet): Decathlon,
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
-    Home24, Roller, Kika, Leiner, XXXLutz. (Most big chains are bot-blocked — confirmed by probing.)
+    Home24, Roller, Kika, Leiner, XXXLutz, **Sotka (FI — JS-only, 10.45)**. (Most big chains are bot-blocked
+    — confirmed by probing.)
   - `home-gym` still relies on sample data (needs a Decathlon feed).
 - **Second-hand marketplace (Njuškalo, FB Marketplace): designed 10.17 + Phase 1 built 10.21** →
   `docs/marketplace-sourcing.md`. Feed/API model (never scrape; both `OFFICIAL_FEED_REQUIRED`). Phase 1

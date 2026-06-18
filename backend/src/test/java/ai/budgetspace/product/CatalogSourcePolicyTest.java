@@ -32,6 +32,12 @@ class CatalogSourcePolicyTest {
         assertThat(CatalogSourcePolicy.feedRequiredRetailers())
                 .contains("Decathlon", "Lesnina", "Pevex")
                 .doesNotContain("IKEA", "JYSK", "Emmezeta", "Harvey Norman", "Otto");
+        // Sprint 10.45: Finland's Sotka renders prices client-side (JS-only) → feed-required, so FI has no
+        // non-IKEA/JYSK catalog. (JS-only, not a 403, so it is asserted apart from the 403-reason loop above.)
+        assertThat(CatalogSourcePolicy.statusFor("Sotka"))
+                .isEqualTo(CatalogSourcePolicy.SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        assertThat(CatalogSourcePolicy.isFeedRequired("Sotka")).isTrue();
+        assertThat(CatalogSourcePolicy.feedRequiredRetailers()).contains("Sotka");
     }
 
     @Test
@@ -43,6 +49,12 @@ class CatalogSourcePolicyTest {
                 .isEqualTo(CatalogSourcePolicy.SourcingStatus.MANUAL_VERIFIED_ONLY);
         assertThat(CatalogSourcePolicy.isFeedRequired("Emmezeta")).isFalse();
         assertThat(CatalogSourcePolicy.isDirectFetchAllowed("Emmezeta")).isFalse();
+        // Sprint 10.45: depth — Moviflor (PT) + Nábytok (SK) are manually verified (link-out, have products).
+        for (String retailer : new String[] {"Moviflor", "Nábytok"}) {
+            assertThat(CatalogSourcePolicy.statusFor(retailer)).as("%s status", retailer)
+                    .isEqualTo(CatalogSourcePolicy.SourcingStatus.MANUAL_VERIFIED_ONLY);
+            assertThat(CatalogSourcePolicy.isFeedRequired(retailer)).as("%s feed-required", retailer).isFalse();
+        }
     }
 
     @Test

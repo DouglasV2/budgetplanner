@@ -153,6 +153,8 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // price structure as jysk.nl/hr). Slovak names + per-market EUR price + verified og:image, 2026-06-18.
             "/catalog/real-ikea-sk-rooms.json",
             "/catalog/real-jysk-sk-rooms.json",
+            // Sprint 10.45: Slovakia depth — Nábytok (nabytok.sk, static-priced product pages + og:image, verified).
+            "/catalog/real-sk-retailers.json",
             // Sprint 10.39: Spain — IKEA ES (IT-set number-trick → /es/es/, Spanish name + per-market EUR price
             // + verified og:image, 2026-06-18). IKEA-only (no JYSK in Spain), like FR/IT.
             "/catalog/real-ikea-es-rooms.json",
@@ -161,7 +163,10 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-es-retailers.json",
             // Sprint 10.41: Portugal — IKEA PT (IT-set number-trick → /pt/pt/, Portuguese name + per-market EUR
             // price + verified og:image, 2026-06-18). IKEA-only (no JYSK in Portugal).
-            "/catalog/real-ikea-pt-rooms.json"
+            "/catalog/real-ikea-pt-rooms.json",
+            // Sprint 10.45: Portugal depth — Moviflor (moviflor.pt, static-priced product pages + og:image,
+            // verified; page is windows-1252 so the sourcer decodes per the declared charset).
+            "/catalog/real-pt-retailers.json"
     );
 
     /**
