@@ -118,7 +118,28 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.49 — marketplace placeholders + pluggable MarketplaceFeed seam (current)
+### Sprint 10.50 — human copy + premium UX polish (less "ChatGPT wrapper") (current)
+- Owner: make it feel like a real interior designer, not an AI explaining its algorithm; modern readable font;
+  fix the broken "Prati cijenu" modal.
+- **Recommendation copy rewritten (backend `PlannerService`)** — removed the AI tells ("Ovo je glavni komad",
+  "ima smisla biti u prvom fokusu", "dobar omjer cijene, izgleda i korisnosti") and the algorithm-explaining
+  tone. `buildReason` now speaks like a designer: one or two concrete reasons (role in the room, style match,
+  budget fit). Also `roleForCategory`/`stepForCategory` (Temelj prostora / Kreni odavde), `buildSummary`,
+  `buildGoodFor`, `describePlan`, the plan labels (Najpametniji izbor…) and the store-trip line. No tests assert
+  the old strings (they were test data), so all green.
+- **Font: Fraunces → Bricolage Grotesque** (the serif read old-fashioned; the grotesque is modern, warm,
+  readable) + Inter for body. `index.html` + `--font-display`; heading weight/tracking retuned. Verified live.
+- **"Prati cijenu" modal fixed** — it opened broken (consent text squished into a narrow right column, checkbox
+  floating). Now left-aligned, width-capped (`max-width: 460px`), consent is a clean checkbox+flexing-text row.
+- **Premium lower sections:** priority chips → clean uppercase tags with a base style (Ključno / Udobnost /
+  Kasnije, was "Najvažnije / Za ugodniji prostor"); feedback buttons → conversational (soft cards, hover-lift,
+  not survey pills); **tamed the extra-black weights** (900/950/850/800 → ~620–650) that made everything feel
+  mechanical; accordion summaries got a rotating **chevron + hover** so they read as interactive, not placeholder.
+- **Verified:** backend tests green; frontend build clean; font + landing confirmed in the live preview.
+- **Rabljeno:** owner gave the go-ahead → next is an **eBay Browse API** client to fill the 10.49 marketplace
+  placeholders (needs a free eBay API key as a backend env var; never committed).
+
+### Sprint 10.49 — marketplace placeholders + pluggable MarketplaceFeed seam
 - Owner: "for now I'd rather have backend placeholders for the marketplaces we can affiliate later (no open
   API), and use the ones a country actually offers." Built exactly that — **no scraping, no data invented**.
 - **Per-country "Rabljeno" placeholders registered** (`ProductTaxonomy.SUPPORTED_RETAILERS` +

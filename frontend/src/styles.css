@@ -1,6 +1,6 @@
 :root {
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, ui-serif, serif;
+  --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-family: var(--font-sans);
   color: #211e19;
   background: #f7f1e7;
@@ -45,13 +45,13 @@ body {
   background: var(--paper);
 }
 
-/* Display serif for headings — the single biggest shift away from a generic system-font template. */
+/* Modern display grotesque for headings — characterful but clean and readable, not a system font. */
 h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.018em;
+  font-weight: 600;
+  letter-spacing: -0.012em;
 }
 
 button,
@@ -95,7 +95,7 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 850;
+  font-weight: 620;
   letter-spacing: -0.03em;
   font-size: 1.03rem;
 }
@@ -639,7 +639,7 @@ input[type='range'] {
   border-radius: 999px;
   background: rgba(102, 120, 95, 0.12);
   color: #3f563a;
-  font-weight: 850;
+  font-weight: 620;
   white-space: nowrap;
 }
 
@@ -715,7 +715,7 @@ input[type='range'] {
 .category-title {
   margin: 6px 0 8px;
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 620;
   color: var(--muted);
   text-transform: uppercase;
 }
@@ -731,7 +731,7 @@ input[type='range'] {
 }
 
 .product-title-line span {
-  font-weight: 850;
+  font-weight: 620;
   white-space: nowrap;
 }
 
@@ -772,7 +772,7 @@ input[type='range'] {
 }
 
 .footer a {
-  font-weight: 800;
+  font-weight: 620;
   color: var(--ink);
 }
 
@@ -934,7 +934,7 @@ textarea:focus {
   padding: 16px 18px;
   background: linear-gradient(135deg, var(--ink), #47392c);
   color: white;
-  font-weight: 850;
+  font-weight: 620;
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -971,7 +971,7 @@ textarea:focus {
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  font-weight: 800;
+  font-weight: 620;
 }
 
 .segment.active {
@@ -995,7 +995,7 @@ textarea:focus {
   color: var(--muted);
   padding: 9px 12px;
   cursor: pointer;
-  font-weight: 800;
+  font-weight: 620;
   font-size: 0.86rem;
 }
 
@@ -1064,7 +1064,7 @@ textarea:focus {
   background: rgba(102, 120, 95, 0.12);
   color: #3f563a;
   font-size: 0.82rem;
-  font-weight: 850;
+  font-weight: 620;
 }
 
 .product-actions,
@@ -1083,7 +1083,7 @@ textarea:focus {
   background: rgba(255,255,255,0.68);
   color: var(--ink);
   padding: 9px 12px;
-  font-weight: 800;
+  font-weight: 620;
   cursor: pointer;
   font-size: 0.86rem;
 }
@@ -1165,7 +1165,7 @@ textarea:focus {
   background: #eef6ef;
   color: #2b6f46;
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 620;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -1300,7 +1300,7 @@ textarea:focus {
 .budget-input-wrap input {
   padding-right: 44px;
   font-size: 1.35rem;
-  font-weight: 850;
+  font-weight: 620;
   letter-spacing: -0.04em;
 }
 
@@ -1308,7 +1308,7 @@ textarea:focus {
   position: absolute;
   right: 15px;
   color: var(--muted);
-  font-weight: 900;
+  font-weight: 650;
 }
 
 .control-block small {
@@ -1410,7 +1410,7 @@ textarea:focus {
 
 .understood-header span {
   color: #3f563a;
-  font-weight: 900;
+  font-weight: 650;
   text-transform: uppercase;
   font-size: 0.78rem;
   letter-spacing: 0.08em;
@@ -1477,7 +1477,7 @@ textarea:focus {
   border-radius: 999px;
   padding: 9px 12px;
   cursor: pointer;
-  font-weight: 850;
+  font-weight: 620;
   font-size: 0.84rem;
 }
 
@@ -1494,7 +1494,7 @@ textarea:focus {
 .breakdown-title {
   color: var(--muted);
   font-size: 0.82rem;
-  font-weight: 850;
+  font-weight: 620;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -1507,7 +1507,7 @@ textarea:focus {
 }
 
 .breakdown-row span {
-  font-weight: 850;
+  font-weight: 620;
 }
 
 .breakdown-row small {
@@ -1567,7 +1567,7 @@ textarea:focus {
   border-radius: 20px;
   padding: 13px 16px;
   margin: -18px 0 20px;
-  font-weight: 800;
+  font-weight: 620;
   line-height: 1.45;
 }
 
@@ -1581,7 +1581,7 @@ textarea:focus {
 /* Sprint 10.13 (#2): per-product review aggregate + link out to the store. */
 .review-chip {
   color: #6b4f23;
-  font-weight: 800;
+  font-weight: 620;
 }
 
 /* Sprint 10.33: discount / sale tracking. The regular price is struck through next to the current price;
@@ -1597,13 +1597,13 @@ textarea:focus {
 .meta-line .sale-chip {
   background: rgba(102, 120, 95, 0.18);
   color: #3f563a;
-  font-weight: 800;
+  font-weight: 620;
 }
 
 .meta-line .sale-saving {
   background: rgba(102, 120, 95, 0.1);
   color: #33502d;
-  font-weight: 800;
+  font-weight: 620;
 }
 
 .meta-line .sale-ends {
@@ -1614,46 +1614,64 @@ textarea:focus {
 
 /* Sprint 10.34: opt-in price-drop watch — a discreet inline form on the product row. */
 .price-watch-form {
-  margin-top: 10px;
-  padding: 12px 14px;
-  border: 1px solid rgba(31, 29, 26, 0.12);
-  border-radius: 12px;
-  background: rgba(102, 120, 95, 0.06);
+  margin-top: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: rgba(95, 114, 87, 0.07);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 11px;
+  width: 100%;
+  max-width: 460px;
 }
 
 .price-watch-title {
-  font-weight: 800;
-  font-size: 0.92rem;
+  font-weight: 650;
+  font-size: 0.95rem;
+  color: var(--ink);
 }
 
 .price-watch-email {
-  padding: 9px 11px;
-  border: 1px solid rgba(31, 29, 26, 0.18);
-  border-radius: 9px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
   font: inherit;
-  max-width: 320px;
+  width: 100%;
+  background: var(--white);
 }
 
 .price-watch-consent {
   display: flex;
-  gap: 8px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 10px;
   align-items: flex-start;
+  width: 100%;
   font-size: 0.82rem;
   color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.5;
+  cursor: pointer;
 }
 
-.price-watch-consent input {
-  margin-top: 3px;
+.price-watch-consent input[type="checkbox"] {
+  margin: 1px 0 0;
   flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--orange);
+}
+
+.price-watch-consent span {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .price-watch-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  margin-top: 2px;
 }
 
 .price-watch-submit {
@@ -1695,7 +1713,7 @@ textarea:focus {
 
 .feedback-card > span {
   color: var(--muted);
-  font-weight: 850;
+  font-weight: 620;
   font-size: 0.86rem;
 }
 
@@ -1711,7 +1729,7 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.68);
   color: var(--ink);
   padding: 9px 12px;
-  font-weight: 800;
+  font-weight: 620;
   cursor: pointer;
   font-size: 0.84rem;
 }
@@ -1830,7 +1848,7 @@ textarea:focus {
   display: block;
   color: var(--ink);
   font-size: 0.95rem;
-  font-weight: 900;
+  font-weight: 650;
 }
 
 .prompt-first-card {
@@ -1913,7 +1931,7 @@ textarea {
   background: rgba(255, 255, 255, 0.62);
   padding: 10px 9px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 650;
   color: var(--muted);
 }
 
@@ -2108,7 +2126,7 @@ textarea {
 .feedback-card > span {
   display: block;
   color: var(--ink);
-  font-weight: 900;
+  font-weight: 650;
   margin-bottom: 10px;
 }
 
@@ -2120,18 +2138,26 @@ textarea {
 
 .feedback-buttons button {
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.68);
-  color: var(--muted);
-  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  background: var(--white);
+  color: var(--ink-soft);
+  padding: 9px 15px;
   cursor: pointer;
-  font-weight: 850;
+  font-weight: 520;
+  font-size: 0.9rem;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.feedback-buttons button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(31, 29, 26, 0.22);
 }
 
 .feedback-buttons button.active {
   color: #3f563a;
-  background: rgba(102, 120, 95, 0.12);
-  border-color: rgba(102, 120, 95, 0.3);
+  background: rgba(95, 114, 87, 0.12);
+  border-color: rgba(95, 114, 87, 0.34);
+  font-weight: 600;
 }
 
 @media (max-width: 1180px) {
@@ -2240,7 +2266,7 @@ textarea {
 }
 
 .plan-choice-card span {
-  font-weight: 900;
+  font-weight: 650;
   color: var(--ink);
 }
 
@@ -2274,7 +2300,7 @@ textarea {
 .product-reason-box span {
   color: var(--ink);
   font-size: 0.82rem;
-  font-weight: 950;
+  font-weight: 650;
   letter-spacing: 0.02em;
 }
 
@@ -2294,7 +2320,7 @@ textarea {
 .plan-summary-box small {
   color: #3f563a;
   line-height: 1.5;
-  font-weight: 800;
+  font-weight: 620;
 }
 
 .plan-explainer-grid {
@@ -2343,7 +2369,7 @@ textarea {
   color: var(--orange-dark);
   padding: 9px 12px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 650;
 }
 
 /* List style inside missing-box for clearer display of each category */
@@ -2422,7 +2448,7 @@ textarea {
 .shopping-steps-heading span {
   color: var(--ink);
   font-size: 0.86rem;
-  font-weight: 950;
+  font-weight: 650;
 }
 
 .shopping-steps-heading p {
@@ -2455,13 +2481,13 @@ textarea {
   place-items: center;
   background: rgba(236, 122, 46, 0.12);
   color: var(--orange-dark);
-  font-weight: 950;
+  font-weight: 650;
 }
 
 .shopping-step-row strong,
 .shopping-step-row span {
   color: var(--ink);
-  font-weight: 950;
+  font-weight: 650;
 }
 
 .shopping-step-row p {
@@ -2475,8 +2501,20 @@ textarea {
   line-height: 1.45;
 }
 
+.priority-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .priority-chip.buy-first {
-  background: rgba(236, 122, 46, 0.14);
+  background: rgba(207, 95, 42, 0.13);
   color: var(--orange-dark);
 }
 
@@ -2527,7 +2565,7 @@ textarea {
 .tradeoff-card span {
   color: var(--ink);
   font-size: 0.84rem;
-  font-weight: 950;
+  font-weight: 650;
   letter-spacing: 0.02em;
 }
 
@@ -2649,7 +2687,7 @@ textarea {
   background: rgba(236, 122, 46, 0.14);
   color: var(--orange-dark);
   font-size: 0.78rem;
-  font-weight: 950;
+  font-weight: 650;
   padding: 7px 11px;
 }
 
@@ -2694,7 +2732,7 @@ textarea {
   display: block;
   color: var(--muted);
   font-size: 0.78rem;
-  font-weight: 900;
+  font-weight: 650;
   margin-bottom: 4px;
 }
 
@@ -2816,7 +2854,7 @@ textarea {
   border-radius: 999px;
   background: #fff;
   padding: 9px 11px;
-  font-weight: 850;
+  font-weight: 620;
   color: var(--ink);
   cursor: pointer;
 }
@@ -2836,11 +2874,19 @@ textarea {
 .compact-understood-card summary {
   cursor: pointer;
   list-style: none;
-  padding: 15px 16px;
+  padding: 16px 46px 16px 18px;
   display: flex;
   justify-content: space-between;
   gap: 14px;
   align-items: center;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.alternate-plans-panel summary:hover,
+.secondary-info-panel summary:hover,
+.compact-understood-card summary:hover {
+  background: rgba(31, 29, 26, 0.03);
 }
 
 .alternate-plans-panel summary::-webkit-details-marker,
@@ -2849,11 +2895,33 @@ textarea {
   display: none;
 }
 
+/* Chevron affordance so the panels clearly read as expandable, not placeholder sections. */
+.alternate-plans-panel summary::after,
+.secondary-info-panel summary::after,
+.compact-understood-card summary::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.alternate-plans-panel[open] summary::after,
+.secondary-info-panel[open] summary::after,
+.compact-understood-card[open] summary::after {
+  transform: translateY(-30%) rotate(225deg);
+}
+
 .alternate-plans-panel summary span,
 .secondary-info-panel summary span,
 .compact-understood-card summary span {
   color: var(--ink);
-  font-weight: 950;
+  font-weight: 650;
 }
 
 .alternate-plans-panel summary strong,
@@ -2994,7 +3062,7 @@ textarea {
 .dislike-reasons span {
   color: var(--muted);
   font-size: 0.78rem;
-  font-weight: 850;
+  font-weight: 620;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -3067,7 +3135,7 @@ textarea {
   padding: 9px 12px;
   color: var(--ink);
   cursor: pointer;
-  font-weight: 850;
+  font-weight: 620;
 }
 
 .shopping-list-card {
@@ -3186,7 +3254,7 @@ textarea {
   background: rgba(102, 120, 95, 0.09);
   color: #3f563a;
   padding: 11px 12px;
-  font-weight: 850;
+  font-weight: 620;
   line-height: 1.45;
 }
 
@@ -3202,7 +3270,7 @@ textarea {
 
 .budget-pressure-strip strong {
   color: var(--orange-dark);
-  font-weight: 900;
+  font-weight: 650;
 }
 
 .budget-pressure-strip span {
@@ -3242,7 +3310,7 @@ textarea {
   position: absolute;
   left: 2px;
   color: var(--orange);
-  font-weight: 900;
+  font-weight: 650;
 }
 
 .store-limit-note {
@@ -3265,7 +3333,7 @@ textarea {
 
 .partial-plan-note strong {
   color: var(--orange-dark);
-  font-weight: 900;
+  font-weight: 650;
 }
 
 .partial-plan-note span {
@@ -3275,13 +3343,13 @@ textarea {
 .shopping-list-lead {
   margin: 0;
   color: #3f563a;
-  font-weight: 800;
+  font-weight: 620;
   line-height: 1.45;
 }
 
 .shopping-list-group li small.check-store-tag {
   color: var(--orange-dark);
-  font-weight: 850;
+  font-weight: 620;
   white-space: nowrap;
 }
 
@@ -3293,7 +3361,7 @@ textarea {
 
 .product-shop-note {
   margin-top: 2px;
-  font-weight: 800;
+  font-weight: 620;
 }
 
 .product-actions button:disabled {
@@ -3370,7 +3438,7 @@ textarea {
 }
 
 .design-assistant-head span {
-  font-weight: 900;
+  font-weight: 650;
   color: var(--ink);
 }
 
@@ -3404,7 +3472,7 @@ textarea {
 }
 
 .ai-insight-head span {
-  font-weight: 900;
+  font-weight: 650;
   color: var(--ink);
 }
 
@@ -3452,7 +3520,7 @@ textarea {
 }
 
 .pricing-price {
-  font-weight: 900;
+  font-weight: 650;
   color: var(--ink);
 }
 
@@ -3500,7 +3568,7 @@ textarea {
 }
 
 .advanced-settings > summary span {
-  font-weight: 900;
+  font-weight: 650;
   color: var(--ink);
 }
 

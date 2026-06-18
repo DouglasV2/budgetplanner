@@ -274,9 +274,9 @@ public class PlannerService {
         }
 
         String label = switch (mode) {
-            case "stretch" -> "Ljepša verzija s jačim dojmom";
-            case "value" -> "Najbolji omjer cijene i izgleda";
-            default -> "Najpovoljnija razumna verzija";
+            case "stretch" -> "Dovršeniji, ljepši prostor";
+            case "value" -> "Najpametniji izbor";
+            default -> "Najpovoljnija baza";
         };
         String name = switch (mode) {
             case "stretch" -> "Ljepša verzija";
@@ -547,11 +547,11 @@ public class PlannerService {
     private String buildStoreTripRecommendation(int storeCount, String mainRetailer, int checkInStoreCount) {
         String base;
         if (storeCount <= 0 || mainRetailer == null) {
-            base = "Plan je još prazan, dodaj barem jedan glavni komad.";
+            base = "Plan je još prazan — dodaj prvi komad da krenemo.";
         } else if (storeCount == 1) {
-            base = "Sve kupuješ u " + mainRetailer + ", pa je manje obilazaka.";
+            base = "Sve na jednom mjestu, u " + mainRetailer + " — jedan odlazak i gotovo.";
         } else {
-            base = "Većinu kupuješ u " + mainRetailer + ", a plan koristi " + storeCount + " " + storesWord(storeCount) + ".";
+            base = "Težište je u " + mainRetailer + "; ostatak pokupiš u još " + (storeCount - 1) + " " + storesWord(storeCount - 1) + ".";
         }
         if (checkInStoreCount > 0) {
             base += checkInStoreCount == 1
@@ -775,21 +775,20 @@ public class PlannerService {
     }
 
     private String buildReason(Product product, PlannerInputDto input, String mode) {
-        String styleMatch = styleMatches(product, input.style())
-                ? "izgledom ide uz ono što si tražio"
-                : "dovoljno je neutralan da se lako uklopi";
-        String priceNote = input.optimizationGoal().equals("lowest-price") || mode.equals("budget")
-                ? "ne jede previše budžeta"
-                : mode.equals("value")
-                ? "daje dobar omjer cijene, izgleda i korisnosti"
-                : "podiže finalni dojam prostora";
-        String categoryNote = roleForCategory(input.roomType(), product.getCategory()) + ".";
-        String stepNote = switch (priorityForCategory(input.roomType(), product.getCategory())) {
-            case "buy-first" -> "Zato ima smisla biti u prvom fokusu, prije sitnica.";
-            case "add-comfort" -> "Dodaje udobnost i pomaže da prostor ne izgleda prazno.";
-            default -> "Može i kasnije ako želiš prvo čuvati budžet.";
+        // Speak like a designer: one or two concrete reasons, no algorithm talk.
+        String lead = switch (priorityForCategory(input.roomType(), product.getCategory())) {
+            case "buy-first" -> "Temelj prostora — oko njega slažeš ostalo, zato ide prvi.";
+            case "add-comfort" -> "Daje toplinu i čini da soba djeluje dovršeno, a ne prazno.";
+            default -> "Završni detalj koji uskače kad ostane budžeta.";
         };
-        return categoryNote + " " + stepNote + " " + styleMatch + " i " + priceNote + ". " + product.getNote();
+        String fit = styleMatches(product, input.style())
+                ? " Po izgledu pogađa ono što si htio."
+                : " Miran, neutralan komad koji pristaje uz gotovo sve.";
+        String value = mode.equals("budget") || input.optimizationGoal().equals("lowest-price")
+                ? " Uz to drži cijenu razumnom."
+                : "";
+        String note = product.getNote() == null || product.getNote().isBlank() ? "" : " " + product.getNote().trim();
+        return lead + fit + value + note;
     }
 
     private String buildSummary(String mode, PlannerInputDto input, List<PlanItemDto> items, double total, List<String> retailersUsed) {
@@ -804,17 +803,17 @@ public class PlannerService {
                 : "prelazi budžet za " + money(total - input.budget());
         String stores = retailersUsed.size() <= 1 ? "iz jedne trgovine" : "iz " + retailersUsed.size() + " trgovine";
         return switch (mode) {
-            case "stretch" -> "Ljepša verzija ima smisla ako želiš dovršeniji dojam odmah. Uključuje " + categories + ", " + budgetText + " i koristi " + stores + ".";
-            case "value" -> "Najisplativije je prvo riješiti " + categories + ". Plan " + budgetText + ", a novac ide na stvari koje najviše mijenjaju " + room + ".";
-            default -> "Najpovoljnija razumna baza pokriva " + categories + ". Plan " + budgetText + " i namjerno preskače detalje koji mogu čekati.";
+            case "stretch" -> "Za dovršen dojam odmah, bez kompromisa na glavnim komadima. Pokriva " + categories + ", " + budgetText + ", " + stores + ".";
+            case "value" -> "Novac ide tamo gdje se najviše osjeti u " + room + "u. Pokriva " + categories + ", " + budgetText + ", " + stores + ".";
+            default -> "Sigurna baza koja drži budžet. Pokriva " + categories + ", " + budgetText + ", a sitnice ostavlja za kasnije.";
         };
     }
 
     private String buildGoodFor(String mode, PlannerInputDto input) {
         return switch (mode) {
-            case "stretch" -> "Dobro ako želiš da prostor odmah izgleda dovršenije i spreman si dodati malo novca za bolji dojam.";
-            case "value" -> "Dobro za većinu ljudi: prvo pokriva glavne komade, zatim dodaje udobnost tek kad budžet to dopušta.";
-            default -> "Dobro ako se useljavaš, imaš ograničen budžet ili želiš prvo riješiti osnovne stvari pa kasnije nadograditi.";
+            case "stretch" -> "Kad želiš da prostor odmah izgleda gotovo i spreman si uložiti malo više.";
+            case "value" -> "Za većinu ljudi — prvo glavni komadi, udobnost dolazi kad budžet dopusti.";
+            default -> "Za useljenje ili tanji budžet: prvo osnovno, nadogradnja kasnije.";
         };
     }
 
@@ -962,9 +961,9 @@ public class PlannerService {
         String level = furnishingLevelText(input.furnishingLevel());
 
         return switch (mode) {
-            case "stretch" -> "Ova verzija bira malo ljepše i kompletnije komade za razinu: " + level + ". " + storeText + ".";
-            case "value" -> "Ovo je najuravnoteženija verzija za " + input.size() + " m²: prvo glavni komadi, zatim udobnost, pa detalji ako stanu. " + storeText + ".";
-            default -> "Ova verzija prvo čuva budžet za " + room + " u " + input.location() + ", pa kupnju slaže redom važnosti. " + storeText + ".";
+            case "stretch" -> "Ljepši, kompletniji komadi za razinu " + level + ". " + storeText + ".";
+            case "value" -> "Uravnoteženo za " + input.size() + " m²: prvo glavni komadi, pa udobnost, pa detalji ako stanu. " + storeText + ".";
+            default -> "Prvo čuva budžet za " + room + " u " + input.location() + ", pa slaže kupnju po važnosti. " + storeText + ".";
         };
     }
 
@@ -1013,16 +1012,16 @@ public class PlannerService {
     }
 
     private String roleForCategory(String roomType, String category) {
-        if (isCoreCategory(roomType, category)) return "Ovo je glavni komad";
-        if (isComfortCategory(roomType, category)) return "Ovo zaokružuje prostor";
-        return "Ovo je detalj za kasnije";
+        if (isCoreCategory(roomType, category)) return "Temelj prostora";
+        if (isComfortCategory(roomType, category)) return "Za toplinu i udobnost";
+        return "Završni detalj";
     }
 
     private String stepForCategory(String roomType, String category) {
         return switch (priorityForCategory(roomType, category)) {
-            case "buy-first" -> "1. Najvažnije za početak";
-            case "add-comfort" -> "2. Za ugodniji prostor";
-            default -> "3. Može kasnije";
+            case "buy-first" -> "Kreni odavde";
+            case "add-comfort" -> "Za udobnost";
+            default -> "Može kasnije";
         };
     }
 
