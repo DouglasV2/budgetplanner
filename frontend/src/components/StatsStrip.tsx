@@ -15,7 +15,7 @@ export function StatsStrip() {
   ];
 
   return (
-    <section className="stats shell" aria-label="Product highlights">
+    <section className="stats shell" aria-label={t('aria.productHighlights')}>
       {stats.map((stat) => (
         <div className="stat" key={stat.label}>
           <strong>{stat.value}</strong>

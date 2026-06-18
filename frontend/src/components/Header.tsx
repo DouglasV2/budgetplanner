@@ -10,7 +10,7 @@ export function Header() {
         <span className="brand-mark">B</span>
         <span>BudgetSpace</span>
       </a>
-      <nav className="nav" aria-label="Main navigation">
+      <nav className="nav" aria-label={t('aria.mainNav')}>
         <a href="#how">{t('nav.how')}</a>
         <a href="#planner">{t('nav.planner')}</a>
       </nav>

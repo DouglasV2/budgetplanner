@@ -118,7 +118,31 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.46 — Scandinavia: Norway + Sweden + Denmark (first non-EUR markets) (current)
+### Sprint 10.47 — i18n coverage fix (dynamic labels) + UI/UX redesign (current)
+- **Translation audit (owner: "are translations applied on every part, for every country?").** The static
+  chrome was fully translated, but **dynamic domain labels were hardcoded Croatian** in `utils/planner.ts` and
+  leaked into all 12 non-HR markets: category names (on every product), room/style/level/priority labels, the
+  store-count text, the store-trip recommendation and the share/export text. Fix: the 5 label maps are now
+  language-aware **proxies** that translate on access (`localisedLabels()` → `translate(key, activeMarketLang)`),
+  so all ~25 call sites stay unchanged. Rooms/styles/levels reuse the already-translated `form.*` option keys;
+  **41 new keys** (`cat.*`, `priority.*`, `unit.stores*`, `storeTrip.*`, `share.*`, `aria.*`) added to the
+  DICTIONARY and translated into all 12 languages (3 subagents, parity-checked: 409 keys each, 0 placeholder
+  drift). Store-count pluralisation now uses `Intl.PluralRules`. Two `aria-label`s localised.
+  - **Example-prompt bug:** the prefilled demo prompt was seeded from `t()` at mount, capturing the English
+    fallback before a non-HR overlay lazy-loaded (so NO showed English). Now re-seeded when the overlay arrives
+    — and the ref update is kept OUTSIDE the `setInput` updater (StrictMode double-invokes it in dev, which made
+    the first naive fix bail). Verified live in NO: prompt + labels + currency all Norwegian.
+- **UI/UX redesign (owner: "make it not look AI-made").** The look was system-font + pills-everywhere
+  (`border-radius: 999px`) + huge diffuse shadows + radial-gradient blobs + filled eyebrow pills — generic
+  template tells. Reworked the design system in `styles.css` + `index.html`: **display serif (Fraunces) for
+  headings** (was system-ui — the single biggest shift) with Inter for UI; **editorial eyebrows/kickers**
+  (uppercase, letter-spaced, leading rule — no pill); **considered radii** (10/14/20/26px) replacing full pills
+  on buttons/cards/chips; **tight layered shadows** instead of one 90px blur; **clean paper background** (blobs
+  removed); solid serif brand mark; deeper terracotta accent. Verified across HR + NO, desktop.
+- **Verified:** frontend build clean; all 12 message files 409 keys / 0 missing / 0 placeholder drift; live
+  preview in HR + NO. (Backend untouched.)
+
+### Sprint 10.46 — Scandinavia: Norway + Sweden + Denmark (first non-EUR markets)
 - **Why now:** the owner asked why NO/SE/DK weren't covered. The blocker was never sourcing — it was that
   the app implicitly assumed EUR. Turns out it didn't: `MarketConfig` already carried `currency`+`locale` and
   `formatCurrency` already used `Intl.NumberFormat`, so non-EUR "just worked" once a local-currency catalog

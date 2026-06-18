@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
@@ -133,6 +133,10 @@ export function Planner() {
   // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
   // the active market's language (the user can then edit freely).
   const [input, setInput] = useState<PlannerInput>(() => ({ ...initialInput, prompt: t('planner.examplePrompt'), market }));
+  // The example prompt is seeded from t() at mount, but a non-HR market's translations are lazy-loaded, so the
+  // first seed can be the English fallback. Re-seed it once the language overlay arrives (t() identity changes
+  // on langReady) — but only while the textarea still holds the seeded example, so a user's edits are never lost.
+  const seededPromptRef = useRef<string>(input.prompt);
   const [plans, setPlans] = useState<FurnishingPlan[]>([]);
   const [savedPlans, setSavedPlans] = useState<SavedPlanResponse[]>([]);
   const [savedSearch, setSavedSearch] = useState('');
@@ -172,6 +176,16 @@ export function Planner() {
       return { ...current, market, selectedRetailers: kept.length ? kept : allowed };
     });
   }, [market]);
+
+  // Re-seed the localised example prompt when the active language's overlay loads or the market changes.
+  // Keep the ref update OUTSIDE the state updater — StrictMode double-invokes the updater in dev, and a ref
+  // mutation inside it would make the second pass bail. Only replace while the textarea still holds the seed.
+  useEffect(() => {
+    const next = t('planner.examplePrompt');
+    const prevSeed = seededPromptRef.current;
+    seededPromptRef.current = next;
+    setInput((current) => (current.prompt === prevSeed && current.prompt !== next ? { ...current, prompt: next } : current));
+  }, [t]);
 
   useEffect(() => {
     const sharedPlanId = readSharedPlanIdFromUrl();

@@ -1,5 +1,27 @@
 import type { FurnishingLevel, FurnishingPlan, PlanItem, PlannerInput, Product, ProductCategory, Retailer, RoomType, ShoppingPriority, StoreTotal, StoreTrip, StyleType } from '../types';
 import { marketConfig } from '../markets';
+import { translate } from '../i18n';
+
+// Sprint 10.13/10.47: the active market drives BOTH currency formatting and domain-label translation
+// app-wide (LocaleProvider sets it on country switch). Domain labels read the market's language so
+// category/room/style/level/priority names are localised instead of hardcoded Croatian.
+let activeMarket = 'HR';
+export function setFormattingMarket(market: string | undefined) {
+  activeMarket = market ?? 'HR';
+}
+function labelLang() {
+  return marketConfig(activeMarket).lang;
+}
+function tLabel(key: string, params?: Record<string, string | number>) {
+  return translate(key, labelLang(), params);
+}
+// Turn an enum→i18n-key map into a string map that translates on access, so every existing
+// `categoryLabels[x]` call site stays unchanged but now returns the active language.
+function localisedLabels<K extends string>(keys: Record<K, string>): Record<K, string> {
+  return new Proxy({} as Record<K, string>, {
+    get: (_target, prop) => (typeof prop === 'string' ? tLabel(keys[prop as K] ?? prop) : undefined)
+  });
+}
 
 export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Decathlon', 'Lesnina'];
 
@@ -30,63 +52,65 @@ export function retailersForMarket(code?: string): Retailer[] {
   return retailersByMarket[(code ?? 'HR').toUpperCase()] ?? ['IKEA', 'JYSK'];
 }
 
-export const categoryLabels: Record<ProductCategory, string> = {
-  sofa: 'Sofa / kauč',
-  chair: 'Stolica',
-  table: 'Klub stolić',
-  'tv-unit': 'TV komoda',
-  storage: 'Polica / spremanje',
-  rug: 'Tepih',
-  lighting: 'Rasvjeta',
-  decor: 'Dekoracije',
-  desk: 'Radni stol',
-  bed: 'Krevet',
-  mattress: 'Madrac',
-  'gym-equipment': 'Oprema za vježbanje',
-  'dining-table': 'Blagovaonski stol',
-  'dining-chair': 'Blagovaonska stolica',
-  'kitchen-storage': 'Kuhinjsko spremanje',
-  'kitchen-cart': 'Kuhinjska kolica',
-  nightstand: 'Noćni ormarić',
-  wardrobe: 'Ormar za odjeću',
-  dresser: 'Komoda s ladicama'
-};
+// Category + priority names are new i18n keys (cat.* / priority.*); room/style/level reuse the form.*
+// option keys that are already translated in every language. All resolve to the active market language.
+export const categoryLabels: Record<ProductCategory, string> = localisedLabels<ProductCategory>({
+  sofa: 'cat.sofa',
+  chair: 'cat.chair',
+  table: 'cat.table',
+  'tv-unit': 'cat.tv-unit',
+  storage: 'cat.storage',
+  rug: 'cat.rug',
+  lighting: 'cat.lighting',
+  decor: 'cat.decor',
+  desk: 'cat.desk',
+  bed: 'cat.bed',
+  mattress: 'cat.mattress',
+  'gym-equipment': 'cat.gym-equipment',
+  'dining-table': 'cat.dining-table',
+  'dining-chair': 'cat.dining-chair',
+  'kitchen-storage': 'cat.kitchen-storage',
+  'kitchen-cart': 'cat.kitchen-cart',
+  nightstand: 'cat.nightstand',
+  wardrobe: 'cat.wardrobe',
+  dresser: 'cat.dresser'
+});
 
-export const roomLabels: Record<RoomType, string> = {
-  'living-room': 'dnevni boravak',
-  'home-office': 'radni kutak',
-  bedroom: 'spavaća soba',
-  'home-gym': 'kućna teretana',
-  kitchen: 'kuhinja',
-  'dining-room': 'blagovaonica',
-  hallway: 'hodnik',
-  bathroom: 'kupaonica'
-};
+export const roomLabels: Record<RoomType, string> = localisedLabels<RoomType>({
+  'living-room': 'form.roomLivingRoomLabel',
+  'home-office': 'form.roomHomeOfficeLabel',
+  bedroom: 'form.roomBedroomLabel',
+  'home-gym': 'form.roomHomeGymLabel',
+  kitchen: 'form.roomKitchenLabel',
+  'dining-room': 'form.roomDiningRoomLabel',
+  hallway: 'form.roomHallwayLabel',
+  bathroom: 'form.roomBathroomLabel'
+});
 
-export const furnishingLevelLabels: Record<FurnishingLevel, string> = {
-  basic: 'osnovno',
-  comfort: 'udobnije',
-  complete: 'kompletno'
-};
+export const furnishingLevelLabels: Record<FurnishingLevel, string> = localisedLabels<FurnishingLevel>({
+  basic: 'form.furnishingBasicLabel',
+  comfort: 'form.furnishingComfortLabel',
+  complete: 'form.furnishingCompleteLabel'
+});
 
-export const shoppingPriorityLabels: Record<ShoppingPriority, string> = {
-  'buy-first': 'Najvažnije',
-  'add-comfort': 'Za ugodniji prostor',
-  later: 'Može kasnije'
-};
+export const shoppingPriorityLabels: Record<ShoppingPriority, string> = localisedLabels<ShoppingPriority>({
+  'buy-first': 'priority.buy-first',
+  'add-comfort': 'priority.add-comfort',
+  later: 'priority.later'
+});
 
-export const styleLabels: Record<StyleType, string> = {
-  bright: 'svijetlo i prozračno',
-  warm: 'toplo i domaće',
-  modern: 'moderno i uredno',
-  minimal: 'jednostavno i čisto',
-  classic: 'klasično',
-  industrial: 'tamno / industrijski',
-  boho: 'boho / prirodno',
-  surprise: 'nisam siguran, predloži mi',
-  scandinavian: 'svijetlo i prozračno',
-  cozy: 'toplo i domaće'
-};
+export const styleLabels: Record<StyleType, string> = localisedLabels<StyleType>({
+  bright: 'form.styleBrightLabel',
+  warm: 'form.styleWarmLabel',
+  modern: 'form.styleModernLabel',
+  minimal: 'form.styleMinimalLabel',
+  classic: 'form.styleClassicLabel',
+  industrial: 'form.styleIndustrialLabel',
+  boho: 'form.styleBohoLabel',
+  surprise: 'form.styleSurpriseLabel',
+  scandinavian: 'form.styleBrightLabel',
+  cozy: 'form.styleWarmLabel'
+});
 
 export function getRetailerBreakdown(plan: FurnishingPlan) {
   const breakdown = plan.items.reduce<Record<string, { total: number; count: number; items: PlanItem[] }>>((acc, item) => {
@@ -109,10 +133,8 @@ export function isCheckInStore(product: Product) {
 }
 
 function storesWord(count: number) {
-  const mod100 = count % 100;
-  const mod10 = count % 10;
-  if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'trgovine';
-  return 'trgovina';
+  const plural = new Intl.PluralRules(marketConfig(activeMarket).locale).select(count);
+  return tLabel(plural === 'one' ? 'unit.storesOne' : 'unit.storesOther');
 }
 
 export function storeCountText(count: number) {
@@ -122,14 +144,14 @@ export function storeCountText(count: number) {
 function buildStoreTripRecommendation(storeCount: number, mainRetailer: Retailer | null, checkInStoreCount: number) {
   let base: string;
   if (storeCount <= 0 || !mainRetailer) {
-    base = 'Plan je još prazan, dodaj barem jedan glavni komad.';
+    base = tLabel('storeTrip.empty');
   } else if (storeCount === 1) {
-    base = `Sve kupuješ u ${mainRetailer}, pa je manje obilazaka.`;
+    base = tLabel('storeTrip.single', { store: mainRetailer });
   } else {
-    base = `Većinu kupuješ u ${mainRetailer}, a plan koristi ${storeCount} ${storesWord(storeCount)}.`;
+    base = tLabel('storeTrip.multi', { store: mainRetailer, count: storeCount, stores: storesWord(storeCount) });
   }
   if (checkInStoreCount > 0) {
-    base += checkInStoreCount === 1 ? ' Jedan komad prvo provjeri u trgovini.' : ' Neke komade prvo provjeri u trgovini.';
+    base += ' ' + tLabel(checkInStoreCount === 1 ? 'storeTrip.checkOne' : 'storeTrip.checkMany');
   }
   return base;
 }
@@ -160,30 +182,21 @@ export function resolveStoreTrip(plan: FurnishingPlan): StoreTrip {
 
 export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) {
   const storeSections = getRetailerBreakdown(plan).flatMap((entry) => [
-    `${entry.retailer} — ${entry.count} ${entry.count === 1 ? 'komad' : 'komada'} — ${formatCurrency(entry.total)}`,
+    `${entry.retailer} — ${tLabel('share.items', { count: entry.count })} — ${formatCurrency(entry.total)}`,
     ...entry.items.map((item) => `- ${item.product.name} — ${formatCurrency(item.product.price)} (${shoppingPriorityLabels[item.shoppingPriority ?? 'later']})`),
     ''
   ]);
 
   return [
-    `Moj BudgetSpace plan: ${roomLabels[input.roomType]}`,
-    `Budžet: ${formatCurrency(input.budget)}`,
-    `Ukupno: ${formatCurrency(plan.total)}${plan.total <= input.budget ? ` · ostaje ${formatCurrency(input.budget - plan.total)}` : ` · ${formatCurrency(plan.total - input.budget)} iznad budžeta`}`,
-    `Trgovine: ${plan.retailersUsed.join(', ') || 'nema'}`,
-    plan.advisorNote ? `Kratko: ${plan.advisorNote}` : '',
+    tLabel('share.title', { room: roomLabels[input.roomType] }),
+    `${tLabel('share.budget')}: ${formatCurrency(input.budget)}`,
+    `${tLabel('share.total')}: ${formatCurrency(plan.total)}${plan.total <= input.budget ? ` · ${tLabel('share.remains', { amount: formatCurrency(input.budget - plan.total) })}` : ` · ${tLabel('share.over', { amount: formatCurrency(plan.total - input.budget) })}`}`,
+    `${tLabel('share.stores')}: ${plan.retailersUsed.join(', ') || tLabel('share.none')}`,
+    plan.advisorNote ? `${tLabel('share.short')}: ${plan.advisorNote}` : '',
     '',
-    'POPIS PO TRGOVINAMA',
+    tLabel('share.byStore'),
     ...storeSections
   ].filter(Boolean).join('\n');
-}
-
-// Sprint 10.13 (#3): the active market drives currency formatting app-wide. It defaults to HR
-// (EUR / hr-HR) so every existing `formatCurrency(amount)` call keeps its previous behaviour; the
-// LocaleProvider updates it when the user switches country.
-let activeMarket = 'HR';
-
-export function setFormattingMarket(market: string | undefined) {
-  activeMarket = market ?? 'HR';
 }
 
 export function formatCurrency(amount: number, market?: string) {
