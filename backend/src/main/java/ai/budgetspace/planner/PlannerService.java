@@ -1143,9 +1143,29 @@ public class PlannerService {
     // blocked retailer that wasn't fed. Stale rows still pass (they enter with a "check in store" note, so
     // an aging catalog never silently empties). A room with no eligible products yields an empty/partial
     // plan (honest) rather than placeholder data.
+    // Sprint 10.39 (perf): the products table is effectively immutable after the startup seed — the only
+    // runtime writer is the admin import, which is disabled in prod. marketCatalog() is called many times
+    // per plan request (once per category/retailer pass), so caching findAll() for a short window collapses
+    // those ~N full-table loads into a single query — the cost stops growing with the catalog (now 1200+
+    // rows). The small TTL means a dev admin-import is still reflected within a couple of seconds.
+    private static final long CATALOG_SNAPSHOT_TTL_MS = 2_000;
+    private volatile List<Product> catalogSnapshot;
+    private volatile long catalogSnapshotAt;
+
+    private List<Product> allProducts() {
+        List<Product> snapshot = catalogSnapshot;
+        if (snapshot != null && System.currentTimeMillis() - catalogSnapshotAt < CATALOG_SNAPSHOT_TTL_MS) {
+            return snapshot;
+        }
+        snapshot = List.copyOf(productRepository.findAll());
+        catalogSnapshot = snapshot;
+        catalogSnapshotAt = System.currentTimeMillis();
+        return snapshot;
+    }
+
     private List<Product> marketCatalog(PlannerInputDto input) {
         String market = Markets.normalize(input == null ? null : input.market());
-        List<Product> all = productRepository.findAll();
+        List<Product> all = allProducts();
         return all.stream()
                 .filter(CatalogSourcePolicy::isPlannerEligible)
                 .filter(product -> product.getMarket() == null || product.getMarket().isBlank()

@@ -31,6 +31,8 @@ public final class Markets {
             Map.entry("NL", new MarketInfo("NL", "EUR", "nl-NL")),
             // Sprint 10.38: Slovakia — EUR, verified IKEA + JYSK catalog (Slovak language = sk, ≠ SI/sl).
             Map.entry("SK", new MarketInfo("SK", "EUR", "sk-SK")),
+            // Sprint 10.39: Spain — EUR, verified IKEA catalog (IKEA-only; no JYSK in ES).
+            Map.entry("ES", new MarketInfo("ES", "EUR", "es-ES")),
             Map.entry("PL", new MarketInfo("PL", "PLN", "pl-PL")),
             Map.entry("CZ", new MarketInfo("CZ", "CZK", "cs-CZ")),
             Map.entry("HU", new MarketInfo("HU", "HUF", "hu-HU")),

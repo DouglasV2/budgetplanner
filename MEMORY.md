@@ -24,7 +24,14 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **161 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 137 in 10.31, 139 in 10.33, 154 in 10.34, 156 in 10.35, 157 in 10.36, 159 in 10.37). Catalog **1146 rows**.
+- Backend tests: **164 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 154 in 10.34, 156 in 10.35, 157 in 10.36, 159 in 10.37, 161 in 10.38). Catalog **1214 rows**.
+- **Spain + perf (Sprint 10.39).** 10th market: ES added (Markets.java + markets.ts + Spanish `messages/es.json`,
+  368 keys, parity-checked) with **IKEA ES 68 rows** (IT-set number-trick → `/es/es/`; IKEA-only, no JYSK in ES;
+  KIVIK 629 ES vs 749 FR vs 549 NL). **Perf:** `PlannerService.marketCatalog()` was calling
+  `productRepository.findAll()` (full scan) ~dozen× per plan request (it grew with the catalog); added a 2s
+  snapshot cache (`allProducts()`) so a request loads the catalog **once** (guarded by `PlannerCatalogCacheTest`:
+  findAll ≤2 per generate). Safe because products are immutable post-seed (admin import is the only runtime
+  writer, off in prod). The frontend `translate()` is already a plain key lookup (no per-call merge).
 - **Slovakia (Sprint 10.38).** 9th market (NL's twin recipe): SK added to `Markets.java` + `markets.ts` (flag,
   cities, detection, retailers IKEA+JYSK) and **fully Slovak-localised** (`messages/sk.json`, 368 keys, parity-
   checked). **IKEA SK 72 rows** (IT-set number-trick → `/sk/sk/`) + **JYSK SK 38 rows** (jysk.sk, same static
@@ -67,7 +74,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37), SK (IKEA + JYSK 10.38).** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37), SK (IKEA + JYSK 10.38), ES (IKEA 10.39).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
   ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets

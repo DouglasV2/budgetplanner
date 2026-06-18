@@ -2,7 +2,7 @@
 // Only EUR markets are offered in the UI for now, because the catalog prices are in EUR — adding a
 // non-EUR market (PLN/CZK/…) requires its own verified, currency-correct catalog first.
 // `available` = a real per-market catalog exists today; others are foundation/"coming soon".
-export type Lang = 'hr' | 'en' | 'de' | 'it' | 'sl' | 'fi' | 'fr' | 'nl' | 'sk';
+export type Lang = 'hr' | 'en' | 'de' | 'it' | 'sl' | 'fi' | 'fr' | 'nl' | 'sk' | 'es';
 
 export interface MarketConfig {
   code: string;
@@ -30,7 +30,9 @@ export const MARKETS: MarketConfig[] = [
   // Sprint 10.37: Netherlands — EUR, Dutch-localised, verified IKEA + JYSK catalog.
   { code: 'NL', label: 'Nederland', currency: 'EUR', locale: 'nl-NL', lang: 'nl', available: true, flag: '🇳🇱' },
   // Sprint 10.38: Slovakia — EUR, Slovak-localised, verified IKEA + JYSK catalog.
-  { code: 'SK', label: 'Slovensko', currency: 'EUR', locale: 'sk-SK', lang: 'sk', available: true, flag: '🇸🇰' }
+  { code: 'SK', label: 'Slovensko', currency: 'EUR', locale: 'sk-SK', lang: 'sk', available: true, flag: '🇸🇰' },
+  // Sprint 10.39: Spain — EUR, Spanish-localised, verified IKEA catalog (IKEA-only).
+  { code: 'ES', label: 'España', currency: 'EUR', locale: 'es-ES', lang: 'es', available: true, flag: '🇪🇸' }
 ];
 
 // Sprint 10.30: major cities per market for the optional city picker (datalist suggestions; the user can
@@ -45,6 +47,7 @@ export const CITIES_BY_MARKET: Record<string, string[]> = {
   FR: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'],
   NL: ['Amsterdam', 'Rotterdam', 'Den Haag', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen'],
   SK: ['Bratislava', 'Košice', 'Prešov', 'Žilina', 'Nitra', 'Banská Bystrica', 'Trnava', 'Trenčín', 'Martin', 'Poprad'],
+  ES: ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Bilbao', 'Alicante'],
 };
 
 export function citiesForMarket(code?: string): string[] {
@@ -93,6 +96,7 @@ const MARKET_DETECTION: Array<{ market: string; pattern: RegExp }> = [
   { market: 'FR', pattern: /\b(francusk\w*|france|pariz\w*|paris|marseille|lyon|toulouse|\bnica\b|nice|nantes|strasbourg|bordeaux|lille|montpellier)\b/ },
   { market: 'NL', pattern: /\b(nizozemsk\w*|netherlands|holland|nederland|amsterdam|rotterdam|den haag|utrecht|eindhoven|groningen|tilburg|nijmegen)\b/ },
   { market: 'SK', pattern: /\b(slovack\w*|slovakia|slovensk\w*|bratislav\w*|kosic\w*|presov|zilina|nitra|banska bystrica|trnava|trencin|poprad)\b/ },
+  { market: 'ES', pattern: /\b(spanjolsk\w*|spain|espana|espanol\w*|madrid|barcelon\w*|valencia|sevilla|zaragoza|malaga|bilbao|alicante|murcia)\b/ },
   { market: 'HR', pattern: /\b(hrvatsk\w*|croatia|zagreb\w*|split\w*|rijek\w*|osijek|zadar|pula|dubrovnik|varazdin|karlovac|sisak)\b/ }
 ];
 

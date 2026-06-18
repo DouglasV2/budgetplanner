@@ -118,7 +118,28 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.38 — new market: Slovakia (SK), Slovak-localised IKEA + JYSK (current)
+### Sprint 10.39 — new market Spain (ES) + plan-generation perf optimization (current)
+- **10th market.** Added ES to `Markets.java` + `markets.ts` (flag 🇪🇸, Madrid/Barcelona/… cities, prompt
+  detection) + `retailersByMarket` (ES = IKEA only — no JYSK in Spain, like FR/IT). `Lang` += `'es'`.
+- **Full Spanish localisation.** `frontend/src/messages/es.json` (368 keys, native informal "tú"), parity-checked
+  (0 missing/extra/placeholder-mismatch/empty). Wired into `i18n.ts`.
+- **IKEA ES — 68 verified rows** (`real-ikea-es-rooms.json`): IKEA Italy set ported via the article-number trick
+  to `/es/es/` (Spanish name + per-market EUR price — KIVIK 629 ES vs 749 FR vs 549 NL — + verified og:image,
+  ikea.com/es 2026-06-18). `SpainCatalogRuntimeTest`.
+- **Perf optimization (owner-requested — "don't let the app lag as we scale").** `PlannerService.marketCatalog()`
+  is called many times while building one plan, and each call ran `productRepository.findAll()` — a full table
+  scan that grew with the catalog (now 1214 rows). Added a 2-second snapshot cache (`allProducts()`): a single
+  plan request now loads the catalog **once** instead of ~a dozen times. Safe because the products table is
+  immutable after the startup seed (the admin import is the only runtime writer, and it's disabled in prod);
+  the short TTL still reflects a dev admin-import within seconds. Guarded by `PlannerCatalogCacheTest` (findAll
+  called ≤2 per `generate()`). The frontend `translate()` is already a plain key lookup, no per-call merge.
+- **Verified:** backend **164 tests, 0 failures** (+Spain ×2, +cache guard); frontend build clean; es.json parity
+  0 issues; catalog **1214 rows, 0 dup URLs/externalIds**. No fabrication, no 403-bypass.
+- **Possible next perf step:** lazy-load per-language `messages/*.json` (the JS bundle grows ~1 file per market —
+  now ~126 kB gzipped); deferred as a larger async refactor since the interactive lag (plan generation) is fixed.
+- **Next EUR market when wanted:** PT (Portugal — IKEA-only, 5/5 fetchable in the 10.35 probe).
+
+### Sprint 10.38 — new market: Slovakia (SK), Slovak-localised IKEA + JYSK
 - **9th market, two retailers** (same recipe as NL). Added SK to `Markets.java` + `markets.ts` (flag 🇸🇰,
   `available:true`, Bratislava/Košice/… cities, prompt detection) + `retailersByMarket` (SK = IKEA + JYSK).
   `Lang` += `'sk'`. **Note the SK/SI + sk/sl distinction** (Slovakia/Slovak ≠ Slovenia/Slovenian).
