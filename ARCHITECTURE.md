@@ -60,10 +60,11 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   / fingerprint / cookies / private endpoints). Per-retailer status:
   - `DIRECT_VERIFIED` (pages fetchable + hand-verified, in collector allowlist): IKEA, JYSK
   - `MANUAL_VERIFIED_ONLY` (verified, link-out, have products): Emmezeta, Harvey Norman, Namjestaj.hr,
-    Otto, Segmüller, Poco
+    Otto, Segmüller, Poco, **Camif** (FR — price in static HTML, 10.36)
   - `OFFICIAL_FEED_REQUIRED` (403/anti-bot/JS-only/out-of-scope → only an official/partner feed, no
     products yet): Decathlon, Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus,
-    FeroTerm, Merkur, Dipo, Wayfair, Home24, Roller, Kika, Leiner, XXXLutz
+    FeroTerm, Merkur, Dipo, Wayfair, Home24, Roller, Kika, Leiner, XXXLutz, **Conforama, But, Maisons du
+    Monde, La Redoute, Fly, Habitat, Cdiscount, Vente-unique** (FR chains — DataDome/Cloudflare, 10.36)
   - Adding a retailer = add to `ProductTaxonomy.SUPPORTED_RETAILERS` + `CatalogSourcePolicy` status
     (+ `PlannerService.RETAILERS` if it has products). Most big chains are bot-blocked (confirmed by
     probing) → they wait for a feed.
@@ -73,7 +74,7 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   stale AND has sourceReference AND, if feed-required, came from a feed) → excludes NEEDS_REVIEW /
   STALE / sample. Full rules: [docs/sourcing-policy.md](docs/sourcing-policy.md).
 - **Markets with data**: HR (deep — every room); SI/AT/DE/IT/FI (IKEA: living-room/bedroom/home-office +
-  bathroom/hallway/kitchen, SI/AT/DE also dining); **FR (Sprint 10.35 — IKEA, all core rooms, IKEA-only)**;
+  bathroom/hallway/kitchen, SI/AT/DE also dining); **FR (IKEA all core rooms — 10.35; + Camif breadth — 10.36)**;
   JYSK adds hallway/kitchen for SI/DE/FI (JYSK AT pending — jysk.at gates stock behind JS; no JYSK in FR).
   PL/CZ/HU/RO/SE/DK exist in `Markets` but have **no catalog** → empty plan (non-EUR — deferred until the UI
   handles their currency; `markets.ts` is EUR-only). IKEA/JYSK verified per market (prices differ per country —

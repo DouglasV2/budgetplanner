@@ -11,7 +11,9 @@ export type Retailer =
   | 'Namjestaj.hr'
   | 'Otto'
   | 'Segmüller'
-  | 'Poco';
+  | 'Poco'
+  // Sprint 10.36: France
+  | 'Camif';
 
 export type RoomType =
   | 'living-room'

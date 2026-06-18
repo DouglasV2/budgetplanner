@@ -118,7 +118,26 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.35 — new market: France (FR), fully French-localised IKEA catalog (current)
+### Sprint 10.36 — France non-IKEA breadth: Camif + FR retailer assessment (current)
+- **Probed the major French furniture chains** (raw-HTTP, browser UA, 2026-06-18). Result mirrors the 10.16
+  pattern — almost all are anti-bot or JS-only:
+  - **Anti-bot (DataDome/Cloudflare 403) → `OFFICIAL_FEED_REQUIRED`:** Conforama, **But** (intermittent
+    DataDome), Maisons du Monde, La Redoute, Fly, Habitat, Cdiscount, Vente-unique. Registered in
+    `ProductTaxonomy` + `CatalogSourcePolicy` (never bypassed).
+  - **Directly verifiable → `MANUAL_VERIFIED_ONLY`:** **Camif** (camif.fr) — serves the price in static HTML
+    (JSON-LD `offers.price` / visible €) + `og:image`. The one major non-IKEA FR retailer we can source.
+- **Sourced 46 web-verified Camif rows** (`real-camif-fr.json`) across all core categories (sofa 9 / bed 6 /
+  table 5 / storage 5 / wardrobe 4 / dresser 4 / tv-unit 3 / dining-table 3 / chair 2 / dining-chair 2 / desk 2
+  / mattress 1). Each row's French name (og:title, HTML-entity-decoded) + current EUR price (JSON-LD/visible €)
+  + verified `og:image` read off camif.fr (Portimo sofa + Capucine bed images spot-checked). Camif's standing
+  ~−20% web price (`priceValidUntil` = +1yr schema default) is **not** a real promo → stored as the honest
+  current price, no `originalPrice`/sale badge. Registered Camif in `PlannerService.RETAILERS`, frontend
+  `Retailer` type + `retailersByMarket` (FR = IKEA + Camif). `CamifFranceCatalogRuntimeTest`.
+- **Verified:** backend **157 tests, 0 failures**; frontend build clean; catalog **924 rows, 0 dup
+  URLs/externalIds**. No fabrication, no 403-bypass.
+- **Next:** NL + SK (both IKEA via number-trick + JYSK — two retailers each), per the 10.35 EUR-market probe.
+
+### Sprint 10.35 — new market: France (FR), fully French-localised IKEA catalog
 - **7th market.** Added FR to `Markets.java` (EUR) + `markets.ts` (flag 🇫🇷, `available:true`, Paris/Lyon/…
   cities, prompt market-detection) + `retailersByMarket` (IKEA-only — no JYSK in France). `Lang` widened to
   include `'fr'`.

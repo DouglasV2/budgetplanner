@@ -51,6 +51,9 @@ public final class ProductTaxonomy {
             "Otto",
             "Segmüller",
             "Poco",
+            // Sprint 10.36: France — Camif (camif.fr) is reachable + serves the price in static HTML
+            // (JSON-LD offers.price / visible €) + og:image, so it is web-verifiable like IKEA/JYSK.
+            "Camif",
             // Known/targeted but currently feed-required (403/anti-bot/JS-only or out-of-scope). Registered
             // so the system is aware of them and a feed can target them later; they carry no products yet.
             "Momax",
@@ -66,6 +69,16 @@ public final class ProductTaxonomy {
             "Kika",
             "Leiner",
             "XXXLutz",
+            // Sprint 10.36: major French furniture chains probed 2026-06-18 — all anti-bot (DataDome /
+            // Cloudflare 403) or JS-only, so feed-required. We never bypass the protection.
+            "Conforama",
+            "But",
+            "Maisons du Monde",
+            "La Redoute",
+            "Fly",
+            "Habitat",
+            "Cdiscount",
+            "Vente-unique",
             // Sprint 10.21: second-hand consumer marketplaces. Feed/API-only (OFFICIAL_FEED_REQUIRED) —
             // never scraped; carry no products until a compliant feed exists. See docs/marketplace-sourcing.md.
             "Njuškalo",

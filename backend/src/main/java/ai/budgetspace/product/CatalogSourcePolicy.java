@@ -76,6 +76,8 @@ public final class CatalogSourcePolicy {
         map.put("Otto", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Segmüller", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Poco", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.36: France — reachable + price in static HTML (JSON-LD / visible €), web-verified per product.
+        map.put("Camif", SourcingStatus.MANUAL_VERIFIED_ONLY);
         // Re-confirmed 2026-06-16: blocked (403/anti-bot/unreachable) or unusable for direct import
         // (JS-only prices / out-of-scope catalog) → only an official/partner feed may populate them.
         map.put("Momax", SourcingStatus.OFFICIAL_FEED_REQUIRED);
@@ -91,6 +93,16 @@ public final class CatalogSourcePolicy {
         map.put("Kika", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Leiner", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("XXXLutz", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.36: major French chains probed 2026-06-18 — anti-bot (DataDome/Cloudflare 403) or
+        // JS-only. Not bypassed → feed-required (Camif above is the one directly-verifiable FR retailer).
+        map.put("Conforama", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("But", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Maisons du Monde", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("La Redoute", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Fly", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Habitat", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Cdiscount", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        map.put("Vente-unique", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.21: second-hand consumer marketplaces. ToS-protected, no open product API, anti-bot —
         // populated only by a compliant official/partner feed (sourceType=marketplace-listing), never
         // scraped. See docs/marketplace-sourcing.md.

@@ -137,7 +137,11 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Sprint 10.35: France (FR) — first IKEA FR catalog, ported from the IKEA IT set via the global
             // article-number trick to /fr/fr/. Each row's French name (og:title) + per-market EUR price
             // (JSON-LD) + verified og:image read off ikea.com/fr on 2026-06-18. IKEA-only (no JYSK in FR).
-            "/catalog/real-ikea-fr-rooms.json"
+            "/catalog/real-ikea-fr-rooms.json",
+            // Sprint 10.36: France non-IKEA breadth — Camif (camif.fr), the one major FR chain that serves
+            // the price in static HTML (JSON-LD / visible €). 46 web-verified rows across all core rooms;
+            // every other big FR chain (Conforama/But/Maisons du Monde/La Redoute/…) is anti-bot → feed-required.
+            "/catalog/real-camif-fr.json"
     );
 
     /**

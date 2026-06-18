@@ -24,7 +24,15 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **156 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31, 139 in 10.33, 154 in 10.34).
+- Backend tests: **157 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 117 in 10.16, 137 in 10.31, 139 in 10.33, 154 in 10.34, 156 in 10.35).
+- **France retailers (Sprint 10.36).** Probed the major FR furniture chains: **only Camif (camif.fr) is
+  directly verifiable** (price in static HTML — JSON-LD `offers.price` / visible €). Sourced **46 web-verified
+  Camif rows** (`real-camif-fr.json`) across all core furniture categories (sofa/bed/table/storage/wardrobe/
+  dresser/desk/tv-unit/dining/chair/mattress) with verified `og:image` (sofa+bed spot-checked). Camif runs a
+  standing ~−20% web price (priceValidUntil = +1yr schema default, not a real promo) → stored as the honest
+  current price, no `originalPrice`. **Everything else is anti-bot → feed-required:** Conforama, But (DataDome),
+  Maisons du Monde, La Redoute, Fly, Habitat, Cdiscount, Vente-unique (all registered in `CatalogSourcePolicy`).
+  So **FR = IKEA + Camif** directly; the rest wait for a feed. Next EUR markets: NL, SK (both IKEA + JYSK).
 - **France (Sprint 10.35).** 7th market: FR added to `Markets.java` + `markets.ts` (flag, cities, prompt
   detection, IKEA-only retailer list) and **fully French-localised** (`messages/fr.json`, 368 keys, parity-checked).
   First IKEA FR catalog: **72 verified rows** (`real-ikea-fr-rooms.json`) ported from the IKEA IT set via the
@@ -48,7 +56,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (10.35, IKEA-only).** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
   ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets
@@ -57,7 +65,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   SE/DK) have **no catalog** → empty plan (expected).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
   - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE), Emmezeta (HR), **Harvey Norman (HR/SI),
-    Namjestaj.hr (HR), Otto/Segmüller/Poco (DE)**.
+    Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36)**.
   - Registered but **feed-required** (403/anti-bot/JS-only/out-of-scope → no products yet): Decathlon,
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
     Home24, Roller, Kika, Leiner, XXXLutz. (Most big chains are bot-blocked — confirmed by probing.)
