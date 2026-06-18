@@ -136,6 +136,12 @@ public final class CatalogSourcePolicy {
         // scraped. See docs/marketplace-sourcing.md.
         map.put("Njuškalo", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Facebook Marketplace", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.49: per-country second-hand marketplace placeholders — feed/affiliate-ready, never scraped.
+        for (String marketplace : new String[] {
+                "eBay", "Bolha", "Willhaben", "Kleinanzeigen", "Subito", "Tori", "Leboncoin", "Marktplaats",
+                "Bazoš", "Wallapop", "OLX", "Finn", "Blocket", "DBA" }) {
+            map.put(marketplace, SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        }
         return Map.copyOf(map);
     }
 

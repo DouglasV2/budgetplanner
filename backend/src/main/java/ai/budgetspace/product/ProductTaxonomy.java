@@ -114,7 +114,24 @@ public final class ProductTaxonomy {
             // Sprint 10.21: second-hand consumer marketplaces. Feed/API-only (OFFICIAL_FEED_REQUIRED) —
             // never scraped; carry no products until a compliant feed exists. See docs/marketplace-sourcing.md.
             "Njuškalo",
-            "Facebook Marketplace"
+            "Facebook Marketplace",
+            // Sprint 10.49: per-country second-hand marketplace placeholders — registered so each market has a
+            // "Rabljeno" source slot ready to plug an official/partner/affiliate feed (never scraped). eBay has
+            // a public Browse API (a real first source); the rest need a partner/affiliate/export agreement.
+            "eBay",            // multi-market, public Browse API (used furniture, by location)
+            "Bolha",           // SI
+            "Willhaben",       // AT
+            "Kleinanzeigen",   // DE
+            "Subito",          // IT
+            "Tori",            // FI
+            "Leboncoin",       // FR
+            "Marktplaats",     // NL
+            "Bazoš",           // SK
+            "Wallapop",        // ES
+            "OLX",             // PT (and others)
+            "Finn",            // NO (finn.no)
+            "Blocket",         // SE
+            "DBA"              // DK (Den Blå Avis)
     );
 
     public static final Set<String> AVAILABILITY_STATUSES = Set.of(

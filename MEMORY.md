@@ -24,7 +24,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **178 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 175 in 10.45, 177 in 10.46/10.47). Catalog **1840 rows**.
+- Backend tests: **181 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 177 in 10.46/10.47, 178 in 10.48). Catalog **1840 rows**.
 - **Retail re-sweep (Sprint 10.48) — retail broadly maximised.** Probed fresh non-IKEA/JYSK candidates across all
   markets; **+13 verified retailers / +199 products** (`real-<market>-retailers-2.json`, all MANUAL_VERIFIED_ONLY):
   HR Svijetnamještaja, SI Svetpohištva, IT **Conforama** (conforama.it JSON-LD — flipped from FR-feed-required;
@@ -35,6 +35,13 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   `product:price:amount`/`itemprop=price` → visible (€/kr/`:-`/`,-`), charset-aware, per-currency tiers, junk
   filter (<unit floor / Westwing / U+FFFD). **Marketplace (Njuškalo):** scaffold already solves volume/selection/
   sold-guard; blocker = a compliant feed (no Njuškalo API, never scrape) → recommend eBay Browse API first.
+- **Marketplace placeholders + seam (Sprint 10.49).** Per-country classifieds registered OFFICIAL_FEED_REQUIRED
+  (Njuškalo HR, Bolha SI, Willhaben AT, Kleinanzeigen DE, Subito IT, Tori FI, Leboncoin FR, Marktplaats NL, Bazoš
+  SK, Wallapop ES, OLX PT, Finn NO, Blocket SE, DBA DK + eBay/FB). Pluggable `MarketplaceFeed` seam in
+  `ai.budgetspace.feed` (`MarketplaceFeed`/`ConfigBackedMarketplaceFeed`/`MarketplaceFeedProperties`/
+  `MarketplaceFeedConfig`) — unconfigured, imports nothing, no creds; a real eBay-API/partner client drops into
+  one bean. `MarketplaceFeedSeamTest`. Next: eBay Browse API client + secondHand/condition/location through the
+  snapshot DTO + a "Rabljeno" UI section.
 - **Scandinavia (Sprint 10.46) — first NON-EUR markets: NO/SE/DK.** The app was never really EUR-locked: each
   `MarketConfig` already had `currency`+`locale` and `formatCurrency` already used `Intl.NumberFormat`, so NOK/
   SEK/DKK "just worked" once a local-currency catalog existed (**no FX** — a plan uses one market's catalog vs a

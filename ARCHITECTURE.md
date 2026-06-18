@@ -47,7 +47,11 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   feed-required retailers**), `HttpProductPageFetcher` (plain JDK HTTP, honest UA, 403 = clean fail).
 - **feed/** — official/partner feed seam: `RetailerFeed` interface, `ConfigBackedRetailerFeed`
   (unconfigured by default), `RetailerFeedProperties` (env-backed, blank), `RetailerFeedImporter`
-  (startup; cleanly skips unconfigured feeds, never crashes). No credentials committed.
+  (startup; cleanly skips unconfigured feeds, never crashes). No credentials committed. **Sprint 10.49:
+  second-hand marketplace seam** — `MarketplaceFeed` (extends `RetailerFeed`; `sourceType=marketplace-listing`,
+  must run rows through `MarketplaceListingFilter`, never scrape) + `ConfigBackedMarketplaceFeed` +
+  `MarketplaceFeedProperties` + `MarketplaceFeedConfig` (a placeholder bean per market's classifieds — Njuškalo,
+  Willhaben, Leboncoin, Wallapop, Finn, … + eBay/FB — all `OFFICIAL_FEED_REQUIRED`, feed/affiliate-ready, no data).
 - **ai/** — `LlmClient` (+ `OpenAiLlmClient`/`AnthropicLlmClient`), `LlmClientFactory`, `LlmProperties`,
   `AiUsageTracker` (monthly-USD + per-day + per-session caps). Off by default.
 - **saved/**, **tracking/** — saved plans; product-click / plan-feedback events.

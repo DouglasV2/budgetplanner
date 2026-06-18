@@ -155,10 +155,17 @@ When a compliant feed exists:
    sold/expired guard, with `SOLD_MARKERS` + `MARKETPLACE_STALE_AFTER_HOURS=24` + `shouldDrop`);
    `Product.secondHand` / `conditionLabel` / `sellerLocation` columns; `MarketplaceListingFilterTest` +
    `MarketplaceSourcingPolicyTest`. No feed/data/UI yet — imports nothing (scaffold-first, like 10.14).
-3. **Phase 2:** integrate the first **compliant** source (whichever of Njuškalo's partner API / a sanctioned
-   export becomes available) — a `MarketplaceFeed` mapping rows to `sourceType=marketplace-listing`, each run
-   through `MarketplaceListingFilter` before import. FB Marketplace only if an official Commerce API path is
-   authorised. Never scrape.
+3. **Phase 2a (Sprint 10.49):** ✅ done — **per-country placeholders + pluggable seam, no data**. Every market's
+   marketplace registered `OFFICIAL_FEED_REQUIRED` (Njuškalo HR, Bolha SI, Willhaben AT, Kleinanzeigen DE, Subito
+   IT, Tori FI, Leboncoin FR, Marktplaats NL, Bazoš SK, Wallapop ES, OLX PT, Finn NO, Blocket SE, DBA DK, + eBay
+   & FB Marketplace). `MarketplaceFeed` (extends `RetailerFeed`) + `ConfigBackedMarketplaceFeed` (unconfigured) +
+   `MarketplaceFeedProperties` (env `budgetspace.marketplace-feeds.<name>.url`, blank) + `MarketplaceFeedConfig`
+   (one placeholder bean per marketplace, consumed by `RetailerFeedImporter`). `MarketplaceFeedSeamTest`.
+3. **Phase 2b (next, when a source is chosen):** integrate the first **compliant** source — recommended **eBay
+   Browse API** (free key via backend env; used furniture, by location) or a Njuškalo partner/affiliate export.
+   The real `MarketplaceFeed` maps rows to `sourceType=marketplace-listing` + `secondHand=true` + `condition` +
+   `location`, each run through `MarketplaceListingFilter` before import (needs the §3 columns through the
+   snapshot DTO). FB Marketplace only via an authorised Commerce API. Never scrape.
 4. **Phase 3:** UI section ("Rabljeno") + trust/safety copy + freshness monitoring; used items kept out of
    the new-retail plan total.
 

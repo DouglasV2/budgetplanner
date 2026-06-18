@@ -118,7 +118,30 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.48 — retail re-sweep: +13 verified retailers (maximise per-market depth) (current)
+### Sprint 10.49 — marketplace placeholders + pluggable MarketplaceFeed seam (current)
+- Owner: "for now I'd rather have backend placeholders for the marketplaces we can affiliate later (no open
+  API), and use the ones a country actually offers." Built exactly that — **no scraping, no data invented**.
+- **Per-country "Rabljeno" placeholders registered** (`ProductTaxonomy.SUPPORTED_RETAILERS` +
+  `CatalogSourcePolicy` = `OFFICIAL_FEED_REQUIRED`): Njuškalo (HR, already), Bolha (SI), Willhaben (AT),
+  Kleinanzeigen (DE), Subito (IT), Tori (FI), Leboncoin (FR), Marktplaats (NL), Bazoš (SK), Wallapop (ES),
+  OLX (PT), Finn (NO), Blocket (SE), DBA (DK), + multi-market **eBay** (public Browse API) & Facebook
+  Marketplace. Each market now has a second-hand source slot ready for a feed/affiliate.
+- **Pluggable `MarketplaceFeed` seam** (`ai.budgetspace.feed`): `MarketplaceFeed` (extends `RetailerFeed`;
+  contract = `sourceType=marketplace-listing`, mark second-hand, run rows through `MarketplaceListingFilter`
+  before returning, never scrape); `ConfigBackedMarketplaceFeed` (unconfigured placeholder, imports nothing);
+  `MarketplaceFeedProperties` (env-backed `budgetspace.marketplace-feeds.<name>.url`, blank by default — **no
+  creds committed**); `MarketplaceFeedConfig` registers one placeholder bean per marketplace. The existing
+  `RetailerFeedImporter` consumes them and skips each cleanly on startup. A real client (e.g. an eBay Browse
+  API mapper, or a Njuškalo partner export) drops into one bean — nothing else changes.
+- `MarketplaceFeedSeamTest`: all 16 marketplaces are feed-required placeholders; the default feeds are
+  unconfigured + import nothing (import service never touched); the sold-guard drops PRODANO/reserved/expired.
+- **Verified:** backend tests green; app runs identically (placeholders import nothing). The 3 owner worries
+  are answered in code: volume → filtered feed; which items → category/location/condition; **sold → already-built
+  `MarketplaceListingFilter`** (SOLD_MARKERS + 24h staleness + planner-exclusion).
+- **Next when you want data:** wire the **eBay Browse API** client (free key as backend env) as the first real
+  "Rabljeno" source, +`secondHand`/`condition`/`location` through the snapshot DTO, + a "Rabljeno" UI section.
+
+### Sprint 10.48 — retail re-sweep: +13 verified retailers (maximise per-market depth)
 - Owner: "go through our countries again, find more retail stores, pull the maximum." 4 scout agents probed
   fresh candidates across all 14 markets (does the product page serve the price in **static HTML** — JSON-LD /
   PrestaShop `itemprop` / Shopify / visible €/kr — or is it 403/JS-only?), then 4 URL-discovery agents gathered
