@@ -118,7 +118,25 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.42 — geo-IP market detection (current)
+### Sprint 10.43 — Spain depth: non-IKEA retailers (Kenay Home + Banak Importa) (current)
+- **Start of the production-ready retailer-depth push** (owner-requested: enough stores per market that users
+  have real options). A homepage fetchability probe (2026-06-18) across our markets mapped ~9 candidate non-IKEA/
+  JYSK retailers (ES/NL/DE/PT/FI/SK); **AT + IT had none reachable** (all anti-bot). Working order: ES → NL → DE
+  → PT → FI → SK.
+- **Spain (this sprint).** Probed Kenay Home, Banak Importa, Muebles La Fábrica:
+  - **Kenay Home (14) + Banak Importa (14) = 28 web-verified rows** (`real-es-retailers.json`): price from JSON-LD
+    `offers.price` / visible €, name from og:title (entity-decoded), verified og:image (Kenay Orson sofa spot-
+    checked). Honest current price only (no fabricated discount). Registered `MANUAL_VERIFIED_ONLY` in
+    `ProductTaxonomy` + `CatalogSourcePolicy` + `PlannerService.RETAILERS` + frontend `Retailer` type +
+    `retailersByMarket` (ES = IKEA + Kenay + Banak).
+  - **Muebles La Fábrica → `OFFICIAL_FEED_REQUIRED`**: homepage reachable but product pages reset the connection
+    (anti-bot). Registered, not sourced. Never bypassed.
+  - `EsRetailersCatalogRuntimeTest`.
+- **Verified:** backend **172 tests, 0 failures**; frontend build clean; catalog **1315 rows, 0 dup
+  URLs/externalIds**. No fabrication, no anti-bot bypass.
+- **Next:** NL (Leen Bakker, Kwantum), then DE (Roller, Möbel Boss), PT (Moviflor), FI (Sotka), SK (Nábytok).
+
+### Sprint 10.42 — geo-IP market detection
 - **Auto-pick the country from the visitor's real location**, completing the market-detection story (the other
   two layers — browser-locale guess + prompt-text detection like "in Paris" → FR — were already live and
   verified across all 11 markets).

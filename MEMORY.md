@@ -24,7 +24,15 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **171 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 157 in 10.36, 159 in 10.37, 161 in 10.38, 164 in 10.39, 166 in 10.41). Catalog **1287 rows**.
+- Backend tests: **172 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 159 in 10.37, 161 in 10.38, 164 in 10.39, 166 in 10.41, 171 in 10.42). Catalog **1315 rows**.
+- **Retailer depth — production-ready goal (owner-requested 10.43+).** Per market, add every deterministically-
+  fetchable non-IKEA/JYSK retailer; the rest → feed-required. Homepage probe (2026-06-18) mapped ~9 candidates
+  across ES/NL/DE/PT/FI/SK; **AT + IT have none reachable** (all anti-bot) → stay as-is. Working order:
+  **ES (done 10.43)** → NL → DE → PT → FI → SK.
+- **Spain depth (Sprint 10.43).** Added **Kenay Home (14) + Banak Importa (14) = 28 verified rows**
+  (`real-es-retailers.json`, price from JSON-LD/visible €, og:image, honest current price only). **Muebles La
+  Fábrica → feed-required** (homepage reachable but product pages reset the connection / anti-bot). ES is now
+  IKEA + Kenay + Banak.
 - **Market detection has 3 layers (no LLM needed for the common cases).** (1) browser locale region →
   `marketFromBrowser`; (2) prompt text → `detectMarketFromText` ("in Paris" → FR even in an English prompt,
   runs in `Planner.runGeneration` before generating); (3) **geo-IP (Sprint 10.42)** — `GET /api/geo` reads the
@@ -88,7 +96,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37), SK (IKEA + JYSK 10.38), ES (IKEA 10.39), PT (IKEA 10.41).** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37), SK (IKEA + JYSK 10.38), ES (IKEA + Kenay + Banak 10.39/10.43), PT (IKEA 10.41).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
   ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets
@@ -97,7 +105,7 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   SE/DK) have **no catalog** → empty plan (expected).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
   - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE/FI/NL/SK), Emmezeta (HR), **Harvey Norman (HR/SI),
-    Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36)**.
+    Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36), Kenay Home/Banak Importa (ES — 10.43)**.
   - Registered but **feed-required** (403/anti-bot/JS-only/out-of-scope → no products yet): Decathlon,
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
     Home24, Roller, Kika, Leiner, XXXLutz. (Most big chains are bot-blocked — confirmed by probing.)

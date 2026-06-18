@@ -13,7 +13,10 @@ export type Retailer =
   | 'Segmüller'
   | 'Poco'
   // Sprint 10.36: France
-  | 'Camif';
+  | 'Camif'
+  // Sprint 10.43: Spain
+  | 'Kenay Home'
+  | 'Banak Importa';
 
 export type RoomType =
   | 'living-room'

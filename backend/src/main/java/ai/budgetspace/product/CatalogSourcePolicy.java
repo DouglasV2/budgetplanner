@@ -78,6 +78,9 @@ public final class CatalogSourcePolicy {
         map.put("Poco", SourcingStatus.MANUAL_VERIFIED_ONLY);
         // Sprint 10.36: France — reachable + price in static HTML (JSON-LD / visible €), web-verified per product.
         map.put("Camif", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.43: Spain — Kenay Home + Banak Importa serve static prices on product pages (verified).
+        map.put("Kenay Home", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Banak Importa", SourcingStatus.MANUAL_VERIFIED_ONLY);
         // Re-confirmed 2026-06-16: blocked (403/anti-bot/unreachable) or unusable for direct import
         // (JS-only prices / out-of-scope catalog) → only an official/partner feed may populate them.
         map.put("Momax", SourcingStatus.OFFICIAL_FEED_REQUIRED);
@@ -103,6 +106,8 @@ public final class CatalogSourcePolicy {
         map.put("Habitat", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Cdiscount", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         map.put("Vente-unique", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.43: Spain — homepage reachable but product pages reset the connection (anti-bot).
+        map.put("Muebles La Fabrica", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.21: second-hand consumer marketplaces. ToS-protected, no open product API, anti-bot —
         // populated only by a compliant official/partner feed (sourceType=marketplace-listing), never
         // scraped. See docs/marketplace-sourcing.md.

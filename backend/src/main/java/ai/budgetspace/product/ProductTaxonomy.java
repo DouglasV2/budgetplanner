@@ -54,6 +54,10 @@ public final class ProductTaxonomy {
             // Sprint 10.36: France — Camif (camif.fr) is reachable + serves the price in static HTML
             // (JSON-LD offers.price / visible €) + og:image, so it is web-verifiable like IKEA/JYSK.
             "Camif",
+            // Sprint 10.43: Spain — Kenay Home + Banak Importa serve the price in static HTML (JSON-LD /
+            // visible €) on product pages, web-verifiable per product.
+            "Kenay Home",
+            "Banak Importa",
             // Known/targeted but currently feed-required (403/anti-bot/JS-only or out-of-scope). Registered
             // so the system is aware of them and a feed can target them later; they carry no products yet.
             "Momax",
@@ -79,6 +83,9 @@ public final class ProductTaxonomy {
             "Habitat",
             "Cdiscount",
             "Vente-unique",
+            // Sprint 10.43: Spain — Muebles La Fábrica's product pages reset the connection (anti-bot),
+            // though its homepage is reachable → feed-required.
+            "Muebles La Fabrica",
             // Sprint 10.21: second-hand consumer marketplaces. Feed/API-only (OFFICIAL_FEED_REQUIRED) —
             // never scraped; carry no products until a compliant feed exists. See docs/marketplace-sourcing.md.
             "Njuškalo",
