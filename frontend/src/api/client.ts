@@ -72,6 +72,17 @@ export function generatePlan(input: PlannerInput) {
   });
 }
 
+// Sprint 10.42: geo-IP market hint. Reads the visitor's country (2-letter ISO) that a CDN/proxy injected
+// as a request header; null when none is present (local/no-CDN). Best-effort — never throws.
+export async function fetchGeoCountry(): Promise<string | null> {
+  try {
+    const res = await request<{ country: string | null }>('/api/geo');
+    return res.country ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // Sprint 10.34: opt-in price-drop watch. The backend stores only the email + product + threshold (with
 // explicit consent) and emails the user when the price falls; one-click unsubscribe in every alert.
 export interface PriceWatchResponse {

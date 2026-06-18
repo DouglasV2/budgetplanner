@@ -53,6 +53,9 @@ dnevni boravak, moderno, već imam TV") and gets 3 concrete, priced shopping pla
   (**off by default**, `budgetspace.price-watch.recheck-enabled`) that reuses a deterministic `LivePriceProbe`
   (raw HTTP + JSON-LD price) and a `PriceWatchNotifier` **seam** (`LoggingPriceWatchNotifier` default via
   `@ConditionalOnMissingBean`; a real email provider plugs in via backend env — no committed creds).
+- **geo/** — geo-IP market hint (Sprint 10.42): `GET /api/geo` returns the visitor's 2-letter country read
+  from a CDN/proxy header (`CF-IPCountry`, CloudFront, Vercel, …) — no IP stored, no third-party call;
+  `null` when no header (local/no-CDN). The frontend prefers it over the browser-locale guess on a fresh visit.
 - **config/** — `CorsConfig` (allows the frontend origin + `X-BudgetSpace-Session` header),
   `AdminEndpointGuardFilter` (hides admin/collector/import endpoints in prod), `GlobalExceptionHandler`.
 

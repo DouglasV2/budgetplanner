@@ -24,7 +24,13 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **166 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 156 in 10.35, 157 in 10.36, 159 in 10.37, 161 in 10.38, 164 in 10.39). Catalog **1287 rows**.
+- Backend tests: **171 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 157 in 10.36, 159 in 10.37, 161 in 10.38, 164 in 10.39, 166 in 10.41). Catalog **1287 rows**.
+- **Market detection has 3 layers (no LLM needed for the common cases).** (1) browser locale region →
+  `marketFromBrowser`; (2) prompt text → `detectMarketFromText` ("in Paris" → FR even in an English prompt,
+  runs in `Planner.runGeneration` before generating); (3) **geo-IP (Sprint 10.42)** — `GET /api/geo` reads the
+  visitor's country from a CDN header (`CF-IPCountry`/CloudFront/Vercel/…, no IP stored, no third-party call),
+  and `LocaleProvider` prefers it over the browser-locale guess on a fresh visit. Geo no-ops without a CDN
+  (local/Railway-without-CDN) → falls back to browser locale. LLM later adds only the fuzzy/implicit cases.
 - **Portugal (Sprint 10.41).** 11th market (ES recipe): PT added (Markets.java + markets.ts + Portuguese
   `messages/pt.json`, 368 keys, parity-checked) with **IKEA PT 73 rows** (IT-set number-trick → `/pt/pt/`;
   IKEA-only, no JYSK in PT; NORDLI 469 PT). Thanks to the 10.40 lazy-load, **no `i18n.ts` edit was needed** and

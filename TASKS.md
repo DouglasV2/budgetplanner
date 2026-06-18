@@ -118,7 +118,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.41 — new market: Portugal (PT), Portuguese-localised IKEA (current)
+### Sprint 10.42 — geo-IP market detection (current)
+- **Auto-pick the country from the visitor's real location**, completing the market-detection story (the other
+  two layers — browser-locale guess + prompt-text detection like "in Paris" → FR — were already live and
+  verified across all 11 markets).
+- **Backend `geo/` package.** `GET /api/geo` returns the visitor's 2-letter country read from a CDN/proxy
+  header (`CF-IPCountry`, `CloudFront-Viewer-Country`, `X-Vercel-IP-Country`, Fastly, generic) — **no IP stored,
+  no third-party call, no dependency**. Returns `null` when no such header (local dev / no CDN). `GeoControllerTest`.
+- **Frontend.** `fetchGeoCountry()` (best-effort, never throws); `LocaleProvider` upgrades the browser-locale
+  guess to the real geo country **only on a fresh visit** (a returning visitor's saved choice is respected).
+  So a French visitor with an English browser starts on France.
+- **Activation:** needs a CDN/proxy in front that injects a country header (CloudFlare etc.); otherwise it
+  gracefully no-ops and the app keeps its existing browser-locale + prompt detection. (No paid geo-IP service
+  pulled in — same "seam now, provider later" stance as OpenAI/email; a real geo-IP lookup can be added if a
+  deploy has no CDN.)
+- **Verified:** backend **171 tests, 0 failures** (+GeoController ×5); frontend build clean.
+
+### Sprint 10.41 — new market: Portugal (PT), Portuguese-localised IKEA
 - **11th market** (same recipe as ES/FR — IKEA-only, no JYSK in Portugal). Added PT to `Markets.java` +
   `markets.ts` (flag 🇵🇹, Lisboa/Porto/… cities, prompt detection) + `retailersByMarket` (PT = IKEA). `Lang` += `'pt'`.
 - **Full European-Portuguese localisation.** `frontend/src/messages/pt.json` (368 keys, native pt-PT informal "tu"
