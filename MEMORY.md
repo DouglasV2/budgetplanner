@@ -24,11 +24,11 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **172 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 159 in 10.37, 161 in 10.38, 164 in 10.39, 166 in 10.41, 171 in 10.42). Catalog **1315 rows**.
+- Backend tests: **173 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 161 in 10.38, 164 in 10.39, 166 in 10.41, 171 in 10.42, 172 in 10.43). Catalog **1345 rows**.
 - **Retailer depth — production-ready goal (owner-requested 10.43+).** Per market, add every deterministically-
   fetchable non-IKEA/JYSK retailer; the rest → feed-required. Homepage probe (2026-06-18) mapped ~9 candidates
   across ES/NL/DE/PT/FI/SK; **AT + IT have none reachable** (all anti-bot) → stay as-is. Working order:
-  **ES (done 10.43)** → NL → DE → PT → FI → SK.
+  **ES (10.43, Kenay+Banak) → NL (10.44, Leen Bakker+Kwantum)** → DE → PT → FI → SK.
 - **Spain depth (Sprint 10.43).** Added **Kenay Home (14) + Banak Importa (14) = 28 verified rows**
   (`real-es-retailers.json`, price from JSON-LD/visible €, og:image, honest current price only). **Muebles La
   Fábrica → feed-required** (homepage reachable but product pages reset the connection / anti-bot). ES is now
@@ -105,7 +105,8 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   SE/DK) have **no catalog** → empty plan (expected).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
   - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE/FI/NL/SK), Emmezeta (HR), **Harvey Norman (HR/SI),
-    Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36), Kenay Home/Banak Importa (ES — 10.43)**.
+    Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36), Kenay Home/Banak Importa (ES — 10.43),
+    Leen Bakker/Kwantum (NL — 10.44)**.
   - Registered but **feed-required** (403/anti-bot/JS-only/out-of-scope → no products yet): Decathlon,
     Pevex, Lesnina, Momax, Prima Namještaj, Perfecta Dreams, Bauhaus, FeroTerm, Merkur, Dipo, Wayfair,
     Home24, Roller, Kika, Leiner, XXXLutz. (Most big chains are bot-blocked — confirmed by probing.)

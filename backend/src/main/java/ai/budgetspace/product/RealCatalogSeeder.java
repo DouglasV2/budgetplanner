@@ -147,6 +147,8 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // JYSK NL (jysk.nl is reachable + serves static prices, unlike jysk.at). NL = IKEA + JYSK.
             "/catalog/real-ikea-nl-rooms.json",
             "/catalog/real-jysk-nl-rooms.json",
+            // Sprint 10.44: Netherlands depth — Leen Bakker + Kwantum (static-priced product pages, verified).
+            "/catalog/real-nl-retailers.json",
             // Sprint 10.38: Slovakia — IKEA SK (IT-set number-trick → /sk/sk/) + JYSK SK (jysk.sk, same static
             // price structure as jysk.nl/hr). Slovak names + per-market EUR price + verified og:image, 2026-06-18.
             "/catalog/real-ikea-sk-rooms.json",

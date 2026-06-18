@@ -16,7 +16,7 @@ export const retailersByMarket: Record<string, Retailer[]> = {
   IT: ['IKEA'],
   FI: ['IKEA', 'JYSK'],
   FR: ['IKEA', 'Camif'],
-  NL: ['IKEA', 'JYSK'],
+  NL: ['IKEA', 'JYSK', 'Leen Bakker', 'Kwantum'],
   SK: ['IKEA', 'JYSK'],
   ES: ['IKEA', 'Kenay Home', 'Banak Importa'],
   PT: ['IKEA'],

@@ -16,7 +16,10 @@ export type Retailer =
   | 'Camif'
   // Sprint 10.43: Spain
   | 'Kenay Home'
-  | 'Banak Importa';
+  | 'Banak Importa'
+  // Sprint 10.44: Netherlands
+  | 'Leen Bakker'
+  | 'Kwantum';
 
 export type RoomType =
   | 'living-room'

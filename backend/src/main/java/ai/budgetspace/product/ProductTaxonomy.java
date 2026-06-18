@@ -58,6 +58,9 @@ public final class ProductTaxonomy {
             // visible €) on product pages, web-verifiable per product.
             "Kenay Home",
             "Banak Importa",
+            // Sprint 10.44: Netherlands — Leen Bakker + Kwantum serve static prices on product pages.
+            "Leen Bakker",
+            "Kwantum",
             // Known/targeted but currently feed-required (403/anti-bot/JS-only or out-of-scope). Registered
             // so the system is aware of them and a feed can target them later; they carry no products yet.
             "Momax",

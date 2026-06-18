@@ -81,6 +81,9 @@ public final class CatalogSourcePolicy {
         // Sprint 10.43: Spain — Kenay Home + Banak Importa serve static prices on product pages (verified).
         map.put("Kenay Home", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Banak Importa", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.44: Netherlands — Leen Bakker + Kwantum (static-priced product pages, verified).
+        map.put("Leen Bakker", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        map.put("Kwantum", SourcingStatus.MANUAL_VERIFIED_ONLY);
         // Re-confirmed 2026-06-16: blocked (403/anti-bot/unreachable) or unusable for direct import
         // (JS-only prices / out-of-scope catalog) → only an official/partner feed may populate them.
         map.put("Momax", SourcingStatus.OFFICIAL_FEED_REQUIRED);

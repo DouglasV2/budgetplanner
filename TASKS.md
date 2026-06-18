@@ -118,7 +118,17 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.43 — Spain depth: non-IKEA retailers (Kenay Home + Banak Importa) (current)
+### Sprint 10.44 — Netherlands depth: Leen Bakker + Kwantum (current)
+- Continuing the retailer-depth push (ES→**NL**→DE→PT→FI→SK). Both Dutch candidates are sourceable:
+  **Leen Bakker (18) + Kwantum (12) = 30 web-verified rows** (`real-nl-retailers.json`): price from JSON-LD /
+  visible €, name from og:title (entity-decoded), verified og:image where it resolved (20/30; the rest are
+  honest partials with the labelled placeholder — Leen Bakker AYLO armchair spot-checked). Honest current price
+  only. Registered both `MANUAL_VERIFIED_ONLY` (`ProductTaxonomy` + `CatalogSourcePolicy` + `PlannerService` +
+  frontend `Retailer` type + `retailersByMarket`: NL = IKEA + JYSK + Leen Bakker + Kwantum). `NlRetailersCatalogRuntimeTest`.
+- **Verified:** backend **173 tests, 0 failures**; frontend build clean; catalog **1345 rows, 0 dups**.
+- **Next:** DE (Roller, Möbel Boss), then PT, FI, SK.
+
+### Sprint 10.43 — Spain depth: non-IKEA retailers (Kenay Home + Banak Importa)
 - **Start of the production-ready retailer-depth push** (owner-requested: enough stores per market that users
   have real options). A homepage fetchability probe (2026-06-18) across our markets mapped ~9 candidate non-IKEA/
   JYSK retailers (ES/NL/DE/PT/FI/SK); **AT + IT had none reachable** (all anti-bot). Working order: ES → NL → DE

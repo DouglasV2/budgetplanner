@@ -24,7 +24,9 @@ public class PlannerService {
             // Sprint 10.36: France — Camif (verified products).
             "Camif",
             // Sprint 10.43: Spain — Kenay Home + Banak Importa (verified products).
-            "Kenay Home", "Banak Importa");
+            "Kenay Home", "Banak Importa",
+            // Sprint 10.44: Netherlands — Leen Bakker + Kwantum (verified products).
+            "Leen Bakker", "Kwantum");
 
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.ofEntries(
             Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "decor")),
