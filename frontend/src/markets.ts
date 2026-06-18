@@ -1,8 +1,9 @@
-// Sprint 10.13 (#3): EU market configuration (mirrors backend ai.budgetspace.product.Markets).
-// Only EUR markets are offered in the UI for now, because the catalog prices are in EUR — adding a
-// non-EUR market (PLN/CZK/…) requires its own verified, currency-correct catalog first.
+// Sprint 10.13 (#3): EU/EEA market configuration (mirrors backend ai.budgetspace.product.Markets).
+// Each market carries its own `currency` + `locale`; `formatCurrency` renders prices via
+// Intl.NumberFormat, so non-EUR markets (Sprint 10.46: NO/SE/DK) display in their national currency.
+// Adding a market still requires its own verified, currency-correct catalog (prices in that currency).
 // `available` = a real per-market catalog exists today; others are foundation/"coming soon".
-export type Lang = 'hr' | 'en' | 'de' | 'it' | 'sl' | 'fi' | 'fr' | 'nl' | 'sk' | 'es' | 'pt';
+export type Lang = 'hr' | 'en' | 'de' | 'it' | 'sl' | 'fi' | 'fr' | 'nl' | 'sk' | 'es' | 'pt' | 'no' | 'sv' | 'da';
 
 export interface MarketConfig {
   code: string;
@@ -34,7 +35,11 @@ export const MARKETS: MarketConfig[] = [
   // Sprint 10.39: Spain — EUR, Spanish-localised, verified IKEA catalog (IKEA-only).
   { code: 'ES', label: 'España', currency: 'EUR', locale: 'es-ES', lang: 'es', available: true, flag: '🇪🇸' },
   // Sprint 10.41: Portugal — EUR, Portuguese-localised, verified IKEA catalog (IKEA-only).
-  { code: 'PT', label: 'Portugal', currency: 'EUR', locale: 'pt-PT', lang: 'pt', available: true, flag: '🇵🇹' }
+  { code: 'PT', label: 'Portugal', currency: 'EUR', locale: 'pt-PT', lang: 'pt', available: true, flag: '🇵🇹' },
+  // Sprint 10.46: Scandinavia — non-EUR (NOK/SEK/DKK), natively localised, verified IKEA + JYSK catalogs.
+  { code: 'NO', label: 'Norge', currency: 'NOK', locale: 'nb-NO', lang: 'no', available: true, flag: '🇳🇴' },
+  { code: 'SE', label: 'Sverige', currency: 'SEK', locale: 'sv-SE', lang: 'sv', available: true, flag: '🇸🇪' },
+  { code: 'DK', label: 'Danmark', currency: 'DKK', locale: 'da-DK', lang: 'da', available: true, flag: '🇩🇰' }
 ];
 
 // Sprint 10.30: major cities per market for the optional city picker (datalist suggestions; the user can
@@ -51,6 +56,9 @@ export const CITIES_BY_MARKET: Record<string, string[]> = {
   SK: ['Bratislava', 'Košice', 'Prešov', 'Žilina', 'Nitra', 'Banská Bystrica', 'Trnava', 'Trenčín', 'Martin', 'Poprad'],
   ES: ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Bilbao', 'Alicante'],
   PT: ['Lisboa', 'Porto', 'Vila Nova de Gaia', 'Braga', 'Coimbra', 'Amadora', 'Funchal', 'Setúbal', 'Almada', 'Faro'],
+  NO: ['Oslo', 'Bergen', 'Trondheim', 'Stavanger', 'Drammen', 'Fredrikstad', 'Kristiansand', 'Tromsø', 'Sandnes', 'Ålesund'],
+  SE: ['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Norrköping', 'Lund'],
+  DK: ['København', 'Aarhus', 'Odense', 'Aalborg', 'Esbjerg', 'Randers', 'Kolding', 'Horsens', 'Vejle', 'Roskilde'],
 };
 
 export function citiesForMarket(code?: string): string[] {
@@ -101,6 +109,9 @@ const MARKET_DETECTION: Array<{ market: string; pattern: RegExp }> = [
   { market: 'SK', pattern: /\b(slovack\w*|slovakia|slovensk\w*|bratislav\w*|kosic\w*|presov|zilina|nitra|banska bystrica|trnava|trencin|poprad)\b/ },
   { market: 'ES', pattern: /\b(spanjolsk\w*|spain|espana|espanol\w*|madrid|barcelon\w*|valencia|sevilla|zaragoza|malaga|bilbao|alicante|murcia)\b/ },
   { market: 'PT', pattern: /\b(portugalsk\w*|portugal|portugues\w*|lisbo\w*|lisbon|porto|braga|coimbra|funchal|faro|setubal|almada)\b/ },
+  { market: 'NO', pattern: /\b(norvesk\w*|norway|norge|norwegen|oslo|bergen|trondheim|stavanger|tromso|drammen|kristiansand|alesund)\b/ },
+  { market: 'SE', pattern: /\b(svedsk\w*|sweden|sverige|schweden|stockholm\w*|goteborg|gothenburg|malmo|uppsala|vasteras|orebro|linkoping|helsingborg)\b/ },
+  { market: 'DK', pattern: /\b(dansk\w*|denmark|danmark|danemark|kobenhavn|copenhagen|aarhus|odense|aalborg|esbjerg|randers|kolding|vejle|roskilde)\b/ },
   { market: 'HR', pattern: /\b(hrvatsk\w*|croatia|zagreb\w*|split\w*|rijek\w*|osijek|zadar|pula|dubrovnik|varazdin|karlovac|sisak)\b/ }
 ];
 

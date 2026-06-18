@@ -39,6 +39,9 @@ public final class Markets {
             Map.entry("CZ", new MarketInfo("CZ", "CZK", "cs-CZ")),
             Map.entry("HU", new MarketInfo("HU", "HUF", "hu-HU")),
             Map.entry("RO", new MarketInfo("RO", "RON", "ro-RO")),
+            // Sprint 10.46: Scandinavia — non-EUR markets with verified IKEA + JYSK catalogs (prices in the
+            // national currency; the frontend formats each market in its own currency via Intl.NumberFormat).
+            Map.entry("NO", new MarketInfo("NO", "NOK", "nb-NO")),
             Map.entry("SE", new MarketInfo("SE", "SEK", "sv-SE")),
             Map.entry("DK", new MarketInfo("DK", "DKK", "da-DK"))
     );

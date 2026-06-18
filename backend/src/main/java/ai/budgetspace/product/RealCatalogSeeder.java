@@ -166,7 +166,17 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-ikea-pt-rooms.json",
             // Sprint 10.45: Portugal depth — Moviflor (moviflor.pt, static-priced product pages + og:image,
             // verified; page is windows-1252 so the sourcer decodes per the declared charset).
-            "/catalog/real-pt-retailers.json"
+            "/catalog/real-pt-retailers.json",
+            // Sprint 10.46: Scandinavia (non-EUR). IKEA NO/SE/DK via the number-trick (→ /no/no/, /se/sv/,
+            // /dk/da/) with per-market JSON-LD price + priceCurrency (NOK/SEK/DKK) + verified og:image; JYSK
+            // NO/SE/DK from static product pages (priceAmount=regular, JSON-LD price=current; sale only when a
+            // priceValidUntil window confirms it). Prices are in the national currency, formatted per market.
+            "/catalog/real-ikea-no-rooms.json",
+            "/catalog/real-jysk-no-rooms.json",
+            "/catalog/real-ikea-se-rooms.json",
+            "/catalog/real-jysk-se-rooms.json",
+            "/catalog/real-ikea-dk-rooms.json",
+            "/catalog/real-jysk-dk-rooms.json"
     );
 
     /**

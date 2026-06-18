@@ -46,8 +46,8 @@ const DICTIONARY: Record<string, Entry> = {
   'planner.generate': { hr: 'Složi moj plan', en: 'Build my plan' },
   'planner.generating': { hr: 'Slažem plan...', en: 'Building plan...' },
   'planner.marketComingSoon': {
-    hr: 'Katalog za ovu državu se još puni — prikazujemo opće prijedloge. Cijene su u eurima.',
-    en: 'The catalog for this country is still being built — showing general suggestions. Prices are in euros.'
+    hr: 'Katalog za ovu državu se još puni — prikazujemo opće prijedloge. Cijene su u valuti tog tržišta.',
+    en: 'The catalog for this country is still being built — showing general suggestions. Prices are in that market\'s currency.'
   },
 
   'pricing.eyebrow': { hr: 'Trebaš više planova?', en: 'Need more plans?' },
@@ -247,7 +247,7 @@ const DICTIONARY: Record<string, Entry> = {
   'form.locationAriaLabel': { hr: 'Lokacija', en: 'Location' },
   'form.locationHelp': { hr: 'Koristimo ovo kasnije za dostupnost i trgovine u blizini.', en: 'We use this later for availability and nearby stores.' },
   'form.countryLabel': { hr: 'Država', en: 'Country' },
-  'form.countryHelp': { hr: 'Određuje katalog i valutu (cijene su u eurima).', en: 'Sets the catalog and currency (prices are in euros).' },
+  'form.countryHelp': { hr: 'Određuje katalog i valutu (cijene su u valuti tog tržišta).', en: 'Sets the catalog and currency (prices shown in that market\'s currency).' },
   'form.cityLabel': { hr: 'Grad (nije obavezno)', en: 'City (optional)' },
   'form.cityAriaLabel': { hr: 'Grad', en: 'City' },
   'form.cityPlaceholder': { hr: 'npr. {example}', en: 'e.g. {example}' },

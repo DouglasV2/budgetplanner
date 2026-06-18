@@ -24,7 +24,16 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   never replaces `originalProductUrl`; sponsored is discreet + labelled. No Stripe.
 
 ## Current state (as of 2026-06-18)
-- Backend tests: **175 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 161 in 10.38, 164 in 10.39, 166 in 10.41, 171 in 10.42, 172 in 10.43, 173 in 10.44). Catalog **1376 rows**.
+- Backend tests: **177 green, 0 failures** (baseline grows each sprint; was 92 mid-10.x, 172 in 10.43, 173 in 10.44, 175 in 10.45). Catalog **1623 rows**.
+- **Scandinavia (Sprint 10.46) — first NON-EUR markets: NO/SE/DK.** The app was never really EUR-locked: each
+  `MarketConfig` already had `currency`+`locale` and `formatCurrency` already used `Intl.NumberFormat`, so NOK/
+  SEK/DKK "just worked" once a local-currency catalog existed (**no FX** — a plan uses one market's catalog vs a
+  budget in the same currency). Sourced **IKEA NO 47/SE 52/DK 53** (number-trick → `/no/no/ /se/sv/ /dk/da/`,
+  per-market JSON-LD `price`+`priceCurrency`, all imaged) + **JYSK NO 32/SE 31/DK 32** (static pages; sale only
+  when `priceValidUntil` confirms — 6 real SE promos). `Markets.java` +NO (SE/DK pre-existed); markets.ts +NO/SE/
+  DK (NOK/SEK/DKK, flags, cities, detection) + `Lang` no/sv/da; natively localised (`messages/{no,sv,da}.json`,
+  368 keys, parity-checked). Fixed 2 EUR-assuming strings + StatsStrip now shows the market's currency symbol.
+  **14 markets / 13 UI languages.** Next non-EUR: PL/CZ/HU/RO (same recipe).
 - **Retailer depth — production-ready goal (owner-requested 10.43+) — push COMPLETE.** Per market, add every
   deterministically-fetchable non-IKEA/JYSK retailer; the rest → feed-required. Homepage probe (2026-06-18)
   mapped ~9 candidates across ES/NL/DE/PT/FI/SK; **AT + IT have none reachable** (all anti-bot) → stay as-is.
@@ -103,13 +112,13 @@ gets 3 concrete priced shopping plans from a **real, web-verified** catalog. Cro
   bathroom/hallway/kitchen IKEA); 10.19 +44 (JYSK SI/DE hallway/kitchen); 10.20 +116 (new markets IT 51 +
   FI 50 IKEA + JYSK FI 15); 10.22 +53 (HR gap-fill + non-IKEA breadth → HR is now ~290 sourced rows, every
   planner-flow room×category cell covered).
-- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37 + Leen Bakker/Kwantum 10.44), SK (IKEA + JYSK 10.38 + Nábytok 10.45), ES (IKEA + Kenay + Banak 10.39/10.43), PT (IKEA 10.41 + Moviflor 10.45).** SI/AT/DE/IT/FI cover
+- **Markets with real catalog: HR (deep — all rooms), SI, AT, DE, IT, FI, FR (IKEA 10.35 + Camif 10.36), NL (IKEA + JYSK 10.37 + Leen Bakker/Kwantum 10.44), SK (IKEA + JYSK 10.38 + Nábytok 10.45), ES (IKEA + Kenay + Banak 10.39/10.43), PT (IKEA 10.41 + Moviflor 10.45), NO/SE/DK (IKEA + JYSK 10.46 — non-EUR NOK/SEK/DKK).** SI/AT/DE/IT/FI cover
   living-room + bedroom + home-office + kitchen + bathroom + hallway (IKEA; SI/AT/DE also dining). JYSK
   covers hallway/kitchen for **SI + DE + FI** (not AT — jysk.at gates stock behind JS, "Vorübergehend
-  ausverkauft" in static HTML → can't confirm availability; needs feed/API). Non-EUR EU markets
-  (PL/CZ/HU/RO/SE/DK) deferred (frontend is EUR-only). Per-market prices verified individually (they genuinely
-  differ: KALLAX 169 DE / 189 AT / 199 SI / 179 HR). Other countries in `Markets` (IT/FI/PL/CZ/HU/RO/
-  SE/DK) have **no catalog** → empty plan (expected).
+  ausverkauft" in static HTML → can't confirm availability; needs feed/API). Per-market prices verified
+  individually (they genuinely differ: KALLAX 169 DE / 189 AT / 199 SI / 179 HR). **Non-EUR works now**
+  (Sprint 10.46): each market formats its own currency via `Intl.NumberFormat`, no FX. Remaining `Markets`
+  countries PL/CZ/HU/RO have **no catalog** → empty plan (next: same IKEA-number-trick + JYSK recipe as NO/SE/DK).
 - **Retailers** (single source of truth = `CatalogSourcePolicy`):
   - Verified/with-products: IKEA, JYSK (HR/SI/AT/DE/FI/NL/SK), Emmezeta (HR), **Harvey Norman (HR/SI),
     Namjestaj.hr (HR), Otto/Segmüller/Poco (DE), Camif (FR — 10.36), Kenay Home/Banak Importa (ES — 10.43),

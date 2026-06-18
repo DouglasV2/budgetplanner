@@ -20,6 +20,10 @@ export const retailersByMarket: Record<string, Retailer[]> = {
   SK: ['IKEA', 'JYSK', 'Nábytok'],
   ES: ['IKEA', 'Kenay Home', 'Banak Importa'],
   PT: ['IKEA', 'Moviflor'],
+  // Sprint 10.46: Scandinavia — IKEA + JYSK, prices in the national currency.
+  NO: ['IKEA', 'JYSK'],
+  SE: ['IKEA', 'JYSK'],
+  DK: ['IKEA', 'JYSK'],
 };
 
 export function retailersForMarket(code?: string): Retailer[] {

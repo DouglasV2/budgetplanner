@@ -118,7 +118,31 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
-### Sprint 10.45 — depth: Portugal (Moviflor) + Slovakia (Nábytok); Finland feed-required; Germany deferred (current)
+### Sprint 10.46 — Scandinavia: Norway + Sweden + Denmark (first non-EUR markets) (current)
+- **Why now:** the owner asked why NO/SE/DK weren't covered. The blocker was never sourcing — it was that
+  the app implicitly assumed EUR. Turns out it didn't: `MarketConfig` already carried `currency`+`locale` and
+  `formatCurrency` already used `Intl.NumberFormat`, so non-EUR "just worked" once a local-currency catalog
+  existed. No FX needed — a plan is built from one market's catalog and compared to a budget in the **same**
+  currency, so NOK/SEK/DKK are self-contained.
+- **3 new markets, each IKEA + JYSK, prices in the national currency:**
+  - **IKEA NO 47 / SE 52 / DK 53** — number-trick (`/no/no/`, `/se/sv/`, `/dk/da/`) from the HR article numbers
+    (global across markets); per-market JSON-LD `price` + `priceCurrency` (NOK/SEK/DKK) + localized og:title name
+    + verified og:image, all 152 imaged. Per-currency price tiers (≈EUR thresholds × FX).
+  - **JYSK NO 32 / SE 31 / DK 32** — static product pages (URLs discovered by 3 subagents, then deterministic
+    fetch): JSON-LD `price` = current, `priceAmount` = regular, **sale shown only when `priceValidUntil`
+    confirms a window** (6 real SE promos auto-detected, e.g. KOKKEDAL chair 425 was 849 SEK). All 95 imaged.
+- **Backend:** `Markets.java` +NO (SE/DK already present); 6 catalog files registered in `RealCatalogSeeder`.
+  IKEA/JYSK were already `DIRECT_VERIFIED`, so no policy change. `ScandinaviaCatalogRuntimeTest` (currency wiring
+  + per-market import + planner-eligibility + honest-sale guard).
+- **Frontend:** `markets.ts` +NO/SE/DK (NOK/SEK/DKK, flags, cities, prompt-detection) + `Lang` `no`/`sv`/`da`;
+  `retailersByMarket` NO/SE/DK = IKEA+JYSK. **Natively localised** — `messages/{no,sv,da}.json` (368 keys each,
+  parity-checked, translated by 3 subagents from the EN source) lazy-loaded like the rest. Fixed 2 EUR-assuming
+  strings to currency-generic; `StatsStrip` now shows the active market's currency symbol (€/kr) not a hardcoded €.
+- **Verified:** backend tests green; frontend build clean (new no/sv/da chunks, main still ~77 kB gzip);
+  catalog **1623 rows, 0 dups** (+247 Scandi). The app now spans **14 markets / 13 UI languages**.
+- **Next clean follow-up:** PL/CZ/HU/RO (non-EUR, same recipe — IKEA number-trick + JYSK where static-priced).
+
+### Sprint 10.45 — depth: Portugal (Moviflor) + Slovakia (Nábytok); Finland feed-required; Germany deferred
 - Closing out the retailer-depth push (ES→NL→DE→PT→FI→**SK**) so every market has more than IKEA/JYSK where a
   non-IKEA retailer is deterministically fetchable. Outcomes for the last three:
   - **PT — Moviflor (moviflor.pt): 20 web-verified rows** (`real-pt-retailers.json`), all with a verified
