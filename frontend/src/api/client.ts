@@ -15,7 +15,8 @@ export interface PlanGenerationResponse {
   secondHandSuggestions?: Product[];
 }
 
-// Stable per-browser id so the backend can apply per-session AI usage limits. No PII.
+// Stable per-browser id so the backend can apply per-session AI usage limits + scope a guest's saved plans.
+// No PII. On Google sign-in this id is sent once so the guest's saved plans migrate onto the account.
 function sessionId(): string {
   try {
     const key = 'bs-session-id';
@@ -30,10 +31,18 @@ function sessionId(): string {
   }
 }
 
+/** The guest browser-session id (used to migrate guest-saved plans onto an account on first sign-in). */
+export function getGuestSessionId(): string {
+  return sessionId();
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
+      // Sprint 10.63: send the auth session cookie on every API call so signed-in requests are recognised
+      // (CORS allows credentials for the explicit frontend origins). Harmless for guest calls.
+      credentials: 'include',
       // Spread options FIRST, then headers — otherwise an options.headers (e.g. the session header on
       // /api/plans/generate) overwrites the merged headers and drops Content-Type, so the browser sends
       // text/plain and the backend rejects it (HttpMediaTypeNotSupportedException → 500).
@@ -53,6 +62,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(message || `Zahtjev nije uspio (${response.status}).`);
   }
 
+  // A 204 (e.g. logout) has no body — calling .json() on it would throw, so return nothing.
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
@@ -60,6 +71,7 @@ function fireAndForget(path: string, payload: unknown) {
   void fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
     keepalive: true,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json'
     },
@@ -182,4 +194,39 @@ export function getProducts(params: Partial<{ retailer: string; category: string
   });
   const query = search.toString();
   return request<Product[]>(`/api/products${query ? `?${query}` : ''}`);
+}
+
+// Sprint 10.63: Google Sign-In + server sessions. The session lives in an HttpOnly cookie (set by the backend);
+// the frontend never sees the token, it just calls /me to learn who is signed in.
+export interface AuthUser {
+  id: string;
+  email: string | null;
+  name: string | null;
+  pictureUrl: string | null;
+}
+
+export interface AuthMe {
+  user: AuthUser | null;
+  googleEnabled: boolean;
+  // The PUBLIC Google client id, served by the backend so the frontend has one source of truth. Null when
+  // Google sign-in is not configured (dormant — guest-only, no fake auth).
+  googleClientId: string | null;
+}
+
+/** Who (if anyone) is signed in, plus whether Google sign-in is available and the client id to render it. */
+export function fetchAuthMe() {
+  return request<AuthMe>('/api/auth/me');
+}
+
+/** Exchange a Google ID token for a session; sends the guest id so guest-saved plans migrate onto the account. */
+export function googleLogin(credential: string) {
+  return request<AuthUser>('/api/auth/google', {
+    method: 'POST',
+    body: JSON.stringify({ credential, guestSessionId: getGuestSessionId() })
+  });
+}
+
+/** Sign out: the backend deletes the session and clears the cookie. */
+export function authLogout() {
+  return request<void>('/api/auth/logout', { method: 'POST' });
 }

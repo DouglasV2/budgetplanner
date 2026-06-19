@@ -427,6 +427,17 @@ const DICTIONARY: Record<string, Entry> = {
   'account.signInGoogle': { hr: 'Prijava s Google-om', en: 'Sign in with Google' },
   'account.soonBadge': { hr: 'uskoro', en: 'soon' },
   'account.signInTooltip': { hr: 'Uskoro — planovi će se vezati uz tvoj Google račun, ne uz ovaj preglednik.', en: 'Coming soon — your plans will be tied to your Google account, not this browser.' },
+  'account.signedInHint': { hr: 'Spremljeni planovi su vezani uz tvoj račun i dostupni na svakom uređaju.', en: 'Saved plans are tied to your account and available on every device.' },
+
+  // Sprint 10.63: real Google sign-in + the front door.
+  'auth.gateTitle': { hr: 'Dobrodošli u BudgetSpace', en: 'Welcome to BudgetSpace' },
+  'auth.gateSubtitle': { hr: 'Prijavi se da tvoji planovi ostanu spremljeni i prate te na svakom uređaju.', en: 'Sign in so your plans stay saved and follow you on every device.' },
+  'auth.continueGuest': { hr: 'Nastavi kao gost', en: 'Continue as guest' },
+  'auth.guestNote': { hr: 'Možeš i bez prijave — tada se planovi spremaju samo u ovaj preglednik.', en: 'You can skip it — your plans are then saved only in this browser.' },
+  'auth.signIn': { hr: 'Prijava', en: 'Sign in' },
+  'auth.signOut': { hr: 'Odjava', en: 'Sign out' },
+  'auth.signedInAs': { hr: 'Prijavljen kao {name}', en: 'Signed in as {name}' },
+  'auth.signInError': { hr: 'Prijava nije uspjela. Pokušaj ponovno.', en: 'Sign-in failed. Please try again.' },
   // Sprint 10.54: feedback that acts. After the user rates the plan, offer the one-click fix for the complaint.
   'results.feedbackThanks': { hr: 'Hvala — drago nam je da pomaže.', en: 'Thanks — glad it helps.' },
   'results.feedbackThanksActable': { hr: 'Hvala. Da to odmah složim?', en: 'Thanks. Want me to sort that now?' },

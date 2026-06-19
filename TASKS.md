@@ -7,15 +7,22 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 A running registry of everything intentionally left as a placeholder / dormant seam, so we never forget to wire
 the real thing. Each line says what activates it. (Added 2026-06-19.)
 
-- **eBay Browse "Rabljeno" feed** (10.51) — built + dormant. Activate: set `BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID`
-  + `..._CLIENTSECRET` (eBay App ID + Cert ID) in the backend env, restart → imports used furniture for
-  DE/IT/AT/FR/NL/ES/GB. **Owner's key is coming (~1 business day).** Then: live smoke test + tune furniture category id.
+- **eBay Browse "Rabljeno" feed** (10.51) — built + dormant. ⚠️ **DO NOT activate as-built.** The owner
+  registered the eBay PRODUCTION app declaring *"we do not persist eBay data — responses are used only
+  transiently"*, but `EbayBrowseFeed` is a `MarketplaceFeed` whose rows are **imported into the `products`
+  table** (`RetailerFeedImporter` → `RetailerSnapshotImportService`) and served from the DB — that conflicts
+  with the declaration and eBay's ToS. **Rework first:** make eBay a live, request-time, in-memory-only source
+  (fetch Browse on demand → map in memory → return → never write to DB), then wire the PROD keys
+  (`BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID/_CLIENTSECRET`, backend env only). See `memory/ebay-no-persist.md`.
 - **Per-country marketplace feeds** (10.49) — Njuškalo (HR), Bolha (SI), Willhaben (AT), Kleinanzeigen (DE), Subito
   (IT), Tori (FI), Leboncoin (FR), Marktplaats (NL), Bazoš (SK), Wallapop (ES), OLX (PT), Finn (NO), Blocket (SE),
   DBA (DK), Facebook Marketplace — registered `OFFICIAL_FEED_REQUIRED`, import 0. Activate: a compliant
   partner/affiliate/export feed each (build a `MarketplaceFeed` like `EbayBrowseFeed`). **Never scrape.**
-- **Google sign-in** (10.53) — disabled "Prijava s Google-om · uskoro" button (no fake auth/state). Activate: real
-  Google OAuth2 + an account identity; migrate the session-scoped saved plans to the account.
+- **Google sign-in** (10.53 → ✅ **10.63**) — real Google Sign-In now ships: a sign-in front door (with a guest
+  escape), local Google ID-token verification (Nimbus, no client secret), HttpOnly cookie sessions with absolute
+  + idle expiry (auto-logout), and guest→account saved-plan migration on first sign-in. Live only once the OAuth
+  client has `http://localhost:5180` (and the prod origin) in its Authorized JavaScript origins, and
+  `BUDGETSPACE_GOOGLE_CLIENTID` is set (public client id, supplied via the gitignored `.env`). Blank → dormant.
 - **Moodboard upload** (10.58) — disabled "Učitaj moodboard · uskoro" placeholder in the vibe picker. Activate: a
   vision/AI layer (uploaded room image → inferred style + palette). Gated by the AI layer being enabled.
 - **OpenAI / AI layer** — `BUDGETSPACE_AI_ENABLED=false` by default (rule-based planner runs). Activate: set the
@@ -148,6 +155,26 @@ needs `OPENAI_API_KEY`, backend env only).
 - **Scale/perf**: load test, query/caching review, CDN for assets.
 
 ## Recently done
+
+### Sprint 10.63 — real Google sign-in + sessions before the app (current)
+- Owner: "Google prijava prije ulaska u app, čuvaj sesiju, odlogiraj nakon nekog vremena." Replaced the honest
+  disabled placeholder with **real Google Sign-In** + a server session lifecycle.
+- **Backend (211 tests, 0 failures — +17 new):** `GoogleTokenVerifier` verifies the Google ID token **locally**
+  (Nimbus, RS256 against Google's JWKS; audience = our public client id; issuer/expiry checked) — **no client
+  secret** (ID-token flow, not the code flow). `AppUser` (by Google sub) + `AuthSession` (opaque token, absolute
+  `expiresAt` + sliding `lastSeenAt`) → **auto-logout** on TTL/idle. `AuthService` upserts the account, mints a
+  session, and **migrates the guest's saved plans** onto the account on first sign-in. `AuthController`:
+  `POST /api/auth/google` (sets an HttpOnly `SameSite=Lax` cookie), `GET /api/auth/me` (who + the public client
+  id), `POST /api/auth/logout`. CORS now `allowCredentials(true)`; saved-plan ownership resolves to the account
+  when signed in, else the guest session (back-compat). Config: `BUDGETSPACE_GOOGLE_CLIENTID` (blank → dormant),
+  `session.ttl-days` (30), `session.idle-days` (7).
+- **Frontend:** `AuthProvider` (loads `/api/auth/me`), a premium **sign-in front door** shown on entry (with a
+  **"Nastavi kao gost"** escape; **shared `/plan/<id>` links bypass it** so the share loop never hits a wall),
+  the real **Google Identity Services** button, header sign-in/out + avatar, and the planner account strip + saved
+  inbox now reflect real account state (saved plans refetch on sign-in to show the migrated ones). New i18n (hr+en)
+  + CSS. **Frontend build clean.**
+- **Dormant seam preserved:** with no client id, the Google button stays honestly disabled and the app is
+  guest-only — no fake auth. The public client id is served by the backend (`/api/auth/me`), one source of truth.
 
 ### Sprint 10.62 — calmer results (UX simplification) (current)
 - Owner: "čim uđe i izgenerira plan vidi dosta toga i svačega." After a plan, `PlanResults` stacked ~11 full

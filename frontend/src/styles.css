@@ -3798,6 +3798,174 @@ textarea {
   border-radius: 999px;
 }
 
+/* Sprint 10.63: real account state in the planner strip + the sign-in front door + header auth. */
+.account-strip-badge {
+  font-weight: 640;
+  font-size: 0.86rem;
+  color: var(--ink);
+  background: rgba(102, 120, 95, 0.14);
+  border: 1px solid var(--hairline);
+  padding: 8px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.account-signin-link {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--orange-dark);
+  font-weight: 640;
+  font-size: 0.88rem;
+  padding: 9px 18px;
+  cursor: pointer;
+}
+
+.account-signin-link:hover {
+  background: rgba(207, 95, 42, 0.06);
+}
+
+.header-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+}
+
+.header-avatar-fallback {
+  display: inline-grid;
+  place-items: center;
+  background: var(--orange);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.header-user-name {
+  font-weight: 620;
+  font-size: 0.88rem;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-signin,
+.header-signout {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 620;
+  font-size: 0.85rem;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.header-signin:hover,
+.header-signout:hover {
+  background: rgba(31, 29, 26, 0.04);
+}
+
+.auth-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(31, 29, 26, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.auth-gate-card {
+  width: min(420px, 100%);
+  background: var(--paper, #fffdf8);
+  border: 1px solid var(--hairline);
+  border-radius: 26px;
+  padding: 34px 30px 28px;
+  box-shadow: 0 30px 80px rgba(31, 29, 26, 0.28);
+  text-align: center;
+}
+
+.auth-gate-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 18px;
+}
+
+.auth-gate-card h1 {
+  font-size: 1.5rem;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.auth-gate-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 22px;
+  line-height: 1.5;
+}
+
+.auth-gate-actions {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.google-signin-mount {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+.auth-gate-guest {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 640;
+  font-size: 0.92rem;
+  padding: 11px 22px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+}
+
+.auth-gate-guest:hover {
+  background: rgba(31, 29, 26, 0.04);
+}
+
+.auth-gate-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.auth-gate-error {
+  color: #b3261e;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Shown only for the brief moment a first-time visit waits for /me, so the app never flashes under the gate. */
+.auth-splash {
+  position: fixed;
+  inset: 0;
+  background: var(--paper, #faf7f0);
+}
+
 .shopping-list-head,
 .shopping-list-group-title {
   display: flex;

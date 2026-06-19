@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
+import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
 import { detectMarketFromText, marketConfig } from '../markets';
 import { PlannerForm } from './PlannerForm';
@@ -187,6 +188,9 @@ function SavedPlansInbox({
 
 export function Planner() {
   const { market, config, setMarket, t } = useLocale();
+  // Sprint 10.63: real auth. When the signed-in user changes (sign-in/out), the saved-plans inbox refetches so
+  // the now account-owned plans (migrated from the guest session on first sign-in) appear.
+  const { user, openSignIn } = useAuth();
   // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
   // the active market's language (the user can then edit freely).
   const [input, setInput] = useState<PlannerInput>(() => ({ ...initialInput, prompt: t('planner.examplePrompt'), market }));
@@ -222,7 +226,10 @@ export function Planner() {
 
   useEffect(() => {
     void refreshSavedPlans();
-  }, []);
+    // Refetch when the signed-in identity changes: after sign-in the inbox should show the account's plans
+    // (including the ones migrated from this browser's guest session), and after sign-out the guest's again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Sprint 10.13 (#3): keep the request's market in sync with the selected country so the backend
   // filters the catalog and the totals are formatted in that market's currency.
@@ -461,18 +468,18 @@ export function Planner() {
 
       {notice && <div className="planner-notice">{notice}</div>}
 
-      {/* Sprint 10.53: honest account seam. Plans are session-scoped (this browser) today; Google login lands
-          later and ties them to an account. The button is intentionally disabled — no fake logged-in state. */}
+      {/* Sprint 10.63: real account state. Signed in → plans are tied to the account; guest → saved in this
+          browser, with a one-click way back to the sign-in front door. */}
       <div className="account-strip">
         <div className="account-strip-text">
           <span>{t('account.title')}</span>
-          <small>{t('account.hint')}</small>
+          <small>{user ? t('account.signedInHint') : t('account.hint')}</small>
         </div>
-        <button type="button" className="google-signin-button" disabled title={t('account.signInTooltip')}>
-          <span className="g-mark" aria-hidden="true">G</span>
-          <span>{t('account.signInGoogle')}</span>
-          <span className="soon-badge">{t('account.soonBadge')}</span>
-        </button>
+        {user ? (
+          <span className="account-strip-badge">{t('auth.signedInAs', { name: user.name || user.email || '' })}</span>
+        ) : (
+          <button type="button" className="account-signin-link" onClick={openSignIn}>{t('auth.signIn')}</button>
+        )}
       </div>
 
       <SavedPlansInbox
