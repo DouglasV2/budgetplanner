@@ -384,6 +384,12 @@ const DICTIONARY: Record<string, Entry> = {
   'results.secondHandApproxPrice': { hr: '≈ {price}', en: '≈ {price}' },
   'results.secondHandPriceNote': { hr: 'cijena okvirna · provjeri dostupnost', en: 'approx. price · check availability' },
   'results.secondHandOpenListing': { hr: 'Otvori oglas ↗', en: 'Open listing ↗' },
+  // Sprint 10.53: honest account seam. Plans are session-scoped (this browser) today; Google login lands later.
+  'account.title': { hr: 'Tvoji planovi', en: 'Your plans' },
+  'account.hint': { hr: 'Za sada se spremaju u ovaj preglednik. Prijavom će biti vezani uz tvoj račun.', en: 'For now they\'re saved in this browser. Sign in to tie them to your account.' },
+  'account.signInGoogle': { hr: 'Prijava s Google-om', en: 'Sign in with Google' },
+  'account.soonBadge': { hr: 'uskoro', en: 'soon' },
+  'account.signInTooltip': { hr: 'Uskoro — planovi će se vezati uz tvoj Google račun, ne uz ovaj preglednik.', en: 'Coming soon — your plans will be tied to your Google account, not this browser.' },
   // Sprint 10.34: opt-in price-drop watch. GDPR-minimal: explicit consent, says exactly what we store,
   // one-click unsubscribe. {email} is the address the user typed back to them.
   'results.watchPrice': { hr: 'Prati cijenu', en: 'Watch price' },

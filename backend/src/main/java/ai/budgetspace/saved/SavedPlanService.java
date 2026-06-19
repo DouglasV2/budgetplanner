@@ -23,7 +23,7 @@ public class SavedPlanService {
         this.objectMapper = objectMapper;
     }
 
-    public SavedPlanResponse save(SavedPlanRequest request) {
+    public SavedPlanResponse save(SavedPlanRequest request, String sessionId) {
         if (request == null || request.plan() == null || request.input() == null) {
             throw new IllegalArgumentException("plan and input are required");
         }
@@ -35,27 +35,42 @@ public class SavedPlanService {
                     objectMapper.writeValueAsString(request.input().normalized()),
                     Instant.now()
             );
+            // Sprint 10.53: stamp the owner so the inbox can be scoped to this session.
+            savedPlan.setSessionId(blankToNull(sessionId));
             return toResponse(savedPlanRepository.save(savedPlan));
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Could not save plan", exception);
         }
     }
 
+    /**
+     * Open by id — this is the shareable link: the unguessable id is the capability, so a recipient on a
+     * different session can still open a plan that was shared with them. (Personal listing is scoped; this is not.)
+     */
     public SavedPlanResponse findById(String id) {
         return savedPlanRepository.findById(id)
                 .map(this::toResponse)
                 .orElseThrow(() -> new NoSuchElementException("Saved plan not found"));
     }
 
-    public List<SavedPlanResponse> findAll() {
-        return savedPlanRepository.findAllByOrderByFavoriteDescCreatedAtDesc().stream()
+    /** The "Moji planovi" inbox — scoped to the owner's session. No session → no personal inbox (empty). */
+    public List<SavedPlanResponse> findForSession(String sessionId) {
+        String owner = blankToNull(sessionId);
+        if (owner == null) return List.of();
+        return savedPlanRepository.findBySessionIdOrderByFavoriteDescCreatedAtDesc(owner).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public SavedPlanResponse setFavorite(String id, boolean favorite) {
+    public SavedPlanResponse setFavorite(String id, boolean favorite, String sessionId) {
         SavedPlan savedPlan = savedPlanRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Saved plan not found"));
+        // Owner-only: only the session that saved a plan may toggle its favorite flag. A non-owner (incl. a
+        // shared-link viewer) is treated as if it does not exist, so ownership is never revealed or mutated.
+        String owner = blankToNull(sessionId);
+        if (savedPlan.getSessionId() == null || !savedPlan.getSessionId().equals(owner)) {
+            throw new NoSuchElementException("Saved plan not found");
+        }
         savedPlan.setFavorite(favorite);
         return toResponse(savedPlanRepository.save(savedPlan));
     }
@@ -76,5 +91,9 @@ public class SavedPlanService {
 
     private String shortId() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+    }
+
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 }

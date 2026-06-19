@@ -129,9 +129,13 @@ export function replaceProduct(plan: FurnishingPlan, input: PlannerInput, produc
   });
 }
 
+// Sprint 10.53: send the browser session so the backend scopes saved plans to this owner — the "Moji
+// planovi" inbox returns only the caller's own plans. getSavedPlan deliberately omits the header: it is the
+// shareable link, open by id, so a recipient on another session can still open a plan shared with them.
 export function savePlan(plan: FurnishingPlan, input: PlannerInput) {
   return request<SavedPlanResponse>('/api/saved-plans', {
     method: 'POST',
+    headers: { 'X-BudgetSpace-Session': sessionId() },
     body: JSON.stringify({ plan, input })
   });
 }
@@ -141,12 +145,15 @@ export function getSavedPlan(id: string) {
 }
 
 export function listSavedPlans() {
-  return request<SavedPlanResponse[]>('/api/saved-plans');
+  return request<SavedPlanResponse[]>('/api/saved-plans', {
+    headers: { 'X-BudgetSpace-Session': sessionId() }
+  });
 }
 
 export function setSavedPlanFavorite(id: string, favorite: boolean) {
   return request<SavedPlanResponse>(`/api/saved-plans/${id}/favorite`, {
     method: 'PATCH',
+    headers: { 'X-BudgetSpace-Session': sessionId() },
     body: JSON.stringify({ favorite })
   });
 }

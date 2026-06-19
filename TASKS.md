@@ -118,6 +118,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.53 — saved plans become *yours* (privacy fix) + Google-login seam (current)
+- Owner asked "does 'Spremi u moje planove' actually save anywhere?" — it did, but to a **shared, global table**:
+  `listSavedPlans` returned EVERY visitor's plans, so "Moji planovi" showed strangers' plans. A real privacy leak.
+- **Fixed (session-scoping):** `SavedPlan` now carries a `session_id` (the existing `X-BudgetSpace-Session`). The
+  inbox query is scoped (`findBySessionIdOrderBy…`); the controller reads the header and threads it through save /
+  list / favorite. Only the owner can toggle favorite (a non-owner is treated as not-found, so ownership never
+  leaks). The frontend sends the header on save / list / favorite. **Share-by-link stays OPEN by id** (the id is
+  the capability) so a shared plan still opens for the recipient. `SavedPlanServiceTest` proves: save stamps the
+  owner; the inbox returns only the caller's plans (empty for no session); a shared link opens by id; only the
+  owner can favorite. **Backend 189 tests, 0 failures.**
+- **Google-login seam (honest placeholder):** a discreet "Tvoji planovi" strip with a *disabled* "Prijava s
+  Google-om · uskoro" button + tooltip ("plans will be tied to your Google account, not this browser"). **No fake
+  logged-in state, no fake OAuth, no localStorage flags** — just the seam + honest copy; real OAuth lands later.
+  Verified live: strip renders, correct copy, button disabled, zero console errors. Frontend build clean.
+- Note: `ddl-auto=create` rebuilds the dev schema, so the new column needs no migration now; the prod move to
+  Flyway adds it as a versioned migration (already a tracked prod blocker).
+
 ### Sprint 10.52 — "Rabljeno" frontend: the separate second-hand section (current)
 - The visible half of 10.51: renders `PlanGenerationResponse.secondHandSuggestions` in a distinct "Rabljeno"
   block under the new-retail plan, **never mixed into a total**.

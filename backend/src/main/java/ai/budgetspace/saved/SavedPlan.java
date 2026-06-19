@@ -25,6 +25,13 @@ public class SavedPlan {
     @Column(nullable = false)
     private boolean favorite;
 
+    // Sprint 10.53: the owner's browser session (the X-BudgetSpace-Session header). Saved plans are scoped to
+    // this so a visitor's "Moji planovi" inbox shows ONLY their own plans — never everyone's. Nullable so a
+    // legacy/orphaned row (or a save with no session) simply never matches an inbox query (invisible, not
+    // leaked). A real account id replaces this once Google login lands; share-by-link stays open by id.
+    @Column(name = "session_id", length = 80)
+    private String sessionId;
+
     public SavedPlan() {
     }
 
@@ -50,4 +57,6 @@ public class SavedPlan {
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public boolean isFavorite() { return favorite; }
     public void setFavorite(boolean favorite) { this.favorite = favorite; }
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
 }

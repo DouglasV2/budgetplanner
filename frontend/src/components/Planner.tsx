@@ -393,6 +393,20 @@ export function Planner() {
 
       {notice && <div className="planner-notice">{notice}</div>}
 
+      {/* Sprint 10.53: honest account seam. Plans are session-scoped (this browser) today; Google login lands
+          later and ties them to an account. The button is intentionally disabled — no fake logged-in state. */}
+      <div className="account-strip">
+        <div className="account-strip-text">
+          <span>{t('account.title')}</span>
+          <small>{t('account.hint')}</small>
+        </div>
+        <button type="button" className="google-signin-button" disabled title={t('account.signInTooltip')}>
+          <span className="g-mark" aria-hidden="true">G</span>
+          <span>{t('account.signInGoogle')}</span>
+          <span className="soon-badge">{t('account.soonBadge')}</span>
+        </button>
+      </div>
+
       <SavedPlansInbox
         plans={savedPlans}
         search={savedSearch}
