@@ -33,6 +33,30 @@ const styles: Array<{ value: StyleType; label: string; hint: string }> = [
   { value: 'boho', label: 'form.styleBohoLabel', hint: 'form.styleBohoHint' }
 ];
 
+// Sprint 10.57: "Choose a vibe" — a premium one-tap style picker for people who can't describe their style.
+// Each vibe maps to the EXISTING engine (a canonical style + colour/material preferences the planner already
+// scores on) and sets a STYLE-PURE prompt — verified live so the rule-based extractor yields exactly this
+// style and preserves the vibe's colours/materials (the prompt carries no room/colour/material/budget words).
+type Vibe = {
+  id: string;
+  label: string;
+  desc: string;
+  promptKey: string;
+  style: StyleType;
+  colors: string[];
+  materials: string[];
+  swatch: [string, string, string];
+};
+
+const vibes: Vibe[] = [
+  { id: 'scandinavian', label: 'form.vibeScandinavianLabel', desc: 'form.vibeScandinavianDesc', promptKey: 'form.vibeScandinavianPrompt', style: 'bright', colors: ['white', 'grey', 'natural'], materials: ['wood', 'fabric'], swatch: ['#EFEADF', '#CFC7B7', '#A98E68'] },
+  { id: 'japandi', label: 'form.vibeJapandiLabel', desc: 'form.vibeJapandiDesc', promptKey: 'form.vibeJapandiPrompt', style: 'minimal', colors: ['beige', 'natural', 'black'], materials: ['wood', 'rattan'], swatch: ['#E6DCC9', '#B79A6F', '#2C2A26'] },
+  { id: 'minimalist', label: 'form.vibeMinimalistLabel', desc: 'form.vibeMinimalistDesc', promptKey: 'form.vibeMinimalistPrompt', style: 'minimal', colors: ['white', 'grey'], materials: ['metal', 'glass'], swatch: ['#FBFBFA', '#D4D4D2', '#2B2B2B'] },
+  { id: 'industrial', label: 'form.vibeIndustrialLabel', desc: 'form.vibeIndustrialDesc', promptKey: 'form.vibeIndustrialPrompt', style: 'industrial', colors: ['black', 'grey', 'brown'], materials: ['metal', 'wood', 'leather'], swatch: ['#3A3936', '#7C786F', '#5A4332'] },
+  { id: 'warm-modern', label: 'form.vibeWarmModernLabel', desc: 'form.vibeWarmModernDesc', promptKey: 'form.vibeWarmModernPrompt', style: 'warm', colors: ['beige', 'brown', 'natural'], materials: ['wood', 'fabric', 'velvet'], swatch: ['#E4C9A6', '#B07C4F', '#6E4A2D'] },
+  { id: 'luxury-hotel', label: 'form.vibeLuxuryLabel', desc: 'form.vibeLuxuryDesc', promptKey: 'form.vibeLuxuryPrompt', style: 'classic', colors: ['black', 'grey', 'gold'], materials: ['velvet', 'marble', 'leather'], swatch: ['#1E1A15', '#C2A86B', '#6F6F6F'] }
+];
+
 const furnishingLevels: Array<{ value: FurnishingLevel; label: string; description: string }> = [
   { value: 'basic', label: 'form.furnishingBasicLabel', description: 'form.furnishingBasicDescription' },
   { value: 'comfort', label: 'form.furnishingComfortLabel', description: 'form.furnishingComfortDescription' },
@@ -171,6 +195,19 @@ function applyTemplate(input: PlannerInput, template: Partial<PlannerInput>, pro
   };
 }
 
+// Sprint 10.57: apply a vibe as a style overlay — keeps the room/budget/size/stores, sets the style +
+// colour/material preferences, and a style-pure prompt the extractor maps to this exact style.
+function applyVibe(input: PlannerInput, vibe: Vibe, prompt: string): PlannerInput {
+  return {
+    ...input,
+    style: vibe.style,
+    colorPreferences: vibe.colors,
+    materialPreferences: vibe.materials,
+    prompt,
+    lockedProductIds: []
+  };
+}
+
 function selectedShopMode(input: PlannerInput, marketRetailers: Retailer[]) {
   if (input.retailerMode === 'single') return 'one-store';
   if (marketRetailers.length > 0 && marketRetailers.every((retailer) => input.selectedRetailers.includes(retailer))) return 'best-combo';
@@ -211,6 +248,7 @@ function categoriesFromText(value: string): ProductCategory[] {
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
   const { t, market, setMarket } = useLocale();
   const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
+  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
   const marketRetailers = retailersForMarket(market);
   const shopMode = selectedShopMode(input, marketRetailers);
   const cityExample = citiesForMarket(market)[0] ?? '';
@@ -248,6 +286,34 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           {isLoading ? t('planner.generating') : t('planner.generate')}
           <span>{t('form.generateHint')}</span>
         </button>
+      </div>
+
+      <div className="form-step vibe-panel">
+        <div className="step-kicker">{t('form.vibeKicker')}</div>
+        <h3>{t('form.vibeHeading')}</h3>
+        <p>{t('form.vibeIntro')}</p>
+        <div className="vibe-grid" role="group" aria-label={t('form.vibeHeading')}>
+          {vibes.map((vibe) => (
+            <button
+              type="button"
+              key={vibe.id}
+              className={selectedVibe === vibe.id ? 'vibe-card active' : 'vibe-card'}
+              aria-pressed={selectedVibe === vibe.id}
+              onClick={() => {
+                setSelectedVibe(vibe.id);
+                onChange(applyVibe(input, vibe, t(vibe.promptKey)));
+              }}
+            >
+              <span className="vibe-swatch" aria-hidden="true">
+                {vibe.swatch.map((colour, index) => (
+                  <span key={index} style={{ background: colour }} />
+                ))}
+              </span>
+              <strong>{t(vibe.label)}</strong>
+              <small>{t(vibe.desc)}</small>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="form-step starter-template-panel">

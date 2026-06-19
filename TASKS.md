@@ -118,6 +118,19 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.57 — "Choose a vibe" style picker (current)
+- Owner: users who can't describe their style should be able to pick one. Built a premium one-tap **vibe picker**
+  in the planner form (right after the prompt): **Scandinavian / Japandi / Minimalist / Industrial / Warm modern /
+  Luxury hotel** — each a card with a 3-tone palette swatch + a one-line descriptor.
+- Each vibe is a **style overlay over the existing engine (no backend change):** it sets the canonical style +
+  colour/material preferences the planner already scores on, plus a **STYLE-PURE prompt**. The prompt carries only
+  a style cue (no room/colour/material/budget words), so the rule-based extractor maps it to exactly the intended
+  style AND preserves the vibe's colours/materials; the user's room/budget/stores are kept. Mappings **verified
+  LIVE** against the running extractor (HR + EN) and locked by `VibeStylePresetTest`.
+- i18n: 21 new hr+en keys (heading/intro + 6×label/desc/prompt); premium card + swatch CSS. **Verified live**: the
+  panel renders all 6 cards; clicking one updates the prompt + marks the card active; zero console errors.
+  **Backend 193 tests, 0 failures; frontend build clean.**
+
 ### Sprint 10.56 — UK depth + live full-stack smoke test (current)
 - **UK depth:** +31 web-verified IKEA GB products (real name + GBP + og:image on ikea.com/gb/en) → GB catalog
   **48 → 79**, every thin cell now ≥3 (sofa/bed/mattress/table/rug/tv-unit/dining-chair 1→4; wardrobe/dresser/
