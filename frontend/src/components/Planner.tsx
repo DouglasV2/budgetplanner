@@ -61,30 +61,57 @@ function formatSavedDate(value: string) {
   }).format(date);
 }
 
+// Sprint 10.61: Saved Spaces — group a session's saved room-plans by "space" (e.g. "Moj dom"), let the user
+// switch/create the active space, and "keep designing" a space (= start another room for the same home).
 function SavedPlansInbox({
   plans,
   search,
   onSearchChange,
   onOpen,
-  onFavorite
+  onFavorite,
+  activeSpace,
+  onActiveSpaceChange,
+  onContinueSpace,
+  defaultSpaceName
 }: {
   plans: SavedPlanResponse[];
   search: string;
   onSearchChange: (value: string) => void;
   onOpen: (plan: SavedPlanResponse) => void;
   onFavorite: (plan: SavedPlanResponse) => void;
+  activeSpace: string;
+  onActiveSpaceChange: (name: string) => void;
+  onContinueSpace: (name: string) => void;
+  defaultSpaceName: string;
 }) {
   const { t } = useLocale();
+  const [newSpace, setNewSpace] = useState('');
   const filteredPlans = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return plans.slice(0, 8);
-    return plans.filter((plan) => planSearchText(plan).includes(query)).slice(0, 12);
+    if (!query) return plans.slice(0, 24);
+    return plans.filter((plan) => planSearchText(plan).includes(query)).slice(0, 24);
   }, [plans, search]);
 
   if (!plans.length) return null;
 
+  const spaceOf = (plan: SavedPlanResponse) => plan.spaceName?.trim() || defaultSpaceName;
+  const groups = new Map<string, SavedPlanResponse[]>();
+  filteredPlans.forEach((plan) => {
+    const key = spaceOf(plan);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(plan);
+  });
+  const spaceNames = Array.from(new Set([activeSpace, ...groups.keys()]));
+
+  function createSpace() {
+    const name = newSpace.trim();
+    if (!name) return;
+    onActiveSpaceChange(name);
+    setNewSpace('');
+  }
+
   return (
-    <details className="saved-plans-inbox">
+    <details className="saved-plans-inbox" open>
       <summary>
         <div>
           <span>{t('saved.title')}</span>
@@ -92,38 +119,68 @@ function SavedPlansInbox({
         </div>
         <small>{t('saved.openLater')}</small>
       </summary>
+
+      <div className="spaces-control">
+        <span className="spaces-control-label">{t('spaces.designingFor')}</span>
+        <div className="spaces-chips">
+          {spaceNames.map((name) => (
+            <button type="button" key={name} className={name === activeSpace ? 'space-chip active' : 'space-chip'} onClick={() => onActiveSpaceChange(name)}>
+              {name}
+            </button>
+          ))}
+          <input
+            className="space-new-input"
+            value={newSpace}
+            placeholder={t('spaces.newPlaceholder')}
+            aria-label={t('spaces.newPlaceholder')}
+            onChange={(event) => setNewSpace(event.target.value)}
+            onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); createSpace(); } }}
+          />
+        </div>
+      </div>
+
       <div className="saved-plans-toolbar">
         <label>
           <span>{t('saved.search')}</span>
           <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder={t('saved.search')} />
         </label>
       </div>
-      <div className="saved-plans-list">
-        {filteredPlans.map((savedPlan) => {
-          const stores = savedPlan.plan.retailersUsed.join(' + ') || t('saved.noStores');
-          return (
-            <article className={savedPlan.favorite ? 'saved-plan-card favorite' : 'saved-plan-card'} key={savedPlan.id}>
-              <div>
-                <span>{savedPlan.favorite ? t('saved.favorite') : t('saved.saved')} · {formatSavedDate(savedPlan.createdAt)}</span>
-                <strong>{roomLabels[savedPlan.input.roomType]}</strong>
-                <small>{t('saved.metaLine', { price: formatCurrency(savedPlan.plan.total), count: savedPlan.plan.items.length, stores })}</small>
-              </div>
-              <div className="saved-plan-actions">
-                <button
-                  type="button"
-                  className={savedPlan.favorite ? 'favorite-toggle active' : 'favorite-toggle'}
-                  onClick={() => onFavorite(savedPlan)}
-                  aria-label={savedPlan.favorite ? t('saved.removeFavorite') : t('saved.addFavorite')}
-                >
-                  {savedPlan.favorite ? t('saved.favoriteStar') : t('saved.markStar')}
-                </button>
-                <button type="button" onClick={() => onOpen(savedPlan)}>{t('saved.open')}</button>
-              </div>
-            </article>
-          );
-        })}
-        {!filteredPlans.length && <p className="saved-empty">{t('saved.emptySearch')}</p>}
-      </div>
+
+      {Array.from(groups.entries()).map(([spaceName, spacePlans]) => (
+        <div className="space-group" key={spaceName}>
+          <div className="space-group-head">
+            <strong>{spaceName}</strong>
+            <small>{t('saved.roomsCount', { count: spacePlans.length })}</small>
+            <button type="button" className="space-continue" onClick={() => onContinueSpace(spaceName)}>{t('spaces.continue')}</button>
+          </div>
+          <div className="saved-plans-list">
+            {spacePlans.map((savedPlan) => {
+              const stores = savedPlan.plan.retailersUsed.join(' + ') || t('saved.noStores');
+              return (
+                <article className={savedPlan.favorite ? 'saved-plan-card favorite' : 'saved-plan-card'} key={savedPlan.id}>
+                  <div>
+                    <span>{savedPlan.favorite ? t('saved.favorite') : t('saved.saved')} · {formatSavedDate(savedPlan.createdAt)}</span>
+                    <strong>{roomLabels[savedPlan.input.roomType]}</strong>
+                    <small>{t('saved.metaLine', { price: formatCurrency(savedPlan.plan.total), count: savedPlan.plan.items.length, stores })}</small>
+                  </div>
+                  <div className="saved-plan-actions">
+                    <button
+                      type="button"
+                      className={savedPlan.favorite ? 'favorite-toggle active' : 'favorite-toggle'}
+                      onClick={() => onFavorite(savedPlan)}
+                      aria-label={savedPlan.favorite ? t('saved.removeFavorite') : t('saved.addFavorite')}
+                    >
+                      {savedPlan.favorite ? t('saved.favoriteStar') : t('saved.markStar')}
+                    </button>
+                    <button type="button" onClick={() => onOpen(savedPlan)}>{t('saved.open')}</button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      {!filteredPlans.length && <p className="saved-empty">{t('saved.emptySearch')}</p>}
     </details>
   );
 }
@@ -149,6 +206,8 @@ export function Planner() {
   const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
   // Sprint 10.51: the separate "Rabljeno" (second-hand) suggestions — kept entirely out of every plan total.
   const [secondHand, setSecondHand] = useState<Product[]>([]);
+  // Sprint 10.61: the active "space" (home) that new room-plans save into; default "Moj dom".
+  const [activeSpace, setActiveSpace] = useState<string>(() => t('spaces.defaultName'));
   // Sprint 10.13 (#3): reversible "we picked your country from the prompt" note.
   const [marketNote, setMarketNote] = useState<string | null>(null);
 
@@ -285,7 +344,8 @@ export function Planner() {
   }
 
   async function handleSavePlan(plan: FurnishingPlan, copyLink: boolean) {
-    const savedPlan = await savePlan(plan, input);
+    // Sprint 10.61: the plan joins the active space (e.g. "Moj dom") so the user's rooms group together.
+    const savedPlan = await savePlan(plan, input, activeSpace);
     const url = `${window.location.origin}/plan/${savedPlan.id}`;
     setSavedPlans((currentPlans) => [savedPlan, ...currentPlans.filter((currentPlan) => currentPlan.id !== savedPlan.id)]);
 
@@ -294,10 +354,17 @@ export function Planner() {
       setNotice(t('planner.noticeLinkCopied'));
     } else {
       window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
-      setNotice(t('planner.noticeSaved'));
+      setNotice(t('spaces.savedTo', { name: activeSpace }));
     }
 
     return url;
+  }
+
+  // Sprint 10.61: "keep designing" a space — make it active, nudge the user to the form for the next room.
+  function handleContinueSpace(spaceName: string) {
+    setActiveSpace(spaceName);
+    setNotice(t('spaces.nowDesigning', { name: spaceName }));
+    document.getElementById('planner')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function handleProductClick(planId: string, product: Product) {
@@ -313,6 +380,7 @@ export function Planner() {
     setInput(savedPlan.input);
     setPlans([savedPlan.plan]);
     setSecondHand([]);
+    if (savedPlan.spaceName) setActiveSpace(savedPlan.spaceName);
     setPartialNotice(null);
     setDesign(null);
     setAnalysis(null);
@@ -413,6 +481,10 @@ export function Planner() {
         onSearchChange={setSavedSearch}
         onOpen={openSavedPlan}
         onFavorite={toggleSavedFavorite}
+        activeSpace={activeSpace}
+        onActiveSpaceChange={setActiveSpace}
+        onContinueSpace={handleContinueSpace}
+        defaultSpaceName={t('spaces.defaultName')}
       />
 
       <div className="planner-layout">

@@ -132,11 +132,12 @@ export function replaceProduct(plan: FurnishingPlan, input: PlannerInput, produc
 // Sprint 10.53: send the browser session so the backend scopes saved plans to this owner — the "Moji
 // planovi" inbox returns only the caller's own plans. getSavedPlan deliberately omits the header: it is the
 // shareable link, open by id, so a recipient on another session can still open a plan shared with them.
-export function savePlan(plan: FurnishingPlan, input: PlannerInput) {
+export function savePlan(plan: FurnishingPlan, input: PlannerInput, spaceName?: string) {
   return request<SavedPlanResponse>('/api/saved-plans', {
     method: 'POST',
     headers: { 'X-BudgetSpace-Session': sessionId() },
-    body: JSON.stringify({ plan, input })
+    // Sprint 10.61: spaceName groups this room-plan under a "space" (e.g. "Moj dom") in "Moji planovi".
+    body: JSON.stringify({ plan, input, spaceName })
   });
 }
 

@@ -32,6 +32,12 @@ public class SavedPlan {
     @Column(name = "session_id", length = 80)
     private String sessionId;
 
+    // Sprint 10.61: Saved Spaces. The "space" (e.g. "Moj dom") groups a session's room-plans so a user can
+    // design several rooms of one home and come back to keep going. Nullable — a plan saved without a space
+    // groups under the default space client-side. A real account replaces session_id; space_name stays.
+    @Column(name = "space_name", length = 80)
+    private String spaceName;
+
     public SavedPlan() {
     }
 
@@ -59,4 +65,6 @@ public class SavedPlan {
     public void setFavorite(boolean favorite) { this.favorite = favorite; }
     public String getSessionId() { return sessionId; }
     public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+    public String getSpaceName() { return spaceName; }
+    public void setSpaceName(String spaceName) { this.spaceName = spaceName; }
 }

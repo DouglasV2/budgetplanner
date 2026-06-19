@@ -89,6 +89,20 @@ class SavedPlanServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
+    @Test
+    void saveStampsTheSpaceName() {
+        SavedPlanRepository repository = mock(SavedPlanRepository.class);
+        when(repository.save(any(SavedPlan.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        SavedPlanService service = serviceWith(repository);
+
+        var response = service.save(new SavedPlanRequest(planDto(), inputDto(), "Moj dom"), "session-A");
+
+        ArgumentCaptor<SavedPlan> captor = ArgumentCaptor.forClass(SavedPlan.class);
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue().getSpaceName()).isEqualTo("Moj dom");
+        assertThat(response.spaceName()).isEqualTo("Moj dom");
+    }
+
     private SavedPlan entity(String id, String sessionId) throws Exception {
         SavedPlan plan = new SavedPlan(
                 id,

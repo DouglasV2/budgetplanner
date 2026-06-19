@@ -37,6 +37,8 @@ public class SavedPlanService {
             );
             // Sprint 10.53: stamp the owner so the inbox can be scoped to this session.
             savedPlan.setSessionId(blankToNull(sessionId));
+            // Sprint 10.61: stamp the space (e.g. "Moj dom") so the inbox can group a home's rooms together.
+            savedPlan.setSpaceName(blankToNull(request.spaceName()));
             return toResponse(savedPlanRepository.save(savedPlan));
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Could not save plan", exception);
@@ -82,7 +84,8 @@ public class SavedPlanService {
                     objectMapper.readValue(savedPlan.getPlanJson(), FurnishingPlanDto.class),
                     objectMapper.readValue(savedPlan.getInputJson(), PlannerInputDto.class).normalized(),
                     savedPlan.getCreatedAt(),
-                    savedPlan.isFavorite()
+                    savedPlan.isFavorite(),
+                    savedPlan.getSpaceName()
             );
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Could not read saved plan", exception);

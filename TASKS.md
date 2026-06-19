@@ -149,6 +149,17 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.61 — Saved Spaces (multiple rooms per home) (current)
+- Retention feature: a **"space"** (e.g. "Moj dom") groups a session's saved room-plans, so a user can design a
+  living room → bedroom → office for the **same home** and come back to keep going ("continue designing").
+- **Backend:** `SavedPlan.spaceName` (nullable) threaded through request/response/save (like `session_id`);
+  `SavedPlanServiceTest` asserts it's stamped + returned. **Backend 194 tests, 0 failures.**
+- **Frontend:** `savePlan` sends the active space (default "Moj dom") so each room joins it; **"Moji planovi" now
+  GROUPS plans by space**, with an active-space chip row + a "+ novi prostor" input to create/switch, and a
+  per-space **"Nastavi slagati"** button that re-activates the space + scrolls to the form for the next room.
+  Opening a saved plan adopts its space; the save notice says which space it landed in. New i18n (hr+en) + CSS.
+  Frontend build clean.
+
 ### Sprint 10.60 — social share card (growth loop) (current)
 - After a plan, a **"Podijeli svoj plan"** card shows a clean shareable summary ("Moj dnevni boravak do 1500 €:
   kauč 349 €, … · ukupno 827 € · ostaje 673 €. Složeno u BudgetSpace.") + share buttons: **native share** (when

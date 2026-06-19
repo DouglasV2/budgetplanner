@@ -1540,6 +1540,87 @@ textarea:focus {
 .share-btn.reddit { border-color: rgba(255, 69, 0, 0.45); color: #D93A00; }
 .share-btn.x { border-color: rgba(31, 29, 26, 0.5); color: #1F1D1A; }
 
+/* Sprint 10.61: Saved Spaces — active-space chips + grouped saved plans + "keep designing". */
+.spaces-control {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+.spaces-control-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 620;
+}
+
+.spaces-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+
+.space-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white, #fff);
+  color: var(--ink);
+  padding: 5px 13px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.space-chip.active {
+  border-color: rgba(236, 122, 46, 0.55);
+  background: rgba(236, 122, 46, 0.1);
+  color: var(--orange-dark);
+}
+
+.space-new-input {
+  border: 1px dashed var(--hairline);
+  border-radius: 999px;
+  background: transparent;
+  padding: 5px 13px;
+  font-size: 0.84rem;
+  width: 130px;
+}
+
+.space-group {
+  margin-top: 12px;
+}
+
+.space-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.space-group-head > strong {
+  font-size: 0.95rem;
+}
+
+.space-group-head > small {
+  color: var(--muted);
+  flex: 1;
+}
+
+.space-continue {
+  border: 1px solid rgba(236, 122, 46, 0.4);
+  border-radius: 999px;
+  background: rgba(236, 122, 46, 0.08);
+  color: var(--orange-dark);
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 620;
+  cursor: pointer;
+}
+
+.space-continue:hover {
+  transform: translateY(-1px);
+}
+
 .template-card strong,
 .template-card span {
   display: block;

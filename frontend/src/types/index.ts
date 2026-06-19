@@ -257,6 +257,8 @@ export interface SavedPlanResponse {
   input: PlannerInput;
   createdAt: string;
   favorite: boolean;
+  // Sprint 10.61: the "space" (e.g. "Moj dom") this plan belongs to — groups a home's rooms in "Moji planovi".
+  spaceName?: string;
 }
 
 export type PlanFeedback = 'useful' | 'too-expensive' | 'wrong-style' | 'too-many-stores';
