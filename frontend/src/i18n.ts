@@ -425,6 +425,10 @@ const DICTIONARY: Record<string, Entry> = {
   'results.feedbackDoCheaper': { hr: 'Složi jeftiniju verziju', en: 'Build a cheaper version' },
   'results.feedbackDoNicer': { hr: 'Složi ljepšu verziju', en: 'Build a nicer version' },
   'results.feedbackDoFewerStores': { hr: 'Smanji broj trgovina', en: 'Use fewer stores' },
+  // Sprint 10.59: budget breakdown — where the money goes + the remaining budget, highlighted.
+  'results.budgetBreakdownTitle': { hr: 'Kamo ide budžet', en: 'Where your budget goes' },
+  'results.budgetLeftShort': { hr: 'ostaje {amount}', en: '{amount} left' },
+  'results.budgetOverShort': { hr: '{amount} iznad', en: '{amount} over' },
   // Sprint 10.34: opt-in price-drop watch. GDPR-minimal: explicit consent, says exactly what we store,
   // one-click unsubscribe. {email} is the address the user typed back to them.
   'results.watchPrice': { hr: 'Prati cijenu', en: 'Watch price' },

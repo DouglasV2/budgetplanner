@@ -149,6 +149,12 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.59 — budget breakdown (where your money goes) (current)
+- Makes the planner's existing budget allocation **visible**: a stacked "Kamo ide budžet / Where your budget
+  goes" bar (share per category) with the **remaining (or over) budget highlighted**, placed right under the
+  decision card. Legend lists the top 6 categories with € + %. Frontend-only — uses plan data, no backend
+  change. New i18n (hr+en) + premium bar/legend CSS. Frontend build clean.
+
 ### Sprint 10.58 — vibe copy in a human voice + moodboard placeholder + placeholders registry (current)
 - **Vibe copy → less AI, more human:** rewrote the 6 vibe descriptors + the intro so each paints a relatable
   room a person recognises ("Svijetlo drvo, mekani tekstil i puno zraka — toplo, a uredno." / "Metal, tamni

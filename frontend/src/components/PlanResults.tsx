@@ -384,6 +384,58 @@ function itemsCountText(t: Translate, count: number) {
   return t('results.itemCountMany', { count });
 }
 
+// Sprint 10.59: budget breakdown — makes the planner's existing budget allocation VISIBLE. A single stacked
+// bar shows where the money goes (share per category) and the remaining budget is highlighted. Plan data only.
+const BUDGET_COLORS = ['#CF5F2A', '#66785F', '#B0894E', '#7C786F', '#9C6B4A', '#5E7488', '#A88A5C'];
+
+function BudgetBreakdown({ plan, input }: { plan: FurnishingPlan; input: PlannerInput }) {
+  const { t } = useLocale();
+  const total = plan.total;
+  if (!plan.items.length || total <= 0) return null;
+
+  const byCategory = new Map<ProductCategory, number>();
+  plan.items.forEach((item) => {
+    byCategory.set(item.product.category, (byCategory.get(item.product.category) ?? 0) + item.product.price);
+  });
+  const segments = Array.from(byCategory.entries())
+    .map(([category, amount]) => ({ category, amount, pct: Math.round((amount / total) * 100) }))
+    .sort((a, b) => b.amount - a.amount);
+  const remaining = input.budget - total;
+
+  return (
+    <section className="budget-breakdown-card" aria-label={t('results.budgetBreakdownTitle')}>
+      <div className="budget-breakdown-head">
+        <span>{t('results.budgetBreakdownTitle')}</span>
+        <strong className={remaining < 0 ? 'over-text' : 'left-text'}>
+          {remaining >= 0
+            ? t('results.budgetLeftShort', { amount: formatCurrency(remaining) })
+            : t('results.budgetOverShort', { amount: formatCurrency(Math.abs(remaining)) })}
+        </strong>
+      </div>
+      <div className="budget-bar" role="img" aria-label={t('results.budgetBreakdownTitle')}>
+        {segments.map((segment, index) => (
+          <span
+            key={segment.category}
+            className="budget-bar-seg"
+            style={{ width: `${(segment.amount / total) * 100}%`, background: BUDGET_COLORS[index % BUDGET_COLORS.length] }}
+            title={`${categoryLabels[segment.category]} · ${formatCurrency(segment.amount)} · ${segment.pct}%`}
+          />
+        ))}
+      </div>
+      <ul className="budget-legend">
+        {segments.slice(0, 6).map((segment, index) => (
+          <li key={segment.category}>
+            <span className="budget-dot" style={{ background: BUDGET_COLORS[index % BUDGET_COLORS.length] }} aria-hidden="true" />
+            <span className="budget-cat">{categoryLabels[segment.category]}</span>
+            <strong>{formatCurrency(segment.amount)}</strong>
+            <small>{segment.pct}%</small>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: PlannerInput }) {
   const { t } = useLocale();
   const trip = resolveStoreTrip(plan);
@@ -812,6 +864,8 @@ export function PlanResults({
             </div>
           </div>
 
+
+          <BudgetBreakdown plan={selectedPlan} input={input} />
 
           <div className="items-list step-items-list">
             <div className="result-section-heading">
