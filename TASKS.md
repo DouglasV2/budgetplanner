@@ -2,6 +2,37 @@
 
 Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 
+## ⚠️ Placeholders & seams — replace with the real thing (don't ship as-is)
+
+A running registry of everything intentionally left as a placeholder / dormant seam, so we never forget to wire
+the real thing. Each line says what activates it. (Added 2026-06-19.)
+
+- **eBay Browse "Rabljeno" feed** (10.51) — built + dormant. Activate: set `BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID`
+  + `..._CLIENTSECRET` (eBay App ID + Cert ID) in the backend env, restart → imports used furniture for
+  DE/IT/AT/FR/NL/ES/GB. **Owner's key is coming (~1 business day).** Then: live smoke test + tune furniture category id.
+- **Per-country marketplace feeds** (10.49) — Njuškalo (HR), Bolha (SI), Willhaben (AT), Kleinanzeigen (DE), Subito
+  (IT), Tori (FI), Leboncoin (FR), Marktplaats (NL), Bazoš (SK), Wallapop (ES), OLX (PT), Finn (NO), Blocket (SE),
+  DBA (DK), Facebook Marketplace — registered `OFFICIAL_FEED_REQUIRED`, import 0. Activate: a compliant
+  partner/affiliate/export feed each (build a `MarketplaceFeed` like `EbayBrowseFeed`). **Never scrape.**
+- **Google sign-in** (10.53) — disabled "Prijava s Google-om · uskoro" button (no fake auth/state). Activate: real
+  Google OAuth2 + an account identity; migrate the session-scoped saved plans to the account.
+- **Moodboard upload** (10.58) — disabled "Učitaj moodboard · uskoro" placeholder in the vibe picker. Activate: a
+  vision/AI layer (uploaded room image → inferred style + palette). Gated by the AI layer being enabled.
+- **OpenAI / AI layer** — `BUDGETSPACE_AI_ENABLED=false` by default (rule-based planner runs). Activate: set the
+  flag + `OPENAI_API_KEY` (backend env), verify `AiUsageTracker` caps + rule fallback. Deferred until EU catalog filled.
+- **Price-drop email alerts** (10.34) — `PriceWatchNotifier` is a log-only seam + `recheck-enabled=false`. Activate:
+  wire a real email provider + flip `budgetspace.price-watch.recheck-enabled=true`.
+- **Retailer feeds for blocked shops** (10.14) — Decathlon/Pevex/Lesnina + other `OFFICIAL_FEED_REQUIRED` chains
+  carry no products (403/anti-bot, never scraped). Activate: an official/partner/affiliate `RetailerFeed` (seam in
+  `ai.budgetspace.feed`). `home-gym` depends on Decathlon → still partly sample data.
+- **Affiliate / sponsored monetisation** (10.10) — `affiliateUrl`/`sponsored`/`sponsorLabel` columns exist; no
+  affiliate network wired, no sponsored UI. Activate: an affiliate feed + a clearly-labelled sponsored slot that
+  never displaces the best organic pick.
+- **eBay seller images** (10.51) — used listings ship `imageVerified=false` → the UI shows the labelled placeholder,
+  not the seller photo, until eBay's image display-rights terms are confirmed. Activate: confirm rights, then flip.
+- **Prod DB** — `spring.jpa.hibernate.ddl-auto=create` wipes the DB on every startup (dev only). Before Railway:
+  switch to `validate` + Flyway/Liquibase versioned migrations (the new session_id / second-hand / GB columns need it).
+
 ## Road to production (sequenced — added 2026-06-16)
 
 Goal path: **controlled HR beta first**, then full multi-market launch. Catalog + tests + architecture
@@ -117,6 +148,18 @@ needs `OPENAI_API_KEY`, backend env only).
 - **Scale/perf**: load test, query/caching review, CDN for assets.
 
 ## Recently done
+
+### Sprint 10.58 — vibe copy in a human voice + moodboard placeholder + placeholders registry (current)
+- **Vibe copy → less AI, more human:** rewrote the 6 vibe descriptors + the intro so each paints a relatable
+  room a person recognises ("Svijetlo drvo, mekani tekstil i puno zraka — toplo, a uredno." / "Metal, tamni
+  tonovi i karakter starog potkrovlja." / "…u koje se poželiš zavaliti."), not a list of attributes. Descriptors
+  are display-only, so the verified style-pure prompts are untouched (vibe→style mapping unchanged).
+- **Moodboard upload placeholder:** an honest disabled "Učitaj moodboard · uskoro" card under the vibe picker
+  (no fake upload, no fake state) — it needs a vision/AI layer, tracked in the placeholders registry.
+- **Placeholders registry:** added a top-of-TASKS section listing every intentional placeholder/dormant seam
+  (eBay feed, per-country marketplaces, Google login, moodboard, AI layer, price-drop email, blocked-retailer
+  feeds, affiliate/sponsored, eBay seller images, prod DB ddl-auto) with what activates each — so none is shipped
+  as-is or forgotten. Frontend build clean.
 
 ### Sprint 10.57 — "Choose a vibe" style picker (current)
 - Owner: users who can't describe their style should be able to pick one. Built a premium one-tap **vibe picker**

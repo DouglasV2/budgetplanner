@@ -314,6 +314,15 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             </button>
           ))}
         </div>
+        {/* Sprint 10.58: moodboard upload — honest placeholder (needs a vision/AI layer). No fake upload. */}
+        <button type="button" className="moodboard-placeholder" disabled title={t('form.moodboardTooltip')}>
+          <span className="moodboard-icon" aria-hidden="true">🖼️</span>
+          <span className="moodboard-text">
+            <strong>{t('form.moodboardTitle')}</strong>
+            <small>{t('form.moodboardCta')}</small>
+          </span>
+          <span className="soon-badge">{t('form.moodboardSoon')}</span>
+        </button>
       </div>
 
       <div className="form-step starter-template-panel">

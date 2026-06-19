@@ -1329,6 +1329,52 @@ textarea:focus {
   display: block;
 }
 
+/* Sprint 10.58: moodboard upload — honest disabled placeholder (dashed, "soon"); no fake upload. */
+.moodboard-placeholder {
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px dashed rgba(31, 29, 26, 0.22);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+  opacity: 0.85;
+  text-align: left;
+}
+
+.moodboard-icon {
+  font-size: 1.3rem;
+}
+
+.moodboard-text {
+  display: grid;
+  gap: 1px;
+  flex: 1;
+}
+
+.moodboard-text strong {
+  font-size: 0.92rem;
+}
+
+.moodboard-text small {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.moodboard-placeholder .soon-badge {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #8a5a2a;
+  background: rgba(176, 120, 60, 0.14);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
 .template-card strong,
 .template-card span {
   display: block;
