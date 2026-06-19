@@ -118,6 +118,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.56 — UK depth + live full-stack smoke test (current)
+- **UK depth:** +31 web-verified IKEA GB products (real name + GBP + og:image on ikea.com/gb/en) → GB catalog
+  **48 → 79**, every thin cell now ≥3 (sofa/bed/mattress/table/rug/tv-unit/dining-chair 1→4; wardrobe/dresser/
+  decor/kitchen-storage 2→4). Same no-fabrication recipe (parallel discover+verify workflow → deterministic
+  number-trick URLs → dedup vs existing). SONGESAND bed was on sale → kept the current £129 only (no fabricated
+  discount window). `GbCatalogRuntimeTest` + `StoreLinkIntegrityTest` green; **backend 191 tests, 0 failures.**
+- **Live full-stack smoke test** (the real docker stack — Postgres + Spring on 8090 + Vite frontend): restarted
+  the backend (devtools-restart is off by design → a manual restart recompiles the new code + re-seeds via
+  `ddl-auto=create`). Verified end-to-end: a GB request returns a **non-partial plan of REAL GB IKEA products in
+  GBP** (KIVIK £599, LACK TV bench £40, STOENSE rug £79…), `secondHandSuggestions` empty (no eBay key yet),
+  currency GBP.
+- **Swap verified (owner's question — "replace sofa only, keep the rest, coherent"):** `/api/plans/replace`
+  changes only the targeted item and keeps the rest **byte-identical** (confirmed all 5 non-sofa items unchanged
+  after a sofa replace). When no better option exists it's an honest no-op (pre-depth, with 1 sofa, "cheaper"
+  returned the same plan instead of inventing one); depth now provides real swap alternatives. The replacement is
+  scored on same category + room + style + budget fit, so it stays coherent.
+
 ### Sprint 10.55 — United Kingdom: 15th market + verified IKEA GB catalog (current)
 - Owner asked for a UK market + UK catalog. Built it the no-fabrication way: every product web-verified on
   ikea.com/gb/en (English name + GBP price + og:image) — never invented.
