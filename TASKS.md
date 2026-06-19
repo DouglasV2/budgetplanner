@@ -26,8 +26,11 @@ the real thing. Each line says what activates it. (Added 2026-06-19.)
   `BUDGETSPACE_GOOGLE_CLIENTID` is set (public client id, supplied via the gitignored `.env`). Blank → dormant.
 - **Moodboard upload** (10.58) — disabled "Učitaj moodboard · uskoro" placeholder in the vibe picker. Activate: a
   vision/AI layer (uploaded room image → inferred style + palette). Gated by the AI layer being enabled.
-- **OpenAI / AI layer** — `BUDGETSPACE_AI_ENABLED=false` by default (rule-based planner runs). Activate: set the
-  flag + `OPENAI_API_KEY` (backend env), verify `AiUsageTracker` caps + rule fallback. Deferred until EU catalog filled.
+- **AI layer (Gemini default)** (10.66) — `BUDGETSPACE_AI_ENABLED=false` by default (rule-based planner runs).
+  Provider-agnostic; **Gemini Flash added as the cheapest default** (free tier) — the "Plus" carrot (smart prompt
+  understanding + design rationale). Activate: set `BUDGETSPACE_AI_ENABLED=true` + `BUDGETSPACE_LLM_PROVIDER=gemini`
+  + `GEMINI_API_KEY` (gitignored `.env`), then verify `AiUsageTracker` caps + rule fallback. The earlier "defer
+  until EU catalog" hold was lifted (2026-06-19) because Gemini's free tier removes the cost-of-testing concern.
 - **Price-drop email alerts** (10.34) — `PriceWatchNotifier` is a log-only seam + `recheck-enabled=false`. Activate:
   wire a real email provider + flip `budgetspace.price-watch.recheck-enabled=true`.
 - **Retailer feeds for blocked shops** (10.14) — Decathlon/Pevex/Lesnina + other `OFFICIAL_FEED_REQUIRED` chains
@@ -156,6 +159,21 @@ needs `OPENAI_API_KEY`, backend env only).
 - **Scale/perf**: load test, query/caching review, CDN for assets.
 
 ## Recently done
+
+### Sprint 10.66 — Gemini AI provider (the "Plus" carrot) (current)
+- Monetization direction (this session): affiliate is the long-term money but **gated behind traffic** (won't get
+  approved pre-traction); the core is deterministic so AI cost is **not** the risk the way it is for AI-native
+  products. The smart early model = generous Free (≈€0 to serve) + a thin **Plus (€5.99/mo)** whose real carrot is
+  the **AI assistant**. The AI assistant needs a cheap provider → **Gemini Flash** (cheapest + free tier).
+- Added `GeminiLlmClient` to the existing provider-agnostic LLM layer (raw JDK HTTP, no SDK — like OpenAI/Anthropic):
+  Gemini's shape (top-level `systemInstruction`, `contents`, JSON via `responseMimeType`, `candidates`/
+  `usageMetadata`); key in the `x-goog-api-key` header (never the URL/logs). `LlmProvider.GEMINI` + `LlmProperties`
+  (key + `gemini-2.0-flash` default). Pure `buildBody`/`parseCompletion` are unit-tested (5 tests) without a
+  network. **Backend 218 tests, 0 failures.**
+- **Still OFF by default** (`aiUsable()` false → rule-based). Flip on via the gitignored `.env`
+  (`BUDGETSPACE_AI_ENABLED=true` + `BUDGETSPACE_LLM_PROVIDER=gemini` + `GEMINI_API_KEY`); hard-capped by
+  `AiUsageTracker`, rule-based fallback on every failure. The owner's earlier "defer AI until EU catalog" hold was
+  lifted because Gemini's free tier removes the cost-of-testing concern. (Plus-gating of AI is a later sprint.)
 
 ### Sprint 10.65 — missing saved plan → 404, not 500 (current)
 - Bug (owner-spotted in the logs): opening a shared `/plan/<id>` link whose plan no longer exists threw

@@ -12,7 +12,10 @@ import java.util.Locale;
 public enum LlmProvider {
     OFF,
     ANTHROPIC,
-    OPENAI;
+    OPENAI,
+    // Sprint 10.66: Google Gemini — the cheapest option (and a free tier), chosen as the default AI provider
+    // for the cost-sensitive early stage. The task (structuring a prompt + a short rationale) only needs a Flash model.
+    GEMINI;
 
     public static LlmProvider from(String value) {
         if (value == null || value.isBlank()) return OFF;

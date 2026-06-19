@@ -16,11 +16,14 @@ import java.time.Duration;
 public class LlmProperties {
     private static final String OPENAI_DEFAULT_MODEL = "gpt-4o-mini";
     private static final String ANTHROPIC_DEFAULT_MODEL = "claude-haiku-4-5";
+    // Sprint 10.66: a cheap Flash model with a free tier — enough to structure a prompt + write a short rationale.
+    private static final String GEMINI_DEFAULT_MODEL = "gemini-2.0-flash";
 
     private final boolean enabled;
     private final LlmProvider provider;
     private final String openAiApiKey;
     private final String anthropicApiKey;
+    private final String geminiApiKey;
     private final String model;
     private final int timeoutSeconds;
     private final int maxOutputTokens;
@@ -30,6 +33,7 @@ public class LlmProperties {
             @Value("${budgetspace.ai.provider:off}") String provider,
             @Value("${budgetspace.ai.openai-api-key:${OPENAI_API_KEY:}}") String openAiApiKey,
             @Value("${budgetspace.ai.anthropic-api-key:${ANTHROPIC_API_KEY:}}") String anthropicApiKey,
+            @Value("${budgetspace.ai.gemini-api-key:${GEMINI_API_KEY:}}") String geminiApiKey,
             @Value("${budgetspace.ai.model:}") String model,
             @Value("${budgetspace.ai.timeout-seconds:15}") int timeoutSeconds,
             @Value("${budgetspace.ai.max-output-tokens:700}") int maxOutputTokens) {
@@ -37,6 +41,7 @@ public class LlmProperties {
         this.provider = LlmProvider.from(provider);
         this.openAiApiKey = trim(openAiApiKey);
         this.anthropicApiKey = trim(anthropicApiKey);
+        this.geminiApiKey = trim(geminiApiKey);
         this.model = trim(model);
         this.timeoutSeconds = timeoutSeconds <= 0 ? 15 : timeoutSeconds;
         this.maxOutputTokens = maxOutputTokens <= 0 ? 700 : maxOutputTokens;
@@ -54,6 +59,7 @@ public class LlmProperties {
         return switch (target) {
             case OPENAI -> openAiApiKey;
             case ANTHROPIC -> anthropicApiKey;
+            case GEMINI -> geminiApiKey;
             case OFF -> "";
         };
     }
@@ -64,6 +70,7 @@ public class LlmProperties {
         return switch (target) {
             case OPENAI -> OPENAI_DEFAULT_MODEL;
             case ANTHROPIC -> ANTHROPIC_DEFAULT_MODEL;
+            case GEMINI -> GEMINI_DEFAULT_MODEL;
             case OFF -> "";
         };
     }

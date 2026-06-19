@@ -21,6 +21,13 @@ services:
       # Cert ID come from the gitignored root .env. Blank → eBay source dormant (no used items, no network call).
       BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID:-}
       BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET:-}
+      # Sprint 10.66: AI (Gemini) — cheapest provider + free tier; the "Plus" carrot (smart prompt understanding
+      # + design rationale). OFF by default; flip on via the gitignored .env (BUDGETSPACE_AI_ENABLED=true,
+      # BUDGETSPACE_LLM_PROVIDER=gemini, GEMINI_API_KEY=...). Hard-capped by AiUsageTracker; rule-based fallback on
+      # any failure. The key is backend-only, never committed.
+      BUDGETSPACE_AI_ENABLED: ${BUDGETSPACE_AI_ENABLED:-false}
+      BUDGETSPACE_LLM_PROVIDER: ${BUDGETSPACE_LLM_PROVIDER:-off}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       # Spring Boot DevTools auto-restart loops under a Docker bind mount (it watches target/classes,
       # which mvn spring-boot:run itself rewrites) → the backend kept restarting and requests in that
       # window failed with ERR_EMPTY_RESPONSE / "no Access-Control-Allow-Origin" in the browser. Keep

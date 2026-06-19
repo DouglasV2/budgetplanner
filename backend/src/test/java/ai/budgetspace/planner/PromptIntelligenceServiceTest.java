@@ -119,11 +119,12 @@ class PromptIntelligenceServiceTest {
     }
 
     private LlmProperties enabledOpenAi(String key) {
-        return new LlmProperties(true, "openai", key, "", "", 15, 700);
+        // (enabled, provider, openAiKey, anthropicKey, geminiKey, model, timeoutSeconds, maxOutputTokens)
+        return new LlmProperties(true, "openai", key, "", "", "", 15, 700);
     }
 
     private LlmProperties disabled() {
-        return new LlmProperties(false, "off", "", "", "", 15, 700);
+        return new LlmProperties(false, "off", "", "", "", "", 15, 700);
     }
 
     private AiUsageTracker defaultTracker() {

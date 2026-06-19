@@ -71,10 +71,12 @@ budgetspace:
     # Sprint 10.10: AI prompt-understanding layer. Off by default → deterministic rule-based parsing.
     # API keys are backend-only and never exposed to the frontend.
     enabled: ${BUDGETSPACE_AI_ENABLED:false}
-    provider: ${BUDGETSPACE_LLM_PROVIDER:off}            # off | openai | anthropic
+    provider: ${BUDGETSPACE_LLM_PROVIDER:off}            # off | openai | anthropic | gemini
     openai-api-key: ${OPENAI_API_KEY:}
     anthropic-api-key: ${ANTHROPIC_API_KEY:}
-    model: ${BUDGETSPACE_LLM_MODEL:}                     # blank → cheap mini model per provider
+    # Sprint 10.66: Gemini (cheapest + free tier) — the default AI provider for the early stage.
+    gemini-api-key: ${GEMINI_API_KEY:}
+    model: ${BUDGETSPACE_LLM_MODEL:}                     # blank → cheap default model per provider (gemini-2.0-flash)
     timeout-seconds: ${BUDGETSPACE_LLM_TIMEOUT_SECONDS:15}
     max-output-tokens: ${BUDGETSPACE_LLM_MAX_OUTPUT_TOKENS:700}
     # Cost / rate guardrails — on breach the app falls back to rule-based (never errors).
