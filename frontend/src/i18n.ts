@@ -429,6 +429,16 @@ const DICTIONARY: Record<string, Entry> = {
   'results.budgetBreakdownTitle': { hr: 'Kamo ide budžet', en: 'Where your budget goes' },
   'results.budgetLeftShort': { hr: 'ostaje {amount}', en: '{amount} left' },
   'results.budgetOverShort': { hr: '{amount} iznad', en: '{amount} over' },
+  // Sprint 10.60: social share — a shareable plan summary card (WhatsApp/Reddit/X/native/copy).
+  'results.shareTitle': { hr: 'Podijeli svoj plan', en: 'Share your plan' },
+  'results.shareHint': { hr: 'Pošalji ga prijatelju ili objavi.', en: 'Send it to a friend or post it.' },
+  'results.shareLead': { hr: 'Moj {room} do {budget}:', en: 'My {room} for {budget}:' },
+  'results.shareTotal': { hr: 'ukupno {total}', en: 'total {total}' },
+  'results.shareSaved': { hr: 'ostaje {amount}', en: '{amount} left' },
+  'results.shareFooter': { hr: 'Složeno u BudgetSpace.', en: 'Built with BudgetSpace.' },
+  'results.shareNative': { hr: 'Podijeli', en: 'Share' },
+  'results.shareCopy': { hr: 'Kopiraj', en: 'Copy' },
+  'results.shareCopied': { hr: 'Kopirano!', en: 'Copied!' },
   // Sprint 10.34: opt-in price-drop watch. GDPR-minimal: explicit consent, says exactly what we store,
   // one-click unsubscribe. {email} is the address the user typed back to them.
   'results.watchPrice': { hr: 'Prati cijenu', en: 'Watch price' },

@@ -1466,6 +1466,80 @@ textarea:focus {
   text-align: right;
 }
 
+/* Sprint 10.60: social share — a clean summary card + platform buttons (organic growth loop). */
+.share-card {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.86);
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.share-head {
+  display: grid;
+  gap: 2px;
+}
+
+.share-head > span {
+  font-weight: 640;
+  font-size: 0.95rem;
+}
+
+.share-head > small {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.share-preview {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(31, 29, 26, 0.04);
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.share-btn {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white, #fff);
+  color: var(--ink);
+  padding: 8px 15px;
+  font-weight: 620;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.share-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(31, 29, 26, 0.22);
+}
+
+.share-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.share-btn.primary {
+  background: #CF5F2A;
+  border-color: #CF5F2A;
+  color: #fff;
+}
+
+.share-btn.whatsapp { border-color: rgba(37, 211, 102, 0.5); color: #128C4B; }
+.share-btn.reddit { border-color: rgba(255, 69, 0, 0.45); color: #D93A00; }
+.share-btn.x { border-color: rgba(31, 29, 26, 0.5); color: #1F1D1A; }
+
 .template-card strong,
 .template-card span {
   display: block;

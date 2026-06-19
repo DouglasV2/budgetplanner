@@ -149,6 +149,12 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.60 — social share card (growth loop) (current)
+- After a plan, a **"Podijeli svoj plan"** card shows a clean shareable summary ("Moj dnevni boravak do 1500 €:
+  kauč 349 €, … · ukupno 827 € · ostaje 673 €. Složeno u BudgetSpace.") + share buttons: **native share** (when
+  available), **WhatsApp, Reddit, X, copy**. Reuses `onSavePlan` to mint a shareable `/plan/<id>` link once
+  (cached, so repeated shares don't re-save). Frontend-only. New i18n (hr+en) + premium CSS. Build clean.
+
 ### Sprint 10.59 — budget breakdown (where your money goes) (current)
 - Makes the planner's existing budget allocation **visible**: a stacked "Kamo ide budžet / Where your budget
   goes" bar (share per category) with the **remaining (or over) budget highlighted**, placed right under the

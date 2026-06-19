@@ -436,6 +436,98 @@ function BudgetBreakdown({ plan, input }: { plan: FurnishingPlan; input: Planner
   );
 }
 
+// Sprint 10.60: social share — an organic growth loop. A clean summary card of the plan ("My living room for
+// £1500 — sofa £349… total £827, £673 left. Built with BudgetSpace.") that the user can send to a friend or
+// post (WhatsApp / Reddit / X / native share / copy). Reuses onSavePlan to mint a shareable /plan/<id> link.
+function buildShareText(t: Translate, plan: FurnishingPlan, input: PlannerInput): string {
+  const room = roomLabels[input.roomType];
+  const items = plan.items
+    .slice(0, 3)
+    .map((item) => `${categoryLabels[item.product.category]} ${formatCurrency(item.product.price)}`)
+    .join(', ');
+  const remaining = input.budget - plan.total;
+  const lead = t('results.shareLead', { room, budget: formatCurrency(input.budget) });
+  const totalPart = t('results.shareTotal', { total: formatCurrency(plan.total) });
+  const savedPart = remaining >= 0 ? ` · ${t('results.shareSaved', { amount: formatCurrency(remaining) })}` : '';
+  return `${lead} ${items}. ${totalPart}${savedPart}. ${t('results.shareFooter')}`;
+}
+
+function SharePanel({ plan, input, onSavePlan }: {
+  plan: FurnishingPlan;
+  input: PlannerInput;
+  onSavePlan: (plan: FurnishingPlan, copyLink: boolean) => Promise<string>;
+}) {
+  const { t } = useLocale();
+  const [url, setUrl] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const summary = buildShareText(t, plan, input);
+  const canNativeShare = typeof navigator !== 'undefined' && typeof (navigator as Navigator & { share?: unknown }).share === 'function';
+
+  // Mint (once) a shareable /plan/<id> link by saving the plan; cache it so repeated shares don't re-save.
+  async function ensureUrl(): Promise<string> {
+    if (url) return url;
+    setBusy(true);
+    try {
+      const saved = await onSavePlan(plan, false);
+      setUrl(saved);
+      return saved;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function shareTo(target: 'whatsapp' | 'reddit' | 'x') {
+    const link = await ensureUrl();
+    const enc = encodeURIComponent;
+    const href =
+      target === 'whatsapp' ? `https://wa.me/?text=${enc(`${summary} ${link}`)}`
+      : target === 'reddit' ? `https://www.reddit.com/submit?url=${enc(link)}&title=${enc(summary)}`
+      : `https://twitter.com/intent/tweet?text=${enc(summary)}&url=${enc(link)}`;
+    window.open(href, '_blank', 'noopener,noreferrer');
+  }
+
+  async function nativeShare() {
+    const link = await ensureUrl();
+    const nav = navigator as Navigator & { share?: (data: { title?: string; text?: string; url?: string }) => Promise<void> };
+    try {
+      await nav.share?.({ title: t('results.shareTitle'), text: summary, url: link });
+    } catch {
+      // user cancelled or unsupported — no-op
+    }
+  }
+
+  async function copyShare() {
+    const link = await ensureUrl();
+    try {
+      await navigator.clipboard.writeText(`${summary} ${link}`);
+    } catch {
+      // clipboard blocked — the text is still visible in the preview
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  }
+
+  return (
+    <section className="share-card" aria-label={t('results.shareTitle')}>
+      <div className="share-head">
+        <span>{t('results.shareTitle')}</span>
+        <small>{t('results.shareHint')}</small>
+      </div>
+      <p className="share-preview">{summary}</p>
+      <div className="share-actions">
+        {canNativeShare && (
+          <button type="button" className="share-btn primary" onClick={nativeShare} disabled={busy}>{t('results.shareNative')}</button>
+        )}
+        <button type="button" className="share-btn whatsapp" onClick={() => shareTo('whatsapp')} disabled={busy}>WhatsApp</button>
+        <button type="button" className="share-btn reddit" onClick={() => shareTo('reddit')} disabled={busy}>Reddit</button>
+        <button type="button" className="share-btn x" onClick={() => shareTo('x')} disabled={busy}>X</button>
+        <button type="button" className="share-btn" onClick={copyShare} disabled={busy}>{copied ? t('results.shareCopied') : t('results.shareCopy')}</button>
+      </div>
+    </section>
+  );
+}
+
 function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: PlannerInput }) {
   const { t } = useLocale();
   const trip = resolveStoreTrip(plan);
@@ -1028,6 +1120,8 @@ export function PlanResults({
           <ShoppingListCard plan={selectedPlan} input={input} />
 
           <SecondHandSection products={secondHandSuggestions} planId={selectedPlan.id} onProductClick={onProductClick} />
+
+          <SharePanel plan={selectedPlan} input={input} onSavePlan={onSavePlan} />
 
           <details className="alternate-plans-panel">
             <summary>
