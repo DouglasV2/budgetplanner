@@ -7,13 +7,14 @@ Living backlog + done log. Pair with `MEMORY.md` and `ARCHITECTURE.md`.
 A running registry of everything intentionally left as a placeholder / dormant seam, so we never forget to wire
 the real thing. Each line says what activates it. (Added 2026-06-19.)
 
-- **eBay Browse "Rabljeno" feed** (10.51) — built + dormant. ⚠️ **DO NOT activate as-built.** The owner
-  registered the eBay PRODUCTION app declaring *"we do not persist eBay data — responses are used only
-  transiently"*, but `EbayBrowseFeed` is a `MarketplaceFeed` whose rows are **imported into the `products`
-  table** (`RetailerFeedImporter` → `RetailerSnapshotImportService`) and served from the DB — that conflicts
-  with the declaration and eBay's ToS. **Rework first:** make eBay a live, request-time, in-memory-only source
-  (fetch Browse on demand → map in memory → return → never write to DB), then wire the PROD keys
-  (`BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID/_CLIENTSECRET`, backend env only). See `memory/ebay-no-persist.md`.
+- **eBay Browse "Rabljeno" feed** (10.51 → ✅ reworked **10.64**) — now a **live, request-time, in-memory-only**
+  source: `EbayBrowseFeed` is a `@Service` (no longer a `RetailerFeed`/import bean) that the planner calls when
+  building a plan; results map to **transient `Product`s, returned in that one response, NEVER written to the DB**
+  (honours the owner's eBay "do not persist" declaration + eBay ToS). A short in-memory cache (10 min) spares the
+  rate limit. PRODUCTION keys are wired via the gitignored `.env`
+  (`BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID/_CLIENTSECRET`; the Cert ID is a real secret, never committed).
+  Markets: DE/IT/AT/FR/NL/ES/GB (eBay has no local site elsewhere). Blank keys → dormant. **Rotate the Cert ID**
+  (it was shared in chat). Possible tuning: the furniture category id (3197) if a market returns thin results.
 - **Per-country marketplace feeds** (10.49) — Njuškalo (HR), Bolha (SI), Willhaben (AT), Kleinanzeigen (DE), Subito
   (IT), Tori (FI), Leboncoin (FR), Marktplaats (NL), Bazoš (SK), Wallapop (ES), OLX (PT), Finn (NO), Blocket (SE),
   DBA (DK), Facebook Marketplace — registered `OFFICIAL_FEED_REQUIRED`, import 0. Activate: a compliant
@@ -155,6 +156,21 @@ needs `OPENAI_API_KEY`, backend env only).
 - **Scale/perf**: load test, query/caching review, CDN for assets.
 
 ## Recently done
+
+### Sprint 10.64 — eBay "Rabljeno" → live, no-persist (compliance) (current)
+- The owner's eBay PRODUCTION app declares *"we do not persist eBay data — responses are used only transiently."*
+  But the Sprint 10.51 `EbayBrowseFeed` was a `MarketplaceFeed` whose rows the startup importer **wrote into the
+  `products` table** and the planner served from the DB — a direct conflict (and against eBay's ToS). An
+  adversarial review + compliance check caught it before the keys were ever wired.
+- **Rework:** `EbayBrowseFeed` is now a **live, request-time `@Service`** (removed from the importer bean list).
+  The planner calls `findUsedFurniture(market)` while building a plan; the proven OAuth + Browse search + mapping
+  is reused, but results map to **transient `Product`s, returned in that one response and NEVER persisted** — a
+  short (10 min) in-memory cache only. The same second-hand filters (room/condition/link/freshness) + sold guard
+  still apply; used items still never enter a plan or total. The `liveUsedListings…` test proves the whole live
+  path end-to-end (offline, via an injected transport). **Backend 212 tests, 0 failures.**
+- **PRODUCTION keys wired** via the gitignored `.env` (Cert ID is a real secret — never committed; value-free
+  reference in `docker-compose.override.yml`). Live for DE/IT/AT/FR/NL/ES/GB; dormant when blank. Rotate the Cert
+  ID (shared in chat); possibly tune the furniture category id (3197) per market. See `memory/ebay-no-persist.md`.
 
 ### Sprint 10.63 — real Google sign-in + sessions before the app (current)
 - Owner: "Google prijava prije ulaska u app, čuvaj sesiju, odlogiraj nakon nekog vremena." Replaced the honest

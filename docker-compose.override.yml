@@ -17,6 +17,10 @@ services:
       # Value-free here on purpose — supplied via the gitignored root .env. Blank → Google sign-in is dormant
       # (guest-only, no fake auth). No client secret is needed (we verify the ID token, not the code flow).
       BUDGETSPACE_GOOGLE_CLIENTID: ${BUDGETSPACE_GOOGLE_CLIENTID:-}
+      # Sprint 10.64: eBay Browse API (live "Rabljeno", no DB persistence). Value-free here — App ID + the SECRET
+      # Cert ID come from the gitignored root .env. Blank → eBay source dormant (no used items, no network call).
+      BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID:-}
+      BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET:-}
       # Spring Boot DevTools auto-restart loops under a Docker bind mount (it watches target/classes,
       # which mvn spring-boot:run itself rewrites) → the backend kept restarting and requests in that
       # window failed with ERR_EMPTY_RESPONSE / "no Access-Control-Allow-Origin" in the browser. Keep

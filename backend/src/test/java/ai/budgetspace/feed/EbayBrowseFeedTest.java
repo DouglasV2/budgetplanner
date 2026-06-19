@@ -7,36 +7,35 @@ import ai.budgetspace.dto.ProductDto;
 import ai.budgetspace.dto.RetailerProductSnapshotDto;
 import ai.budgetspace.planner.PlannerService;
 import ai.budgetspace.product.Product;
-import ai.budgetspace.product.ProductImportService;
 import ai.budgetspace.product.ProductRepository;
-import ai.budgetspace.product.RetailerCatalogAdapter;
-import ai.budgetspace.product.RetailerSnapshotImportService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.StandardEnvironment;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Sprint 10.51 — the real eBay Browse "Rabljeno" feed and the second-hand pipeline it fills. Proves:
+ * Sprint 10.51 → 10.64 — the eBay Browse "Rabljeno" source, now a LIVE request-time service (never persisted).
+ * Proves:
  * <ul>
- *   <li>the feed is dormant (no network, imports nothing) without credentials,</li>
- *   <li>it only targets markets where eBay runs a local site (never claims coverage where it has none),</li>
+ *   <li>dormant without credentials (no network, returns nothing),</li>
+ *   <li>only targets markets where eBay runs a local site (never claims coverage where it has none),</li>
  *   <li>its mapping keeps verified used furniture and drops sold / unpriced / unclassifiable listings,</li>
- *   <li>and a used listing NEVER enters a plan or total, yet is surfaced in the separate block (§5).</li>
+ *   <li>and a used listing fetched live NEVER enters a plan or total, yet is surfaced in the separate block (§5).</li>
  * </ul>
- * No credentials and no live internet — the mapping runs on a fixture modelled on the documented Browse shape.
+ * No live internet: a fake transport replays a documented Browse fixture, so the whole live path runs offline.
  */
 class EbayBrowseFeedTest {
 
@@ -45,13 +44,10 @@ class EbayBrowseFeedTest {
     }
 
     @Test
-    void isDormantAndImportsNothingWithoutCredentials() {
+    void isDormantAndReturnsNothingWithoutCredentials() {
         EbayBrowseFeed feed = dormantFeed();
-        assertThat(feed.retailer()).isEqualTo("eBay");
-        assertThat(feed.market()).isNull();
-        assertThat(feed.sourceType()).isEqualTo("marketplace-listing");
         assertThat(feed.isConfigured()).isFalse();
-        assertThat(feed.fetchSnapshot()).isEmpty(); // no credentials → no network call, nothing imported
+        assertThat(feed.findUsedFurniture("DE")).isEmpty(); // no credentials → no network call, nothing returned
     }
 
     @Test
@@ -61,6 +57,8 @@ class EbayBrowseFeedTest {
         assertThat(EbayBrowseFeedProperties.SUPPORTED_MARKETS).containsExactly("DE", "IT", "AT", "FR", "NL", "ES", "GB");
         assertThat(new EbayBrowseFeedProperties(new StandardEnvironment()).markets())
                 .isEqualTo(EbayBrowseFeedProperties.SUPPORTED_MARKETS);
+        // An unsupported market is never queried, even when configured.
+        assertThat(configuredFeed().findUsedFurniture("HR")).isEmpty();
     }
 
     @Test
@@ -91,15 +89,13 @@ class EbayBrowseFeedTest {
     }
 
     @Test
-    void usedListingsNeverEnterAPlanOrTotalButAreSurfacedSeparately() throws Exception {
-        // Import the real eBay-mapped used rows so secondHand flows through the whole pipeline.
-        List<Product> catalog = new ArrayList<>(importUsedProducts(mappedSampleRows()));
-        catalog.add(retailSofa("ikea-de-sofa-1", "Sofa STOCKHOLM", 349));
-        catalog.add(retailSofa("ikea-de-sofa-2", "Sofa EKTORP", 299));
-
+    void liveUsedListingsNeverEnterAPlanOrTotalButAreSurfacedSeparately() {
+        // The catalog holds only new-retail products; the used items come LIVE from eBay (transient, never saved).
         ProductRepository repository = mock(ProductRepository.class);
-        when(repository.findAll()).thenReturn(catalog);
-        PlannerService planner = new PlannerService(repository);
+        when(repository.findAll()).thenReturn(new ArrayList<>(List.of(
+                retailSofa("ikea-de-sofa-1", "Sofa STOCKHOLM", 349),
+                retailSofa("ikea-de-sofa-2", "Sofa EKTORP", 299))));
+        PlannerService planner = new PlannerService(repository, configuredFeed());
 
         PlanGenerationResponse response = planner.generateResolved(livingRoomInput().withMarket("DE"));
 
@@ -124,30 +120,42 @@ class EbayBrowseFeedTest {
 
     // --- helpers ---
 
-    private List<RetailerProductSnapshotDto> mappedSampleRows() throws Exception {
+    /** A configured eBay service whose transport replays the documented Browse fixture (no live internet). */
+    private EbayBrowseFeed configuredFeed() {
+        StandardEnvironment env = new StandardEnvironment();
+        env.getPropertySources().addFirst(new MapPropertySource("ebay-test", Map.of(
+                "budgetspace.marketplace-feeds.ebay.client-id", "test-app-id",
+                "budgetspace.marketplace-feeds.ebay.client-secret", "test-cert-id")));
+        return new EbayBrowseFeed(new EbayBrowseFeedProperties(env), fixtureTransport(), new ObjectMapper());
+    }
+
+    private EbayBrowseFeed.EbayTransport fixtureTransport() {
+        return new EbayBrowseFeed.EbayTransport() {
+            @Override
+            public String get(String url, Map<String, String> headers) throws IOException {
+                return fixtureJson(); // the Browse item_summary/search response
+            }
+
+            @Override
+            public String post(String url, Map<String, String> headers, String formBody) {
+                return "{\"access_token\":\"test-token\",\"expires_in\":7200}"; // the OAuth token response
+            }
+        };
+    }
+
+    private String fixtureJson() throws IOException {
         try (InputStream in = getClass().getResourceAsStream("/ebay/browse-de-sample.json")) {
             assertThat(in).as("eBay fixture resource").isNotNull();
-            String json = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            return dormantFeed().mapSearchResponse(json, "DE", Instant.now());
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+
+    private List<RetailerProductSnapshotDto> mappedSampleRows() throws Exception {
+        return dormantFeed().mapSearchResponse(fixtureJson(), "DE", Instant.now());
     }
 
     private RetailerProductSnapshotDto row(List<RetailerProductSnapshotDto> rows, String category) {
         return rows.stream().filter(r -> category.equals(r.category())).findFirst().orElseThrow();
-    }
-
-    private List<Product> importUsedProducts(List<RetailerProductSnapshotDto> rows) {
-        ProductRepository repository = mock(ProductRepository.class);
-        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
-        List<Product> saved = new ArrayList<>();
-        when(repository.save(any(Product.class))).thenAnswer(invocation -> {
-            Product product = invocation.getArgument(0);
-            saved.add(product);
-            return product;
-        });
-        new RetailerSnapshotImportService(new ProductImportService(repository), new RetailerCatalogAdapter())
-                .importSnapshot(rows);
-        return saved;
     }
 
     private Product retailSofa(String id, String name, double price) {

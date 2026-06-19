@@ -40,12 +40,12 @@ class MarketplaceFeedSeamTest {
     void marketplaceConfigWiresOneUnconfiguredPlaceholderPerMarketplace() {
         MarketplaceFeedProperties properties = new MarketplaceFeedProperties(new StandardEnvironment());
         MarketplaceFeedConfig config = new MarketplaceFeedConfig();
-        // Sprint 10.51: eBay is now the real EbayBrowseFeed (its own env-backed properties); unconfigured here
-        // → still dormant, so it satisfies the same placeholder contract as the rest.
-        EbayBrowseFeedProperties ebayProperties = new EbayBrowseFeedProperties(new StandardEnvironment());
+        // Sprint 10.64: eBay is no longer an import-feed bean — it became a live, request-time @Service (it must
+        // NOT persist eBay data), so it is intentionally absent here. The remaining 15 marketplaces are still
+        // unconfigured RetailerFeed placeholders awaiting a compliant partner feed.
         List<RetailerFeed> feeds = List.of(
                 config.njuskaloMarketplaceFeed(properties), config.facebookMarketplaceFeed(properties),
-                config.ebayMarketplaceFeed(ebayProperties), config.bolhaMarketplaceFeed(properties),
+                config.bolhaMarketplaceFeed(properties),
                 config.willhabenMarketplaceFeed(properties), config.kleinanzeigenMarketplaceFeed(properties),
                 config.subitoMarketplaceFeed(properties), config.toriMarketplaceFeed(properties),
                 config.leboncoinMarketplaceFeed(properties), config.marktplaatsMarketplaceFeed(properties),
@@ -53,7 +53,7 @@ class MarketplaceFeedSeamTest {
                 config.olxMarketplaceFeed(properties), config.finnMarketplaceFeed(properties),
                 config.blocketMarketplaceFeed(properties), config.dbaMarketplaceFeed(properties));
 
-        assertThat(feeds).hasSameSizeAs(MARKETPLACES);
+        assertThat(feeds).hasSize(MARKETPLACES.size() - 1); // 15: every marketplace except eBay (now a live service)
         assertThat(feeds).allSatisfy(feed -> {
             assertThat(feed.sourceType()).isEqualTo(CatalogSourcePolicy.SOURCE_MARKETPLACE_LISTING);
             assertThat(feed.isConfigured()).as("%s unconfigured by default", feed.retailer()).isFalse();
@@ -64,7 +64,7 @@ class MarketplaceFeedSeamTest {
         RetailerSnapshotImportService importService = mock(RetailerSnapshotImportService.class);
         List<RetailerFeedImporter.FeedResult> results =
                 new RetailerFeedImporter(feeds, importService).importConfiguredFeeds();
-        assertThat(results).hasSameSizeAs(MARKETPLACES)
+        assertThat(results).hasSize(feeds.size())
                 .allSatisfy(r -> assertThat(r.status()).isEqualTo(RetailerFeedImporter.Status.SKIPPED_NOT_CONFIGURED));
         verifyNoInteractions(importService);
     }

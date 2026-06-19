@@ -3,10 +3,13 @@ package ai.budgetspace.feed;
 import ai.budgetspace.dto.RetailerProductSnapshotDto;
 import ai.budgetspace.product.CatalogSourcePolicy;
 import ai.budgetspace.product.MarketplaceListingFilter;
+import ai.budgetspace.product.Product;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -25,40 +28,38 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Sprint 10.51 — the real second-hand marketplace feed: eBay Browse API ({@code item_summary/search}) for
- * used furniture, by market. It is the first compliant "Rabljeno" source that fills the per-country
- * placeholders. It honours every rule in {@code docs/marketplace-sourcing.md}:
+ * Sprint 10.51 → 10.64 — the eBay Browse API source for used furniture ("Rabljeno").
  *
- * <ul>
- *   <li><strong>Official API only — never scrape.</strong> All access is the documented Browse API with an
- *       OAuth client-credentials token. Credentials are read from the environment ({@link EbayBrowseFeedProperties});
- *       nothing is committed. With no credentials the feed is dormant — {@link #isConfigured()} is {@code false}
- *       and {@link #fetchSnapshot()} makes no network call and imports nothing.</li>
- *   <li><strong>Every row marked second-hand</strong> ({@code secondHand=true},
- *       {@code sourceType=marketplace-listing}) with the seller's stated condition + city, so the planner keeps
- *       it out of the budget total and the UI shows it in the separate section.</li>
- *   <li><strong>Sold/expired guard before return.</strong> Every candidate runs through
- *       {@link MarketplaceListingFilter#shouldDrop} so a {@code PRODANO}/reserved/expired ad is never imported.
- *       (The Browse search already returns only live items; this is belt-and-suspenders.)</li>
- *   <li><strong>No fabrication.</strong> A row with no concrete price, photo, condition, link, or a furniture
- *       type we cannot confidently classify, is dropped — honesty over coverage.</li>
- * </ul>
+ * <p><strong>Live, request-time, in-memory only — it never persists eBay data.</strong> This is a deliberate
+ * compliance choice (Sprint 10.64): the app's eBay registration declares that eBay responses are used only
+ * transiently to display search results and are not stored in our database. So eBay is NOT an import feed (it is
+ * not a {@code RetailerFeed} and the startup importer never touches it). Instead the planner calls
+ * {@link #findUsedFurniture(String)} when it builds a plan; the results are mapped to <em>transient</em>
+ * {@link Product} objects (never saved), returned in that one response, and held only in a short in-memory cache
+ * ({@link #CACHE_TTL}) to spare eBay's rate limit — there is no row in any table, ever.</p>
  *
- * <p>eBay runs local marketplaces only in {@link EbayBrowseFeedProperties#SUPPORTED_MARKETS} (DE/IT/AT/FR/NL/ES);
- * the other BudgetSpace markets keep their own placeholders. The category classification + Browse query are a
- * sensible first cut that is tuned against live responses once the owner's developer key is active (the key
- * gates the live smoke test, not this code — the mapping is unit-tested on a fixture).</p>
+ * <p>Every other rule from {@code docs/marketplace-sourcing.md} still holds: official Browse API only (never
+ * scrape), each row marked second-hand and kept out of every plan total, a sold/expired guard
+ * ({@link MarketplaceListingFilter}), and no fabrication (a row with no price/photo/condition/link or an
+ * unclassifiable type is dropped). Dormant without credentials — {@link #isConfigured()} is false and
+ * {@link #findUsedFurniture} makes no network call. eBay runs local sites only in
+ * {@link EbayBrowseFeedProperties#SUPPORTED_MARKETS}; other markets keep their own placeholders.</p>
  */
-public class EbayBrowseFeed implements MarketplaceFeed {
+@Service
+public class EbayBrowseFeed {
 
     private static final Logger log = LoggerFactory.getLogger(EbayBrowseFeed.class);
 
     private static final String RETAILER = "eBay";
     private static final String OAUTH_SCOPE = "https://api.ebay.com/oauth/api_scope";
     private static final Duration TOKEN_SAFETY_MARGIN = Duration.ofSeconds(60);
-    private static final Duration HTTP_TIMEOUT = Duration.ofSeconds(20);
+    private static final Duration HTTP_TIMEOUT = Duration.ofSeconds(8);
+    // How long a market's mapped results stay in the in-memory cache. Short on purpose: a used listing goes
+    // stale fast, and this is transient display data, never persisted. Bounded by the handful of eBay markets.
+    private static final Duration CACHE_TTL = Duration.ofMinutes(10);
 
     private final EbayBrowseFeedProperties properties;
     private final EbayTransport transport;
@@ -68,73 +69,71 @@ public class EbayBrowseFeed implements MarketplaceFeed {
     private String cachedToken;
     private Instant tokenExpiresAt = Instant.EPOCH;
 
+    // Transient per-market cache of mapped used furniture. Never persisted; lost on restart; at most one entry
+    // per supported eBay market.
+    private final Map<String, CachedMarket> cache = new ConcurrentHashMap<>();
+
+    @Autowired
     public EbayBrowseFeed(EbayBrowseFeedProperties properties) {
         this(properties, new HttpClientTransport(), new ObjectMapper());
     }
 
-    // Package-private: lets a test inject a fake transport (and exercise the pure mapping) without a network.
+    // Package-private: lets a test inject a fake transport (and exercise the live path + mapping) without a network.
     EbayBrowseFeed(EbayBrowseFeedProperties properties, EbayTransport transport, ObjectMapper objectMapper) {
         this.properties = properties;
         this.transport = transport;
         this.objectMapper = objectMapper;
     }
 
-    @Override
-    public String retailer() {
-        return RETAILER;
-    }
-
-    @Override
-    public String market() {
-        return null; // multi-market — each row carries its own market code.
-    }
-
-    @Override
-    public String sourceType() {
-        return CatalogSourcePolicy.SOURCE_MARKETPLACE_LISTING;
-    }
-
-    @Override
+    /** True only when an eBay App ID + Cert ID are supplied via the environment. */
     public boolean isConfigured() {
         return properties.isConfigured();
     }
 
-    @Override
-    public String statusReason() {
-        if (isConfigured()) {
-            return "eBay Browse API konfiguriran (tržišta=" + properties.markets() + ") — uvozi rabljeni "
-                    + "namještaj (conditions=USED), svaki red kroz MarketplaceListingFilter.";
+    /**
+     * Live used furniture for one market, mapped to TRANSIENT {@link Product} objects (never persisted), or an
+     * empty list when eBay is not configured, the market has no eBay site, or the live call fails. Results are
+     * cached in memory for {@link #CACHE_TTL} so repeated plans for the same market don't re-hit eBay.
+     */
+    public List<Product> findUsedFurniture(String market) {
+        if (market == null) {
+            return List.of();
         }
-        return "eBay placeholder — nema App ID/Cert ID u okolini "
-                + "(budgetspace.marketplace-feeds.ebay.client-id/client-secret). Uvozi 0. Nikad se ne scrape-a.";
-    }
-
-    @Override
-    public List<RetailerProductSnapshotDto> fetchSnapshot() {
-        if (!isConfigured()) {
-            return List.of(); // dormant — never touch the network without credentials.
-        }
-        String token;
-        try {
-            token = accessToken();
-        } catch (Exception exception) {
-            log.error("eBay Browse: OAuth token nije dohvaćen — preskačem feed (0 redaka).", exception);
+        String code = market.trim().toUpperCase(Locale.ROOT);
+        if (!isConfigured() || !properties.markets().contains(code)) {
             return List.of();
         }
         Instant now = Instant.now();
-        List<RetailerProductSnapshotDto> all = new ArrayList<>();
-        for (String market : properties.markets()) {
-            try {
-                String json = searchUsedFurniture(token, market);
-                List<RetailerProductSnapshotDto> rows = mapSearchResponse(json, market, now);
-                all.addAll(rows);
-                log.info("eBay Browse [{}]: {} rabljenih redaka nakon filtra.", market, rows.size());
-            } catch (Exception exception) {
-                // A broken market must not take the feed (or the other markets) down.
-                log.error("eBay Browse [{}]: dohvat nije uspio — preskačem ovo tržište, nastavljam.", market, exception);
-            }
+        CachedMarket cached = cache.get(code);
+        if (cached != null && cached.fetchedAt().isAfter(now.minus(CACHE_TTL))) {
+            return cached.products();
         }
-        return all;
+        List<Product> products = fetchLive(code, now);
+        cache.put(code, new CachedMarket(now, products));
+        return products;
+    }
+
+    private List<Product> fetchLive(String market, Instant now) {
+        try {
+            String token = accessToken();
+            String json = searchUsedFurniture(token, market);
+            List<Product> products = mapSearchResponse(json, market, now).stream()
+                    .map(EbayBrowseFeed::toTransientProduct)
+                    .toList();
+            log.info("eBay live [{}]: {} used item(s) after filter (transient, not persisted).", market, products.size());
+            return products;
+        } catch (Exception exception) {
+            // A failed live call must never break plan generation — the plan just shows no "Rabljeno" items.
+            if (exception instanceof InterruptedException) {
+                Thread.currentThread().interrupt(); // restore the interrupt flag before swallowing
+            }
+            log.error("eBay live [{}]: fetch failed — returning no used items.", market, exception);
+            return List.of();
+        }
+    }
+
+    /** A market's mapped used furniture plus when it was fetched — held only in memory, never persisted. */
+    private record CachedMarket(Instant fetchedAt, List<Product> products) {
     }
 
     // --- OAuth client-credentials (one app token, cached until just before expiry) ---
@@ -212,7 +211,7 @@ public class EbayBrowseFeed implements MarketplaceFeed {
                 || isBlank(image) || isBlank(condition) || category == null) {
             return null;
         }
-        // Belt-and-suspenders sold/expired guard before a row can ever be imported.
+        // Belt-and-suspenders sold/expired guard before a row can ever be surfaced.
         String nowIso = now.toString();
         if (MarketplaceListingFilter.shouldDrop(title, condition, nowIso, now)) {
             return null;
@@ -249,6 +248,48 @@ public class EbayBrowseFeed implements MarketplaceFeed {
                 true,                                   // secondHand
                 condition,                              // conditionLabel — the seller's stated condition
                 location);                              // sellerLocation — city/region for pickup distance
+    }
+
+    /**
+     * Maps a verified used snapshot to a TRANSIENT {@link Product} (never persisted) so the planner can surface
+     * it in the "Rabljeno" block through the same filtering it uses for retail products. Non-null entity columns
+     * get safe defaults; the row is flagged {@code secondHand} and image-unverified (the UI shows a placeholder).
+     */
+    private static Product toTransientProduct(RetailerProductSnapshotDto snapshot) {
+        Product product = new Product();
+        product.setId(snapshot.externalId());
+        product.setExternalId(snapshot.externalId());
+        product.setName(snapshot.name());
+        product.setRetailer(snapshot.retailer());
+        product.setCategory(snapshot.category());
+        product.setPrice(snapshot.price());
+        product.setProductUrl(snapshot.productUrl());
+        product.setUrl(snapshot.productUrl());
+        product.setImageUrl(snapshot.imageUrl());
+        product.setImage("");
+        product.setAvailabilityStatus(snapshot.availabilityStatus());
+        product.setLastCheckedAt(snapshot.lastCheckedAt());
+        product.setStyleTags(joinTags(snapshot.styleTags()));
+        product.setRoomTags(joinTags(snapshot.roomTags()));
+        product.setPriceTier(snapshot.priceTier());
+        product.setSourceType(snapshot.sourceType());
+        product.setSourceName(snapshot.sourceName());
+        product.setSourceReference(snapshot.sourceReference());
+        product.setDataQuality(snapshot.dataQuality());
+        product.setDataQualityNotes(snapshot.dataQualityNotes());
+        product.setMarket(snapshot.market());
+        product.setImageVerified(Boolean.TRUE.equals(snapshot.imageVerified()));
+        product.setSecondHand(Boolean.TRUE.equals(snapshot.secondHand()));
+        product.setConditionLabel(snapshot.conditionLabel());
+        product.setSellerLocation(snapshot.sellerLocation());
+        product.setRating(0);
+        product.setInStock(true);
+        product.setNote("");
+        return product;
+    }
+
+    private static String joinTags(List<String> tags) {
+        return tags == null ? "" : String.join(",", tags);
     }
 
     // --- Furniture-type classification (multilingual, most-specific first; unmappable -> drop) ---

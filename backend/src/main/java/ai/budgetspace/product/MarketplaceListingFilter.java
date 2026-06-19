@@ -23,9 +23,10 @@ import java.util.Locale;
  *   <li>{@link #shouldDrop} — the combined ingest test: drop if sold/unavailable OR stale.</li>
  * </ul>
  *
- * <p>This is scaffolding: no marketplace feed is wired yet (the retailers are
- * {@link CatalogSourcePolicy.SourcingStatus#OFFICIAL_FEED_REQUIRED} and carry no products). When a
- * compliant feed lands, it runs every candidate row through this filter before import.</p>
+ * <p>Sprint 10.64: eBay is now wired as a LIVE source (transient, never persisted) and runs every candidate row
+ * through this filter before surfacing it. The other marketplaces remain
+ * {@link CatalogSourcePolicy.SourcingStatus#OFFICIAL_FEED_REQUIRED} placeholders that carry no products, awaiting
+ * a compliant feed which would likewise run each row through this filter.</p>
  */
 public final class MarketplaceListingFilter {
 

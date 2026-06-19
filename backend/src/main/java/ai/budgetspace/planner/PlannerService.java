@@ -1,6 +1,7 @@
 package ai.budgetspace.planner;
 
 import ai.budgetspace.dto.*;
+import ai.budgetspace.feed.EbayBrowseFeed;
 import ai.budgetspace.product.CatalogSourcePolicy;
 import ai.budgetspace.product.MarketplaceListingFilter;
 import ai.budgetspace.product.Markets;
@@ -9,6 +10,7 @@ import ai.budgetspace.product.ProductRepository;
 import ai.budgetspace.product.ProductTaxonomy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -86,10 +88,19 @@ public class PlannerService {
     );
 
     private final ProductRepository productRepository;
+    // Sprint 10.64: the live, request-time eBay source for "Rabljeno" (used items are never persisted). Nullable
+    // — tests that don't exercise second-hand build the planner without it, and then no used items are surfaced.
+    private final EbayBrowseFeed ebayMarketplace;
     private final PlannerIntentExtractor intentExtractor = new PlannerIntentExtractor();
 
     public PlannerService(ProductRepository productRepository) {
+        this(productRepository, null);
+    }
+
+    @Autowired
+    public PlannerService(ProductRepository productRepository, EbayBrowseFeed ebayMarketplace) {
         this.productRepository = productRepository;
+        this.ebayMarketplace = ebayMarketplace;
     }
 
     public PlanGenerationResponse generate(PlannerInputDto rawInput) {
@@ -133,7 +144,10 @@ public class PlannerService {
         String market = Markets.normalize(input.market());
         String room = input.roomType();
         Instant now = Instant.now();
-        return allProducts().stream()
+        // Sprint 10.64: used items come LIVE from eBay (transient, never persisted) — not from the catalog DB.
+        // The same downstream filters still apply (room match, freshness, condition, link), defensively.
+        List<Product> usedListings = ebayMarketplace == null ? List.of() : ebayMarketplace.findUsedFurniture(market);
+        return usedListings.stream()
                 .filter(Product::isSecondHand)
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> product.getMarket() == null || product.getMarket().isBlank()
