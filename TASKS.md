@@ -149,6 +149,20 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.62 — calmer results (UX simplification) (current)
+- Owner: "čim uđe i izgenerira plan vidi dosta toga i svačega." After a plan, `PlanResults` stacked ~11 full
+  sections at once. Restructured into **progressive disclosure — nothing removed**, the default view is now just
+  the **verdict + products + 3 actions**.
+- **Per-product row:** only **"Otvori u trgovini"** stays visible (now the filled primary); Reviews / Promijeni /
+  Zadrži / Prati cijenu hide behind one **"Više opcija"** toggle (new `actionsProductId` state + `toggleActions`).
+- **One collapsed `<details>` "Više o ovom planu"** now holds the supporting detail: budget breakdown, shopping-
+  by-store, version comparison, full plan details, "što smo razumjeli". Rabljeno / Share / Feedback stay below.
+- Removed only the redundant "najvažnije u planu" strip (it duplicated the products list's first step).
+- **Adversarial multi-agent review** (4 dimensions + double-verify) caught + fixed: missing `aria-expanded` on the
+  Change / dislike toggles; an iterative-replace collapse (split the reset effect so an in-place swap keeps the
+  row open); a locked-item replacement menu staying live (`!locked` gate); two mobile `@media` parity gaps for
+  the new panel + secondary actions. New i18n (hr+en) + CSS. **Frontend build clean (tsc strict + vite).**
+
 ### Sprint 10.61 — Saved Spaces (multiple rooms per home) (current)
 - Retention feature: a **"space"** (e.g. "Moj dom") groups a session's saved room-plans, so a user can design a
   living room → bedroom → office for the **same home** and come back to keep going ("continue designing").

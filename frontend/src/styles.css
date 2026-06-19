@@ -3344,6 +3344,89 @@ textarea {
   margin-right: 16px;
 }
 
+/* Sprint 10.62: calmer results. All supporting detail collapses into one "More about this plan" panel so the
+   default view stays the verdict + products + actions. The summary mirrors the other panels' chevron affordance. */
+.more-about-plan {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.58);
+  padding: 0;
+  overflow: hidden;
+}
+
+.more-about-plan > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 16px 46px 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.more-about-plan > summary:hover {
+  background: rgba(31, 29, 26, 0.03);
+}
+
+.more-about-plan > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-about-plan > summary::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.more-about-plan[open] > summary::after {
+  transform: translateY(-30%) rotate(225deg);
+}
+
+.more-about-plan > summary span {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.more-about-plan > summary small {
+  color: var(--muted);
+  font-size: 0.86rem;
+  text-align: right;
+}
+
+/* Nested cards/panels sit on an even inset inside the wrapper (vertical margins collapse to one gap). */
+.more-about-plan > :not(summary) {
+  margin: 14px;
+}
+
+/* Per-product secondary actions, revealed by the "More options" toggle. A hairline marks them as a deliberate
+   second tier rather than a wrapped overflow of the primary row. */
+.product-secondary-actions {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(31, 29, 26, 0.08);
+}
+
+/* The primary per-product action is filled, so "open in store" clearly outranks the quiet "More options" toggle. */
+.decision-product-actions .open-store-link {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #fff;
+}
+
+.decision-product-actions .more-options-toggle {
+  background: transparent;
+  color: var(--muted);
+}
+
 .compact-plan-header {
   border-radius: 20px;
   padding: 14px;
@@ -3378,6 +3461,7 @@ textarea {
 
   .decision-actions,
   .decision-product-actions,
+  .product-secondary-actions,
   .replacement-menu {
     display: grid;
     grid-template-columns: 1fr;
@@ -3385,14 +3469,16 @@ textarea {
 
   .alternate-plans-panel summary,
   .secondary-info-panel summary,
-  .compact-understood-card summary {
+  .compact-understood-card summary,
+  .more-about-plan > summary {
     align-items: flex-start;
     flex-direction: column;
   }
 
   .alternate-plans-panel summary strong,
   .secondary-info-panel summary strong,
-  .compact-understood-card summary strong {
+  .compact-understood-card summary strong,
+  .more-about-plan > summary small {
     text-align: left;
   }
 }

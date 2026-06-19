@@ -721,6 +721,9 @@ export function PlanResults({
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const [dislikeProductId, setDislikeProductId] = useState<string | null>(null);
+  // Sprint 10.62: per-product secondary actions (change / keep / watch / reviews) hide behind one toggle so a
+  // row shows just the price, the reason and "open in store" by default. Only one row's actions open at a time.
+  const [actionsProductId, setActionsProductId] = useState<string | null>(null);
   // Sprint 10.34: opt-in price-drop watch (one inline form open at a time).
   const [watchProductId, setWatchProductId] = useState<string | null>(null);
   const [watchEmail, setWatchEmail] = useState('');
@@ -728,22 +731,43 @@ export function PlanResults({
   const [watchSubmitting, setWatchSubmitting] = useState(false);
   const [watchStatus, setWatchStatus] = useState<{ id: string; type: 'ok' | 'error'; message: string } | null>(null);
 
+  // Sprint 10.62: a genuinely new plan SET (fresh generation / opened plan) is identified by its plan ids; an
+  // in-place product replace keeps the same ids. We key the per-row disclosure reset on the ids so the
+  // "More options" row a user is editing survives an iterative replace instead of snapping shut under them.
+  const planIdsKey = plans.map((plan) => plan.id).join('|');
+
+  // Runs on every plans change: keep the selected version in sync, and clear stale feedback (Sprint 10.54: a
+  // fresh plan set means old feedback no longer applies, so a stale "make it cheaper?" CTA never lingers).
   useEffect(() => {
     setSelectedPlanId(preferredPlanId(plans, input));
-    setExpandedProductId(null);
-    setDislikeProductId(null);
-    setWatchProductId(null);
-    setWatchStatus(null);
-    // Sprint 10.54: a fresh plan set means old feedback no longer applies — clear it so a stale "make it
-    // cheaper?" CTA never lingers after the plan was already regenerated.
     setFeedbackByPlan({});
   }, [plans, input.optimizationGoal, input.furnishingLevel]);
+
+  // Runs only on a genuinely new plan set (new ids) or a goal/level switch — NOT on an in-place replace — so a
+  // row the user has open for editing stays open while they try cheaper/nicer swaps on the same item.
+  useEffect(() => {
+    setExpandedProductId(null);
+    setDislikeProductId(null);
+    setActionsProductId(null);
+    setWatchProductId(null);
+    setWatchStatus(null);
+  }, [planIdsKey, input.optimizationGoal, input.furnishingLevel]);
 
   function openWatchForm(productId: string) {
     setWatchProductId(watchProductId === productId ? null : productId);
     setWatchStatus(null);
     setWatchEmail('');
     setWatchConsent(false);
+  }
+
+  // Sprint 10.62: open/close a row's secondary actions. Toggling always collapses that row's nested menus so a
+  // fresh open starts clean and a closed row never leaves an orphaned replacement/watch panel showing.
+  function toggleActions(productId: string) {
+    setActionsProductId((current) => (current === productId ? null : productId));
+    setExpandedProductId(null);
+    setDislikeProductId(null);
+    setWatchProductId(null);
+    setWatchStatus(null);
   }
 
   async function submitWatch(product: Product) {
@@ -866,7 +890,6 @@ export function PlanResults({
     : furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
   const selectedFeedback = feedbackByPlan[selectedPlan.id];
   const selectedFix = selectedFeedback ? FEEDBACK_ACTION[selectedFeedback] : undefined;
-  const primaryStep = steps.find((step) => step.priority === 'buy-first') ?? steps[0];
 
   return (
     <ResultShell>
@@ -936,13 +959,6 @@ export function PlanResults({
               <div className="store-limit-note">{selectedPlan.storeLimitNote}</div>
             )}
 
-            {primaryStep && (
-              <div className="first-buy-strip">
-                <span>{t('results.mostImportantInPlan')}</span>
-                <strong>{primaryStep.items.map((item) => item.product.name).join(' + ')}</strong>
-              </div>
-            )}
-
             <div className="decision-actions">
               <button className="plan-button primary-copy-button" type="button" onClick={() => copyPlan(selectedPlan)}>
                 {copiedPlanId === selectedPlan.id ? t('results.listCopied') : t('results.copyShoppingList')}
@@ -955,9 +971,6 @@ export function PlanResults({
               </button>
             </div>
           </div>
-
-
-          <BudgetBreakdown plan={selectedPlan} input={input} />
 
           <div className="items-list step-items-list">
             <div className="result-section-heading">
@@ -975,6 +988,7 @@ export function PlanResults({
                   const locked = lockedProductIds.includes(product.id);
                   const priority = priorityForItem(item, input.roomType);
                   const expanded = expandedProductId === product.id;
+                  const actionsOpen = actionsProductId === product.id;
                   const openUrl = productUrl(product);
                   const reviewsHref = reviewsUrl(product);
                   const market = marketBadge(product);
@@ -1041,7 +1055,7 @@ export function PlanResults({
                         </div>
                         <div className="product-actions decision-product-actions">
                           {openUrl ? (
-                            <a href={openUrl} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
+                            <a className="open-store-link" href={openUrl} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
                               {t('results.openInStore')}
                             </a>
                           ) : (
@@ -1049,26 +1063,33 @@ export function PlanResults({
                               {t('results.productLinkUnavailable')}
                             </button>
                           )}
-                          {hasReviews(t, product) && reviewsHref && (
-                            <a className="reviews-link" href={reviewsHref} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
-                              {t('product.reviews')} ↗
-                            </a>
-                          )}
-                          <button type="button" onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>
-                            {expanded ? t('results.hideReplacements') : t('results.change')}
-                          </button>
-                          <button type="button" onClick={() => onToggleLock(product.id)}>
-                            {locked ? t('results.release') : t('results.keep')}
-                          </button>
-                          <button type="button" className="watch-price-button" aria-expanded={watchProductId === product.id} onClick={() => openWatchForm(product.id)}>
-                            {t('results.watchPrice')}
+                          <button type="button" className="more-options-toggle" aria-expanded={actionsOpen} onClick={() => toggleActions(product.id)}>
+                            {actionsOpen ? t('results.hideOptions') : t('results.moreOptions')}
                           </button>
                         </div>
-                        {expanded && (
+                        {actionsOpen && (
+                          <div className="product-actions product-secondary-actions">
+                            {hasReviews(t, product) && reviewsHref && (
+                              <a className="reviews-link" href={reviewsHref} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
+                                {t('product.reviews')} ↗
+                              </a>
+                            )}
+                            <button type="button" aria-expanded={expanded} onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>
+                              {expanded ? t('results.hideReplacements') : t('results.change')}
+                            </button>
+                            <button type="button" onClick={() => onToggleLock(product.id)}>
+                              {locked ? t('results.release') : t('results.keep')}
+                            </button>
+                            <button type="button" className="watch-price-button" aria-expanded={watchProductId === product.id} onClick={() => openWatchForm(product.id)}>
+                              {t('results.watchPrice')}
+                            </button>
+                          </div>
+                        )}
+                        {actionsOpen && expanded && !locked && (
                           <div className="replacement-menu" aria-label={t('results.replacementMenuLabel')}>
                             <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>{t('results.findCheaper')}</button>
                             <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>{t('results.findNicer')}</button>
-                            <button type="button" onClick={() => setDislikeProductId(dislikeProductId === product.id ? null : product.id)}>{t('results.dontLikeIt')}</button>
+                            <button type="button" aria-expanded={dislikeProductId === product.id} onClick={() => setDislikeProductId(dislikeProductId === product.id ? null : product.id)}>{t('results.dontLikeIt')}</button>
                             <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>{t('results.dontNeedThis')}</button>
                             {dislikeProductId === product.id && (
                               <div className="dislike-reasons">
@@ -1081,7 +1102,7 @@ export function PlanResults({
                             )}
                           </div>
                         )}
-                        {watchProductId === product.id && (
+                        {actionsOpen && watchProductId === product.id && (
                           <div className="price-watch-form" aria-label={t('results.watchTitle')}>
                             <span className="price-watch-title">{t('results.watchTitle')}</span>
                             <input
@@ -1117,11 +1138,18 @@ export function PlanResults({
             ))}
           </div>
 
-          <ShoppingListCard plan={selectedPlan} input={input} />
+          {/* Sprint 10.62: one calm "more" panel collapses the supporting detail (breakdown, shopping-by-store,
+              version comparison, full plan details, what-we-understood) so the default view stays the verdict +
+              products. Closed by default — opened when a user wants to dig in. Nothing was removed. */}
+          <details className="more-about-plan">
+            <summary>
+              <span>{t('results.moreAboutPlan')}</span>
+              <small>{t('results.moreAboutPlanHint')}</small>
+            </summary>
 
-          <SecondHandSection products={secondHandSuggestions} planId={selectedPlan.id} onProductClick={onProductClick} />
+            <BudgetBreakdown plan={selectedPlan} input={input} />
 
-          <SharePanel plan={selectedPlan} input={input} onSavePlan={onSavePlan} />
+            <ShoppingListCard plan={selectedPlan} input={input} />
 
           <details className="alternate-plans-panel">
             <summary>
@@ -1241,7 +1269,12 @@ export function PlanResults({
             )}
           </details>
 
-          <UnderstandingSummary input={input} />
+            <UnderstandingSummary input={input} />
+          </details>
+
+          <SecondHandSection products={secondHandSuggestions} planId={selectedPlan.id} onProductClick={onProductClick} />
+
+          <SharePanel plan={selectedPlan} input={input} onSavePlan={onSavePlan} />
 
           <div className="feedback-card compact-feedback-card">
             <span>{t('results.isPlanGood')}</span>

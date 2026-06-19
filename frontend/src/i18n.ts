@@ -509,6 +509,14 @@ const DICTIONARY: Record<string, Entry> = {
   'results.skippedForNowHint': { hr: 'Ovo ti pomaže odvojiti što kupiti sada, a što mirno može čekati kasnije.', en: 'This helps you separate what to buy now from what can comfortably wait.' },
   'results.isPlanGood': { hr: 'Je li ovaj plan dobar?', en: 'Is this plan good?' },
 
+  // Sprint 10.62: calmer results. The heavy supporting sections (budget breakdown, shopping-by-store,
+  // version comparison, full details) collapse into one panel so the default view is just the verdict +
+  // products + actions; per-product secondary actions hide behind a single toggle.
+  'results.moreAboutPlan': { hr: 'Više o ovom planu', en: 'More about this plan' },
+  'results.moreAboutPlanHint': { hr: 'Razrada budžeta, popis po trgovinama, usporedba i detalji', en: 'Budget breakdown, shopping by store, comparison and details' },
+  'results.moreOptions': { hr: 'Više opcija', en: 'More options' },
+  'results.hideOptions': { hr: 'Sakrij opcije', en: 'Hide options' },
+
   // Sprint 10.47: dynamic domain labels — previously hardcoded Croatian in utils/planner.ts, so they leaked
   // untranslated into every non-HR market (category names on every product, priority chips, plan summary,
   // share export). Now routed through translate(); rooms/styles/levels reuse the form.* keys above.
