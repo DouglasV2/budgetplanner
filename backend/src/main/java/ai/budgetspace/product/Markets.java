@@ -35,6 +35,10 @@ public final class Markets {
             Map.entry("ES", new MarketInfo("ES", "EUR", "es-ES")),
             // Sprint 10.41: Portugal — EUR, verified IKEA catalog (IKEA-only; no JYSK in PT).
             Map.entry("PT", new MarketInfo("PT", "EUR", "pt-PT")),
+            // Sprint 10.55: United Kingdom — GBP, English. First non-EUR EU-adjacent market with a verified
+            // IKEA GB catalog (prices read in GBP off ikea.com/gb/en). eBay also runs a real EBAY_GB site,
+            // so "Rabljeno" can cover the UK once the eBay key is set.
+            Map.entry("GB", new MarketInfo("GB", "GBP", "en-GB")),
             Map.entry("PL", new MarketInfo("PL", "PLN", "pl-PL")),
             Map.entry("CZ", new MarketInfo("CZ", "CZK", "cs-CZ")),
             Map.entry("HU", new MarketInfo("HU", "HUF", "hu-HU")),

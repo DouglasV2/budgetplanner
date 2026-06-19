@@ -56,8 +56,9 @@ class EbayBrowseFeedTest {
 
     @Test
     void onlyTargetsMarketsWhereEbayRunsALocalSite() {
-        // No HR/SI/FI/NO/SE/DK/SK/PT — eBay has no local marketplace there, so we never claim coverage.
-        assertThat(EbayBrowseFeedProperties.SUPPORTED_MARKETS).containsExactly("DE", "IT", "AT", "FR", "NL", "ES");
+        // eBay runs local sites in these markets (incl. GB, Sprint 10.55). No HR/SI/FI/NO/SE/DK/SK/PT — eBay
+        // has no local marketplace there, so we never claim coverage where it has none.
+        assertThat(EbayBrowseFeedProperties.SUPPORTED_MARKETS).containsExactly("DE", "IT", "AT", "FR", "NL", "ES", "GB");
         assertThat(new EbayBrowseFeedProperties(new StandardEnvironment()).markets())
                 .isEqualTo(EbayBrowseFeedProperties.SUPPORTED_MARKETS);
     }

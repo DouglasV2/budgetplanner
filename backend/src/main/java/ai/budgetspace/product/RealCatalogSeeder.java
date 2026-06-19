@@ -191,7 +191,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-pt-retailers-2.json",
             "/catalog/real-es-retailers-2.json",
             "/catalog/real-nl-retailers-2.json",
-            "/catalog/real-sk-retailers-2.json"
+            "/catalog/real-sk-retailers-2.json",
+            // Sprint 10.55: United Kingdom — first GB catalog. IKEA GB ported via the article-number trick to
+            // /gb/en/ (English name + GBP price + verified og:image, read off ikea.com/gb/en 2026-06-19). 48
+            // products across all rooms, deduped, every planner cell >=1. IKEA-only for now (JYSK has no UK
+            // stores); eBay runs a real EBAY_GB site, so "Rabljeno" can cover the UK once the eBay key is set.
+            "/catalog/real-ikea-gb-rooms.json"
     );
 
     /**

@@ -39,7 +39,10 @@ export const MARKETS: MarketConfig[] = [
   // Sprint 10.46: Scandinavia — non-EUR (NOK/SEK/DKK), natively localised, verified IKEA + JYSK catalogs.
   { code: 'NO', label: 'Norge', currency: 'NOK', locale: 'nb-NO', lang: 'no', available: true, flag: '🇳🇴' },
   { code: 'SE', label: 'Sverige', currency: 'SEK', locale: 'sv-SE', lang: 'sv', available: true, flag: '🇸🇪' },
-  { code: 'DK', label: 'Danmark', currency: 'DKK', locale: 'da-DK', lang: 'da', available: true, flag: '🇩🇰' }
+  { code: 'DK', label: 'Danmark', currency: 'DKK', locale: 'da-DK', lang: 'da', available: true, flag: '🇩🇰' },
+  // Sprint 10.55: United Kingdom — GBP, English, verified IKEA GB catalog (IKEA-only; JYSK has no UK stores).
+  // eBay runs a real EBAY_GB site, so "Rabljeno" can cover the UK once the eBay key is set.
+  { code: 'GB', label: 'United Kingdom', currency: 'GBP', locale: 'en-GB', lang: 'en', available: true, flag: '🇬🇧' }
 ];
 
 // Sprint 10.30: major cities per market for the optional city picker (datalist suggestions; the user can
@@ -59,6 +62,7 @@ export const CITIES_BY_MARKET: Record<string, string[]> = {
   NO: ['Oslo', 'Bergen', 'Trondheim', 'Stavanger', 'Drammen', 'Fredrikstad', 'Kristiansand', 'Tromsø', 'Sandnes', 'Ålesund'],
   SE: ['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Norrköping', 'Lund'],
   DK: ['København', 'Aarhus', 'Odense', 'Aalborg', 'Esbjerg', 'Randers', 'Kolding', 'Horsens', 'Vejle', 'Roskilde'],
+  GB: ['London', 'Manchester', 'Birmingham', 'Leeds', 'Glasgow', 'Liverpool', 'Bristol', 'Sheffield', 'Edinburgh', 'Cardiff'],
 };
 
 export function citiesForMarket(code?: string): string[] {
@@ -112,6 +116,7 @@ const MARKET_DETECTION: Array<{ market: string; pattern: RegExp }> = [
   { market: 'NO', pattern: /\b(norvesk\w*|norway|norge|norwegen|oslo|bergen|trondheim|stavanger|tromso|drammen|kristiansand|alesund)\b/ },
   { market: 'SE', pattern: /\b(svedsk\w*|sweden|sverige|schweden|stockholm\w*|goteborg|gothenburg|malmo|uppsala|vasteras|orebro|linkoping|helsingborg)\b/ },
   { market: 'DK', pattern: /\b(dansk\w*|denmark|danmark|danemark|kobenhavn|copenhagen|aarhus|odense|aalborg|esbjerg|randers|kolding|vejle|roskilde)\b/ },
+  { market: 'GB', pattern: /\b(united kingdom|uk|britain|british|england|scotland|wales|london|manchester|birmingham|leeds|glasgow|liverpool|bristol|sheffield|edinburgh|cardiff|newcastle|nottingham|leicester)\b/ },
   { market: 'HR', pattern: /\b(hrvatsk\w*|croatia|zagreb\w*|split\w*|rijek\w*|osijek|zadar|pula|dubrovnik|varazdin|karlovac|sisak)\b/ }
 ];
 

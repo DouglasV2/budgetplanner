@@ -118,6 +118,25 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.55 — United Kingdom: 15th market + verified IKEA GB catalog (current)
+- Owner asked for a UK market + UK catalog. Built it the no-fabrication way: every product web-verified on
+  ikea.com/gb/en (English name + GBP price + og:image) — never invented.
+- **Catalog:** `real-ikea-gb-rooms.json` — **48 IKEA GB products** across all 7 rooms, **every planner cell ≥1**
+  (sofa/bed/mattress/tv-unit/desk/chair/dining-table/dining-chair + storage/lighting/rug/decor/…). Ported the
+  IKEA ES set's global article numbers to `/gb/en/` via a parallel verification workflow (10 agents, WebFetch),
+  then hardened: **deterministic number-trick URLs** (`https://www.ikea.com/gb/en/p/-<article>/`, each verified to
+  resolve to a live product) instead of model-extracted slugs; the 4 combination-article URLs spot-checked LIVE;
+  **10 exact duplicates removed**; ÅFJÄLL (number-trick → category page) dropped and replaced with a verified
+  ÅBYGDA mattress (£139). Prices spot-checked on the live pages (KIVIK £599, ALEX desk £129, …).
+- **Wiring:** GB → GBP/en-GB in `Markets.java` + `markets.ts` (`available:true`) + `retailersByMarket`
+  (IKEA-only — no JYSK in the UK) + GB cities + prompt detection (london/uk/britain/…). **eBay GB** added to the
+  Browse feed's `SUPPORTED_MARKETS`, so "Rabljeno" covers the UK the moment the eBay key is set. Catalog
+  registered in `RealCatalogSeeder`.
+- **Tests:** `GbCatalogRuntimeTest` — imports cleanly, every row market=GB/IKEA/planner-eligible with a verified
+  image + `www.ikea.com/gb` URL, unique ids/links, all rooms + core categories covered, a GB living-room plan is
+  non-partial. **Backend 191 tests, 0 failures.** Frontend build clean; 🇬🇧 United Kingdom verified live in the picker.
+- JYSK has no UK stores → IKEA-only for now; depth (more sofas/beds + UK non-IKEA retailers) is a later sweep.
+
 ### Sprint 10.54 — plan feedback that acts (current)
 - Owner asked: when the user picks "Preskupo" on "Je li ovaj plan dobar?", what happens? **Before:** nothing
   useful — it was recorded to the DB (and never read) + a generic thank-you. Pure telemetry.

@@ -37,7 +37,7 @@ public class EbayBrowseFeedProperties {
      * {@code EBAY_<CC>} marketplace id). This is the hard allow-list — an override that names a market eBay
      * does not serve (e.g. HR) is ignored, so we never claim eBay coverage where it has no site.
      */
-    static final List<String> SUPPORTED_MARKETS = List.of("DE", "IT", "AT", "FR", "NL", "ES");
+    static final List<String> SUPPORTED_MARKETS = List.of("DE", "IT", "AT", "FR", "NL", "ES", "GB");
 
     /** eBay's "Home & Garden &gt; Furniture" category. Configurable because ids can drift per site/over time. */
     private static final String DEFAULT_FURNITURE_CATEGORY_ID = "3197";
