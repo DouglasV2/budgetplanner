@@ -10,7 +10,6 @@ import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,9 +83,19 @@ class SavedPlanServiceTest {
 
         assertThat(service.setFavorite("plan-a", true, "session-A").favorite()).isTrue();
         assertThatThrownBy(() -> service.setFavorite("plan-a", true, "session-B"))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(SavedPlanNotFoundException.class);
         assertThatThrownBy(() -> service.setFavorite("plan-a", true, null))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(SavedPlanNotFoundException.class);
+    }
+
+    @Test
+    void findByIdThrowsNotFoundForAMissingPlan() {
+        SavedPlanRepository repository = mock(SavedPlanRepository.class);
+        when(repository.findById("gone")).thenReturn(Optional.empty());
+        SavedPlanService service = serviceWith(repository);
+
+        // A stale shared /plan/<id> link → a clean not-found (the global handler maps this to 404, not 500).
+        assertThatThrownBy(() -> service.findById("gone")).isInstanceOf(SavedPlanNotFoundException.class);
     }
 
     @Test

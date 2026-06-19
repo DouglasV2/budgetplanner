@@ -157,6 +157,17 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.65 — missing saved plan → 404, not 500 (current)
+- Bug (owner-spotted in the logs): opening a shared `/plan/<id>` link whose plan no longer exists threw
+  `NoSuchElementException` → `GlobalExceptionHandler` mapped it to **500 + a full stack trace**. Common in dev
+  because `ddl-auto=create` wipes `saved_plans` on every restart, so every old link 404s.
+- Fix: a dedicated `SavedPlanNotFoundException` (extends `NoSuchElementException`, so existing call sites/tests
+  are unaffected) thrown by `SavedPlanService.findById`/`setFavorite`; `GlobalExceptionHandler` maps it to a
+  clean **404** ("Plan nije pronađen.") logged quietly — a stale/shared link is an expected client situation, not
+  a server fault. New test `findByIdThrowsNotFoundForAMissingPlan`; favorite owner-check now asserts the specific
+  type. **Backend 213 tests, 0 failures.** (The underlying wipe-on-restart is the known `ddl-auto=create` prod
+  blocker — Flyway/Liquibase before deploy.)
+
 ### Sprint 10.64 — eBay "Rabljeno" → live, no-persist (compliance) (current)
 - The owner's eBay PRODUCTION app declares *"we do not persist eBay data — responses are used only transiently."*
   But the Sprint 10.51 `EbayBrowseFeed` was a `MarketplaceFeed` whose rows the startup importer **wrote into the

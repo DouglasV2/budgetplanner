@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -52,7 +51,7 @@ public class SavedPlanService {
     public SavedPlanResponse findById(String id) {
         return savedPlanRepository.findById(id)
                 .map(this::toResponse)
-                .orElseThrow(() -> new NoSuchElementException("Saved plan not found"));
+                .orElseThrow(() -> new SavedPlanNotFoundException("Saved plan not found"));
     }
 
     /** The "Moji planovi" inbox — scoped to the owner's session. No session → no personal inbox (empty). */
@@ -66,12 +65,12 @@ public class SavedPlanService {
 
     public SavedPlanResponse setFavorite(String id, boolean favorite, String sessionId) {
         SavedPlan savedPlan = savedPlanRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Saved plan not found"));
+                .orElseThrow(() -> new SavedPlanNotFoundException("Saved plan not found"));
         // Owner-only: only the session that saved a plan may toggle its favorite flag. A non-owner (incl. a
         // shared-link viewer) is treated as if it does not exist, so ownership is never revealed or mutated.
         String owner = blankToNull(sessionId);
         if (savedPlan.getSessionId() == null || !savedPlan.getSessionId().equals(owner)) {
-            throw new NoSuchElementException("Saved plan not found");
+            throw new SavedPlanNotFoundException("Saved plan not found");
         }
         savedPlan.setFavorite(favorite);
         return toResponse(savedPlanRepository.save(savedPlan));
