@@ -1747,6 +1747,37 @@ textarea:focus {
   color: #3f563a;
 }
 
+/* Sprint 10.54: one-click "fix it" CTA shown after the user rates the plan (e.g. too expensive -> cheaper). */
+.feedback-followup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.feedback-action-button {
+  border: 1px solid rgba(95, 114, 87, 0.34);
+  border-radius: 999px;
+  background: rgba(95, 114, 87, 0.12);
+  color: #3f563a;
+  padding: 8px 16px;
+  font-weight: 640;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.feedback-action-button:hover {
+  transform: translateY(-1px);
+  background: rgba(95, 114, 87, 0.18);
+}
+
+.feedback-thanks {
+  color: var(--muted);
+}
+
 .share-button.soft {
   background: rgba(255, 255, 255, 0.42);
   color: var(--muted);

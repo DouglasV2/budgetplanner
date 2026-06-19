@@ -118,6 +118,17 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.54 — plan feedback that acts (current)
+- Owner asked: when the user picks "Preskupo" on "Je li ovaj plan dobar?", what happens? **Before:** nothing
+  useful — it was recorded to the DB (and never read) + a generic thank-you. Pure telemetry.
+- **Now** each rating maps to the existing quick action that fixes it, offered as a **one-click CTA** after the
+  thanks (never auto-regenerated, so a user mid-evaluation is never surprised): too-expensive → cheaper,
+  wrong-style → nicer, too-many-stores → fewer stores; "useful" just says thanks. Reuses the proven regeneration
+  path — no new endpoints. A stale CTA can't linger: feedback clears when a fresh plan set arrives.
+- **Adversarially reviewed** (2 independent reviewers): security **PASS** (no way to read/modify another user's
+  plans; share-link stays open by id; no session leak), correctness **clean** (all i18n keys present, mapping +
+  type narrowing correct, no regression). Frontend build clean.
+
 ### Sprint 10.53 — saved plans become *yours* (privacy fix) + Google-login seam (current)
 - Owner asked "does 'Spremi u moje planove' actually save anywhere?" — it did, but to a **shared, global table**:
   `listSavedPlans` returned EVERY visitor's plans, so "Moji planovi" showed strangers' plans. A real privacy leak.

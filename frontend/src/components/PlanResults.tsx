@@ -60,6 +60,15 @@ const feedbackOptions: Array<{ value: PlanFeedback; labelKey: string }> = [
   { value: 'too-many-stores', labelKey: 'results.feedbackTooManyStores' }
 ];
 
+// Sprint 10.54: make feedback actionable. Each "this is wrong" maps to the existing quick action that fixes it,
+// offered as a one-click CTA after the thank-you — we never auto-regenerate and surprise a user mid-evaluation.
+// 'useful' has no fix (it just says thanks). Reuses the proven regeneration path, no new endpoints.
+const FEEDBACK_ACTION: Partial<Record<PlanFeedback, { action: QuickPlanAction; labelKey: string }>> = {
+  'too-expensive': { action: 'cheaper', labelKey: 'results.feedbackDoCheaper' },
+  'wrong-style': { action: 'nicer', labelKey: 'results.feedbackDoNicer' },
+  'too-many-stores': { action: 'least-stores', labelKey: 'results.feedbackDoFewerStores' }
+};
+
 function labelCategories(t: Translate, categories: ProductCategory[]) {
   if (!categories.length) return t('results.noSpecialTags');
   return categories.map((category) => categoryLabels[category]).join(', ');
@@ -581,6 +590,9 @@ export function PlanResults({
     setDislikeProductId(null);
     setWatchProductId(null);
     setWatchStatus(null);
+    // Sprint 10.54: a fresh plan set means old feedback no longer applies — clear it so a stale "make it
+    // cheaper?" CTA never lingers after the plan was already regenerated.
+    setFeedbackByPlan({});
   }, [plans, input.optimizationGoal, input.furnishingLevel]);
 
   function openWatchForm(productId: string) {
@@ -709,6 +721,7 @@ export function PlanResults({
     ? t(TIER_LABEL_KEYS[selectedPlan.name])
     : furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
   const selectedFeedback = feedbackByPlan[selectedPlan.id];
+  const selectedFix = selectedFeedback ? FEEDBACK_ACTION[selectedFeedback] : undefined;
   const primaryStep = steps.find((step) => step.priority === 'buy-first') ?? steps[0];
 
   return (
@@ -1091,6 +1104,20 @@ export function PlanResults({
                 </button>
               ))}
             </div>
+            {selectedFeedback && (
+              <div className="feedback-followup">
+                {selectedFix ? (
+                  <>
+                    <span>{t('results.feedbackThanksActable')}</span>
+                    <button type="button" className="feedback-action-button" onClick={() => onQuickAction(selectedFix.action, selectedPlan)}>
+                      {t(selectedFix.labelKey)}
+                    </button>
+                  </>
+                ) : (
+                  <span className="feedback-thanks">{t('results.feedbackThanks')}</span>
+                )}
+              </div>
+            )}
           </div>
         </article>
       </div>

@@ -390,6 +390,12 @@ const DICTIONARY: Record<string, Entry> = {
   'account.signInGoogle': { hr: 'Prijava s Google-om', en: 'Sign in with Google' },
   'account.soonBadge': { hr: 'uskoro', en: 'soon' },
   'account.signInTooltip': { hr: 'Uskoro — planovi će se vezati uz tvoj Google račun, ne uz ovaj preglednik.', en: 'Coming soon — your plans will be tied to your Google account, not this browser.' },
+  // Sprint 10.54: feedback that acts. After the user rates the plan, offer the one-click fix for the complaint.
+  'results.feedbackThanks': { hr: 'Hvala — drago nam je da pomaže.', en: 'Thanks — glad it helps.' },
+  'results.feedbackThanksActable': { hr: 'Hvala. Da to odmah složim?', en: 'Thanks. Want me to sort that now?' },
+  'results.feedbackDoCheaper': { hr: 'Složi jeftiniju verziju', en: 'Build a cheaper version' },
+  'results.feedbackDoNicer': { hr: 'Složi ljepšu verziju', en: 'Build a nicer version' },
+  'results.feedbackDoFewerStores': { hr: 'Smanji broj trgovina', en: 'Use fewer stores' },
   // Sprint 10.34: opt-in price-drop watch. GDPR-minimal: explicit consent, says exactly what we store,
   // one-click unsubscribe. {email} is the address the user typed back to them.
   'results.watchPrice': { hr: 'Prati cijenu', en: 'Watch price' },
