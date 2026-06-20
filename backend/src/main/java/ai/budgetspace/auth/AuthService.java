@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -150,6 +151,20 @@ public class AuthService {
         return userRepository.findById(ownerKey.substring(ACCOUNT_PREFIX.length()))
                 .map(AppUser::isPlus)
                 .orElse(false);
+    }
+
+    /**
+     * Sprint 10.70: the AI usage tier for an owner key — the account's plan (FREE/PLUS/PRO) when signed in,
+     * else GUEST. A guest owner key (or none) is always GUEST, which carries the smallest daily AI allowance.
+     */
+    public String aiTierFor(String ownerKey) {
+        if (ownerKey == null || !ownerKey.startsWith(ACCOUNT_PREFIX)) {
+            return "GUEST";
+        }
+        return userRepository.findById(ownerKey.substring(ACCOUNT_PREFIX.length()))
+                .map(AppUser::getPlan)
+                .map(plan -> plan == null || plan.isBlank() ? "FREE" : plan.toUpperCase(Locale.ROOT))
+                .orElse("GUEST");
     }
 
     @Transactional

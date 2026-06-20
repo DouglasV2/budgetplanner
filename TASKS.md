@@ -160,6 +160,37 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.70 — Tiers live: per-tier AI caps + Pro "coming soon" (current)
+- **AI is now gated by subscription tier, per user, per day** — the core of the value ladder. `PlanController`
+  resolves the caller (owner key `user:<id>` signed-in / `guest:<browserId>`) and tier via `AuthService`, and
+  `AiUsageTracker` enforces a **per-owner daily allowance per tier**: **Guest 3 · Free 10 · Plus 100 · Pro 500**
+  (all env-configurable under `budgetspace.ai.daily-per-user`). Over the cap → the deterministic rule-based plan
+  (never an error). Free is generous enough to "wow" without bouncing; Plus feels unlimited for a human; the
+  **global monthly-USD budget stays the wallet's hard stop** regardless of tier.
+- Layered guardrails, widest→narrowest: monthly USD budget (wallet) → global daily backstop → per-user/per-tier
+  daily cap (product control). `AiUsageEvent` now carries `ownerKey` + `tier` (replaced the raw session id); the
+  in-memory counters reset on restart (fine pre-launch; **persist before real scale** — see Placeholders).
+- **Third tier (Pro €12.99) shown as "coming soon"** — anchors Plus and collects demand (a "Notify me" records
+  interest, no checkout). Three-column pricing (`.three-tier`, stacks <900px); the existing dead Pro i18n keys
+  filled in. Plan stays a string, so "PRO" needed no migration; `isPlus`/share now treat PRO as paid.
+- **Plus removes the share-card watermark** ("Built with BudgetSpace" stays for Free = organic-growth tag; Plus/Pro
+  share clean). Free pricing copy now advertises the AI taste.
+- Frontend build clean; pricing three-tier verified in-browser (3 columns desktop, stacked mobile, no console
+  errors). Live-boot verified end-to-end: guest `/api/plans/generate` → 200, `aiUsed:true`, `source:gemini` (the
+  new `PlanController`→`AuthService`→`AiUsageTracker` path works and the AI actually runs).
+- **Adversarial review (4 dimensions → each finding independently verified): 0 blockers, 2 majors — both fixed.**
+  (1) **TOCTOU race** — concurrent same-owner requests could overshoot the per-tier cap (the check and the record
+  were separate locks with the LLM call between). Fixed with an **atomic per-owner in-flight reservation**
+  (`tryAcquire`/`complete`); added a concurrency test proving the cap holds under a 6-way burst. (2) **Eviction
+  undercount** — unbounded fallback events could evict today's real events from the 5000-slot log and soften the
+  caps; fixed by **not retaining fallback events** (they count toward nothing). Also hardened: fail-closed on a
+  blank owner key, explicit GUEST case, dedicated Pro "notify" copy, removed dead `.two-tier` CSS.
+- **Deferred (tracked):** `DesignAssistantService` (a separate Anthropic path) still bypasses the caps — but it's
+  **off by default**, pre-existing (10.8), and now flagged as its own task; route it through `AiUsageTracker`
+  before enabling it.
+- **Next:** the production-readiness pass (persist AI counters, prod webhook secret, rotate shared secrets, legal
+  pages + GDPR, hosting + backups + monitoring).
+
 ### Sprint 10.69 — Stripe checkout (real Plus billing) (current)
 - Real Plus subscription via **Stripe (TEST mode), hosted Checkout** — backend creates the session, the frontend
   redirects to Stripe's page (no Stripe.js, no publishable key in the bundle). **Raw JDK HTTP, no Stripe SDK**

@@ -9,15 +9,22 @@ import { useLocale } from '../LocaleContext';
 export function Monetization() {
   const { t } = useLocale();
   const { user, billingEnabled, openSignIn, justUpgraded } = useAuth();
-  const isPlus = user?.plan === 'PLUS' || justUpgraded;
+  const isPlus = user?.plan === 'PLUS' || user?.plan === 'PRO' || justUpgraded;
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
+  const [proNotified, setProNotified] = useState(false);
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   function joinWaitlist() {
     recordPlusInterest(email.trim() || undefined, 'pricing');
     setJoined(true);
+  }
+
+  // Sprint 10.70: Pro is "coming soon" — no checkout yet, just a demand signal.
+  function notifyPro() {
+    recordPlusInterest(undefined, 'pro');
+    setProNotified(true);
   }
 
   async function upgrade() {
@@ -74,7 +81,7 @@ export function Monetization() {
         <h2>{t('pricing.heading')}</h2>
         <p>{t('pricing.sub')}</p>
       </div>
-      <div className="pricing-grid two-tier">
+      <div className="pricing-grid three-tier">
         <article className="pricing-card">
           <div className="pricing-card-head">
             <h3>{t('pricing.freeName')}</h3>
@@ -103,6 +110,23 @@ export function Monetization() {
           </ul>
           {plusCta()}
           {!billingEnabled && !isPlus && <small className="pricing-note">{t('pricing.plusNote')}</small>}
+        </article>
+
+        <article className="pricing-card pro">
+          <div className="pricing-card-head">
+            <h3>{t('pricing.proName')} <span className="pricing-soon-badge">{t('pricing.soon')}</span></h3>
+            <span className="pricing-price">{t('pricing.proPrice')}</span>
+          </div>
+          <p className="pricing-tagline">{t('pricing.proTagline')}</p>
+          <ul className="pricing-features">
+            <li>{t('pricing.proF1')}</li>
+            <li>{t('pricing.proF2')}</li>
+            <li>{t('pricing.proF3')}</li>
+            <li>{t('pricing.proF4')}</li>
+          </ul>
+          {proNotified
+            ? <div className="pricing-joined">{t('pricing.proNotified')}</div>
+            : <button type="button" className="pricing-notify" onClick={notifyPro}>{t('pricing.notifyCta')}</button>}
         </article>
       </div>
       <p className="pricing-footnote">{t('pricing.footnote')}</p>

@@ -90,9 +90,17 @@ budgetspace:
     timeout-seconds: ${BUDGETSPACE_LLM_TIMEOUT_SECONDS:15}
     max-output-tokens: ${BUDGETSPACE_LLM_MAX_OUTPUT_TOKENS:700}
     # Cost / rate guardrails — on breach the app falls back to rule-based (never errors).
+    # The monthly USD budget is the wallet's hard stop; max-requests-per-day is a coarse global backstop.
     monthly-budget-usd: ${BUDGETSPACE_AI_MONTHLY_BUDGET_USD:20}
-    max-requests-per-day: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY:100}
-    max-requests-per-session: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_SESSION:10}
+    max-requests-per-day: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY:2000}
+    # Sprint 10.70: per-user, per-tier daily AI allowance — the product control (one place for the numbers).
+    # Guest = a small taste (resettable, so kept low); Free = generous taste; Plus ≈ unlimited for a human;
+    # Pro = the most. All bounded above by the global caps, so these can be generous without budget risk.
+    daily-per-user:
+      guest: ${BUDGETSPACE_AI_DAILY_GUEST:3}
+      free: ${BUDGETSPACE_AI_DAILY_FREE:10}
+      plus: ${BUDGETSPACE_AI_DAILY_PLUS:100}
+      pro: ${BUDGETSPACE_AI_DAILY_PRO:500}
   price-watch:
     # Sprint 10.34: opt-in price-drop alerts. The scheduled re-check is OFF by default so the app makes no
     # surprise outbound requests; enable it once a delivery provider is wired

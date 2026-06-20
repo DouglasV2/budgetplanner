@@ -24,6 +24,7 @@ import {
   styleLabels
 } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
+import { useAuth } from '../AuthContext';
 import { watchProduct } from '../api/client';
 
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
@@ -439,7 +440,9 @@ function BudgetBreakdown({ plan, input }: { plan: FurnishingPlan; input: Planner
 // Sprint 10.60: social share — an organic growth loop. A clean summary card of the plan ("My living room for
 // £1500 — sofa £349… total £827, £673 left. Built with BudgetSpace.") that the user can send to a friend or
 // post (WhatsApp / Reddit / X / native share / copy). Reuses onSavePlan to mint a shareable /plan/<id> link.
-function buildShareText(t: Translate, plan: FurnishingPlan, input: PlannerInput): string {
+// Sprint 10.70: the "Built with BudgetSpace" watermark is a Free perk of sharing; paid plans (Plus/Pro) share
+// clean. The footer also doubles as the organic-growth tag, so only paid users may drop it.
+function buildShareText(t: Translate, plan: FurnishingPlan, input: PlannerInput, withWatermark: boolean): string {
   const room = roomLabels[input.roomType];
   const items = plan.items
     .slice(0, 3)
@@ -449,7 +452,7 @@ function buildShareText(t: Translate, plan: FurnishingPlan, input: PlannerInput)
   const lead = t('results.shareLead', { room, budget: formatCurrency(input.budget) });
   const totalPart = t('results.shareTotal', { total: formatCurrency(plan.total) });
   const savedPart = remaining >= 0 ? ` · ${t('results.shareSaved', { amount: formatCurrency(remaining) })}` : '';
-  return `${lead} ${items}. ${totalPart}${savedPart}. ${t('results.shareFooter')}`;
+  return `${lead} ${items}. ${totalPart}${savedPart}.${withWatermark ? ` ${t('results.shareFooter')}` : ''}`;
 }
 
 function SharePanel({ plan, input, onSavePlan }: {
@@ -458,10 +461,12 @@ function SharePanel({ plan, input, onSavePlan }: {
   onSavePlan: (plan: FurnishingPlan, copyLink: boolean) => Promise<string>;
 }) {
   const { t } = useLocale();
+  const { user } = useAuth();
+  const paid = user?.plan === 'PLUS' || user?.plan === 'PRO';
   const [url, setUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
-  const summary = buildShareText(t, plan, input);
+  const summary = buildShareText(t, plan, input, !paid);
   const canNativeShare = typeof navigator !== 'undefined' && typeof (navigator as Navigator & { share?: unknown }).share === 'function';
 
   // Mint (once) a shareable /plan/<id> link by saving the plan; cache it so repeated shares don't re-save.

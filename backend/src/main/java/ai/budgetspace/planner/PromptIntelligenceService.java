@@ -54,25 +54,33 @@ public class PromptIntelligenceService {
         this.usageTracker = usageTracker;
     }
 
-    public PlannerIntentAnalysisDto analyze(PlannerInputDto rawInput, String sessionId) {
+    /**
+     * Sprint 10.70: {@code ownerKey} (account "user:&lt;id&gt;" or guest "guest:&lt;browserId&gt;") and
+     * {@code tier} (GUEST/FREE/PLUS/PRO) gate the AI by a per-user, per-tier daily allowance. On any
+     * gate or failure the deterministic rule-based path is used, so a capped user still gets a plan.
+     */
+    public PlannerIntentAnalysisDto analyze(PlannerInputDto rawInput, String ownerKey, String tier) {
         PlannerInputDto input = rawInput == null ? new PlannerInputDto("", 0, null, null, null, 0, null, null, null, null,
                 null, null, null, null, null, 0).normalized() : rawInput.normalized();
         String prompt = input.prompt() == null ? "" : input.prompt();
 
         Optional<LlmClient> client = clientFactory.activeClient();
-        if (client.isPresent() && usageTracker.canUseAi(sessionId)) {
+        // tryAcquire atomically reserves a slot under the tier's daily cap; complete() (always, in the
+        // catch or inside llmAnalyze on success) releases it — so concurrent calls can't overshoot the cap.
+        if (client.isPresent() && usageTracker.tryAcquire(ownerKey, tier)) {
             try {
-                return llmAnalyze(client.get(), input, prompt, sessionId);
+                return llmAnalyze(client.get(), input, prompt, ownerKey, tier);
             } catch (Exception exception) {
                 log.warn("Prompt intelligence LLM call failed ({}); using rule-based fallback.", exception.toString());
-                usageTracker.record(new AiUsageEvent(client.get().provider().name(), properties.resolvedModel(client.get().provider()),
-                        USE_CASE, sessionId, null, null, 0.0, false, true, Instant.now()));
+                usageTracker.complete(ownerKey, new AiUsageEvent(client.get().provider().name(), properties.resolvedModel(client.get().provider()),
+                        USE_CASE, ownerKey, tier, null, null, 0.0, false, true, Instant.now()));
             }
         }
         return ruleBasedAnalyze(input, prompt);
     }
 
-    private PlannerIntentAnalysisDto llmAnalyze(LlmClient client, PlannerInputDto input, String prompt, String sessionId) throws Exception {
+    private PlannerIntentAnalysisDto llmAnalyze(LlmClient client, PlannerInputDto input, String prompt,
+                                                String ownerKey, String tier) throws Exception {
         LlmCompletionRequest request = new LlmCompletionRequest(
                 systemPrompt(), userPrompt(input, prompt), properties.maxOutputTokens(), true, USE_CASE);
         LlmCompletion completion = client.complete(request);
@@ -82,7 +90,7 @@ public class PromptIntelligenceService {
                 .withMeta(true, client.provider().name().toLowerCase(Locale.ROOT), prompt);
 
         double cost = usageTracker.estimateCostUsd(completion.inputTokens(), completion.outputTokens());
-        usageTracker.record(new AiUsageEvent(client.provider().name(), completion.model(), USE_CASE, sessionId,
+        usageTracker.complete(ownerKey, new AiUsageEvent(client.provider().name(), completion.model(), USE_CASE, ownerKey, tier,
                 completion.inputTokens(), completion.outputTokens(), cost, true, false, Instant.now()));
         return sanitized;
     }
