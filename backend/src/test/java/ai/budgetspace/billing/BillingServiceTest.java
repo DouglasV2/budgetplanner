@@ -124,6 +124,26 @@ class BillingServiceTest {
         verify(userRepository, never()).save(any());
     }
 
+    @Test
+    void cancelSubscriptionDeletesItAtStripe() {
+        service.cancelSubscriptionQuietly("sub_1");
+        assertThat(http.lastDeletePath).isEqualTo("/v1/subscriptions/sub_1");
+    }
+
+    @Test
+    void cancelSubscriptionIsBestEffortAndNeverThrows() {
+        http.failDelete = true; // a Stripe error must not block the GDPR account deletion
+        service.cancelSubscriptionQuietly("sub_1");
+        assertThat(http.lastDeletePath).isEqualTo("/v1/subscriptions/sub_1");
+    }
+
+    @Test
+    void cancelSubscriptionIgnoresAMissingSubscription() {
+        service.cancelSubscriptionQuietly(null);
+        service.cancelSubscriptionQuietly("  ");
+        assertThat(http.lastDeletePath).isNull();
+    }
+
     private static AppUser user(String id, String email, String plan) {
         AppUser user = new AppUser(id, "sub-" + id, email, "Name", "pic", Instant.now(), Instant.now());
         user.setPlan(plan);
@@ -142,11 +162,13 @@ class BillingServiceTest {
         return hex.toString();
     }
 
-    /** A fake Stripe transport: captures the last POST body, returns canned JSON. */
+    /** A fake Stripe transport: captures the last POST body / DELETE path, returns canned JSON. */
     private static final class FakeHttp implements BillingService.StripeHttp {
         String postResponse = "{}";
         String getResponse = "{}";
         String lastPostBody;
+        String lastDeletePath;
+        boolean failDelete;
 
         @Override
         public String post(String path, String formBody, String secretKey) {
@@ -157,6 +179,15 @@ class BillingServiceTest {
         @Override
         public String get(String path, String secretKey) {
             return getResponse;
+        }
+
+        @Override
+        public String delete(String path, String secretKey) {
+            this.lastDeletePath = path;
+            if (failDelete) {
+                throw new RuntimeException("stripe down");
+            }
+            return "{\"status\":\"canceled\"}";
         }
     }
 }

@@ -160,6 +160,20 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.73 — Cancel-on-delete + deploy checklist (current)
+- **Cancel-on-delete:** `AuthController.deleteAccount` now cancels any live Stripe subscription (best-effort,
+  never blocks the erasure) BEFORE deleting the account — so a deleted account is never billed again. New
+  `BillingService.cancelSubscriptionQuietly` (DELETE `/v1/subscriptions/<id>`) + a `StripeHttp.delete`; closes the
+  10.72 gap. Backend 235 tests / 0 (+3: cancel hits Stripe, is best-effort/never-throws, ignores a missing sub).
+- **`DEPLOY.md`** — an ordered, provider-agnostic hosting checklist (no secret values): rotate secrets, persistent
+  Postgres + `HIBERNATE_DDL_AUTO=update` (the real fix for the restart-wipe), HTTPS + `cookie-secure`, prod domain
+  on Google OAuth/CORS/`VITE_API_BASE_URL`, Stripe **live** keys + webhook (`STRIPE_WEBHOOK_SECRET`), backups +
+  monitoring, and a post-deploy smoke test. Env-var reference table marks which are secret.
+- **AI verified live across all 15 markets** (HR/SI/AT/DE/IT/FI/FR/NL/SK/ES/PT/NO/SE/DK/GB): every one →
+  `aiUsed:true, source:gemini`, with the room + budget correctly parsed from a prompt in that market's own
+  language. (A first bash/curl sweep showed false "errors" for diacritic prompts — a Windows-shell UTF-8 artifact,
+  not an app bug; confirmed clean via a Node/fetch re-run.)
+
 ### Sprint 10.72 — Legal/GDPR scaffold + account deletion (current)
 - **GDPR "right to be forgotten":** `DELETE /api/auth/account` (authenticated; 401 for guests) erases the account
   and ALL its data — saved plans (owned under `user:<id>`), every session, and the account row — then clears the

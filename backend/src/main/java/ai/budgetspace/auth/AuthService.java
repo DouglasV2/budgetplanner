@@ -183,9 +183,8 @@ public class AuthService {
      * the plans they saved (owned under {@code user:<id>}), all of their sessions, and the account row itself.
      * The controller clears the session cookie afterwards.
      *
-     * <p>NOTE: a live Stripe subscription is NOT cancelled here yet (billing is test-mode + the webhook is dormant
-     * pre-launch). Before enabling live billing, cancel the subscription on deletion so a deleted account is never
-     * billed again — see TASKS.</p>
+     * <p>Sprint 10.73: the controller cancels any live Stripe subscription (best-effort) BEFORE calling this, so a
+     * deleted account is never billed again.</p>
      */
     @Transactional
     public void deleteAccount(AppUser user) {

@@ -31,12 +31,15 @@ public class AuthController {
     private final AuthService authService;
     private final AuthProperties properties;
     private final ai.budgetspace.billing.StripeProperties stripeProperties;
+    private final ai.budgetspace.billing.BillingService billingService;
 
     public AuthController(AuthService authService, AuthProperties properties,
-                          ai.budgetspace.billing.StripeProperties stripeProperties) {
+                          ai.budgetspace.billing.StripeProperties stripeProperties,
+                          ai.budgetspace.billing.BillingService billingService) {
         this.authService = authService;
         this.properties = properties;
         this.stripeProperties = stripeProperties;
+        this.billingService = billingService;
     }
 
     /** Sign in with a Google ID token. Sets the session cookie and returns the signed-in profile. */
@@ -77,6 +80,9 @@ public class AuthController {
                               HttpServletResponse response) {
         AppUser user = authService.authenticate(sessionToken)
                 .orElseThrow(() -> new NotAuthenticatedException("Niste prijavljeni."));
+        // Sprint 10.73: cancel any live Stripe subscription first so a deleted account is never billed again
+        // (best-effort — never blocks the erasure), then delete the account + all its data.
+        billingService.cancelSubscriptionQuietly(user.getStripeSubscriptionId());
         authService.deleteAccount(user);
         response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("", Duration.ZERO).toString());
     }

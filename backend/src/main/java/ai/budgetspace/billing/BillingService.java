@@ -160,6 +160,26 @@ public class BillingService {
         }
     }
 
+    /**
+     * Sprint 10.73 — best-effort cancellation of a Stripe subscription, used when an account is deleted so a
+     * removed account is never billed again. Never throws: a Stripe error (or unconfigured billing) must not
+     * block the GDPR account deletion.
+     */
+    public void cancelSubscriptionQuietly(String subscriptionId) {
+        if (!properties.configured() || subscriptionId == null || subscriptionId.isBlank()) {
+            return;
+        }
+        try {
+            http.delete("/v1/subscriptions/" + urlPath(subscriptionId), properties.secretKey());
+            log.info("Stripe subscription cancelled on account deletion: {}.", subscriptionId);
+        } catch (Exception exception) {
+            if (exception instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            log.warn("Stripe subscription cancel failed for {} — account deletion continues.", subscriptionId, exception);
+        }
+    }
+
     private void applyPlus(AppUser user, String customerId, String subscriptionId) {
         user.setPlan("PLUS");
         if (customerId != null && !customerId.isBlank()) user.setStripeCustomerId(customerId);
@@ -252,6 +272,7 @@ public class BillingService {
     interface StripeHttp {
         String post(String path, String formBody, String secretKey) throws IOException, InterruptedException;
         String get(String path, String secretKey) throws IOException, InterruptedException;
+        String delete(String path, String secretKey) throws IOException, InterruptedException;
     }
 
     static final class HttpClientStripeHttp implements StripeHttp {
@@ -272,6 +293,15 @@ public class BillingService {
             HttpRequest request = HttpRequest.newBuilder(URI.create(API_BASE + path)).timeout(HTTP_TIMEOUT)
                     .header("Authorization", "Bearer " + secretKey)
                     .GET()
+                    .build();
+            return send(request);
+        }
+
+        @Override
+        public String delete(String path, String secretKey) throws IOException, InterruptedException {
+            HttpRequest request = HttpRequest.newBuilder(URI.create(API_BASE + path)).timeout(HTTP_TIMEOUT)
+                    .header("Authorization", "Bearer " + secretKey)
+                    .DELETE()
                     .build();
             return send(request);
         }
