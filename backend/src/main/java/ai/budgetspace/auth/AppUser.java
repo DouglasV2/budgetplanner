@@ -45,6 +45,12 @@ public class AppUser {
     @Column(name = "plan", length = 16, nullable = false)
     private String plan = "FREE";
 
+    // Sprint 10.69: Stripe identifiers, set when the user subscribes to Plus. Nullable (a Free user has none).
+    @Column(name = "stripe_customer_id", length = 80)
+    private String stripeCustomerId;
+    @Column(name = "stripe_subscription_id", length = 80)
+    private String stripeSubscriptionId;
+
     public AppUser() {
     }
 
@@ -84,4 +90,8 @@ public class AppUser {
     public void setLastLoginAt(Instant lastLoginAt) { this.lastLoginAt = lastLoginAt; }
     public String getPlan() { return plan; }
     public void setPlan(String plan) { this.plan = plan; }
+    public String getStripeCustomerId() { return stripeCustomerId; }
+    public void setStripeCustomerId(String stripeCustomerId) { this.stripeCustomerId = stripeCustomerId; }
+    public String getStripeSubscriptionId() { return stripeSubscriptionId; }
+    public void setStripeSubscriptionId(String stripeSubscriptionId) { this.stripeSubscriptionId = stripeSubscriptionId; }
 }

@@ -115,6 +115,12 @@ const DICTIONARY: Record<string, Entry> = {
   'pricing.waitlistEmail': { hr: 'tvoj@email.com (neobavezno)', en: 'you@email.com (optional)' },
   'pricing.waitlistCta': { hr: 'Želim Plus', en: 'I want Plus' },
   'pricing.joined': { hr: 'Hvala! Javit ćemo ti čim Plus krene.', en: 'Thanks! We\'ll let you know when Plus launches.' },
+  // Sprint 10.69: real Stripe checkout CTA.
+  'pricing.upgradeCta': { hr: 'Nadogradi na Plus', en: 'Upgrade to Plus' },
+  'pricing.signInForPlus': { hr: 'Prijavi se za Plus', en: 'Sign in for Plus' },
+  'pricing.redirecting': { hr: 'Otvaram naplatu…', en: 'Opening checkout…' },
+  'pricing.checkoutError': { hr: 'Naplata nije uspjela. Pokušaj ponovno.', en: 'Checkout failed. Please try again.' },
+  'pricing.welcome': { hr: 'Dobrodošao u Plus! 🎉 Sve je otključano.', en: 'Welcome to Plus! 🎉 Everything is unlocked.' },
   'pricing.proTagline': { hr: 'Za one koji planiraju više soba', en: 'For those planning more rooms' },
   'pricing.soon': { hr: 'Uskoro', en: 'Soon' },
   'pricing.proF1': { hr: 'Više AI planova', en: 'More AI plans' },

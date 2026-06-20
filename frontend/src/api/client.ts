@@ -216,6 +216,8 @@ export interface AuthMe {
   // The PUBLIC Google client id, served by the backend so the frontend has one source of truth. Null when
   // Google sign-in is not configured (dormant — guest-only, no fake auth).
   googleClientId: string | null;
+  // Sprint 10.69: true when Stripe is configured → the Plus CTA can start checkout (else it's the waitlist).
+  billingEnabled: boolean;
 }
 
 /** Who (if anyone) is signed in, plus whether Google sign-in is available and the client id to render it. */
@@ -246,4 +248,17 @@ export function recordPlusInterest(email?: string, source?: string) {
     headers: { 'Content-Type': 'application/json', 'X-BudgetSpace-Session': sessionId() },
     body: JSON.stringify({ email: email ?? null, source: source ?? null })
   }).catch(() => undefined);
+}
+
+// Sprint 10.69: Stripe checkout. The backend creates a hosted Checkout Session and returns its URL; the frontend
+// redirects there. On return (?plus=success&session_id=…) confirmCheckout verifies payment + upgrades the account.
+export function startCheckout() {
+  return request<{ url: string }>('/api/billing/checkout', { method: 'POST' });
+}
+
+export function confirmCheckout(sessionId: string) {
+  return request<{ plan: string }>('/api/billing/confirm', {
+    method: 'POST',
+    body: JSON.stringify({ sessionId })
+  });
 }

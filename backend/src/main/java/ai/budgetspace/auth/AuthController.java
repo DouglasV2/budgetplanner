@@ -29,10 +29,13 @@ public class AuthController {
 
     private final AuthService authService;
     private final AuthProperties properties;
+    private final ai.budgetspace.billing.StripeProperties stripeProperties;
 
-    public AuthController(AuthService authService, AuthProperties properties) {
+    public AuthController(AuthService authService, AuthProperties properties,
+                          ai.budgetspace.billing.StripeProperties stripeProperties) {
         this.authService = authService;
         this.properties = properties;
+        this.stripeProperties = stripeProperties;
     }
 
     /** Sign in with a Google ID token. Sets the session cookie and returns the signed-in profile. */
@@ -51,7 +54,8 @@ public class AuthController {
     public AuthMeResponse me(@CookieValue(name = COOKIE, required = false) String sessionToken) {
         AuthUserDto user = authService.authenticate(sessionToken).map(AuthController::toDto).orElse(null);
         return new AuthMeResponse(user, properties.googleEnabled(),
-                properties.googleEnabled() ? properties.googleClientId() : null);
+                properties.googleEnabled() ? properties.googleClientId() : null,
+                stripeProperties.configured());
     }
 
     /** Sign out: delete the server session and clear the cookie. */

@@ -160,6 +160,27 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.69 — Stripe checkout (real Plus billing) (current)
+- Real Plus subscription via **Stripe (TEST mode), hosted Checkout** — backend creates the session, the frontend
+  redirects to Stripe's page (no Stripe.js, no publishable key in the bundle). **Raw JDK HTTP, no Stripe SDK**
+  (consistent with the eBay/LLM clients).
+- Flow: a signed-in user → `POST /api/billing/checkout` (subscription session for the Plus price, tagged
+  `client_reference_id=userId`) → Stripe → back to `?plus=success&session_id=…` → `AuthContext` →
+  `POST /api/billing/confirm` → the backend **re-fetches the session from Stripe** and upgrades to PLUS only when
+  it's **paid AND owned by the authenticated account** (never a client-supplied id). The **webhook**
+  (`POST /api/billing/webhook`, HMAC-SHA256 verified, replay window, constant-time, dormant without
+  `STRIPE_WEBHOOK_SECRET`) is the production path (upgrade on `checkout.session.completed`, downgrade on
+  `customer.subscription.deleted`); dev uses confirm-on-redirect.
+- `AppUser.stripeCustomerId/SubscriptionId`; `/api/auth/me` now returns `billingEnabled` so the Plus CTA is a real
+  "Upgrade" when Stripe is on, else the waitlist; "Welcome to Plus 🎉" on return. Secret key backend-only
+  (gitignored `.env`, value-free in compose). Price `price_1TkM40…` (€/mo).
+- **Adversarial review: 0 blockers/0 majors** — webhook signature, the confirm owner-check, billing auth (401 for
+  guests), open-redirect/SSRF, and secret handling all verified clean; fixed 1 nit (dead code). **Backend 227
+  tests, 0 failures** (incl. `BillingServiceTest`: signature forgery/replay + owner-check + checkout form);
+  frontend build clean.
+- **Next:** test live (test card 4242…); then gate the **AI assistant** behind Plus, wire the webhook in prod
+  (Stripe CLI / dashboard → `STRIPE_WEBHOOK_SECRET`), and a customer-portal "manage subscription" link.
+
 ### Sprint 10.68 — Plus scaffold (monetization) (current)
 - Monetization, honest + lean (no Stripe yet). **Entitlement:** `AppUser.plan` ("FREE"/"PLUS", default FREE),
   exposed via `/api/auth/me`. Only a signed-in account can be Plus; guests are always Free (forge-proof — reuses

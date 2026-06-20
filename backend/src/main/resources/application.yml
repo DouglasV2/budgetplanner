@@ -44,6 +44,13 @@ budgetspace:
   plus:
     # Sprint 10.68: Free tier may save this many plans before Plus is required (Plus = unlimited).
     free-saved-limit: ${BUDGETSPACE_PLUS_FREE_SAVED_LIMIT:3}
+  stripe:
+    # Sprint 10.69: Stripe billing for Plus (TEST). Secret key + price id are required to enable checkout; blank
+    # → billing dormant (the UI keeps the waitlist). Webhook secret optional (dev uses confirm-on-redirect).
+    secret-key: ${STRIPE_SECRET_KEY:}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
+    plus-price-id: ${STRIPE_PLUS_PRICE_ID:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
   real-catalog:
     # Seed the real IKEA/JYSK living-room catalog on startup (env BUDGETSPACE_REAL_CATALOG_SEED_ENABLED).
     seed-enabled: ${BUDGETSPACE_REAL_CATALOG_SEED_ENABLED:true}

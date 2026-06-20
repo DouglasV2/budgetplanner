@@ -1,21 +1,70 @@
-// Sprint 10.10 → 10.68 — value-first pricing. The core (rule-based plans) is free; Plus (€5.99/mo) is the thin
-// margin tier whose real carrot is the AI assistant. No checkout yet (Stripe lands later) — the Plus CTA is an
-// honest waitlist that records willingness-to-pay, never a fake purchase.
+// Sprint 10.10 → 10.69 — value-first pricing. The core (rule-based plans) is free; Plus (€5.99/mo) is the thin
+// margin tier whose real carrot is the AI assistant. When Stripe is configured the Plus CTA starts a real hosted
+// Checkout; otherwise it's an honest waitlist that records willingness-to-pay (never a fake purchase).
 import { useState } from 'react';
-import { recordPlusInterest } from '../api/client';
+import { recordPlusInterest, startCheckout } from '../api/client';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
 
 export function Monetization() {
   const { t } = useLocale();
-  const { user } = useAuth();
-  const isPlus = user?.plan === 'PLUS';
+  const { user, billingEnabled, openSignIn, justUpgraded } = useAuth();
+  const isPlus = user?.plan === 'PLUS' || justUpgraded;
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function joinWaitlist() {
     recordPlusInterest(email.trim() || undefined, 'pricing');
     setJoined(true);
+  }
+
+  async function upgrade() {
+    setCheckoutBusy(true);
+    setError(null);
+    try {
+      const { url } = await startCheckout();
+      window.location.href = url; // redirect to Stripe's hosted checkout
+    } catch {
+      setError(t('pricing.checkoutError'));
+      setCheckoutBusy(false);
+    }
+  }
+
+  function plusCta() {
+    if (isPlus) {
+      return <div className="pricing-active">{justUpgraded ? t('pricing.welcome') : t('pricing.plusActive')}</div>;
+    }
+    if (billingEnabled && user) {
+      return (
+        <div className="pricing-cta">
+          <button type="button" className="pricing-upgrade" onClick={() => void upgrade()} disabled={checkoutBusy}>
+            {checkoutBusy ? t('pricing.redirecting') : t('pricing.upgradeCta')}
+          </button>
+          {error && <small className="pricing-error">{error}</small>}
+        </div>
+      );
+    }
+    if (billingEnabled) {
+      // Stripe is on but the visitor is a guest — they need an account to subscribe.
+      return <button type="button" className="pricing-upgrade" onClick={openSignIn}>{t('pricing.signInForPlus')}</button>;
+    }
+    // Stripe not configured → honest waitlist (no fake checkout).
+    return joined ? (
+      <div className="pricing-joined">{t('pricing.joined')}</div>
+    ) : (
+      <div className="pricing-waitlist">
+        <input
+          type="email"
+          value={email}
+          placeholder={t('pricing.waitlistEmail')}
+          aria-label={t('pricing.waitlistEmail')}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <button type="button" onClick={joinWaitlist}>{t('pricing.waitlistCta')}</button>
+      </div>
+    );
   }
 
   return (
@@ -52,23 +101,8 @@ export function Monetization() {
             <li>{t('pricing.plusF3')}</li>
             <li>{t('pricing.plusF4')}</li>
           </ul>
-          {isPlus ? (
-            <div className="pricing-active">{t('pricing.plusActive')}</div>
-          ) : joined ? (
-            <div className="pricing-joined">{t('pricing.joined')}</div>
-          ) : (
-            <div className="pricing-waitlist">
-              <input
-                type="email"
-                value={email}
-                placeholder={t('pricing.waitlistEmail')}
-                aria-label={t('pricing.waitlistEmail')}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-              <button type="button" onClick={joinWaitlist}>{t('pricing.waitlistCta')}</button>
-            </div>
-          )}
-          <small className="pricing-note">{t('pricing.plusNote')}</small>
+          {plusCta()}
+          {!billingEnabled && !isPlus && <small className="pricing-note">{t('pricing.plusNote')}</small>}
         </article>
       </div>
       <p className="pricing-footnote">{t('pricing.footnote')}</p>

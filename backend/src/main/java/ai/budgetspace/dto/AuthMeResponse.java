@@ -8,6 +8,7 @@ package ai.budgetspace.dto;
  * @param user           the signed-in user, or null when the caller is a guest.
  * @param googleEnabled  true when a Google client id is configured (otherwise sign-in is dormant, guest-only).
  * @param googleClientId the public OAuth Web client id for Google Identity Services, or null when not configured.
+ * @param billingEnabled Sprint 10.69: true when Stripe is configured (the Plus CTA can checkout; else waitlist).
  */
-public record AuthMeResponse(AuthUserDto user, boolean googleEnabled, String googleClientId) {
+public record AuthMeResponse(AuthUserDto user, boolean googleEnabled, String googleClientId, boolean billingEnabled) {
 }
