@@ -35,16 +35,9 @@ public class PlanController {
     public PlanGenerationResponse generate(@RequestBody PlannerInputDto input,
                                            @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
                                            @CookieValue(name = AUTH_COOKIE, required = false) String authToken) {
-        // Sprint 10.70: resolve who's asking so the AI is gated by their tier's daily allowance. The owner key
-        // ("user:<id>" signed-in, else "guest:<browserId>") is the counting identity; the tier (FREE/PLUS/PRO,
-        // else GUEST) sets the per-day cap. A blank/forged session falls back to a per-browser guest bucket.
-        String ownerKey = authService.resolveOwnerKey(authToken, sessionId);
-        String tier = authService.aiTierFor(ownerKey);
-        String countingKey = ownerKey != null ? ownerKey
-                : "guest:" + (sessionId == null || sessionId.isBlank() ? "anon" : sessionId.trim());
-
         // Understand the prompt first (AI when enabled + within the tier's allowance, else rule-based), then plan.
-        PlannerIntentAnalysisDto analysis = promptIntelligenceService.analyze(input, countingKey, tier);
+        Caller caller = resolveCaller(authToken, sessionId);
+        PlannerIntentAnalysisDto analysis = promptIntelligenceService.analyze(input, caller.countingKey(), caller.tier());
         PlanGenerationResponse response = analysis.aiUsed()
                 ? plannerService.generateResolved(promptIntelligenceService.toPlannerInput(analysis, input))
                 : plannerService.generate(input);
@@ -58,8 +51,26 @@ public class PlanController {
 
     // Sprint 10.8: the frontend calls this after /api/plans/generate, passing the generation result
     // back in, to get a short design-assistant description of the plan.
+    // Sprint 10.71: resolve the caller so the (Anthropic) design-summary AI shares the same per-tier caps.
     @PostMapping("/api/plans/design")
-    public DesignAssistantResponse design(@RequestBody PlanGenerationResponse plan) {
-        return designAssistantService.describe(plan);
+    public DesignAssistantResponse design(@RequestBody PlanGenerationResponse plan,
+                                          @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
+                                          @CookieValue(name = AUTH_COOKIE, required = false) String authToken) {
+        Caller caller = resolveCaller(authToken, sessionId);
+        return designAssistantService.describe(plan, caller.countingKey(), caller.tier());
+    }
+
+    // Sprint 10.70/10.71: who is asking, for AI usage gating. The owner key ("user:<id>" signed-in, else
+    // "guest:<browserId>") is the counting identity; the tier (FREE/PLUS/PRO, else GUEST) sets the per-day cap.
+    // A blank/forged session falls back to a per-browser guest bucket so counting always has a non-blank key.
+    private Caller resolveCaller(String authToken, String sessionId) {
+        String ownerKey = authService.resolveOwnerKey(authToken, sessionId);
+        String tier = authService.aiTierFor(ownerKey);
+        String countingKey = ownerKey != null ? ownerKey
+                : "guest:" + (sessionId == null || sessionId.isBlank() ? "anon" : sessionId.trim());
+        return new Caller(countingKey, tier);
+    }
+
+    private record Caller(String countingKey, String tier) {
     }
 }

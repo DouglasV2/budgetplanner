@@ -133,6 +133,8 @@ export function watchProduct(params: {
 export function getDesignSummary(plan: PlanGenerationResponse) {
   return request<DesignAssistant>('/api/plans/design', {
     method: 'POST',
+    // Sprint 10.71: send the browser session so the design-summary AI is gated per guest, like generate.
+    headers: { 'X-BudgetSpace-Session': sessionId() },
     body: JSON.stringify(plan)
   });
 }

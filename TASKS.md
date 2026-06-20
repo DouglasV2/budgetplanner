@@ -160,6 +160,21 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.71 — Gate DesignAssistant + persistence finding (current)
+- **`DesignAssistantService` (the separate Anthropic AI path) now shares the same guardrails** as the prompt path:
+  `PlanController.design` resolves the caller (a shared `resolveCaller` helper with `/generate`), and the service
+  calls `AiUsageTracker.tryAcquire`/`complete` so design-summary calls **count toward the per-tier daily cap +
+  the monthly USD budget** instead of bypassing them. Off by default still; this closes the last AI cost bypass
+  the 10.70 review flagged. (USD estimate uses the cheap-provider rates — tune when actually enabling Anthropic;
+  the per-tier **call** cap is the binding control.) Frontend sends the session header on `/api/plans/design` too.
+- **Finding (re: "persist AI counters"):** the AI counter resetting on restart is the *same* problem as
+  `ddl-auto: create` wiping the **whole** DB (accounts, subscriptions, saved plans) on every restart — see the
+  pre-launch roadmap items (c)/(2). Persisting only the AI table while accounts vanish would be theater; the real
+  fix is the persistent-DB posture (managed Postgres + `HIBERNATE_DDL_AUTO=validate/update` + migrations), which
+  lands with hosting and makes **everything** — including the AI counters once DB-backed — durable. So the
+  counter persistence is bundled there, not done in isolation here.
+- Backend 230 tests / 0 failures; frontend build clean; live-boot verified.
+
 ### Sprint 10.70 — Tiers live: per-tier AI caps + Pro "coming soon" (current)
 - **AI is now gated by subscription tier, per user, per day** — the core of the value ladder. `PlanController`
   resolves the caller (owner key `user:<id>` signed-in / `guest:<browserId>`) and tier via `AuthService`, and
@@ -244,14 +259,15 @@ needs `OPENAI_API_KEY`, backend env only).
   abuse; (5) stop logging the price-watch **unsubscribe token** (a bearer capability); (6) baseline
   **SecurityHeadersFilter** (nosniff, X-Frame-Options DENY, Referrer-Policy, HSTS on HTTPS). **Backend 218 tests, 0
   failures.**
-- **Deferred (do before PUBLIC launch / when AI goes multi-user — not urgent pre-traction):** (a) **per-account
-  AI quota** — `AiUsageTracker` caps are global + per-session (session id is attacker-controlled), so a session-
-  rotating user could exhaust the shared monthly budget and disable AI for everyone; key the quota on
-  `resolveOwnerKey` (user:/guest:) instead. (b) **Rate limiting** (none today) on `/api/auth/google`,
-  `/api/plans/generate`, `/api/price-watch` — a lightweight per-IP/owner limiter (price-watch is an unauthenticated
-  DB write → row-flooding). (c) **Flyway/Liquibase** versioned migrations (the real fix behind ddl-auto). (d)
-  **HTTPS + CSP** at the reverse proxy (CSP must allow-list Google Identity Services + retailer image hosts). (e)
-  Route `DesignAssistantService` (separate Anthropic path) through `AiUsageTracker` so its cost is capped too. (f)
+- **Deferred (do before PUBLIC launch / when AI goes multi-user — not urgent pre-traction):**
+  (a) ✅ **DONE 10.70** — per-account/per-tier AI quota keyed on `resolveOwnerKey` (user:/guest:), with an atomic
+  per-owner reservation (TOCTOU-safe). (Caps are still in-memory → reset on restart; persist with the DB switch,
+  item (c).) (b) **Rate limiting** (none today) on `/api/auth/google`, `/api/plans/generate`, `/api/price-watch`
+  — a lightweight per-IP/owner limiter (price-watch is an unauthenticated DB write → row-flooding). (c)
+  **Flyway/Liquibase** versioned migrations + `HIBERNATE_DDL_AUTO=validate/update` (the real fix behind ddl-auto;
+  this is also what makes the AI counters + accounts + subs actually persist across restarts). (d) **HTTPS + CSP**
+  at the reverse proxy (CSP must allow-list Google Identity Services + retailer image hosts). (e) ✅ **DONE 10.71**
+  — `DesignAssistantService` now routes through `AiUsageTracker` (shares the per-tier cap + monthly budget). (f)
   Real `DATABASE_PASSWORD` in prod (the committed `budgetspace/budgetspace` is dev-compose only).
 
 ### Sprint 10.66 — Gemini AI provider (the "Plus" carrot) (current)

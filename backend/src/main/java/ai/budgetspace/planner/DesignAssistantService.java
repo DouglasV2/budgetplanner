@@ -1,5 +1,7 @@
 package ai.budgetspace.planner;
 
+import ai.budgetspace.ai.AiUsageEvent;
+import ai.budgetspace.ai.AiUsageTracker;
 import ai.budgetspace.dto.DesignAssistantResponse;
 import ai.budgetspace.dto.FurnishingPlanDto;
 import ai.budgetspace.dto.PlanGenerationResponse;
@@ -8,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +70,13 @@ public class DesignAssistantService {
     private String model;
     @Value("${budgetspace.design-assistant.base-url:https://api.anthropic.com}")
     private String baseUrl;
+
+    // Sprint 10.71: this second (Anthropic) AI path now shares the same usage guardrails as the prompt path,
+    // so it counts toward the per-tier daily cap + the monthly USD budget instead of bypassing them. Field
+    // injection (like the @Value config) keeps the no-arg constructor that tests use; it's only touched on the
+    // LLM path, which the default disabled config never reaches.
+    @Autowired
+    private AiUsageTracker usageTracker;
 
     private static final Map<String, String> ROOM_LABELS = Map.ofEntries(
             Map.entry("living-room", "dnevni boravak"),
@@ -117,7 +128,7 @@ public class DesignAssistantService {
             Map.entry("velvet", "baršun")
     );
 
-    public DesignAssistantResponse describe(PlanGenerationResponse plan) {
+    public DesignAssistantResponse describe(PlanGenerationResponse plan, String ownerKey, String tier) {
         DesignAssistantResponse ruleBased = ruleBasedDescribe(plan);
         if (!llmEnabled || !hasText(apiKey) || plan == null || plan.input() == null) {
             return ruleBased;
@@ -126,17 +137,24 @@ public class DesignAssistantService {
         if (primary == null || primary.items().isEmpty()) {
             return ruleBased; // nothing concrete to describe — keep the deterministic message
         }
+        // Same guardrails as the prompt path: over the tier's daily allowance / monthly budget → deterministic.
+        if (!usageTracker.tryAcquire(ownerKey, tier)) {
+            return ruleBased;
+        }
         try {
-            return llmDescribe(plan, primary, ruleBased);
+            return llmDescribe(plan, primary, ruleBased, ownerKey, tier);
         } catch (Exception exception) {
             log.warn("Design assistant LLM call failed ({}); using rule-based fallback.", exception.toString());
+            usageTracker.complete(ownerKey, new AiUsageEvent("ANTHROPIC", model, "design-summary", ownerKey, tier,
+                    null, null, 0.0, false, true, Instant.now()));
             return ruleBased;
         }
     }
 
     // Calls the Anthropic Messages API for the summary paragraph; keeps the deterministic highlights.
     private DesignAssistantResponse llmDescribe(PlanGenerationResponse plan, FurnishingPlanDto primary,
-                                                DesignAssistantResponse ruleBased) throws IOException, InterruptedException {
+                                                DesignAssistantResponse ruleBased, String ownerKey, String tier)
+            throws IOException, InterruptedException {
         String userPrompt = buildLlmPrompt(plan.input(), primary);
         Map<String, Object> body = Map.of(
                 "model", model,
@@ -173,6 +191,14 @@ public class DesignAssistantService {
         if (text.isEmpty()) {
             throw new IOException("empty model response");
         }
+        // Count this call toward the per-tier daily cap + monthly budget. The USD estimate uses the tracker's
+        // default (cheap-provider) rates, so it under-counts pricier Anthropic models — tune the rates / budget
+        // when actually enabling this path; the per-tier daily CALL cap is the binding control either way.
+        JsonNode usage = root.path("usage");
+        Integer inTok = usage.path("input_tokens").isMissingNode() ? null : usage.path("input_tokens").asInt();
+        Integer outTok = usage.path("output_tokens").isMissingNode() ? null : usage.path("output_tokens").asInt();
+        usageTracker.complete(ownerKey, new AiUsageEvent("ANTHROPIC", model, "design-summary", ownerKey, tier,
+                inTok, outTok, usageTracker.estimateCostUsd(inTok, outTok), true, false, Instant.now()));
         logSummary(plan.input(), primary, primary.items().size());
         return new DesignAssistantResponse(text, ruleBased.highlights());
     }

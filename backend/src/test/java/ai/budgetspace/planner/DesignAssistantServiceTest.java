@@ -25,7 +25,7 @@ class DesignAssistantServiceTest {
         ));
         PlanGenerationResponse plan = planner.generate(input("Imam 1500 € za dnevni boravak."));
 
-        DesignAssistantResponse response = service.describe(plan);
+        DesignAssistantResponse response = service.describe(plan, "guest:test", "GUEST");
 
         assertThat(response.summary()).contains("dnevni boravak");
         assertThat(response.summary()).contains("1500");
@@ -38,7 +38,7 @@ class DesignAssistantServiceTest {
         PlanGenerationResponse empty = new PlanGenerationResponse(
                 input("Imam 1500 € za dnevni boravak.").normalized(), List.of(), false, List.of(), null);
 
-        DesignAssistantResponse response = service.describe(empty);
+        DesignAssistantResponse response = service.describe(empty, "guest:test", "GUEST");
 
         assertThat(response.summary()).isNotBlank();
         assertThat(response.highlights()).isEmpty();
@@ -46,7 +46,7 @@ class DesignAssistantServiceTest {
 
     @Test
     void handlesNullPlanGracefully() {
-        DesignAssistantResponse response = service.describe(null);
+        DesignAssistantResponse response = service.describe(null, "guest:test", "GUEST");
 
         assertThat(response.summary()).isNotBlank();
     }
