@@ -73,7 +73,7 @@ public class AuthController {
     }
 
     private static AuthUserDto toDto(AppUser user) {
-        return new AuthUserDto(user.getId(), user.getEmail(), user.getName(), user.getPictureUrl());
+        return new AuthUserDto(user.getId(), user.getEmail(), user.getName(), user.getPictureUrl(), user.getPlan());
     }
 
     // A rejected Google token is a 401; we never say which check failed.

@@ -1,5 +1,6 @@
 package ai.budgetspace.config;
 
+import ai.budgetspace.saved.PlanLimitReachedException;
 import ai.budgetspace.saved.SavedPlanNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,13 @@ public class GlobalExceptionHandler {
         // Expected (stale/shared link, or a non-owner) — log quietly, never a 500 stack trace.
         log.debug("Saved plan not found: {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Plan nije pronađen."));
+    }
+
+    @ExceptionHandler(PlanLimitReachedException.class)
+    public ResponseEntity<Map<String, String>> handlePlanLimit(PlanLimitReachedException exception) {
+        // Sprint 10.68: a Free-tier owner hit the saved-plan cap → 402 so the frontend shows the Plus upsell.
+        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED)
+                .body(Map.of("error", "Dosegnut je limit besplatnih spremljenih planova.", "code", "PLAN_LIMIT"));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -41,6 +41,9 @@ budgetspace:
       idle-days: ${BUDGETSPACE_AUTH_SESSION_IDLE_DAYS:7}     # auto-logout after this many days of inactivity
       cookie-secure: ${BUDGETSPACE_AUTH_COOKIE_SECURE:false} # set true in prod (HTTPS) so the session cookie is Secure
       cleanup-cron: ${BUDGETSPACE_AUTH_SESSION_CLEANUP_CRON:0 30 3 * * *} # daily prune of expired/idle sessions
+  plus:
+    # Sprint 10.68: Free tier may save this many plans before Plus is required (Plus = unlimited).
+    free-saved-limit: ${BUDGETSPACE_PLUS_FREE_SAVED_LIMIT:3}
   real-catalog:
     # Seed the real IKEA/JYSK living-room catalog on startup (env BUDGETSPACE_REAL_CATALOG_SEED_ENABLED).
     seed-enabled: ${BUDGETSPACE_REAL_CATALOG_SEED_ENABLED:true}
@@ -76,7 +79,7 @@ budgetspace:
     anthropic-api-key: ${ANTHROPIC_API_KEY:}
     # Sprint 10.66: Gemini (cheapest + free tier) — the default AI provider for the early stage.
     gemini-api-key: ${GEMINI_API_KEY:}
-    model: ${BUDGETSPACE_LLM_MODEL:}                     # blank → cheap default model per provider (gemini-2.0-flash)
+    model: ${BUDGETSPACE_LLM_MODEL:}                     # blank → cheap default model per provider (gemini-2.5-flash)
     timeout-seconds: ${BUDGETSPACE_LLM_TIMEOUT_SECONDS:15}
     max-output-tokens: ${BUDGETSPACE_LLM_MAX_OUTPUT_TOKENS:700}
     # Cost / rate guardrails — on breach the app falls back to rule-based (never errors).

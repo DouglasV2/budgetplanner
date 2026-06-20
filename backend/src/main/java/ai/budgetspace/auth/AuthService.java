@@ -139,6 +139,19 @@ public class AuthService {
         });
     }
 
+    /**
+     * Sprint 10.68: is the owner of these plans on the paid Plus tier? Only a signed-in account ({@code user:<id>})
+     * can be Plus; a guest owner key is always Free. Used to gate Plus-only limits (e.g. unlimited saved plans).
+     */
+    public boolean isPlusOwner(String ownerKey) {
+        if (ownerKey == null || !ownerKey.startsWith(ACCOUNT_PREFIX)) {
+            return false;
+        }
+        return userRepository.findById(ownerKey.substring(ACCOUNT_PREFIX.length()))
+                .map(AppUser::isPlus)
+                .orElse(false);
+    }
+
     @Transactional
     public void logout(String sessionToken) {
         String token = blankToNull(sessionToken);

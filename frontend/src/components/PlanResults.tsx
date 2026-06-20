@@ -470,7 +470,9 @@ function SharePanel({ plan, input, onSavePlan }: {
     setBusy(true);
     try {
       const saved = await onSavePlan(plan, false);
-      setUrl(saved);
+      // Sprint 10.68: onSavePlan returns '' when the save was blocked (e.g. Free saved-plan limit) — don't cache
+      // an empty link, so a later retry (after upgrading) can mint one.
+      if (saved) setUrl(saved);
       return saved;
     } finally {
       setBusy(false);
@@ -479,6 +481,7 @@ function SharePanel({ plan, input, onSavePlan }: {
 
   async function shareTo(target: 'whatsapp' | 'reddit' | 'x') {
     const link = await ensureUrl();
+    if (!link) return; // save was blocked (e.g. Plus limit) — the upsell notice is already shown
     const enc = encodeURIComponent;
     const href =
       target === 'whatsapp' ? `https://wa.me/?text=${enc(`${summary} ${link}`)}`
@@ -489,6 +492,7 @@ function SharePanel({ plan, input, onSavePlan }: {
 
   async function nativeShare() {
     const link = await ensureUrl();
+    if (!link) return;
     const nav = navigator as Navigator & { share?: (data: { title?: string; text?: string; url?: string }) => Promise<void> };
     try {
       await nav.share?.({ title: t('results.shareTitle'), text: summary, url: link });
@@ -499,6 +503,7 @@ function SharePanel({ plan, input, onSavePlan }: {
 
   async function copyShare() {
     const link = await ensureUrl();
+    if (!link) return;
     try {
       await navigator.clipboard.writeText(`${summary} ${link}`);
     } catch {

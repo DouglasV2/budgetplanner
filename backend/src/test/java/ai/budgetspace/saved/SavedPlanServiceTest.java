@@ -31,7 +31,7 @@ class SavedPlanServiceTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private SavedPlanService serviceWith(SavedPlanRepository repository) {
-        return new SavedPlanService(repository, objectMapper);
+        return new SavedPlanService(repository, objectMapper, 3); // Free saved-plan limit = 3
     }
 
     @Test
@@ -40,11 +40,35 @@ class SavedPlanServiceTest {
         when(repository.save(any(SavedPlan.class))).thenAnswer(invocation -> invocation.getArgument(0));
         SavedPlanService service = serviceWith(repository);
 
-        service.save(new SavedPlanRequest(planDto(), inputDto()), "session-A");
+        service.save(new SavedPlanRequest(planDto(), inputDto()), "session-A", false);
 
         ArgumentCaptor<SavedPlan> captor = ArgumentCaptor.forClass(SavedPlan.class);
         verify(repository).save(captor.capture());
         assertThat(captor.getValue().getSessionId()).isEqualTo("session-A");
+    }
+
+    @Test
+    void freeOwnerIsCappedAtTheSavedLimit() {
+        SavedPlanRepository repository = mock(SavedPlanRepository.class);
+        when(repository.countBySessionId("guest:full")).thenReturn(3L); // already at the limit of 3
+        SavedPlanService service = serviceWith(repository);
+
+        assertThatThrownBy(() -> service.save(new SavedPlanRequest(planDto(), inputDto()), "guest:full", false))
+                .isInstanceOf(PlanLimitReachedException.class);
+        verify(repository, never()).save(any(SavedPlan.class));
+    }
+
+    @Test
+    void plusOwnerSavesWithoutLimit() {
+        SavedPlanRepository repository = mock(SavedPlanRepository.class);
+        when(repository.save(any(SavedPlan.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        SavedPlanService service = serviceWith(repository);
+
+        // Plus owner: the count is never even consulted (unlimited), so a save always goes through.
+        service.save(new SavedPlanRequest(planDto(), inputDto()), "user:vip", true);
+
+        verify(repository).save(any(SavedPlan.class));
+        verify(repository, never()).countBySessionId(any());
     }
 
     @Test
@@ -104,7 +128,7 @@ class SavedPlanServiceTest {
         when(repository.save(any(SavedPlan.class))).thenAnswer(invocation -> invocation.getArgument(0));
         SavedPlanService service = serviceWith(repository);
 
-        var response = service.save(new SavedPlanRequest(planDto(), inputDto(), "Moj dom"), "session-A");
+        var response = service.save(new SavedPlanRequest(planDto(), inputDto(), "Moj dom"), "session-A", false);
 
         ArgumentCaptor<SavedPlan> captor = ArgumentCaptor.forClass(SavedPlan.class);
         verify(repository).save(captor.capture());

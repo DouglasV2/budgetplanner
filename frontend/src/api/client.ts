@@ -59,7 +59,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const message = await response.text().catch(() => '');
-    throw new Error(message || `Zahtjev nije uspio (${response.status}).`);
+    // Attach the HTTP status so callers can react to specific cases (e.g. 402 = Free plan limit → Plus upsell).
+    const error = new Error(message || `Zahtjev nije uspio (${response.status}).`) as Error & { status?: number };
+    error.status = response.status;
+    throw error;
   }
 
   // A 204 (e.g. logout) has no body — calling .json() on it would throw, so return nothing.
@@ -203,6 +206,8 @@ export interface AuthUser {
   email: string | null;
   name: string | null;
   pictureUrl: string | null;
+  // Sprint 10.68: monetization tier — "FREE" or "PLUS". Drives Plus-only gates + the upsell.
+  plan: string | null;
 }
 
 export interface AuthMe {
@@ -229,4 +234,16 @@ export function googleLogin(credential: string) {
 /** Sign out: the backend deletes the session and clears the cookie. */
 export function authLogout() {
   return request<void>('/api/auth/logout', { method: 'POST' });
+}
+
+// Sprint 10.68: an early willingness-to-pay signal — "I want Plus", optionally with an email for the launch
+// list. Fire-and-forget: no payment is taken (a waitlist + interest counter until Stripe is wired).
+export function recordPlusInterest(email?: string, source?: string) {
+  void fetch(`${API_BASE_URL}/api/events/plus-interest`, {
+    method: 'POST',
+    keepalive: true,
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'X-BudgetSpace-Session': sessionId() },
+    body: JSON.stringify({ email: email ?? null, source: source ?? null })
+  }).catch(() => undefined);
 }

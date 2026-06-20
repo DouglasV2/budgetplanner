@@ -1,35 +1,22 @@
-// Sprint 10.10 — value-first pricing. Deliberately discreet: the core AI plan is free, tiers are
-// framed around "planning more rooms", and there is no real checkout yet (pilot pricing).
+// Sprint 10.10 → 10.68 — value-first pricing. The core (rule-based plans) is free; Plus (€5.99/mo) is the thin
+// margin tier whose real carrot is the AI assistant. No checkout yet (Stripe lands later) — the Plus CTA is an
+// honest waitlist that records willingness-to-pay, never a fake purchase.
+import { useState } from 'react';
+import { recordPlusInterest } from '../api/client';
+import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
 
 export function Monetization() {
   const { t } = useLocale();
-  const tiers = [
-    {
-      name: 'Free',
-      tagline: t('pricing.freeTagline'),
-      price: '0 €',
-      features: [t('pricing.freeF1'), t('pricing.freeF2'), t('pricing.freeF3')],
-      note: t('pricing.freeNote'),
-      highlight: false
-    },
-    {
-      name: 'Pro',
-      tagline: t('pricing.proTagline'),
-      price: t('pricing.soon'),
-      features: [t('pricing.proF1'), t('pricing.proF2'), t('pricing.proF3'), t('pricing.proF4')],
-      note: t('pricing.pilotNote'),
-      highlight: true
-    },
-    {
-      name: 'Pro+',
-      tagline: t('pricing.proPlusTagline'),
-      price: t('pricing.soon'),
-      features: [t('pricing.proPlusF1'), t('pricing.proPlusF2'), t('pricing.proPlusF3'), t('pricing.proPlusF4')],
-      note: t('pricing.pilotNote'),
-      highlight: false
-    }
-  ];
+  const { user } = useAuth();
+  const isPlus = user?.plan === 'PLUS';
+  const [email, setEmail] = useState('');
+  const [joined, setJoined] = useState(false);
+
+  function joinWaitlist() {
+    recordPlusInterest(email.trim() || undefined, 'pricing');
+    setJoined(true);
+  }
 
   return (
     <section className="section shell pricing-section" id="pricing">
@@ -38,22 +25,51 @@ export function Monetization() {
         <h2>{t('pricing.heading')}</h2>
         <p>{t('pricing.sub')}</p>
       </div>
-      <div className="pricing-grid">
-        {tiers.map((tier) => (
-          <article className={tier.highlight ? 'pricing-card featured' : 'pricing-card'} key={tier.name}>
-            <div className="pricing-card-head">
-              <h3>{tier.name}</h3>
-              <span className="pricing-price">{tier.price}</span>
+      <div className="pricing-grid two-tier">
+        <article className="pricing-card">
+          <div className="pricing-card-head">
+            <h3>{t('pricing.freeName')}</h3>
+            <span className="pricing-price">0 €</span>
+          </div>
+          <p className="pricing-tagline">{t('pricing.freeTagline')}</p>
+          <ul className="pricing-features">
+            <li>{t('pricing.freeF1')}</li>
+            <li>{t('pricing.freeF2')}</li>
+            <li>{t('pricing.freeF3')}</li>
+            <li>{t('pricing.freeF4')}</li>
+          </ul>
+        </article>
+
+        <article className="pricing-card featured">
+          <div className="pricing-card-head">
+            <h3>{t('pricing.plusName')}</h3>
+            <span className="pricing-price">{t('pricing.plusPrice')}</span>
+          </div>
+          <p className="pricing-tagline">{t('pricing.plusTagline')}</p>
+          <ul className="pricing-features">
+            <li>{t('pricing.plusF1')}</li>
+            <li>{t('pricing.plusF2')}</li>
+            <li>{t('pricing.plusF3')}</li>
+            <li>{t('pricing.plusF4')}</li>
+          </ul>
+          {isPlus ? (
+            <div className="pricing-active">{t('pricing.plusActive')}</div>
+          ) : joined ? (
+            <div className="pricing-joined">{t('pricing.joined')}</div>
+          ) : (
+            <div className="pricing-waitlist">
+              <input
+                type="email"
+                value={email}
+                placeholder={t('pricing.waitlistEmail')}
+                aria-label={t('pricing.waitlistEmail')}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+              <button type="button" onClick={joinWaitlist}>{t('pricing.waitlistCta')}</button>
             </div>
-            <p className="pricing-tagline">{tier.tagline}</p>
-            <ul className="pricing-features">
-              {tier.features.map((feature) => (
-                <li key={feature}>{feature}</li>
-              ))}
-            </ul>
-            <small className="pricing-note">{tier.note}</small>
-          </article>
-        ))}
+          )}
+          <small className="pricing-note">{t('pricing.plusNote')}</small>
+        </article>
       </div>
       <p className="pricing-footnote">{t('pricing.footnote')}</p>
     </section>

@@ -26,6 +26,9 @@ class GeminiLlmClientTest {
         assertThat(body.path("contents").path(0).path("parts").path(0).path("text").asText()).isEqualTo("imam 1500 EUR");
         assertThat(body.path("generationConfig").path("maxOutputTokens").asInt()).isEqualTo(250);
         assertThat(body.path("generationConfig").path("responseMimeType").asText()).isEqualTo("application/json");
+        // Thinking is disabled (budget 0) so the whole output budget goes to the answer (Gemini 2.5 would
+        // otherwise spend it "thinking" and truncate the JSON).
+        assertThat(body.path("generationConfig").path("thinkingConfig").path("thinkingBudget").asInt()).isEqualTo(0);
     }
 
     @Test

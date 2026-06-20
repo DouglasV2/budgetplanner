@@ -160,6 +160,25 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.68 — Plus scaffold (monetization) (current)
+- Monetization, honest + lean (no Stripe yet). **Entitlement:** `AppUser.plan` ("FREE"/"PLUS", default FREE),
+  exposed via `/api/auth/me`. Only a signed-in account can be Plus; guests are always Free (forge-proof — reuses
+  the `user:`/`guest:` namespace).
+- **One real gate that works today:** Free saves up to **3 plans** (`budgetspace.plus.free-saved-limit`), Plus =
+  unlimited. The cap is enforced server-side in `SavedPlanService.save` (new `PlanLimitReachedException → 402`);
+  the frontend catches the 402 and shows a discreet Plus upsell, and **save + the share growth-loop degrade
+  gracefully** (no crash, no broken /plan/<id> link).
+- **Real Free/Plus pricing UI** (€5.99/mo) replacing the old Free/Pro/Pro+ pilot cards, plus an **honest waitlist**
+  (no fake checkout) that records a **willingness-to-pay signal** — `POST /api/events/plus-interest` (optional
+  email for the launch list; email value never logged).
+- An **adversarial review** confirmed 0 blockers/0 majors (cap off-by-one correct, entitlement forge-proof,
+  save/share degradation sound); fixed 2 nits (truncate plus-interest input vs column overflow; generic upsell
+  copy). **Backend 220 tests, 0 failures; frontend build clean.** Verified live: new schema booted clean,
+  `/api/events/plus-interest` → 202.
+- **Stripe (real checkout + the AI/export gating) is the next monetization step** — needs a Stripe account +
+  test keys; the entitlement + gating + UI are ready for it to plug into.
+- Also: Gemini default model → `gemini-2.5-flash` (`gemini-2.0-flash` 404s on the owner's key).
+
 ### Sprint 10.67 — security hardening (from the adversarial audit) (current)
 - Ran a **12-dimension adversarial security audit** (multi-agent: review → independently verify each finding).
   **47 raw findings → 9 confirmed, 0 critical, 0 exploitable app vulns.** Core security held: auth, IDOR/owner

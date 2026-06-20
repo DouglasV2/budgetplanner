@@ -16,8 +16,9 @@ import java.time.Duration;
 public class LlmProperties {
     private static final String OPENAI_DEFAULT_MODEL = "gpt-4o-mini";
     private static final String ANTHROPIC_DEFAULT_MODEL = "claude-haiku-4-5";
-    // Sprint 10.66: a cheap Flash model with a free tier — enough to structure a prompt + write a short rationale.
-    private static final String GEMINI_DEFAULT_MODEL = "gemini-2.0-flash";
+    // Sprint 10.66/10.68: a cheap, fast Flash model — enough to structure a prompt + write a short rationale.
+    // (gemini-2.0-flash 404s on current keys; gemini-2.5-flash is the available stable Flash model.)
+    private static final String GEMINI_DEFAULT_MODEL = "gemini-2.5-flash";
 
     private final boolean enabled;
     private final LlmProvider provider;

@@ -52,12 +52,12 @@ const DICTIONARY: Record<string, Entry> = {
 
   'pricing.eyebrow': { hr: 'Trebaš više planova?', en: 'Need more plans?' },
   'pricing.heading': {
-    hr: 'Osnovni AI plan je besplatan. Nadogradi kad planiraš više.',
-    en: 'The core AI plan is free. Upgrade when you plan more.'
+    hr: 'Slaganje prostora je besplatno. Plus je za one koji žele više.',
+    en: 'Planning a room is free. Plus is for people who want more.'
   },
   'pricing.sub': {
-    hr: 'Spremi i usporedi više ideja za sobe, izvezi popis za kupnju ili planiraj više prostorija. Plaćanje još nije aktivno — ovo je pilot cijena.',
-    en: 'Save and compare more room ideas, export your shopping list, or plan multiple rooms. No checkout yet — this is pilot pricing.'
+    hr: 'Generiranje planova je i ostaje besplatno. Plus otključava neograničeno spremanje, AI asistenta i upozorenja na cijene. Plaćanje stiže uskoro.',
+    en: 'Generating plans is free, and stays free. Plus unlocks unlimited saving, the AI assistant and price alerts. Checkout is coming soon.'
   },
 
   'product.reviews': { hr: 'Recenzije u trgovini', en: 'Reviews in store' },
@@ -95,11 +95,26 @@ const DICTIONARY: Record<string, Entry> = {
   'footer.tagline': { hr: 'Planer koji iz budžeta i želja slaže konkretan popis za kupnju.', en: 'A planner that turns your budget and wishes into a concrete shopping list.' },
   'footer.backToTop': { hr: 'Natrag gore ↑', en: 'Back to top ↑' },
 
-  'pricing.freeTagline': { hr: 'Probaj AI planiranje', en: 'Try AI planning' },
-  'pricing.freeF1': { hr: 'AI plan za tvoju sobu', en: 'An AI plan for your room' },
-  'pricing.freeF2': { hr: 'Nekoliko AI generiranja mjesečno', en: 'A few AI generations per month' },
-  'pricing.freeF3': { hr: 'Osnovne preporuke proizvoda', en: 'Basic product recommendations' },
+  'pricing.freeName': { hr: 'Free', en: 'Free' },
+  'pricing.freeTagline': { hr: 'Puna vrijednost, bez kartice.', en: 'Full value, no card needed.' },
+  'pricing.freeF1': { hr: 'Neograničeno slaganje planova', en: 'Unlimited plan building' },
+  'pricing.freeF2': { hr: 'Spremi do 3 plana', en: 'Save up to 3 plans' },
+  'pricing.freeF3': { hr: 'Kopiraj popis i podijeli plan', en: 'Copy the list & share a plan' },
+  'pricing.freeF4': { hr: 'Rabljeno (eBay) prijedlozi', en: 'Second-hand (eBay) suggestions' },
   'pricing.freeNote': { hr: 'Već koristiš', en: 'You\'re using it' },
+  // Sprint 10.68: real Plus tier + honest waitlist (no checkout yet).
+  'pricing.plusName': { hr: 'Plus', en: 'Plus' },
+  'pricing.plusPrice': { hr: '5,99 €/mj', en: '€5.99/mo' },
+  'pricing.plusTagline': { hr: 'Za one koji slažu više soba i žele AI pomoć.', en: 'For people furnishing more rooms who want AI help.' },
+  'pricing.plusF1': { hr: 'Neograničeno spremljenih planova i prostora', en: 'Unlimited saved plans & spaces' },
+  'pricing.plusF2': { hr: 'AI asistent (pametno razumijevanje + dotjerivanje)', en: 'AI assistant (smart understanding + refine)' },
+  'pricing.plusF3': { hr: 'Upozorenja na pad cijene', en: 'Price-drop alerts' },
+  'pricing.plusF4': { hr: 'Izvoz popisa za kupnju (PDF) — uskoro', en: 'Export shopping list (PDF) — soon' },
+  'pricing.plusNote': { hr: 'Plaćanje stiže uskoro — za sad se prijavi na listu.', en: 'Checkout is coming — join the list for now.' },
+  'pricing.plusActive': { hr: 'Tvoj Plus je aktivan ✓', en: 'Your Plus is active ✓' },
+  'pricing.waitlistEmail': { hr: 'tvoj@email.com (neobavezno)', en: 'you@email.com (optional)' },
+  'pricing.waitlistCta': { hr: 'Želim Plus', en: 'I want Plus' },
+  'pricing.joined': { hr: 'Hvala! Javit ćemo ti čim Plus krene.', en: 'Thanks! We\'ll let you know when Plus launches.' },
   'pricing.proTagline': { hr: 'Za one koji planiraju više soba', en: 'For those planning more rooms' },
   'pricing.soon': { hr: 'Uskoro', en: 'Soon' },
   'pricing.proF1': { hr: 'Više AI planova', en: 'More AI plans' },
@@ -438,6 +453,9 @@ const DICTIONARY: Record<string, Entry> = {
   'auth.signOut': { hr: 'Odjava', en: 'Sign out' },
   'auth.signedInAs': { hr: 'Prijavljen kao {name}', en: 'Signed in as {name}' },
   'auth.signInError': { hr: 'Prijava nije uspjela. Pokušaj ponovno.', en: 'Sign-in failed. Please try again.' },
+
+  // Sprint 10.68: Plus upsell shown when a Free owner hits the saved-plan cap.
+  'plus.saveLimitUpsell': { hr: 'Dosegao si limit besplatnih spremljenih planova. Plus otključava neograničeno (vidi cijene niže).', en: 'You\'ve hit the Free saved-plan limit. Plus unlocks unlimited (see pricing below).' },
   // Sprint 10.54: feedback that acts. After the user rates the plan, offer the one-click fix for the complaint.
   'results.feedbackThanks': { hr: 'Hvala — drago nam je da pomaže.', en: 'Thanks — glad it helps.' },
   'results.feedbackThanksActable': { hr: 'Hvala. Da to odmah složim?', en: 'Thanks. Want me to sort that now?' },

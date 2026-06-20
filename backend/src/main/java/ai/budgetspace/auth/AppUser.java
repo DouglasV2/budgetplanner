@@ -40,6 +40,11 @@ public class AppUser {
     @Column(name = "last_login_at", nullable = false)
     private Instant lastLoginAt;
 
+    // Sprint 10.68: monetization tier. "FREE" (default) or "PLUS". Plus unlocks unlimited saved plans, the AI
+    // assistant, alerts and export. Stored as a string (not an enum) so adding a tier later needs no migration.
+    @Column(name = "plan", length = 16, nullable = false)
+    private String plan = "FREE";
+
     public AppUser() {
     }
 
@@ -58,6 +63,11 @@ public class AppUser {
         return "user:" + id;
     }
 
+    /** True when this account is on the paid Plus tier. */
+    public boolean isPlus() {
+        return "PLUS".equalsIgnoreCase(plan);
+    }
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getGoogleSub() { return googleSub; }
@@ -72,4 +82,6 @@ public class AppUser {
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getLastLoginAt() { return lastLoginAt; }
     public void setLastLoginAt(Instant lastLoginAt) { this.lastLoginAt = lastLoginAt; }
+    public String getPlan() { return plan; }
+    public void setPlan(String plan) { this.plan = plan; }
 }

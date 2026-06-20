@@ -351,8 +351,16 @@ export function Planner() {
   }
 
   async function handleSavePlan(plan: FurnishingPlan, copyLink: boolean) {
-    // Sprint 10.61: the plan joins the active space (e.g. "Moj dom") so the user's rooms group together.
-    const savedPlan = await savePlan(plan, input, activeSpace);
+    let savedPlan: SavedPlanResponse;
+    try {
+      // Sprint 10.61: the plan joins the active space (e.g. "Moj dom") so the user's rooms group together.
+      savedPlan = await savePlan(plan, input, activeSpace);
+    } catch (apiError) {
+      // Sprint 10.68: Free saved-plan limit reached → 402 → show the Plus upsell instead of a generic error.
+      const status = (apiError as { status?: number } | null)?.status;
+      setNotice(status === 402 ? t('plus.saveLimitUpsell') : t('planner.errorUnavailable'));
+      return '';
+    }
     const url = `${window.location.origin}/plan/${savedPlan.id}`;
     setSavedPlans((currentPlans) => [savedPlan, ...currentPlans.filter((currentPlan) => currentPlan.id !== savedPlan.id)]);
 

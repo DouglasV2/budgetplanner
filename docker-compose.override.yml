@@ -28,6 +28,11 @@ services:
       BUDGETSPACE_AI_ENABLED: ${BUDGETSPACE_AI_ENABLED:-false}
       BUDGETSPACE_LLM_PROVIDER: ${BUDGETSPACE_LLM_PROVIDER:-off}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      # AI spend guardrails (AiUsageTracker). Monthly USD is the HARD cap; per-day/session prevent runaway loops.
+      # Defaults are safe; tuned via .env (tight monthly cap + generous per-day/session for prompt testing).
+      BUDGETSPACE_AI_MONTHLY_BUDGET_USD: ${BUDGETSPACE_AI_MONTHLY_BUDGET_USD:-20}
+      BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY:-100}
+      BUDGETSPACE_AI_MAX_REQUESTS_PER_SESSION: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_SESSION:-10}
       # Spring Boot DevTools auto-restart loops under a Docker bind mount (it watches target/classes,
       # which mvn spring-boot:run itself rewrites) → the backend kept restarting and requests in that
       # window failed with ERR_EMPTY_RESPONSE / "no Access-Control-Allow-Origin" in the browser. Keep

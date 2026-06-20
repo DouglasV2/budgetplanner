@@ -36,7 +36,9 @@ public class SavedPlanController {
     public SavedPlanResponse save(@RequestBody SavedPlanRequest request,
                                   @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
                                   @CookieValue(name = AUTH_COOKIE, required = false) String authToken) {
-        return savedPlanService.save(request, authService.resolveOwnerKey(authToken, sessionId));
+        // Sprint 10.68: resolve the owner once, then enforce the Free saved-plan cap (Plus owners are unlimited).
+        String owner = authService.resolveOwnerKey(authToken, sessionId);
+        return savedPlanService.save(request, owner, authService.isPlusOwner(owner));
     }
 
     // Sprint 10.53: the "Moji planovi" inbox is scoped to the caller — only their own saved plans. Sprint 10.63:

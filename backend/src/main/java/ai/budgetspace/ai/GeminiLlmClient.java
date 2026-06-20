@@ -71,6 +71,10 @@ public class GeminiLlmClient implements LlmClient {
     static String buildBody(LlmCompletionRequest request, int maxTokens) throws JsonProcessingException {
         Map<String, Object> generationConfig = new LinkedHashMap<>();
         generationConfig.put("maxOutputTokens", maxTokens);
+        // Gemini 2.5 "thinks" by default, and those thinking tokens consume the output budget BEFORE the answer —
+        // for a structured prompt extraction we don't need it, and leaving it on truncates the JSON (cut-off
+        // array → parse error → rule-based fallback). Disable it (budget 0): faster, cheaper, full budget for the answer.
+        generationConfig.put("thinkingConfig", Map.of("thinkingBudget", 0));
         if (request.expectJson()) {
             // Gemini's controlled-generation JSON mode, mirroring OpenAI's response_format=json_object.
             generationConfig.put("responseMimeType", "application/json");

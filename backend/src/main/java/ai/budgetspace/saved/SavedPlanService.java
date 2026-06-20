@@ -6,6 +6,7 @@ import ai.budgetspace.dto.SavedPlanRequest;
 import ai.budgetspace.dto.SavedPlanResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -17,15 +18,26 @@ import java.util.List;
 public class SavedPlanService {
     private final SavedPlanRepository savedPlanRepository;
     private final ObjectMapper objectMapper;
+    // Sprint 10.68: how many plans a Free-tier owner may save before Plus is required (Plus = unlimited).
+    private final int freeSavedLimit;
 
-    public SavedPlanService(SavedPlanRepository savedPlanRepository, ObjectMapper objectMapper) {
+    public SavedPlanService(SavedPlanRepository savedPlanRepository, ObjectMapper objectMapper,
+                            @Value("${budgetspace.plus.free-saved-limit:3}") int freeSavedLimit) {
         this.savedPlanRepository = savedPlanRepository;
         this.objectMapper = objectMapper;
+        this.freeSavedLimit = freeSavedLimit;
     }
 
-    public SavedPlanResponse save(SavedPlanRequest request, String sessionId) {
+    public SavedPlanResponse save(SavedPlanRequest request, String ownerKey, boolean plus) {
         if (request == null || request.plan() == null || request.input() == null) {
             throw new IllegalArgumentException("plan and input are required");
+        }
+
+        String owner = blankToNull(ownerKey);
+        // Sprint 10.68: the Free tier caps how many plans an owner can save; Plus is unlimited. A null owner is a
+        // save with no session (invisible to every inbox), so the cap doesn't apply to it.
+        if (!plus && owner != null && savedPlanRepository.countBySessionId(owner) >= freeSavedLimit) {
+            throw new PlanLimitReachedException(freeSavedLimit);
         }
 
         try {
@@ -36,7 +48,7 @@ public class SavedPlanService {
                     Instant.now()
             );
             // Sprint 10.53: stamp the owner so the inbox can be scoped to this session.
-            savedPlan.setSessionId(blankToNull(sessionId));
+            savedPlan.setSessionId(owner);
             // Sprint 10.61: stamp the space (e.g. "Moj dom") so the inbox can group a home's rooms together.
             savedPlan.setSpaceName(blankToNull(request.spaceName()));
             return toResponse(savedPlanRepository.save(savedPlan));
