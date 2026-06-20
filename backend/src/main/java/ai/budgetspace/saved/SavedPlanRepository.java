@@ -20,4 +20,9 @@ public interface SavedPlanRepository extends JpaRepository<SavedPlan, String> {
     @Modifying
     @Query("update SavedPlan s set s.sessionId = :newOwner where s.sessionId = :oldOwner")
     int reassignOwner(@Param("oldOwner") String oldOwner, @Param("newOwner") String newOwner);
+
+    // Sprint 10.72: GDPR account deletion — drop every plan this owner (user:<id>) saved.
+    @Modifying
+    @Query("delete from SavedPlan s where s.sessionId = :owner")
+    int deleteByOwner(@Param("owner") String owner);
 }

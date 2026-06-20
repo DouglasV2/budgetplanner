@@ -240,6 +240,12 @@ export function authLogout() {
   return request<void>('/api/auth/logout', { method: 'POST' });
 }
 
+// Sprint 10.72: GDPR "right to be forgotten" — permanently delete the signed-in account and all its data
+// (saved plans + sessions). The backend clears the cookie; the caller then drops the local user.
+export function deleteAccount() {
+  return request<void>('/api/auth/account', { method: 'DELETE' });
+}
+
 // Sprint 10.68: an early willingness-to-pay signal — "I want Plus", optionally with an email for the launch
 // list. Fire-and-forget: no payment is taken (a waitlist + interest counter until Stripe is wired).
 export function recordPlusInterest(email?: string, source?: string) {

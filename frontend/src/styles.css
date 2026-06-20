@@ -4487,6 +4487,156 @@ textarea {
   font-size: 0.85rem;
 }
 
+/* Sprint 10.72: footer legal links + legal/confirm modals (GDPR). */
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.footer-legal button,
+.footer-legal a {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.footer-legal button:hover,
+.footer-legal a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.footer-legal .footer-delete {
+  color: #e2786f;
+}
+
+.legal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 30, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.legal-modal {
+  background: #fff;
+  border-radius: 18px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px 26px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  text-align: left;
+}
+
+.legal-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.legal-modal h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.legal-close {
+  border: none;
+  background: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #5b6472;
+  padding: 0 4px;
+}
+
+.legal-updated {
+  color: #8a93a3;
+  font-size: 0.82rem;
+  margin: 4px 0 0;
+}
+
+.legal-disclaimer {
+  background: #fff6e6;
+  border: 1px solid #f0d9a8;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: #7a5a13;
+  margin: 12px 0;
+}
+
+.legal-body section {
+  margin-top: 16px;
+}
+
+.legal-body h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.legal-body p {
+  margin: 0 0 8px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #2b3240;
+}
+
+.confirm-modal {
+  max-width: 420px;
+  text-align: center;
+}
+
+.confirm-modal p {
+  color: #2b3240;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.confirm-cancel,
+.confirm-delete {
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 620;
+  cursor: pointer;
+}
+
+.confirm-cancel {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #2b3240;
+}
+
+.confirm-delete {
+  border: 1px solid #b3261e;
+  background: #b3261e;
+  color: #fff;
+}
+
+.confirm-delete:disabled,
+.confirm-cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 @media (max-width: 900px) {
   .pricing-grid.three-tier {
     grid-template-columns: 1fr;

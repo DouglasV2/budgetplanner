@@ -94,6 +94,22 @@ const DICTIONARY: Record<string, Entry> = {
 
   'footer.tagline': { hr: 'Planer koji iz budžeta i želja slaže konkretan popis za kupnju.', en: 'A planner that turns your budget and wishes into a concrete shopping list.' },
   'footer.backToTop': { hr: 'Natrag gore ↑', en: 'Back to top ↑' },
+  // Sprint 10.72: legal + GDPR account deletion.
+  'footer.legalNav': { hr: 'Pravno', en: 'Legal' },
+  'legal.privacy': { hr: 'Privatnost', en: 'Privacy' },
+  'legal.terms': { hr: 'Uvjeti', en: 'Terms' },
+  'legal.impressum': { hr: 'Impressum', en: 'Impressum' },
+  'legal.close': { hr: 'Zatvori', en: 'Close' },
+  'account.delete': { hr: 'Obriši račun', en: 'Delete account' },
+  'account.deleteTitle': { hr: 'Obrisati račun?', en: 'Delete account?' },
+  'account.deleteWarning': {
+    hr: 'Ovo trajno briše tvoj račun i sve spremljene planove. Radnja se ne može poništiti.',
+    en: 'This permanently deletes your account and all saved plans. This cannot be undone.'
+  },
+  'account.deleteConfirm': { hr: 'Obriši trajno', en: 'Delete permanently' },
+  'account.deleting': { hr: 'Brišem…', en: 'Deleting…' },
+  'account.cancel': { hr: 'Odustani', en: 'Cancel' },
+  'account.deleteError': { hr: 'Brisanje nije uspjelo. Pokušaj ponovno.', en: 'Deletion failed. Please try again.' },
 
   'pricing.freeName': { hr: 'Free', en: 'Free' },
   'pricing.freeTagline': { hr: 'Puna vrijednost, bez kartice.', en: 'Full value, no card needed.' },

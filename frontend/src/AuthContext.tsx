@@ -1,7 +1,7 @@
 // Sprint 10.63 → 10.69: app-wide auth + billing state. Holds the signed-in user (or null for a guest), whether
 // Google sign-in / Stripe billing are available, the "continue as guest" choice, and the post-checkout upgrade.
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { authLogout, confirmCheckout, fetchAuthMe, type AuthUser } from './api/client';
+import { authLogout, confirmCheckout, deleteAccount as deleteAccountApi, fetchAuthMe, type AuthUser } from './api/client';
 
 const GUEST_KEY = 'bs-guest-continue';
 
@@ -17,6 +17,7 @@ interface AuthContextValue {
   continueAsGuest: () => void;
   openSignIn: () => void;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -118,6 +119,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setUser(null);
       // Keep them in the app as a guest after signing out, rather than bouncing back to the front door.
+      setGuest(true);
+    },
+    // Sprint 10.72: GDPR erasure. The backend deletes the account + data and clears the cookie; reflect it
+    // locally by dropping the user and staying in the app as a guest. Errors propagate so the dialog can show them.
+    deleteAccount: async () => {
+      await deleteAccountApi();
+      setUser(null);
       setGuest(true);
     }
   }), [user, googleEnabled, googleClientId, billingEnabled, loading, guestContinued, justUpgraded]);

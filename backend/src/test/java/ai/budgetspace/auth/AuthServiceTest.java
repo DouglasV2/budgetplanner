@@ -177,6 +177,27 @@ class AuthServiceTest {
         verify(sessionRepository, never()).deleteById("  ");
     }
 
+    @Test
+    void deleteAccountErasesPlansSessionsAndTheUser() {
+        AppUser user = user("u9");
+
+        service.deleteAccount(user);
+
+        // GDPR erasure: the account's saved plans (owned under "user:<id>"), every session, then the account row.
+        verify(savedPlanRepository).deleteByOwner("user:u9");
+        verify(sessionRepository).deleteByUserId("u9");
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void deleteAccountIsANoOpForNull() {
+        service.deleteAccount(null);
+
+        verify(savedPlanRepository, never()).deleteByOwner(any());
+        verify(sessionRepository, never()).deleteByUserId(any());
+        verify(userRepository, never()).delete(any());
+    }
+
     private static AppUser user(String id) {
         return new AppUser(id, "sub-" + id, "e@example.com", "Name", "pic", Instant.now(), Instant.now());
     }

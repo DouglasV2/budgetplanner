@@ -13,4 +13,9 @@ public interface AuthSessionRepository extends JpaRepository<AuthSession, String
     @Modifying
     @Query("delete from AuthSession s where s.expiresAt < :now or s.lastSeenAt < :idleCutoff")
     int deleteExpired(@Param("now") Instant now, @Param("idleCutoff") Instant idleCutoff);
+
+    // Sprint 10.72: GDPR account deletion — sign the account out everywhere by dropping all its sessions.
+    @Modifying
+    @Query("delete from AuthSession s where s.userId = :userId")
+    int deleteByUserId(@Param("userId") String userId);
 }

@@ -160,6 +160,24 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.72 — Legal/GDPR scaffold + account deletion (current)
+- **GDPR "right to be forgotten":** `DELETE /api/auth/account` (authenticated; 401 for guests) erases the account
+  and ALL its data — saved plans (owned under `user:<id>`), every session, and the account row — then clears the
+  cookie. Self-scoped (no target-id param → no IDOR; a user can only delete their own account). Frontend: a
+  "Delete account" link in the footer (signed-in only) → confirm dialog → `AuthContext` drops the local user.
+  **(Gap, tracked):** a live Stripe subscription is NOT yet cancelled on deletion — billing is test-mode/dormant;
+  cancel before going live so a deleted account stops being billed.
+- **Legal scaffold:** Privacy / Terms / Impressum as footer-opened modals (the app has no router), content in a new
+  `legal.ts` (HR + EN, English fallback for other locales) tailored to the real data flows — Google profile, saved
+  plans, Stripe (we never see card data), the AI provider (prompts), eBay (listings), the single
+  strictly-necessary auth cookie. Each doc carries a "template — review with a lawyer" disclaimer; the Impressum
+  has `[fill-in]` placeholders (legally required in HR/EU).
+- Backend 232 tests / 0 failures (+2: deleteAccount erases plans+sessions+user; no-op for null); frontend build
+  clean; legal modal verified in-browser; live-boot verified (`DELETE` → 401 without auth).
+- **Next (before public launch):** rotate shared secrets, hosting + persistent DB (`HIBERNATE_DDL_AUTO` +
+  migrations — also makes AI counters/accounts/subs durable), prod Stripe webhook + cancel-on-delete, monitoring +
+  backups.
+
 ### Sprint 10.71 — Gate DesignAssistant + persistence finding (current)
 - **`DesignAssistantService` (the separate Anthropic AI path) now shares the same guardrails** as the prompt path:
   `PlanController.design` resolves the caller (a shared `resolveCaller` helper with `/generate`), and the service

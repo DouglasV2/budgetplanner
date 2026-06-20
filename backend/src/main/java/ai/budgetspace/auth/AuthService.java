@@ -2,6 +2,8 @@ package ai.budgetspace.auth;
 
 import ai.budgetspace.auth.GoogleTokenVerifier.GoogleIdentity;
 import ai.budgetspace.saved.SavedPlanRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ import java.util.UUID;
  */
 @Service
 public class AuthService {
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     // Only persist a slid lastSeenAt at most this often, so a logged-in user does not cause a DB write on every
     // request. Idle detection is then accurate to within this window — far finer than the multi-day idle limit.
@@ -173,6 +176,26 @@ public class AuthService {
         if (token != null) {
             sessionRepository.deleteById(token);
         }
+    }
+
+    /**
+     * Sprint 10.72 — GDPR erasure ("right to be forgotten"). Permanently removes everything tied to this account:
+     * the plans they saved (owned under {@code user:<id>}), all of their sessions, and the account row itself.
+     * The controller clears the session cookie afterwards.
+     *
+     * <p>NOTE: a live Stripe subscription is NOT cancelled here yet (billing is test-mode + the webhook is dormant
+     * pre-launch). Before enabling live billing, cancel the subscription on deletion so a deleted account is never
+     * billed again — see TASKS.</p>
+     */
+    @Transactional
+    public void deleteAccount(AppUser user) {
+        if (user == null) {
+            return;
+        }
+        savedPlanRepository.deleteByOwner(user.ownerKey());
+        sessionRepository.deleteByUserId(user.getId());
+        userRepository.delete(user);
+        log.info("Account deleted (GDPR erasure): user={}.", user.getId());
     }
 
     private String newId() {
