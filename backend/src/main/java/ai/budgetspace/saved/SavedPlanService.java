@@ -8,9 +8,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class SavedPlanService {
@@ -91,8 +92,14 @@ public class SavedPlanService {
         }
     }
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     private String shortId() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        // Sprint 10.67 (security audit): the share id is a capability — the /plan/<id> link is open-by-id with no
+        // auth — so it must be unguessable. 16 CSPRNG bytes = 128 bits, URL-safe; replaces the old 40-bit UUID prefix.
+        byte[] bytes = new byte[16];
+        RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     private String blankToNull(String value) {

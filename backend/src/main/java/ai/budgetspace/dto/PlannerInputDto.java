@@ -55,7 +55,9 @@ public record PlannerInputDto(
 
     public PlannerInputDto normalized() {
         return new PlannerInputDto(
-                prompt == null ? "" : prompt,
+                // Sprint 10.67 (security audit): bound the prompt so an oversized body can't run up LLM tokens
+                // or waste backend work. 4000 chars is far above any real furnishing description.
+                prompt == null ? "" : prompt.substring(0, Math.min(prompt.length(), 4000)),
                 budget <= 0 ? 1500 : budget,
                 blank(roomType) ? "living-room" : roomType,
                 blank(style) ? "bright" : style,

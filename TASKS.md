@@ -160,6 +160,29 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.67 — security hardening (from the adversarial audit) (current)
+- Ran a **12-dimension adversarial security audit** (multi-agent: review → independently verify each finding).
+  **47 raw findings → 9 confirmed, 0 critical, 0 exploitable app vulns.** Core security held: auth, IDOR/owner
+  isolation (the 10.63 namespace fix), SQL/JPQL (all parameterised), XSS (React auto-escape, no
+  dangerouslySetInnerHTML), SSRF (all outbound hosts hardcoded), secrets (.env gitignored, keys backend-only),
+  CORS (explicit allow-list) — all verified clean. The 38 dropped findings were false-positives or accepted design.
+- **Fixed now (cheap + real):** (1) prod session cookie `Secure` flag (application-prod.yml `cookie-secure:true`;
+  base dev default stays false for HTTP localhost); (2) prod `ddl-auto:validate` + `sql.init.mode:never` (was
+  `create` → wiped all data on every prod restart); (3) share-plan id → **128-bit CSPRNG** (was a 40-bit UUID
+  prefix; the /plan/<id> link is an open capability); (4) prompt length cap (4000) to bound LLM tokens / body
+  abuse; (5) stop logging the price-watch **unsubscribe token** (a bearer capability); (6) baseline
+  **SecurityHeadersFilter** (nosniff, X-Frame-Options DENY, Referrer-Policy, HSTS on HTTPS). **Backend 218 tests, 0
+  failures.**
+- **Deferred (do before PUBLIC launch / when AI goes multi-user — not urgent pre-traction):** (a) **per-account
+  AI quota** — `AiUsageTracker` caps are global + per-session (session id is attacker-controlled), so a session-
+  rotating user could exhaust the shared monthly budget and disable AI for everyone; key the quota on
+  `resolveOwnerKey` (user:/guest:) instead. (b) **Rate limiting** (none today) on `/api/auth/google`,
+  `/api/plans/generate`, `/api/price-watch` — a lightweight per-IP/owner limiter (price-watch is an unauthenticated
+  DB write → row-flooding). (c) **Flyway/Liquibase** versioned migrations (the real fix behind ddl-auto). (d)
+  **HTTPS + CSP** at the reverse proxy (CSP must allow-list Google Identity Services + retailer image hosts). (e)
+  Route `DesignAssistantService` (separate Anthropic path) through `AiUsageTracker` so its cost is capped too. (f)
+  Real `DATABASE_PASSWORD` in prod (the committed `budgetspace/budgetspace` is dev-compose only).
+
 ### Sprint 10.66 — Gemini AI provider (the "Plus" carrot) (current)
 - Monetization direction (this session): affiliate is the long-term money but **gated behind traffic** (won't get
   approved pre-traction); the core is deterministic so AI cost is **not** the risk the way it is for AI-native

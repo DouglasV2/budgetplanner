@@ -16,10 +16,11 @@ public class LoggingPriceWatchNotifier implements PriceWatchNotifier {
 
     @Override
     public void notifyPriceDrop(PriceWatchNotification n) {
-        // Mask the local part of the email so the log does not leak the full address.
-        log.info("Price-drop alert (log-only): product='{}' {} {} -> {} (-{}%) to {} [unsubscribe token={}]",
+        // Mask the local part of the email so the log does not leak the full address. Sprint 10.67 (security
+        // audit): never log the unsubscribe token — it's a bearer capability (anyone with it can unsubscribe).
+        log.info("Price-drop alert (log-only): product='{}' {} {} -> {} (-{}%) to {}",
                 n.productName(), n.market(), n.oldPrice(), n.newPrice(), n.dropPercent(),
-                maskEmail(n.email()), n.unsubscribeToken());
+                maskEmail(n.email()));
     }
 
     private String maskEmail(String email) {

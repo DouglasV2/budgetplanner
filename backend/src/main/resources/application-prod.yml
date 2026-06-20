@@ -8,12 +8,24 @@ spring:
     password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: ${HIBERNATE_DDL_AUTO:create}
+      # Sprint 10.67 (security audit): prod must NOT default to a schema-dropping strategy — `create` wipes ALL
+      # data (users, sessions, saved plans) on every restart. `validate` fails fast on a schema mismatch instead.
+      # Real schema management is Flyway/Liquibase (next deploy step); override only for a controlled bootstrap.
+      ddl-auto: ${HIBERNATE_DDL_AUTO:validate}
+  sql:
+    init:
+      # Don't re-run data.sql on every prod boot (it seeds sample rows — would duplicate/overwrite).
+      mode: ${SPRING_SQL_INIT_MODE:never}
 
 server:
   port: ${SERVER_PORT:8080}
 
 budgetspace:
+  auth:
+    session:
+      # Sprint 10.67: secure-by-default in prod — the session cookie carries the Secure flag (HTTPS only).
+      # Base default stays false (application.yml) so local HTTP dev on :5180 still receives the cookie.
+      cookie-secure: ${BUDGETSPACE_AUTH_COOKIE_SECURE:true}
   admin-endpoints:
     # Dev collector / import / catalog-health endpoints are NOT public in production.
     enabled: ${BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED:false}
