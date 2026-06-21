@@ -67,6 +67,23 @@ public final class Markets {
         return MARKETS.getOrDefault(normalize(market), MARKETS.get(DEFAULT_MARKET)).currency();
     }
 
+    /**
+     * Sprint 10.74 — a sane upper bound for a single-room furnishing budget, per currency (each roughly the same
+     * real value, ≈ EUR 9000). Used to clamp a parsed budget so it rejects absurd values WITHOUT capping a
+     * legitimate budget in a high-denomination currency (e.g. NOK/SEK where 15000 is normal, not "too big").
+     */
+    public static int budgetCeiling(String currency) {
+        return switch (currency == null ? "EUR" : currency.trim().toUpperCase(Locale.ROOT)) {
+            case "NOK", "SEK" -> 100_000;
+            case "DKK" -> 70_000;
+            case "CZK" -> 230_000;
+            case "HUF" -> 3_600_000;
+            case "PLN" -> 40_000;
+            case "RON" -> 45_000;
+            default -> 9_000; // EUR, GBP, CHF and anything else
+        };
+    }
+
     public static String localeFor(String market) {
         return MARKETS.getOrDefault(normalize(market), MARKETS.get(DEFAULT_MARKET)).locale();
     }

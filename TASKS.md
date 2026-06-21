@@ -160,6 +160,22 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.74 — Currency-correct budgets + prompt robustness audit (current)
+- **Currency bug fixed (non-EUR markets)** — two issues a live sweep surfaced:
+  (1) the AI was told the budget is in "EUR", so it **converted** foreign amounts (NOK 15000 → returned 1500 →
+  the plan targeted ~1400 NOK = 2 items instead of the real 15000 NOK). Fixed: the prompt now states the market's
+  currency and tells the model to return the budget **in that currency, no conversion**.
+  (2) the budget clamp was a hardcoded EUR-centric `[100, 9000]`, capping legitimate NOK/SEK/DKK (and high
+  EUR/GBP) budgets. Fixed: `Markets.budgetCeiling(currency)` — a per-currency ceiling (≈ €9000 of real value);
+  applied in the AI path (`sanitize` + `toPlannerInput`) and the rule-based extractor.
+- **Adversarial prompt audit (17 cases)** — empty, gibberish, off-topic, prompt-injection, SQL/HTML, emoji,
+  extreme/negative budgets, mixed-language, very-long, rude → **ALL** returned HTTP 200 with a valid plan of real
+  catalog products: **no crash, no fabrication, no leak** (injection never exposed the system prompt). The
+  deterministic planner + AI sanitisation (unknown rooms/categories/retailers dropped) hold. Garbage degrades to a
+  sensible default room rather than breaking.
+- Backend 237 tests / 0 (+2 `MarketsTest`: per-currency ceiling + `currencyFor`); currency re-sweep confirms
+  NOK/SEK/DKK now parse the real amount. AI was re-verified live across all 15 markets earlier this session.
+
 ### Sprint 10.73 — Cancel-on-delete + deploy checklist (current)
 - **Cancel-on-delete:** `AuthController.deleteAccount` now cancels any live Stripe subscription (best-effort,
   never blocks the erasure) BEFORE deleting the account — so a deleted account is never billed again. New

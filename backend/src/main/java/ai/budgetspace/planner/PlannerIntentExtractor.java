@@ -1,6 +1,7 @@
 package ai.budgetspace.planner;
 
 import ai.budgetspace.dto.PlannerInputDto;
+import ai.budgetspace.product.Markets;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -81,7 +82,12 @@ public class PlannerIntentExtractor {
         }
 
         Optional<Integer> budget = findBudget(text);
-        if (budget.isPresent()) input = input.withBudget(clamp(budget.get(), 100, 9000));
+        if (budget.isPresent()) {
+            // Sprint 10.74: currency-aware ceiling so a high-denomination budget (NOK/SEK/DKK) isn't capped at the
+            // EUR ceiling (9000). The market is the user's; the catalog prices are in that currency.
+            int ceiling = Markets.budgetCeiling(Markets.currencyFor(input.market()));
+            input = input.withBudget(clamp(budget.get(), Math.max(1, ceiling / 90), ceiling));
+        }
 
         Optional<Integer> size = firstNumber(text, Pattern.compile("(\\d{1,2})\\s*(m2|m²|kvadrat)"));
         if (size.isPresent()) input = input.withSize(clamp(size.get(), 8, 60));

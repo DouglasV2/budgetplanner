@@ -9,6 +9,7 @@ import ai.budgetspace.ai.LlmCompletionRequest;
 import ai.budgetspace.ai.LlmProperties;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.PlannerIntentAnalysisDto;
+import ai.budgetspace.product.Markets;
 import ai.budgetspace.product.ProductTaxonomy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -86,7 +87,7 @@ public class PromptIntelligenceService {
         LlmCompletion completion = client.complete(request);
 
         PlannerIntentAnalysisDto parsed = MAPPER.readValue(extractJson(completion.text()), PlannerIntentAnalysisDto.class);
-        PlannerIntentAnalysisDto sanitized = sanitize(parsed)
+        PlannerIntentAnalysisDto sanitized = sanitize(parsed, Markets.currencyFor(input.market()))
                 .withMeta(true, client.provider().name().toLowerCase(Locale.ROOT), prompt);
 
         double cost = usageTracker.estimateCostUsd(completion.inputTokens(), completion.outputTokens());
@@ -121,7 +122,8 @@ public class PromptIntelligenceService {
         String roomType = ProductTaxonomy.normalizeRoom(analysis.roomType()).orElse(base.roomType());
         String style = analysis.style() != null && KNOWN_STYLES.contains(analysis.style().toLowerCase(Locale.ROOT))
                 ? analysis.style().toLowerCase(Locale.ROOT) : base.style();
-        int budget = analysis.budget() == null ? base.budget() : clamp(analysis.budget(), 100, 9000);
+        int ceiling = Markets.budgetCeiling(Markets.currencyFor(base.market()));
+        int budget = analysis.budget() == null ? base.budget() : clamp(analysis.budget(), Math.max(1, ceiling / 90), ceiling);
         int size = analysis.roomSize() == null ? base.size() : clamp(analysis.roomSize(), 8, 60);
 
         List<String> mustHave = validCategories(analysis.mustHaveCategories());
@@ -156,26 +158,32 @@ public class PromptIntelligenceService {
                 + "kategorije ∈ [sofa, tv-unit, table, rug, lighting, storage, decor, bed, mattress, desk, chair, "
                 + "gym-equipment, dining-table, dining-chair, kitchen-storage, kitchen-cart, nightstand, wardrobe, dresser].\n"
                 + "retaileri ∈ [IKEA, JYSK]. qualityPreference ∈ [budget, balanced, premium]. "
-                + "budget i roomSize su cijeli brojevi (EUR / m²). confidence je broj 0..1. "
+                + "budget i roomSize su cijeli brojevi. budget vrati u valuti koju korisnik koristi (navedena niže) "
+                + "kao GOLI broj, BEZ pretvaranja u drugu valutu (npr. 15000 kr ostaje 15000, ne pretvaraj u eure). "
+                + "roomSize je u m². confidence je broj 0..1. "
                 + "Ako nešto nije navedeno, izostavi ili stavi null, i dodaj u missingImportantInfo. "
                 + "userGoalSummary i normalizedPrompt napiši na hrvatskom.";
     }
 
     private String userPrompt(PlannerInputDto input, String prompt) {
+        String currency = Markets.currencyFor(input.market());
         StringBuilder context = new StringBuilder();
+        context.append("Valuta tržišta: ").append(currency)
+                .append(" — budget vrati u ovoj valuti, bez pretvaranja.\n");
         if (input.roomType() != null) context.append("Korisnik je već odabrao sobu: ").append(input.roomType()).append("\n");
-        if (input.budget() > 0) context.append("Već upisan budžet: ").append(input.budget()).append(" EUR\n");
+        if (input.budget() > 0) context.append("Već upisan budžet: ").append(input.budget()).append(" ").append(currency).append("\n");
         if (input.style() != null) context.append("Već odabran stil: ").append(input.style()).append("\n");
         return context + "Opis korisnika:\n" + (prompt == null || prompt.isBlank() ? "(prazno)" : prompt);
     }
 
     // --- sanitisation / mapping helpers ---
 
-    private PlannerIntentAnalysisDto sanitize(PlannerIntentAnalysisDto a) {
+    private PlannerIntentAnalysisDto sanitize(PlannerIntentAnalysisDto a, String currency) {
         String roomType = ProductTaxonomy.normalizeRoom(a.roomType()).orElse(null);
         String style = a.style() != null && KNOWN_STYLES.contains(a.style().toLowerCase(Locale.ROOT))
                 ? a.style().toLowerCase(Locale.ROOT) : null;
-        Integer budget = a.budget() == null ? null : clamp(a.budget(), 100, 9000);
+        int ceiling = Markets.budgetCeiling(currency);
+        Integer budget = a.budget() == null ? null : clamp(a.budget(), Math.max(1, ceiling / 90), ceiling);
         Integer size = a.roomSize() == null ? null : clamp(a.roomSize(), 8, 60);
         String quality = a.qualityPreference() != null && QUALITY_PREFERENCES.contains(a.qualityPreference().toLowerCase(Locale.ROOT))
                 ? a.qualityPreference().toLowerCase(Locale.ROOT) : null;
