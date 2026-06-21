@@ -4305,6 +4305,30 @@ textarea {
   font-weight: 700;
 }
 
+/* Sprint 10.78: "refining with AI" chip shown under the form while the instant draft is on screen. */
+.planner-refining {
+  margin: 12px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #5b6472;
+}
+
+.planner-refining::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--orange);
+  animation: refining-pulse 1s ease-in-out infinite;
+}
+
+@keyframes refining-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
 /* Sprint 10.74 (C): low-confidence nudge — a friendly, non-blocking hint shown above a guessed plan. */
 .planner-lowconf-nudge {
   margin: 18px 0 0;

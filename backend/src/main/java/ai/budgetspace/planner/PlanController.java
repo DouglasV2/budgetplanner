@@ -44,6 +44,14 @@ public class PlanController {
         return response.withAnalysis(analysis);
     }
 
+    // Sprint 10.78: an INSTANT deterministic plan (rule-based parse, no AI/LLM call, no auth needed) so the
+    // frontend can paint a draft in ~50ms while /api/plans/generate refines it with AI in the background — the
+    // user no longer stares at a ~2s spinner. No tier gating here because no AI call happens.
+    @PostMapping("/api/plans/generate-fast")
+    public PlanGenerationResponse generateFast(@RequestBody PlannerInputDto input) {
+        return plannerService.generate(input);
+    }
+
     @PostMapping("/api/plans/replace")
     public FurnishingPlanDto replaceProduct(@RequestBody ReplaceProductRequest request) {
         return plannerService.replaceProduct(request);

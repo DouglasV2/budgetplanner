@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { generatePlan, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
+import { generatePlan, generatePlanFast, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
+import type { PlanGenerationResponse } from '../api/client';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
 import { detectMarketFromText, marketConfig } from '../markets';
@@ -211,6 +212,8 @@ export function Planner() {
   // Sprint 10.74 (C): the prompt the user actually typed, captured at submit (response.input.prompt is cleared on
   // the AI path). Used to show a gentle "I wasn't sure — describe a room + budget" nudge on low-confidence input.
   const [submittedPrompt, setSubmittedPrompt] = useState('');
+  // Sprint 10.78: true while the instant rule-based draft is shown and the AI refine is still in flight.
+  const [refining, setRefining] = useState(false);
   // Sprint 10.51: the separate "Rabljeno" (second-hand) suggestions — kept entirely out of every plan total.
   const [secondHand, setSecondHand] = useState<Product[]>([]);
   // Sprint 10.61: the active "space" (home) that new room-plans save into; default "Moj dom".
@@ -299,33 +302,60 @@ export function Planner() {
     setDesign(null);
     setAnalysis(null);
     setSecondHand([]);
+    setRefining(false);
+
+    // Sprint 10.78: two-phase generate. Paint an INSTANT deterministic draft (~50ms) so the user isn't staring
+    // at a ~2s spinner, then refine it with the AI result (which we kick off immediately, in parallel).
+    const aiPromise = generatePlan(effectiveInput);
+    let shown = false;     // has any plan been rendered?
+    let aiLanded = false;  // did the AI result already replace the draft?
 
     try {
-      const response = await generatePlan(effectiveInput);
-      setSubmittedPrompt((effectiveInput.prompt ?? '').trim()); // before setInput clears it on the AI path
-      setInput({ ...response.input, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
-      setPlans(response.plans);
-      setAnalysis(response.intentAnalysis ?? null);
-      setSecondHand(response.secondHandSuggestions ?? []);
-      const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
-      if (!hasAnyItems) {
-        setPartialNotice(t('planner.partialNone'));
-      } else {
-        setPartialNotice(response.partialPlan ? (response.catalogWarning ?? t('planner.partialBest')) : null);
+      const draft = await generatePlanFast(effectiveInput);
+      if (!aiLanded) {
+        applyResponse(draft, effectiveInput, false);
+        shown = true;
+        setRefining(true);    // plan is visible; AI is sharpening it
+        setIsLoading(false);
       }
+    } catch {
+      // Fast path failed — the AI result (or its error) drives the UI below.
+    }
+
+    try {
+      const ai = await aiPromise;
+      aiLanded = true;
+      applyResponse(ai, effectiveInput, true);
+      shown = true;
+    } catch (apiError) {
+      if (!shown) {
+        setError(apiError instanceof Error ? apiError.message : t('planner.errorUnavailable'));
+      }
+      // else: AI failed but the deterministic draft is already shown — keep it (graceful).
+    } finally {
+      setRefining(false);
+      setIsLoading(false);
+    }
+  }
+
+  // Sprint 10.78: render a plan response. isFinal=true only for the AI (authoritative) result — only then do we
+  // count the generation, fetch the AI design summary, and capture the typed prompt for the low-confidence nudge.
+  function applyResponse(response: PlanGenerationResponse, effectiveInput: PlannerInput, isFinal: boolean) {
+    setInput({ ...response.input, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
+    setPlans(response.plans);
+    setAnalysis(response.intentAnalysis ?? null);
+    setSecondHand(response.secondHandSuggestions ?? []);
+    const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
+    setPartialNotice(!hasAnyItems
+      ? t('planner.partialNone')
+      : (response.partialPlan ? (response.catalogWarning ?? t('planner.partialBest')) : null));
+    if (isFinal) {
+      setSubmittedPrompt((effectiveInput.prompt ?? '').trim());
       setGenerationCount((count) => count + 1);
-      // Sprint 10.8: fetch the design-assistant description. Non-blocking: if it fails the plan still shows.
+      // Non-blocking AI design description: if it fails the plan still shows.
       getDesignSummary(response)
         .then((summary) => setDesign(summary))
         .catch(() => setDesign(null));
-    } catch (apiError) {
-      setError(
-        apiError instanceof Error
-          ? apiError.message
-          : t('planner.errorUnavailable')
-      );
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -515,6 +545,10 @@ export function Planner() {
       <div className="planner-layout">
         <div className="planner-panel">
           <PlannerForm input={input} onChange={setInput} onGenerate={handleGenerate} isLoading={isLoading} />
+          {/* Sprint 10.78: the draft plan is already on the right; the AI is sharpening it in the background. */}
+          {refining && plans.length > 0 && (
+            <p className="planner-refining" role="status">{t('planner.refining')}</p>
+          )}
         </div>
         <PlanResults
           plans={plans}

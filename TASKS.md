@@ -160,6 +160,17 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.78 — Instant plan + AI refine (kill the 2s wait) (current)
+- Generation no longer makes the user stare at a ~2s LLM spinner. **Two-phase:** the frontend fires a fast
+  deterministic plan AND the AI plan in parallel — paints the **rule-based draft in ~0.13s** (spinner off), shows
+  a subtle "Refining your plan with AI…" chip, then swaps in the AI-refined plan when it lands (~2s). If the AI
+  fails, the draft stays (graceful). Measured: `generate-fast` ~0.13s warm vs `generate` ~2.7s.
+- New `POST /api/plans/generate-fast` — rule-based plan only (no AI/LLM, **no auth/tier gating** since no AI
+  call). `generatePlanFast` on the client; `runGeneration` refactored into two phases + an `applyResponse` helper
+  (only the final AI result counts the generation, fetches the design summary, and feeds the low-confidence
+  nudge — the draft has no intentAnalysis, so no premature insight card/nudge).
+- Backend 237 tests / 0; frontend build clean; live-boot verified (fast 0.13s, AI 2.7s, `aiUsed:true`).
+
 ### Sprint 10.77 — Catalog cleanup + verified ES kitchen sourcing (current)
 - **Cleanup — 143 dead "global" rows removed.** `data.sql` seeded 143 unverified sample products (generic
   homepage URLs, Unsplash images, no market, no `sourceReference`) — never plan-eligible, just dead rows.

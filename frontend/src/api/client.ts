@@ -90,6 +90,16 @@ export function generatePlan(input: PlannerInput) {
   });
 }
 
+// Sprint 10.78: instant deterministic (rule-based, no AI) plan — shown as a draft while generatePlan refines
+// it with AI in the background, so the user sees a plan in ~50ms instead of waiting ~2s for the LLM.
+export function generatePlanFast(input: PlannerInput) {
+  return request<PlanGenerationResponse>('/api/plans/generate-fast', {
+    method: 'POST',
+    headers: { 'X-BudgetSpace-Session': sessionId() },
+    body: JSON.stringify(input)
+  });
+}
+
 // Sprint 10.42: geo-IP market hint. Reads the visitor's country (2-letter ISO) that a CDN/proxy injected
 // as a request header; null when none is present (local/no-CDN). Best-effort — never throws.
 export async function fetchGeoCountry(): Promise<string | null> {
