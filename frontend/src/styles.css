@@ -4305,6 +4305,18 @@ textarea {
   font-weight: 700;
 }
 
+/* Sprint 10.74 (C): low-confidence nudge — a friendly, non-blocking hint shown above a guessed plan. */
+.planner-lowconf-nudge {
+  margin: 18px 0 0;
+  border: 1px solid #f0d9a8;
+  background: #fff6e6;
+  color: #7a5a13;
+  border-radius: 14px;
+  padding: 12px 16px;
+  line-height: 1.5;
+  font-weight: 560;
+}
+
 /* Sprint 10.10: discreet, value-first pricing. */
 .pricing-grid {
   display: grid;

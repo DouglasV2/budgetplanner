@@ -160,6 +160,22 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.75 — Low-confidence nudge (C) + multilingual room parsing (current)
+- **C — low-confidence nudge:** when the AI ran but couldn't tell what was asked (garbage / off-topic / very-vague
+  typed prompt → `confidence < 0.4`), the plan **still renders** (never blocks the funnel) but a friendly,
+  non-blocking note nudges the user to describe a room + budget — instead of silently presenting a guessed
+  living-room as if it were the request. The misleading "AI understood" card is suppressed in that case.
+  Frontend-only (confidence is already in the response; gated on `aiUsed` + a non-empty typed prompt).
+- **Multilingual room parsing fixed:** a broad sweep (15 markets × 3 rooms, each in the market's own language)
+  found the AI was HR/EN-centric and misparsed foreign room words to living-room (FR "chambre" → living-room even
+  in a full sentence; terse GB "kitchen" → living-room). The system prompt now states the input may be in ANY
+  supported language and MUST map the named room to the canonical value (cuisine/Küche/kuhinja → kitchen;
+  chambre/Schlafzimmer → bedroom; …), never substituting living-room for a named room. **Re-sweep: 45/45 rooms
+  correct (was 33/45).**
+- **Robustness re-confirmed** after the prompt change: the 17-case adversarial sweep stays all-200, no
+  crash/leak/fabrication; garbage still degrades to a safe default (now surfaced honestly via the C nudge).
+- Backend 237 tests / 0; frontend build clean; C verified to render (app loads clean, no console errors).
+
 ### Sprint 10.74 — Currency-correct budgets + prompt robustness audit (current)
 - **Currency bug fixed (non-EUR markets)** — two issues a live sweep surfaced:
   (1) the AI was told the budget is in "EUR", so it **converted** foreign amounts (NOK 15000 → returned 1500 →

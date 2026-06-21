@@ -208,6 +208,9 @@ export function Planner() {
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
   const [design, setDesign] = useState<DesignAssistant | null>(null);
   const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
+  // Sprint 10.74 (C): the prompt the user actually typed, captured at submit (response.input.prompt is cleared on
+  // the AI path). Used to show a gentle "I wasn't sure — describe a room + budget" nudge on low-confidence input.
+  const [submittedPrompt, setSubmittedPrompt] = useState('');
   // Sprint 10.51: the separate "Rabljeno" (second-hand) suggestions — kept entirely out of every plan total.
   const [secondHand, setSecondHand] = useState<Product[]>([]);
   // Sprint 10.61: the active "space" (home) that new room-plans save into; default "Moj dom".
@@ -299,6 +302,7 @@ export function Planner() {
 
     try {
       const response = await generatePlan(effectiveInput);
+      setSubmittedPrompt((effectiveInput.prompt ?? '').trim()); // before setInput clears it on the AI path
       setInput({ ...response.input, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
       setPlans(response.plans);
       setAnalysis(response.intentAnalysis ?? null);
@@ -456,6 +460,12 @@ export function Planner() {
     await runGeneration(nextInput);
   }
 
+  // Sprint 10.74 (C): the AI ran but wasn't sure what was asked (garbage / off-topic / very-vague typed prompt).
+  // We still show a plan (never block the funnel), but nudge the user to describe a room + budget rather than
+  // silently presenting a guessed room as if it were exactly what they asked for.
+  const lowConfidence = !!analysis && analysis.aiUsed === true && submittedPrompt.length > 0
+    && (analysis.confidence ?? 1) < 0.4;
+
   return (
     <section className="planner-section shell" id="planner">
       <div className="section-heading left planner-heading-row">
@@ -523,7 +533,11 @@ export function Planner() {
         />
       </div>
 
-      {analysis && plans.length > 0 && (analysis.userGoalSummary || (analysis.missingImportantInfo?.length ?? 0) > 0) && (
+      {lowConfidence && plans.length > 0 && (
+        <p className="planner-lowconf-nudge" role="note">{t('planner.lowConfidenceNudge')}</p>
+      )}
+
+      {!lowConfidence && analysis && plans.length > 0 && (analysis.userGoalSummary || (analysis.missingImportantInfo?.length ?? 0) > 0) && (
         <section className="ai-insight-card" aria-label={t('planner.aiInsightAria')}>
           <div className="ai-insight-head">
             <span>{analysis.aiUsed ? t('planner.aiUnderstood') : t('planner.weUnderstood')}</span>
