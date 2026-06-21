@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
-import { LegalModal } from './LegalModal';
-import { DeleteAccountDialog } from './DeleteAccountDialog';
 import type { LegalKey } from '../legal';
+
+// Sprint 10.76 (perf): the legal docs (legal.ts ~8KB) and the modals only ever render on a footer click, so
+// lazy-load them off the critical path — the landing/hero shell no longer ships this code on first load.
+const LegalModal = lazy(() => import('./LegalModal').then((m) => ({ default: m.LegalModal })));
+const DeleteAccountDialog = lazy(() => import('./DeleteAccountDialog').then((m) => ({ default: m.DeleteAccountDialog })));
 
 export function Footer() {
   const { t } = useLocale();
@@ -27,8 +30,16 @@ export function Footer() {
         )}
         <a href="#top">{t('footer.backToTop')}</a>
       </nav>
-      <LegalModal docKey={legal} onClose={() => setLegal(null)} />
-      {deleting && <DeleteAccountDialog onClose={() => setDeleting(false)} />}
+      {legal && (
+        <Suspense fallback={null}>
+          <LegalModal docKey={legal} onClose={() => setLegal(null)} />
+        </Suspense>
+      )}
+      {deleting && (
+        <Suspense fallback={null}>
+          <DeleteAccountDialog onClose={() => setDeleting(false)} />
+        </Suspense>
+      )}
     </footer>
   );
 }

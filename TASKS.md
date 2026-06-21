@@ -160,6 +160,24 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.76 — Performance pass (measured, not guessed) (current)
+- **Adversarial perf audit** (render / images / bundle — each finding benchmarked + independently verified): 18
+  raw → **4 confirmed worth-fixing, 0 high**. The suspected "re-render storm on every keystroke" was **dismissed
+  after measurement** (the re-rendered subtree is ~100-200 elements of µs-cheap work, stable-prop images; no
+  user-visible jank) — avoided a premature refactor. Confirmed + fixed:
+  - **`formatCurrency` cached** — it built a fresh `Intl.NumberFormat` (~95µs) 40-80× per plan render; now reused
+    from a per-`locale|currency` Map. Removes a real per-render CPU cost.
+  - **React vendor chunk** — `manualChunks` splits React/ReactDOM (~45KB gz) into a stable `vendor` chunk so it
+    stays cached across the frequent app-only deploys. App chunk **91KB → 43KB gz** (+ 45KB now-cacheable vendor).
+  - **Legal modals lazy-loaded** — `LegalModal` + `legal.ts` (~3.3KB gz) load only on a footer click, off the
+    critical path.
+  - **Fallback product images 900px → 240px** (Unsplash `w`/`q`) — 5–10× fewer bytes per placeholder (rendered
+    into ≤112px boxes; already `loading="lazy"`).
+  - *Skipped with reason:* code-splitting `PlanResults` — it renders the initial empty-state on load, so deferring
+    it needs a refactor not worth the optimistic ~20KB on a non-critical 91KB bundle.
+- Backend latency is fine (measured): `/design` 0.02s, `/me` 0.01s; `/generate` ~2s is the inherent Gemini call
+  (covered by the loading state), not jank. Frontend build clean; lazy legal modal verified in-browser.
+
 ### Sprint 10.75 — Low-confidence nudge (C) + multilingual room parsing (current)
 - **C — low-confidence nudge:** when the AI ran but couldn't tell what was asked (garbage / off-topic / very-vague
   typed prompt → `confidence < 0.4`), the plan **still renders** (never blocks the funnel) but a friendly,

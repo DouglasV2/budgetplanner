@@ -202,11 +202,22 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
   ].filter(Boolean).join('\n');
 }
 
+// Sprint 10.76 (perf): cache the currency formatter per locale|currency. Constructing Intl.NumberFormat is
+// ~100x slower than calling .format() on a cached instance, and formatCurrency runs dozens of times per plan
+// render — so a tiny module-level cache (≤16 entries, one per market) removes a real per-render CPU cost.
+const currencyFormatters = new Map<string, Intl.NumberFormat>();
+
 export function formatCurrency(amount: number, market?: string) {
   const config = marketConfig(market ?? activeMarket);
-  return new Intl.NumberFormat(config.locale, {
-    style: 'currency',
-    currency: config.currency,
-    maximumFractionDigits: 0
-  }).format(amount);
+  const key = `${config.locale}|${config.currency}`;
+  let formatter = currencyFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(config.locale, {
+      style: 'currency',
+      currency: config.currency,
+      maximumFractionDigits: 0
+    });
+    currencyFormatters.set(key, formatter);
+  }
+  return formatter.format(amount);
 }
