@@ -160,6 +160,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.77 — Catalog cleanup + verified ES kitchen sourcing (current)
+- **Cleanup — 143 dead "global" rows removed.** `data.sql` seeded 143 unverified sample products (generic
+  homepage URLs, Unsplash images, no market, no `sourceReference`) — never plan-eligible, just dead rows.
+  Deleted `data.sql`; dev `spring.sql.init.mode` → `never` (prod already used `never`, so prod never had them).
+  Catalog is now exactly the verified `RealCatalogSeeder` snapshots: **products 2062 → 1924, 0 null-market rows.**
+  *(Caught + fixed a boot break first: a comment-only `data.sql` made Spring throw "'script' must not be null or
+  empty" — found via live boot, not tests.)*
+- **Verified ES kitchen sourcing (no fabrication).** ES was the thinnest kitchen market (5 items). Added 5 real
+  IKEA ES products (RÅSKOG/BEKVÄM/FÖRHÖJA/NISSAFORS carts + RANARP pendant) — name + EUR price + og:image read
+  off `ikea.com/es` on 2026-06-21 (same product IDs as the HR catalog; **reviews left null — not verified**).
+  **ES kitchen 5 → 10.** New `/catalog/real-ikea-es-kitchen.json` + seeder entry. Pipeline proven: WebFetch
+  confirms IKEA name/price/image, and the existing RÅSKOG HR price still matches → the catalog is accurate.
+- **Home-gym — NOT sourced (honest finding).** IKEA's DAJLIEN fitness range is a discontinued limited collection
+  ("trenutno nema proizvoda" on ikea.com/hr); IKEA isn't a gym retailer. Home-gym needs a sports retailer
+  (Decathlon) or to be de-scoped — flagged, not forced. ES kitchen-**storage** is also still thin (follow-up).
+- Live-boot verified (1924 products, ES kitchen plan works, aiUsed:true).
+
 ### Sprint 10.76 — Performance pass (measured, not guessed) (current)
 - **Adversarial perf audit** (render / images / bundle — each finding benchmarked + independently verified): 18
   raw → **4 confirmed worth-fixing, 0 high**. The suspected "re-render storm on every keystroke" was **dismissed

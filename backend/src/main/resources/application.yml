@@ -8,7 +8,7 @@ spring:
   jpa:
     hibernate:
       # Overridable via env (HIBERNATE_DDL_AUTO). Default 'create' keeps the dev/pilot flow where
-      # the schema is rebuilt and data.sql + RealCatalogSeeder repopulate it on each start.
+      # the schema is rebuilt and RealCatalogSeeder repopulates it on each start.
       ddl-auto: ${HIBERNATE_DDL_AUTO:create}
     defer-datasource-initialization: true
     open-in-view: false
@@ -17,7 +17,10 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: always
+      # Sprint 10.77: never run data.sql — the catalog is seeded only by RealCatalogSeeder (verified
+      # /catalog/real-*.json). data.sql used to add 143 unverified sample rows (never plan-eligible); removed.
+      # (application-prod.yml already used 'never'.)
+      mode: ${SPRING_SQL_INIT_MODE:never}
   jackson:
     property-naming-strategy: LOWER_CAMEL_CASE
 

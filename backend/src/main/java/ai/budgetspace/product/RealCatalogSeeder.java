@@ -196,7 +196,10 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // /gb/en/ (English name + GBP price + verified og:image, read off ikea.com/gb/en 2026-06-19). 48
             // products across all rooms, deduped, every planner cell >=1. IKEA-only for now (JYSK has no UK
             // stores); eBay runs a real EBAY_GB site, so "Rabljeno" can cover the UK once the eBay key is set.
-            "/catalog/real-ikea-gb-rooms.json"
+            "/catalog/real-ikea-gb-rooms.json",
+            // Sprint 10.77: kitchen depth for Spain (the thinnest kitchen market). Verified IKEA ES carts +
+            // pendant, EUR prices + og:image read off ikea.com/es on 2026-06-21 (reviews left null — not verified).
+            "/catalog/real-ikea-es-kitchen.json"
     );
 
     /**
