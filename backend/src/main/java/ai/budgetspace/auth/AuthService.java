@@ -1,7 +1,9 @@
 package ai.budgetspace.auth;
 
 import ai.budgetspace.auth.GoogleTokenVerifier.GoogleIdentity;
+import ai.budgetspace.pricewatch.PriceWatchRepository;
 import ai.budgetspace.saved.SavedPlanRepository;
+import ai.budgetspace.tracking.PlusInterestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,8 @@ public class AuthService {
     private final AppUserRepository userRepository;
     private final AuthSessionRepository sessionRepository;
     private final SavedPlanRepository savedPlanRepository;
+    private final PriceWatchRepository priceWatchRepository;
+    private final PlusInterestRepository plusInterestRepository;
     private final AuthProperties properties;
     private final SecureRandom random = new SecureRandom();
 
@@ -52,11 +56,15 @@ public class AuthService {
                        AppUserRepository userRepository,
                        AuthSessionRepository sessionRepository,
                        SavedPlanRepository savedPlanRepository,
+                       PriceWatchRepository priceWatchRepository,
+                       PlusInterestRepository plusInterestRepository,
                        AuthProperties properties) {
         this.verifier = verifier;
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.savedPlanRepository = savedPlanRepository;
+        this.priceWatchRepository = priceWatchRepository;
+        this.plusInterestRepository = plusInterestRepository;
         this.properties = properties;
     }
 
@@ -185,6 +193,10 @@ public class AuthService {
      *
      * <p>Sprint 10.73: the controller cancels any live Stripe subscription (best-effort) BEFORE calling this, so a
      * deleted account is never billed again.</p>
+     *
+     * <p>Sprint 10.81: GDPR Art. 17 also erases the account's email from the price-drop watches and the Plus
+     * waitlist (matched case-insensitively by email — the only other places that store it), so no PII of the
+     * deleted user survives. These are the only entities besides the account row that carry an email.</p>
      */
     @Transactional
     public void deleteAccount(AppUser user) {
@@ -193,8 +205,18 @@ public class AuthService {
         }
         savedPlanRepository.deleteByOwner(user.ownerKey());
         sessionRepository.deleteByUserId(user.getId());
+        // GDPR Art. 17: the account's email also lives in price-drop watches and the Plus waitlist — erase those
+        // by email too, else the subscriber's only PII outlives the account they just deleted.
+        int watches = 0;
+        int interests = 0;
+        String email = user.getEmail();
+        if (email != null && !email.isBlank()) {
+            watches = priceWatchRepository.deleteByEmailIgnoreCase(email);
+            interests = plusInterestRepository.deleteByEmailIgnoreCase(email);
+        }
         userRepository.delete(user);
-        log.info("Account deleted (GDPR erasure): user={}.", user.getId());
+        log.info("Account deleted (GDPR erasure): user={}, priceWatches={}, plusInterest={}.",
+                user.getId(), watches, interests);
     }
 
     private String newId() {

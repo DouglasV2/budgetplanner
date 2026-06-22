@@ -160,6 +160,22 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.81 — GDPR erasure completeness (Art. 17) (current)
+- **Account deletion now erases ALL of the user's PII, not just their plans.** `AuthService.deleteAccount`
+  previously dropped saved plans + sessions + the account row but left the user's **email** behind in two tables:
+  `price_watches` (the price-drop subscriber email — labelled "the only PII") and `plus_interest` (the Plus
+  waitlist email). Those rows survived "delete my account" forever — a direct Art. 17 (right-to-erasure) gap for
+  an EU-targeted paid app.
+- **Fix:** added `deleteByEmailIgnoreCase` (a `@Modifying`/`@Query` bulk delete, matching the existing
+  `deleteByOwner` pattern) to `PriceWatchRepository` + `PlusInterestRepository`; `deleteAccount` now calls both
+  with the account's email (guarded for a null/blank email) and logs the row counts. An **adversarial completeness
+  sweep** confirmed these two + the account row are the **only** entities that store an email — nothing else is
+  missed.
+- Matched by **email** (case-insensitive), not session id: the browser session id is anonymous and an account
+  spans browsers, so the email is the reliable erasure key. `AuthServiceTest`: extended the deletion test to
+  assert both purges, + a new test that a null-email account is still fully erased without a blanket delete.
+  Backend **239 tests / 0** (was 238).
+
 ### Sprint 10.80 — Kitchen depth across 12 thin markets (verified, no fabrication) (current)
 - **+33 real IKEA products** filling the kitchen gap in every market that only had ~5–14 items: the two iconic
   carts **RÅSKOG** (art. 30586783) + **NISSAFORS** (art. 40465733) and the **TORNVIKEN** wall shelf (art. 60391661),

@@ -1,7 +1,9 @@
 package ai.budgetspace.auth;
 
 import ai.budgetspace.auth.GoogleTokenVerifier.GoogleIdentity;
+import ai.budgetspace.pricewatch.PriceWatchRepository;
 import ai.budgetspace.saved.SavedPlanRepository;
+import ai.budgetspace.tracking.PlusInterestRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -13,6 +15,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -29,6 +32,8 @@ class AuthServiceTest {
     private AppUserRepository userRepository;
     private AuthSessionRepository sessionRepository;
     private SavedPlanRepository savedPlanRepository;
+    private PriceWatchRepository priceWatchRepository;
+    private PlusInterestRepository plusInterestRepository;
     private AuthService service;
 
     @BeforeEach
@@ -37,9 +42,12 @@ class AuthServiceTest {
         userRepository = mock(AppUserRepository.class);
         sessionRepository = mock(AuthSessionRepository.class);
         savedPlanRepository = mock(SavedPlanRepository.class);
+        priceWatchRepository = mock(PriceWatchRepository.class);
+        plusInterestRepository = mock(PlusInterestRepository.class);
         when(userRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(sessionRepository.save(any(AuthSession.class))).thenAnswer(invocation -> invocation.getArgument(0));
         service = new AuthService(verifier, userRepository, sessionRepository, savedPlanRepository,
+                priceWatchRepository, plusInterestRepository,
                 new AuthProperties("client-123", 30, 7, false));
     }
 
@@ -186,6 +194,22 @@ class AuthServiceTest {
         // GDPR erasure: the account's saved plans (owned under "user:<id>"), every session, then the account row.
         verify(savedPlanRepository).deleteByOwner("user:u9");
         verify(sessionRepository).deleteByUserId("u9");
+        // ...and the email PII that lives outside the account row: price-drop watches + the Plus waitlist.
+        verify(priceWatchRepository).deleteByEmailIgnoreCase("e@example.com");
+        verify(plusInterestRepository).deleteByEmailIgnoreCase("e@example.com");
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void deleteAccountStillErasesTheAccountWhenEmailIsMissing() {
+        // Defensive: an account with no email (shouldn't happen via Google, but guard it) is still fully erased,
+        // and we don't issue a blanket delete against the email-keyed tables.
+        AppUser user = new AppUser("u10", "sub-u10", null, "Name", "pic", Instant.now(), Instant.now());
+
+        service.deleteAccount(user);
+
+        verify(priceWatchRepository, never()).deleteByEmailIgnoreCase(anyString());
+        verify(plusInterestRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(userRepository).delete(user);
     }
 
@@ -195,6 +219,8 @@ class AuthServiceTest {
 
         verify(savedPlanRepository, never()).deleteByOwner(any());
         verify(sessionRepository, never()).deleteByUserId(any());
+        verify(priceWatchRepository, never()).deleteByEmailIgnoreCase(anyString());
+        verify(plusInterestRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(userRepository, never()).delete(any());
     }
 
