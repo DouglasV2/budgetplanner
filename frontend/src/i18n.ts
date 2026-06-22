@@ -492,6 +492,9 @@ const DICTIONARY: Record<string, Entry> = {
   // card (upgrade / sign-in / see-pricing), so the message no longer points "below".
   'plus.saveLimitUpsell': { hr: 'Dosegao si limit besplatnih spremljenih planova (3). Plus otključava neograničeno spremanje, AI asistenta i alerte.', en: 'You\'ve hit the Free saved-plan limit (3). Plus unlocks unlimited saving, the AI assistant and price alerts.' },
   'plus.seePricing': { hr: 'Pogledaj Plus', en: 'See Plus' },
+  // Sprint 10.89: shown when AI is on but a non-Plus owner's daily AI allowance is spent (plan fell back to rule-based).
+  'plus.aiUpsell': { hr: 'Iskoristio si današnji besplatni AI. Plus = AI asistent koji razumije tvoj prompt i objašnjava plan — praktički neograničeno.', en: 'You\'ve used today\'s free AI. Plus = an AI assistant that understands your prompt and explains the plan — practically unlimited.' },
+  'plus.dismiss': { hr: 'Sakrij', en: 'Dismiss' },
   // Sprint 10.54: feedback that acts. After the user rates the plan, offer the one-click fix for the complaint.
   'results.feedbackThanks': { hr: 'Hvala — drago nam je da pomaže.', en: 'Thanks — glad it helps.' },
   'results.feedbackThanksActable': { hr: 'Hvala. Da to odmah složim?', en: 'Thanks. Want me to sort that now?' },

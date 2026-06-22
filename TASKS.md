@@ -160,6 +160,21 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.89 — Free→Plus: surface the AI carrot where it bites (current)
+- **The AI assistant is the stated Plus carrot, but the funnel never showed it at the value moment.** When a
+  Free/guest owner's daily AI allowance is spent, the prompt silently falls back to the rule-based parser — no hint
+  that Plus unlocks practically-unlimited AI. Now a contextual nudge appears at exactly that moment.
+- **Precise signal (not a false nudge):** added `aiEnabled` to `GET /api/auth/me`
+  (`LlmClientFactory.activeClient().isPresent()`), so the frontend distinguishes "AI is on but you're capped"
+  (upgrading helps) from "AI is off entirely" (it wouldn't). The nudge shows only when
+  `aiEnabled && !analysis.aiUsed && !isPlus` — so with AI off (the current default) it **never** shows.
+- Dismissible card reusing the 10.88 upsell pattern; the upgrade CTA was extracted into a shared `upsellCta()`
+  (DRY across the save-limit and AI upsells). `AuthMeResponse`/`AuthController` + `client.ts`/`AuthContext` +
+  `Planner.tsx` + 2 i18n keys + CSS.
+- **Verified:** backend compiles + 249 tests green (AuthController DI + the new DTO field); frontend `tsc` build
+  clean. (Docker Desktop was down, so the runtime `/api/auth/me` field + the live nudge — which also needs a Gemini
+  key, off in dev — are build-verified, not yet exercised in a browser.)
+
 ### Sprint 10.88 — Free→Plus: actionable save-limit upsell (current)
 - **The one real conversion trigger was a dead end.** When a Free/guest owner hit the 3-plan save cap, the backend
   returned 402 and the frontend showed a **passive toast** ("…see pricing below") — the user then had to scroll and

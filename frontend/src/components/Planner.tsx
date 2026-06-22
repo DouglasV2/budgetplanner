@@ -191,7 +191,8 @@ export function Planner() {
   const { market, config, setMarket, t } = useLocale();
   // Sprint 10.63: real auth. When the signed-in user changes (sign-in/out), the saved-plans inbox refetches so
   // the now account-owned plans (migrated from the guest session on first sign-in) appear.
-  const { user, openSignIn, billingEnabled } = useAuth();
+  const { user, openSignIn, billingEnabled, aiEnabled } = useAuth();
+  const isPlus = user?.plan === 'PLUS' || user?.plan === 'PRO';
   // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
   // the active market's language (the user can then edit freely).
   const [input, setInput] = useState<PlannerInput>(() => ({ ...initialInput, prompt: t('planner.examplePrompt'), market }));
@@ -209,6 +210,9 @@ export function Planner() {
   // Sprint 10.88: the actionable Plus upsell card, shown when a save hits the Free 3-plan cap (402).
   const [saveLimitHit, setSaveLimitHit] = useState(false);
   const [upgradeBusy, setUpgradeBusy] = useState(false);
+  // Sprint 10.89: the "Plus = more AI" nudge, shown when AI is on but this plan fell back to rule-based for a
+  // non-Plus owner (i.e. their tier's AI allowance is spent). Dismissible for the session.
+  const [aiNudgeDismissed, setAiNudgeDismissed] = useState(false);
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
   const [design, setDesign] = useState<DesignAssistant | null>(null);
   const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
@@ -433,7 +437,25 @@ export function Planner() {
   // For guests / when billing is off: take them to the pricing section (sign-in for Plus, or the waitlist).
   function goToPricing() {
     setSaveLimitHit(false);
+    setAiNudgeDismissed(true);
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Sprint 10.88/10.89: the upgrade CTA shared by the save-limit and AI-allowance upsells. Signed-in + billing on
+  // → real Stripe checkout; guest + billing on → sign in (an account is needed to subscribe); billing off →
+  // the pricing section (sign-in / waitlist).
+  function upsellCta() {
+    if (billingEnabled && user) {
+      return (
+        <button type="button" className="planner-upsell-cta" onClick={() => void startUpgrade()} disabled={upgradeBusy}>
+          {upgradeBusy ? t('pricing.redirecting') : t('pricing.upgradeCta')}
+        </button>
+      );
+    }
+    if (billingEnabled) {
+      return <button type="button" className="planner-upsell-cta" onClick={openSignIn}>{t('pricing.signInForPlus')}</button>;
+    }
+    return <button type="button" className="planner-upsell-cta" onClick={goToPricing}>{t('plus.seePricing')}</button>;
   }
 
   // Sprint 10.61: "keep designing" a space — make it active, nudge the user to the form for the next room.
@@ -545,16 +567,15 @@ export function Planner() {
       {saveLimitHit && (
         <div className="planner-upsell" role="status">
           <p className="planner-upsell-text">{t('plus.saveLimitUpsell')}</p>
+          <div className="planner-upsell-actions">{upsellCta()}</div>
+        </div>
+      )}
+      {aiEnabled && analysis && !analysis.aiUsed && !isPlus && !aiNudgeDismissed && (
+        <div className="planner-upsell" role="status">
+          <p className="planner-upsell-text">{t('plus.aiUpsell')}</p>
           <div className="planner-upsell-actions">
-            {billingEnabled && user ? (
-              <button type="button" className="planner-upsell-cta" onClick={() => void startUpgrade()} disabled={upgradeBusy}>
-                {upgradeBusy ? t('pricing.redirecting') : t('pricing.upgradeCta')}
-              </button>
-            ) : billingEnabled ? (
-              <button type="button" className="planner-upsell-cta" onClick={openSignIn}>{t('pricing.signInForPlus')}</button>
-            ) : (
-              <button type="button" className="planner-upsell-cta" onClick={goToPricing}>{t('plus.seePricing')}</button>
-            )}
+            {upsellCta()}
+            <button type="button" className="planner-upsell-dismiss" onClick={() => setAiNudgeDismissed(true)}>{t('plus.dismiss')}</button>
           </div>
         </div>
       )}

@@ -9,6 +9,9 @@ package ai.budgetspace.dto;
  * @param googleEnabled  true when a Google client id is configured (otherwise sign-in is dormant, guest-only).
  * @param googleClientId the public OAuth Web client id for Google Identity Services, or null when not configured.
  * @param billingEnabled Sprint 10.69: true when Stripe is configured (the Plus CTA can checkout; else waitlist).
+ * @param aiEnabled      Sprint 10.89: true when the AI layer is usable (enabled + provider + key), so the frontend
+ *                       surfaces the "Plus = more AI" nudge only when upgrading would actually unlock more AI.
  */
-public record AuthMeResponse(AuthUserDto user, boolean googleEnabled, String googleClientId, boolean billingEnabled) {
+public record AuthMeResponse(AuthUserDto user, boolean googleEnabled, String googleClientId, boolean billingEnabled,
+                             boolean aiEnabled) {
 }

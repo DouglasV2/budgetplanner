@@ -32,14 +32,17 @@ public class AuthController {
     private final AuthProperties properties;
     private final ai.budgetspace.billing.StripeProperties stripeProperties;
     private final ai.budgetspace.billing.BillingService billingService;
+    private final ai.budgetspace.ai.LlmClientFactory clientFactory;
 
     public AuthController(AuthService authService, AuthProperties properties,
                           ai.budgetspace.billing.StripeProperties stripeProperties,
-                          ai.budgetspace.billing.BillingService billingService) {
+                          ai.budgetspace.billing.BillingService billingService,
+                          ai.budgetspace.ai.LlmClientFactory clientFactory) {
         this.authService = authService;
         this.properties = properties;
         this.stripeProperties = stripeProperties;
         this.billingService = billingService;
+        this.clientFactory = clientFactory;
     }
 
     /** Sign in with a Google ID token. Sets the session cookie and returns the signed-in profile. */
@@ -59,7 +62,7 @@ public class AuthController {
         AuthUserDto user = authService.authenticate(sessionToken).map(AuthController::toDto).orElse(null);
         return new AuthMeResponse(user, properties.googleEnabled(),
                 properties.googleEnabled() ? properties.googleClientId() : null,
-                stripeProperties.configured());
+                stripeProperties.configured(), clientFactory.activeClient().isPresent());
     }
 
     /** Sign out: delete the server session and clear the cookie. */

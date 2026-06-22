@@ -230,6 +230,9 @@ export interface AuthMe {
   googleClientId: string | null;
   // Sprint 10.69: true when Stripe is configured → the Plus CTA can start checkout (else it's the waitlist).
   billingEnabled: boolean;
+  // Sprint 10.89: true when the AI layer is usable → show the "Plus = more AI" nudge only when upgrading would
+  // actually unlock more AI (never when AI is off entirely).
+  aiEnabled: boolean;
 }
 
 /** Who (if anyone) is signed in, plus whether Google sign-in is available and the client id to render it. */
