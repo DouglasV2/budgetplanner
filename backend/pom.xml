@@ -34,6 +34,17 @@
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- Sprint 10.83: Flyway owns the PRODUCTION schema (V1 baseline + versioned migrations). Versions come from
+         the Spring Boot BOM; both resolve from Maven Central. Flyway is enabled only in the prod profile
+         (application-prod.yml); dev keeps the fast ddl-auto=create + seeder flow. -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>

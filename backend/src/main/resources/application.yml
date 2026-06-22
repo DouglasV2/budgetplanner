@@ -23,6 +23,10 @@ spring:
       mode: ${SPRING_SQL_INIT_MODE:never}
   jackson:
     property-naming-strategy: LOWER_CAMEL_CASE
+  flyway:
+    # Dev/base keeps the fast ddl-auto=create + RealCatalogSeeder flow, so Flyway is OFF here. Production turns it
+    # ON (application-prod.yml) with ddl-auto=validate — Flyway owns the schema in prod, ddl-auto rebuilds it in dev.
+    enabled: false
 
 server:
   port: ${SERVER_PORT:8080}

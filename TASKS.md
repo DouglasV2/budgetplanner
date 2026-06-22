@@ -160,6 +160,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.83 — Flyway: coherent, durable prod schema management (current)
+- **The schema story was incoherent and a launch foot-gun.** Base `ddl-auto=create` (wipes the schema every
+  restart); prod default `validate` **wouldn't boot a fresh managed DB** (nothing creates the tables); DEPLOY.md
+  told operators to set `update`; no migration tool existed. Three sources disagreed, and `update` can never
+  rename/retype/backfill — no safe path once the schema holds paid subscriptions.
+- **Flyway now owns the prod schema.** Added `flyway-core` + `flyway-database-postgresql`; a
+  **`V1__baseline.sql`** generated from the live Hibernate schema (`pg_dump` of the dev DB → 10 tables, PKs, the
+  `app_users.google_sub` unique, the two IDENTITY columns) so a fresh prod boot creates exactly what the entities
+  expect. Prod: `ddl-auto=validate` (checks Flyway's schema), `baseline-on-migrate` so an already-`update`-
+  bootstrapped DB is adopted as V1 instead of failing. **Dev is unchanged** — Flyway is OFF in the base profile,
+  dev keeps the fast `create` + seeder flow.
+- From here every schema change ships as a new `V2__*.sql` migration — never `ddl-auto` in prod. DEPLOY.md +
+  `.env.example` + `docker-compose.prod.yml` updated (`HIBERNATE_DDL_AUTO=validate`, the misleading "update makes
+  counters survive" line removed).
+- Verified: backend tests green; Docker image boots against a **fresh empty Postgres** → Flyway applies V1, then
+  Hibernate `validate` passes, app starts (proves the baseline matches the entities end-to-end).
+
 ### Sprint 10.82 — Production deploy artifact (the #1 launch blocker) (current)
 - **The repo had nothing to deploy.** No Dockerfile, no Maven wrapper, no `.dockerignore` — the only runner was
   the dev `docker-compose.override.yml` (`mvn spring-boot:run` + the Vite dev server). A deploy to Railway/Render/

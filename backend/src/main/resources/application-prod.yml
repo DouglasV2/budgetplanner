@@ -8,14 +8,24 @@ spring:
     password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
-      # Sprint 10.67 (security audit): prod must NOT default to a schema-dropping strategy — `create` wipes ALL
-      # data (users, sessions, saved plans) on every restart. `validate` fails fast on a schema mismatch instead.
-      # Real schema management is Flyway/Liquibase (next deploy step); override only for a controlled bootstrap.
+      # Sprint 10.67/10.83: prod must NOT default to a schema-dropping strategy — `create` wipes ALL data on every
+      # restart. Flyway (below) owns the schema; `validate` only checks that the Flyway-built schema matches the
+      # entities and fails fast on drift. Do NOT override to create/update in prod — write a migration instead.
       ddl-auto: ${HIBERNATE_DDL_AUTO:validate}
+    # Flyway owns schema creation, so JPA must NOT defer datasource init behind the EntityManagerFactory — that
+    # creates a flyway <-> entityManagerFactory circular depends-on at boot. (No data.sql runs anyway: sql.init=never.)
+    defer-datasource-initialization: false
   sql:
     init:
-      # Don't re-run data.sql on every prod boot (it seeds sample rows — would duplicate/overwrite).
+      # Don't run data.sql in prod — the catalog is seeded by RealCatalogSeeder, the schema by Flyway.
       mode: ${SPRING_SQL_INIT_MODE:never}
+  flyway:
+    # Sprint 10.83: Flyway owns the prod schema. V1__baseline.sql creates it on a fresh DB; every later change is a
+    # new versioned migration. baseline-on-migrate adopts an EXISTING non-empty schema (e.g. one bootstrapped
+    # earlier with ddl-auto=update) as V1 instead of failing — so an already-deployed DB upgrades cleanly too.
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
 
 server:
   port: ${SERVER_PORT:8080}

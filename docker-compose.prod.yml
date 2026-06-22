@@ -37,9 +37,9 @@ services:
       DATABASE_URL: ${DATABASE_URL:-jdbc:postgresql://postgres:5432/budgetspace}
       DATABASE_USERNAME: ${POSTGRES_USER:-budgetspace}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in your .env / host secret store}
-      # prod defaults ddl-auto=validate, which fails fast on a fresh DB (no tables yet). For the FIRST boot set
-      # HIBERNATE_DDL_AUTO=update (Hibernate creates tables, never drops); keep validate once Flyway lands.
-      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO:-update}
+      # Flyway (V1 baseline + migrations) creates/migrates the schema; ddl-auto=validate just checks it matches
+      # the entities. Leave it at validate — never create/update in prod (write a migration instead).
+      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO:-validate}
       # No localhost fallback in prod — the app fails fast at boot if this is missing.
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?set CORS_ALLOWED_ORIGINS to your frontend origin}
       BUDGETSPACE_AUTH_COOKIE_SECURE: ${BUDGETSPACE_AUTH_COOKIE_SECURE:-true}

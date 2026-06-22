@@ -48,13 +48,15 @@ Generate fresh ones and put them ONLY in the host's secret store (never in git, 
 - eBay → regenerate the Cert ID (Client Secret).
 
 ### 2. Persistent database (this is THE big one)
-Today `HIBERNATE_DDL_AUTO` defaults to **`create`** → every backend restart **drops and rebuilds the whole
-schema**, wiping accounts, Plus subscriptions and saved plans. That is a dev/pilot setting.
+The **base** profile defaults `HIBERNATE_DDL_AUTO=create` (a dev setting — rebuilds the schema on every restart).
+The **prod profile** (step 0) instead lets **Flyway** own the schema (`backend/.../db/migration/V1__baseline.sql`)
+with `ddl-auto=validate` checking it. So in prod:
 - Point `DATABASE_URL` / `DATABASE_USERNAME` / `DATABASE_PASSWORD` at the **managed** Postgres (real password, not
   the compose `budgetspace/budgetspace`).
-- Set **`HIBERNATE_DDL_AUTO=update`** (Hibernate adds new tables/columns, never drops). This is what makes
-  accounts, subscriptions **and the AI usage counters** survive restarts.
-- Later, for controlled schema changes, add **Flyway** + switch to `validate` (TASKS item (c)).
+- Leave **`HIBERNATE_DDL_AUTO=validate`** (the prod default). Flyway creates the schema on a fresh DB and applies
+  every future migration; `validate` just confirms it matches the entities. **Never** set `create`/`update` in
+  prod — ship a new `V2__*.sql` migration instead. An already-`update`-bootstrapped DB is adopted automatically
+  (`baseline-on-migrate` marks the existing schema as V1).
 
 ### 3. HTTPS + the session cookie
 - Serve everything over HTTPS (the host usually does this automatically).
@@ -113,7 +115,7 @@ The code is ready and **dormant until the secret is set** ([BillingService](back
 |---|---|---|
 | `SPRING_PROFILES_ACTIVE` | **`prod`** — load-bearing; baked into the backend image | no |
 | `DATABASE_URL` / `DATABASE_USERNAME` / `DATABASE_PASSWORD` | Managed Postgres | password = secret |
-| `HIBERNATE_DDL_AUTO` | `update` for the first boot, then `validate` (NOT `create`) | no |
+| `HIBERNATE_DDL_AUTO` | `validate` (Flyway owns the schema; never `create`/`update` in prod) | no |
 | `BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED` | `false` in prod (the profile also forces this) | no |
 | `BUDGETSPACE_AUTH_COOKIE_SECURE` | `true` in prod | no |
 | `CORS_ALLOWED_ORIGINS` | prod frontend origin(s) | no |
