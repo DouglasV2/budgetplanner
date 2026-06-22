@@ -207,7 +207,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // (AT/DE/IT/FR/NL/GB/SK/SI/FI/SE/NO/DK). Each row's name + local-currency price was fetched, then
             // independently re-fetched by a second agent (33 confirmed, 0 rejected). 3 SI images not re-loaded
             // (imageVerified=false). Verified on ikea.com/* on 2026-06-22; re-check before production.
-            "/catalog/real-ikea-kitchen-carts-10-80.json"
+            "/catalog/real-ikea-kitchen-carts-10-80.json",
+            // Sprint 10.87: depth for the thinnest hallway/home-office/dining cells — verified IKEA staples
+            // (BISSA/STÄLL/MACKAPÄR/TRONES/NISSEDAL, ALEX desk+drawers, MARKUS, DANDERYD, ODGER) into DK/GB/SE/
+            // DE/SI/AT. Each row's name + local-currency price was fetched, then independently re-fetched by a
+            // second agent (21 confirmed, 1 rejected for an article/URL mismatch). Verified on ikea.com/* 2026-06-22.
+            "/catalog/real-ikea-rooms-depth-10-87.json"
     );
 
     /**

@@ -160,6 +160,21 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.87 — Catalog depth for the thinnest (room × market) cells (current)
+- Filled the worst-stocked cells where a user had almost no choice: **hallway DK/GB/SE (2→5 each)**, **home-office
+  DE/SI (3→6), AT (5→8)**, **dining-room DE (4→6), AT (6→7)**.
+- **+21 verified IKEA staples** propagated from the existing catalog's global articles (BISSA/STÄLL/MACKAPÄR/TRONES
+  shoe storage + NISSEDAL mirror; ALEX desk + drawer unit, MARKUS chair; DANDERYD table, ODGER chair), each in the
+  market's **local currency** (BISSA 349 DKK / 599 SEK, STÄLL 769 DKK / 995 SEK, ALEX desk €149–179, DANDERYD
+  €129–199, …).
+- **Gap-targeted (no duplicates):** the fetch list was computed from the catalog (article × thin-market pairs that
+  were missing), and a DB cross-check confirmed 0 of the 21 productUrls already existed. Sourced then
+  **independently re-verified** (fetch → second agent re-fetches): **21 confirmed, 1 rejected** (DK TRONES — the
+  verifier caught an article-number↔URL inconsistency and refused it). The verifier also corrected GB slugs
+  (NISSEDAL→20605485, TRONES→00397307) where the global article maps to a different GB variant.
+- New `/catalog/real-ikea-rooms-depth-10-87.json` + seeder entry. `reviewRating/reviewCount=null` (not verified).
+  `StoreLinkIntegrity` + runtime tests green; live reseed confirmed the cell depths.
+
 ### Sprint 10.86 — Persist the AI usage ledger (caps survive restarts) (current)
 - **The cost guardrails were in-memory only** (`AiUsageTracker`), so every restart/redeploy reset the monthly-USD
   wallet cap + per-user daily caps to zero — the wallet was bypassable by restarting mid-month, and DEPLOY.md even
