@@ -6,9 +6,19 @@ A practical, ordered path from "runs on a laptop via docker-compose" to "real us
 The app is three pieces:
 
 1. **Frontend** — a static Vite/React build (`frontend/`, `npm run build` → `frontend/dist/`). Serve from any
-   static host / CDN. It calls the backend at **build-time** `VITE_API_BASE_URL` ([client.ts](frontend/src/api/client.ts):3).
-2. **Backend** — a Spring Boot container (`backend/`). Needs a persistent Postgres + the env below.
+   static host / CDN, or use **`frontend/Dockerfile`** (builds the bundle → nginx). It calls the backend at
+   **build-time** `VITE_API_BASE_URL` ([client.ts](frontend/src/api/client.ts):3).
+2. **Backend** — a Spring Boot container built from **`backend/Dockerfile`** (multi-stage → slim JRE + fat jar,
+   with `SPRING_PROFILES_ACTIVE=prod` baked in). Needs a persistent Postgres + the env below.
 3. **Database** — managed PostgreSQL (NOT the throwaway compose one).
+
+**Build & run.** `backend/Dockerfile` + `frontend/Dockerfile` are the production artifacts (and `backend/mvnw`
+builds the jar without a host Maven). For a single box, **`docker-compose.prod.yml`** wires both images + Postgres
+with the prod profile, `restart: unless-stopped`, and a DB healthcheck —
+`docker compose -f docker-compose.prod.yml up -d --build`. On Railway/Render/Fly, point each service at its
+Dockerfile. The dev `docker-compose.override.yml` (`mvn spring-boot:run` + the Vite dev server) is NOT for prod.
+A proper liveness/readiness endpoint (`spring-boot-starter-actuator` → `/actuator/health`) is the recommended
+next hardening step; until then a host healthcheck can hit `GET /api/auth/me`.
 
 ## Recommended hosting (solo, low-ops, cheap)
 
@@ -21,6 +31,14 @@ The app is three pieces:
 The steps below are provider-agnostic.
 
 ## Gate 0 — before ANY public traffic
+
+### 0. Activate the prod profile (the one switch that makes the rest safe)
+Set **`SPRING_PROFILES_ACTIVE=prod`** — `backend/Dockerfile` already bakes it in; set it explicitly if you run the
+jar another way. This single variable flips every safe default: non-destructive schema (`ddl-auto=validate`),
+admin/collector endpoints OFF, the session cookie `Secure`, and a required explicit CORS origin. **Without it the
+base (dev) profile wins** — `ddl-auto=create` (drops & rebuilds the whole schema on every restart, wiping accounts
++ subscriptions) and PUBLIC admin/catalog-mutation endpoints. As belt-and-suspenders also set
+**`BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED=false`**.
 
 ### 1. Rotate every secret shared during development
 The Stripe secret key, Gemini key and eBay **PROD** Cert ID were pasted in chat — treat them as compromised.
@@ -93,8 +111,10 @@ The code is ready and **dormant until the secret is set** ([BillingService](back
 
 | Variable | What | Secret? |
 |---|---|---|
+| `SPRING_PROFILES_ACTIVE` | **`prod`** — load-bearing; baked into the backend image | no |
 | `DATABASE_URL` / `DATABASE_USERNAME` / `DATABASE_PASSWORD` | Managed Postgres | password = secret |
-| `HIBERNATE_DDL_AUTO` | `update` in prod (NOT `create`) | no |
+| `HIBERNATE_DDL_AUTO` | `update` for the first boot, then `validate` (NOT `create`) | no |
+| `BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED` | `false` in prod (the profile also forces this) | no |
 | `BUDGETSPACE_AUTH_COOKIE_SECURE` | `true` in prod | no |
 | `CORS_ALLOWED_ORIGINS` | prod frontend origin(s) | no |
 | `VITE_API_BASE_URL` (frontend build) | backend public URL | no |

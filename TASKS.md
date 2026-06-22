@@ -160,6 +160,28 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.82 — Production deploy artifact (the #1 launch blocker) (current)
+- **The repo had nothing to deploy.** No Dockerfile, no Maven wrapper, no `.dockerignore` — the only runner was
+  the dev `docker-compose.override.yml` (`mvn spring-boot:run` + the Vite dev server). A deploy to Railway/Render/
+  Fly stalled immediately. Worse, **all prod safety lived only in `application-prod.yml`, gated on
+  `SPRING_PROFILES_ACTIVE=prod`** — a var documented nowhere — so a deploy that forgot it silently fell back to the
+  base profile: `ddl-auto=create` (wipes the whole schema, incl. accounts + Plus subs, on every restart) and
+  PUBLIC admin/catalog-mutation endpoints.
+- **`backend/Dockerfile`** — multi-stage (Maven build → slim `eclipse-temurin:21-jre` + fat jar), runs as a
+  non-root user, and **bakes in `ENV SPRING_PROFILES_ACTIVE=prod`** so the safe defaults are load-bearing by
+  default and can't be forgotten. Verified by a real `docker build` + a prod-profile boot smoke test.
+- **`frontend/Dockerfile`** (Vite build → nginx static, SPA fallback + asset caching in `nginx.conf`) replaces the
+  dev Vite server. **`backend/mvnw`** (Maven wrapper, `only-script` — no jar committed) makes the build
+  reproducible without a host Maven.
+- **`.dockerignore`** at the root + `backend/` + `frontend/` so the gitignored `.env` (real secrets) can never be
+  baked into an image layer. **`docker-compose.prod.yml`** wires both images + Postgres with the prod profile,
+  `restart: unless-stopped`, a DB healthcheck, and **no weak password default** (`POSTGRES_PASSWORD` is required).
+- **`backend/.env.example` regenerated** secure-by-default (was stale: `admin-endpoints=true`, openai/anthropic
+  instead of Gemini, missing the profile/Stripe/Google/eBay vars). **DEPLOY.md**: `SPRING_PROFILES_ACTIVE=prod` is
+  now Gate-0 step 0 + the first row of the env table, plus `BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED=false` and pointers
+  to the Dockerfiles/compose. (Follow-ups, runner-ups from the audit: Flyway baseline, Stripe webhook
+  idempotency/lifecycle, actuator `/actuator/health` + rate limiting.)
+
 ### Sprint 10.81 — GDPR erasure completeness (Art. 17) (current)
 - **Account deletion now erases ALL of the user's PII, not just their plans.** `AuthService.deleteAccount`
   previously dropped saved plans + sessions + the account row but left the user's **email** behind in two tables:

@@ -1,0 +1,83 @@
+# Production run path for a single box (e.g. a Hetzner VPS). Unlike docker-compose.override.yml — which is the
+# DEV loop (backend via `mvn spring-boot:run`, frontend via the Vite dev server) — this builds real images and
+# runs the prod Spring profile. Front it with the host's HTTPS/reverse proxy.
+#
+#   cp backend/.env.example .env   # then fill in real values (NEVER commit .env)
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# A MANAGED Postgres is preferred (see DEPLOY.md); the bundled postgres here is only for the self-host path.
+# Point DATABASE_URL at a managed instance to skip it.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: budgetspace-postgres-prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-budgetspace}
+      POSTGRES_USER: ${POSTGRES_USER:-budgetspace}
+      # No weak default: the deploy MUST provide a real password (compose errors out if it is unset).
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in your .env / host secret store}
+    volumes:
+      - budgetspace_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    # Not published to the host — only the backend reaches it over the compose network.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-budgetspace} -d ${POSTGRES_DB:-budgetspace}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    image: budgetspace-backend:prod
+    container_name: budgetspace-backend-prod
+    environment:
+      # Redundant with the image's baked-in default, but explicit here so the run path is self-documenting.
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: ${DATABASE_URL:-jdbc:postgresql://postgres:5432/budgetspace}
+      DATABASE_USERNAME: ${POSTGRES_USER:-budgetspace}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in your .env / host secret store}
+      # prod defaults ddl-auto=validate, which fails fast on a fresh DB (no tables yet). For the FIRST boot set
+      # HIBERNATE_DDL_AUTO=update (Hibernate creates tables, never drops); keep validate once Flyway lands.
+      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO:-update}
+      # No localhost fallback in prod — the app fails fast at boot if this is missing.
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?set CORS_ALLOWED_ORIGINS to your frontend origin}
+      BUDGETSPACE_AUTH_COOKIE_SECURE: ${BUDGETSPACE_AUTH_COOKIE_SECURE:-true}
+      BUDGETSPACE_GOOGLE_CLIENTID: ${BUDGETSPACE_GOOGLE_CLIENTID:-}
+      # Stripe — set live values to enable billing; blank => billing dormant (Plus CTA falls back to the waitlist).
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_PLUS_PRICE_ID: ${STRIPE_PLUS_PRICE_ID:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      # AI (Gemini) — blank key => deterministic rule-based fallback (no external calls, no cost).
+      BUDGETSPACE_AI_ENABLED: ${BUDGETSPACE_AI_ENABLED:-false}
+      BUDGETSPACE_LLM_PROVIDER: ${BUDGETSPACE_LLM_PROVIDER:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      BUDGETSPACE_AI_MONTHLY_BUDGET_USD: ${BUDGETSPACE_AI_MONTHLY_BUDGET_USD:-10}
+      # eBay PROD keys (rotated) — blank => dormant. eBay data is request-time, in-memory only, never persisted.
+      BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID:-}
+      BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    # Public API on 8090 (container serves 8080), matching the dev convention. Put TLS in front in real prod.
+    ports:
+      - "8090:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the static bundle at build time — must be the backend's PUBLIC URL (what the browser calls).
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:?set VITE_API_BASE_URL to the backend public URL}
+    image: budgetspace-frontend:prod
+    container_name: budgetspace-frontend-prod
+    depends_on:
+      - backend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  budgetspace_pgdata:

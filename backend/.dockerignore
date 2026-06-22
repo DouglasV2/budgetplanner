@@ -1,0 +1,10 @@
+# Never copy secrets or build cruft into the image build context.
+.env
+**/.env
+*.env
+target/
+.idea/
+*.iml
+.git/
+# The Maven wrapper jar is downloaded on demand (distributionType=only-script); never bake one in.
+.mvn/wrapper/maven-wrapper.jar

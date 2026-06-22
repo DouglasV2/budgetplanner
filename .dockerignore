@@ -1,0 +1,13 @@
+# Repo-root build-context guard. The real secrets live in a gitignored .env; this makes sure no image build
+# (from any context) can ever copy it into a layer, plus keeps heavy/irrelevant trees out of the context.
+.env
+**/.env
+*.env
+.git/
+**/.idea/
+**/*.iml
+backend/target/
+frontend/dist/
+frontend/node_modules/
+node_modules/
+*.patch
