@@ -1,16 +1,22 @@
 package ai.budgetspace.ai;
 
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -36,13 +42,19 @@ import java.util.Map;
  * the real event (fallback events are not retained — they count toward nothing and would otherwise let a
  * flapping provider evict today's real events from the bounded log).</p>
  *
- * <p>Counters are derived from recorded events, so they reset naturally each day/month. Being in-memory,
- * they reset on restart — acceptable pre-launch; persist before real scale.</p>
+ * <p>Counters are derived from recorded events, so they reset naturally each day/month. Sprint 10.86: the
+ * in-memory log stays the live, atomic source (fast, lock-guarded), but every real event is written through to a
+ * durable table ({@link AiUsageRecord}) and the counters are rehydrated from it on startup — so the monthly-USD
+ * wallet and per-user daily caps survive restarts/redeploys instead of resetting to zero. The write is
+ * best-effort (a DB hiccup never fails the user's request). Atomicity is per instance; for multi-instance, pair
+ * with a shared store.</p>
  */
 @Service
 public class AiUsageTracker {
     private static final Logger log = LoggerFactory.getLogger(AiUsageTracker.class);
     private static final int MAX_RETAINED_EVENTS = 5000;
+    // We only ever count the current month (wallet) + today (daily caps), so older rows are dead weight.
+    private static final int RETENTION_DAYS = 45;
 
     private final Deque<AiUsageEvent> events = new ArrayDeque<>();
     // Per-owner count of admitted-but-not-yet-completed AI calls. Counts toward the caps so a burst of
@@ -56,7 +68,17 @@ public class AiUsageTracker {
     private final int proDailyLimit;
     private final double inputCostPer1k;
     private final double outputCostPer1k;
+    // Durable ledger (Sprint 10.86). Null in the pure in-memory test constructor; set by Spring in production.
+    private final AiUsageRecordRepository repository;
 
+    // Test/convenience constructor: pure in-memory, no persistence. Production uses the @Autowired one below.
+    public AiUsageTracker(double monthlyBudgetUsd, int maxRequestsPerDay, int guestDailyLimit, int freeDailyLimit,
+                          int plusDailyLimit, int proDailyLimit, double inputCostPer1k, double outputCostPer1k) {
+        this(monthlyBudgetUsd, maxRequestsPerDay, guestDailyLimit, freeDailyLimit, plusDailyLimit, proDailyLimit,
+                inputCostPer1k, outputCostPer1k, null);
+    }
+
+    @Autowired
     public AiUsageTracker(
             @Value("${budgetspace.ai.monthly-budget-usd:20}") double monthlyBudgetUsd,
             @Value("${budgetspace.ai.max-requests-per-day:2000}") int maxRequestsPerDay,
@@ -65,7 +87,8 @@ public class AiUsageTracker {
             @Value("${budgetspace.ai.daily-per-user.plus:100}") int plusDailyLimit,
             @Value("${budgetspace.ai.daily-per-user.pro:500}") int proDailyLimit,
             @Value("${budgetspace.ai.input-cost-per-1k-usd:0.0002}") double inputCostPer1k,
-            @Value("${budgetspace.ai.output-cost-per-1k-usd:0.0008}") double outputCostPer1k) {
+            @Value("${budgetspace.ai.output-cost-per-1k-usd:0.0008}") double outputCostPer1k,
+            AiUsageRecordRepository repository) {
         this.monthlyBudgetUsd = monthlyBudgetUsd;
         this.maxRequestsPerDay = maxRequestsPerDay;
         this.guestDailyLimit = guestDailyLimit;
@@ -74,6 +97,7 @@ public class AiUsageTracker {
         this.proDailyLimit = proDailyLimit;
         this.inputCostPer1k = inputCostPer1k;
         this.outputCostPer1k = outputCostPer1k;
+        this.repository = repository;
     }
 
     /**
@@ -106,6 +130,64 @@ public class AiUsageTracker {
     public synchronized void complete(String ownerKey, AiUsageEvent event) {
         releaseInFlight(ownerKey);
         record(event);
+        persist(event);
+    }
+
+    // --- durability: write-through + rehydrate-on-boot + retention prune (Sprint 10.86) ---
+
+    /**
+     * Restore the in-memory counters from the durable ledger on startup, so the monthly-USD wallet and per-user
+     * daily caps don't reset to zero on every restart/redeploy. Loads this month's most-recent real events
+     * (bounded like the in-memory log). Best-effort: a DB hiccup just starts with empty counters.
+     */
+    @PostConstruct
+    synchronized void rehydrate() {
+        if (repository == null) {
+            return;
+        }
+        try {
+            Instant monthStart = YearMonth.now(ZoneOffset.UTC).atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+            List<AiUsageRecord> recent = repository.findTop5000ByCreatedAtGreaterThanEqualOrderByCreatedAtDesc(monthStart);
+            // Loaded newest-first; add oldest-first so the bounded log evicts the oldest if it ever overflows.
+            for (int i = recent.size() - 1; i >= 0; i--) {
+                events.addLast(recent.get(i).toEvent());
+            }
+            while (events.size() > MAX_RETAINED_EVENTS) {
+                events.removeFirst();
+            }
+            log.info("AI usage ledger rehydrated: {} event(s) from this month.", events.size());
+        } catch (RuntimeException exception) {
+            log.warn("AI usage ledger rehydrate failed — starting with empty in-memory counters.", exception);
+        }
+    }
+
+    // Write-through to the durable ledger (real events only). Best-effort: the in-memory counters already updated,
+    // so a DB error must not fail the user's request — just log it. Skipped in the pure in-memory test mode.
+    private void persist(AiUsageEvent event) {
+        if (repository == null || event == null || event.fallbackUsed()) {
+            return;
+        }
+        try {
+            repository.save(AiUsageRecord.from(event));
+        } catch (RuntimeException exception) {
+            log.warn("AI usage ledger persist failed — counters stay in memory for this instance.", exception);
+        }
+    }
+
+    /** Drop ledger rows past the retention window (only the current month + today are ever counted). */
+    @Scheduled(cron = "${budgetspace.ai.ledger-cleanup-cron:0 15 3 * * *}")
+    void pruneOldLedgerRows() {
+        if (repository == null) {
+            return;
+        }
+        try {
+            int deleted = repository.deleteByCreatedAtBefore(Instant.now().minus(RETENTION_DAYS, ChronoUnit.DAYS));
+            if (deleted > 0) {
+                log.info("AI usage ledger: pruned {} row(s) older than {} days.", deleted, RETENTION_DAYS);
+            }
+        } catch (RuntimeException exception) {
+            log.warn("AI usage ledger prune failed.", exception);
+        }
     }
 
     /** The per-user daily AI allowance for a subscription tier. Unknown/guest tiers get the smallest. */

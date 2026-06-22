@@ -160,6 +160,22 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.86 — Persist the AI usage ledger (caps survive restarts) (current)
+- **The cost guardrails were in-memory only** (`AiUsageTracker`), so every restart/redeploy reset the monthly-USD
+  wallet cap + per-user daily caps to zero — the wallet was bypassable by restarting mid-month, and DEPLOY.md even
+  wrongly claimed the counters survived restarts. Now durable.
+- **Write-through + rehydrate-on-boot** (kept the elegant in-memory model — it stays the live, atomic, lock-guarded
+  counter source, and all its unit tests are untouched): each REAL (non-fallback) event is written through to a
+  new `ai_usage_events` table (entity `AiUsageRecord`, **Flyway V3**), and on startup the tracker rehydrates this
+  month's events so the caps pick up where they left off. The write is **best-effort** — a DB hiccup logs a warning
+  and never fails the user's request (the in-memory counter already updated). A nightly `@Scheduled` prune drops
+  rows past a 45-day retention window (only the current month + today are ever counted), so the table stays bounded
+  even at thousands of users.
+- Same constructor pattern as `BillingService` (a plain 8-arg test ctor → pure in-memory; an `@Autowired` ctor with
+  the repository → durable), so `PromptIntelligenceServiceTest`'s 5 construction sites are unchanged. Atomicity is
+  per instance; multi-instance exactness would need a shared store (documented). `AiUsageTrackerTest` +3. Backend
+  tests green; prod image boots a fresh DB → Flyway applies V1+V2+V3, `validate` passes, `ai_usage_events` present.
+
 ### Sprint 10.85 — Survive load: rate limit + health probe + pool tuning (current)
 - **Per-IP rate-limit backstop on `/api/plans/*`** (`RateLimitFilter`). The plan endpoints — especially the
   unauthenticated, ungated `/api/plans/generate-fast` — had NO request-rate limit, so one runaway client (or a

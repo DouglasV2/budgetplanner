@@ -4,8 +4,9 @@ import java.time.Instant;
 
 /**
  * Sprint 10.10 — one recorded AI (or fallback) call, for cost/usage tracking and monetization
- * groundwork. Kept in memory (see {@link AiUsageTracker}); no DB migration yet. No prompt text or
- * API key is stored — only metadata.
+ * groundwork. The live counters live in memory (see {@link AiUsageTracker}); since Sprint 10.86 each real
+ * event is also persisted as an {@link AiUsageRecord} so caps survive restarts. No prompt text or API key is
+ * stored — only metadata.
  *
  * <p>Sprint 10.70: {@code ownerKey} (the account "user:&lt;id&gt;" or guest "guest:&lt;browserId&gt;") and
  * {@code tier} (GUEST / FREE / PLUS / PRO) replace the old raw session id, so daily caps can be enforced
