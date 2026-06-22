@@ -18,8 +18,11 @@ RUN mvn -B -DskipTests clean package
 
 # --- Run stage -------------------------------------------------------------------------------------------------
 FROM eclipse-temurin:21-jre AS run
-# Run as an unprivileged user, never root.
-RUN useradd -r -u 1001 -m -d /home/app app
+# curl is only for the container HEALTHCHECK below; install it, drop the apt lists, and add a non-root user.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -r -u 1001 -m -d /home/app app
 WORKDIR /app
 COPY --from=build /build/target/budgetspace-backend-*.jar app.jar
 
@@ -30,5 +33,8 @@ COPY --from=build /build/target/budgetspace-backend-*.jar app.jar
 ENV SPRING_PROFILES_ACTIVE=prod
 ENV JAVA_OPTS=""
 EXPOSE 8080
+# Health/readiness for the host + load balancer (Sprint 10.85). start-period covers JVM boot + Flyway + the seed.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=75s --retries=3 \
+  CMD curl -fsS http://localhost:8080/actuator/health || exit 1
 USER app
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

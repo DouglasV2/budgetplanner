@@ -17,8 +17,10 @@ builds the jar without a host Maven). For a single box, **`docker-compose.prod.y
 with the prod profile, `restart: unless-stopped`, and a DB healthcheck —
 `docker compose -f docker-compose.prod.yml up -d --build`. On Railway/Render/Fly, point each service at its
 Dockerfile. The dev `docker-compose.override.yml` (`mvn spring-boot:run` + the Vite dev server) is NOT for prod.
-A proper liveness/readiness endpoint (`spring-boot-starter-actuator` → `/actuator/health`) is the recommended
-next hardening step; until then a host healthcheck can hit `GET /api/auth/me`.
+The backend image ships a `HEALTHCHECK` (curl `/actuator/health`) — point the host's health probe there too
+(`/actuator/health/readiness` for readiness gating). A per-IP rate-limit backstop guards `/api/plans/*` against
+floods (in-memory, per instance — pair it with the host/CDN limiter at real scale). The DB pool size is
+`DB_POOL_MAX_SIZE` (default 15; raise it on a managed Postgres that allows more connections).
 
 ## Recommended hosting (solo, low-ops, cheap)
 

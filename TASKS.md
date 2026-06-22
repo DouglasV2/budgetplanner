@@ -160,6 +160,26 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.85 — Survive load: rate limit + health probe + pool tuning (current)
+- **Per-IP rate-limit backstop on `/api/plans/*`** (`RateLimitFilter`). The plan endpoints — especially the
+  unauthenticated, ungated `/api/plans/generate-fast` — had NO request-rate limit, so one runaway client (or a
+  spike) could saturate the Tomcat threads/CPU and take the instance down for everyone. Fixed-window per IP
+  (default 60 req / 10s, configurable), in-memory, runs early (rejects before any work), returns **429 +
+  Retry-After**, and stamps the 429 with the CORS allow-origin so the browser surfaces the real status. The bucket
+  map is pruned on a schedule + hard-capped so distinct IPs can't grow it unbounded. It's a coarse abuse guard, not
+  the AI business limit (that stays in `AiUsageTracker`); per instance — pair with the host/CDN limiter at scale.
+- **Health/readiness endpoint** — added `spring-boot-starter-actuator`, exposing **only** `/actuator/health`
+  (liveness + readiness, details hidden). The backend image now ships a `HEALTHCHECK` (curl `/actuator/health`),
+  and `docker-compose.prod.yml`'s frontend waits for the backend to be **healthy** (not just started). DEPLOY.md
+  points the host probe there (was the DB-hitting `/api/auth/me`).
+- **DB pool tuning** — HikariCP was on its default (max 10, no acquire timeout). Set `maximum-pool-size`
+  (`DB_POOL_MAX_SIZE`, default 15), `minimum-idle`, and a 10s `connection-timeout` so a spike **fails fast** instead
+  of piling requests up and hanging.
+- Note: the catalog hot path was already cached (PlannerService `allProducts()`, 2s TTL — collapses the N
+  full-table loads per plan into ~1 query), so the per-request DB cost was already bounded. `RateLimitFilterTest`
+  +4. Backend tests green; verified on the prod image: boots a fresh DB, `/actuator/health` 200, and a flood trips
+  429s while the instance stays up.
+
 ### Sprint 10.84 — Stripe webhook hardening (idempotency + dunning lifecycle) (current)
 - **Idempotency.** Stripe delivers at-least-once and retries on any non-2xx, so the same event arrives more than
   once; the handler applied it every time. Added a `stripe_processed_events` table (event id PK, **Flyway V2**) +

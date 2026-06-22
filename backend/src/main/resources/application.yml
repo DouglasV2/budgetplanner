@@ -5,6 +5,13 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/budgetspace}
     username: ${DATABASE_USERNAME:budgetspace}
     password: ${DATABASE_PASSWORD:budgetspace}
+    hikari:
+      # Sprint 10.85: size the pool for load and fail fast under saturation instead of piling requests up. A managed
+      # Postgres allows far more than the default 10 connections; tune via env. connection-timeout caps how long a
+      # request waits for a free connection before erroring (10s), so a spike degrades gracefully rather than hangs.
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:15}
+      minimum-idle: ${DB_POOL_MIN_IDLE:2}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT_MS:10000}
   jpa:
     hibernate:
       # Overridable via env (HIBERNATE_DDL_AUTO). Default 'create' keeps the dev/pilot flow where
@@ -30,6 +37,19 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+
+management:
+  # Sprint 10.85: expose ONLY health (liveness + readiness) for host/load-balancer probes — nothing else
+  # (no env/beans/metrics/etc. on the public surface). Details are hidden from anonymous callers.
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
 
 app:
   cors:

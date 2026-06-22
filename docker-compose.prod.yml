@@ -74,7 +74,9 @@ services:
     image: budgetspace-frontend:prod
     container_name: budgetspace-frontend-prod
     depends_on:
-      - backend
+      backend:
+        # The image ships a HEALTHCHECK (curl /actuator/health) — wait for the API to be ready, not just started.
+        condition: service_healthy
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-8080}:80"
