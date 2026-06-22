@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { generatePlan, generatePlanFast, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, trackProductClick } from '../api/client';
+import { generatePlan, generatePlanFast, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
 import type { PlanGenerationResponse } from '../api/client';
@@ -191,7 +191,7 @@ export function Planner() {
   const { market, config, setMarket, t } = useLocale();
   // Sprint 10.63: real auth. When the signed-in user changes (sign-in/out), the saved-plans inbox refetches so
   // the now account-owned plans (migrated from the guest session on first sign-in) appear.
-  const { user, openSignIn } = useAuth();
+  const { user, openSignIn, billingEnabled } = useAuth();
   // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
   // the active market's language (the user can then edit freely).
   const [input, setInput] = useState<PlannerInput>(() => ({ ...initialInput, prompt: t('planner.examplePrompt'), market }));
@@ -206,6 +206,9 @@ export function Planner() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Sprint 10.88: the actionable Plus upsell card, shown when a save hits the Free 3-plan cap (402).
+  const [saveLimitHit, setSaveLimitHit] = useState(false);
+  const [upgradeBusy, setUpgradeBusy] = useState(false);
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
   const [design, setDesign] = useState<DesignAssistant | null>(null);
   const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
@@ -390,12 +393,18 @@ export function Planner() {
       // Sprint 10.61: the plan joins the active space (e.g. "Moj dom") so the user's rooms group together.
       savedPlan = await savePlan(plan, input, activeSpace);
     } catch (apiError) {
-      // Sprint 10.68: Free saved-plan limit reached → 402 → show the Plus upsell instead of a generic error.
+      // Sprint 10.68/10.88: Free saved-plan limit reached → 402 → show the actionable Plus upsell card; any other
+      // error is a generic notice.
       const status = (apiError as { status?: number } | null)?.status;
-      setNotice(status === 402 ? t('plus.saveLimitUpsell') : t('planner.errorUnavailable'));
+      if (status === 402) {
+        setSaveLimitHit(true);
+      } else {
+        setNotice(t('planner.errorUnavailable'));
+      }
       return '';
     }
     const url = `${window.location.origin}/plan/${savedPlan.id}`;
+    setSaveLimitHit(false); // a save went through → clear any lingering upsell
     setSavedPlans((currentPlans) => [savedPlan, ...currentPlans.filter((currentPlan) => currentPlan.id !== savedPlan.id)]);
 
     if (copyLink) {
@@ -407,6 +416,24 @@ export function Planner() {
     }
 
     return url;
+  }
+
+  // Sprint 10.88: from the save-limit upsell, start a real Stripe checkout (signed-in Plus-eligible user).
+  async function startUpgrade() {
+    setUpgradeBusy(true);
+    try {
+      const { url } = await startCheckout();
+      window.location.href = url; // Stripe's hosted checkout
+    } catch {
+      setUpgradeBusy(false);
+      setNotice(t('pricing.checkoutError'));
+    }
+  }
+
+  // For guests / when billing is off: take them to the pricing section (sign-in for Plus, or the waitlist).
+  function goToPricing() {
+    setSaveLimitHit(false);
+    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // Sprint 10.61: "keep designing" a space — make it active, nudge the user to the form for the next room.
@@ -515,6 +542,22 @@ export function Planner() {
       {!config.available && <div className="planner-notice market-note">{t('planner.marketComingSoon')}</div>}
 
       {notice && <div className="planner-notice">{notice}</div>}
+      {saveLimitHit && (
+        <div className="planner-upsell" role="status">
+          <p className="planner-upsell-text">{t('plus.saveLimitUpsell')}</p>
+          <div className="planner-upsell-actions">
+            {billingEnabled && user ? (
+              <button type="button" className="planner-upsell-cta" onClick={() => void startUpgrade()} disabled={upgradeBusy}>
+                {upgradeBusy ? t('pricing.redirecting') : t('pricing.upgradeCta')}
+              </button>
+            ) : billingEnabled ? (
+              <button type="button" className="planner-upsell-cta" onClick={openSignIn}>{t('pricing.signInForPlus')}</button>
+            ) : (
+              <button type="button" className="planner-upsell-cta" onClick={goToPricing}>{t('plus.seePricing')}</button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Sprint 10.63: real account state. Signed in → plans are tied to the account; guest → saved in this
           browser, with a one-click way back to the sign-in front door. */}

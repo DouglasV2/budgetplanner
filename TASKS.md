@@ -160,6 +160,21 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.88 — Free→Plus: actionable save-limit upsell (current)
+- **The one real conversion trigger was a dead end.** When a Free/guest owner hit the 3-plan save cap, the backend
+  returned 402 and the frontend showed a **passive toast** ("…see pricing below") — the user then had to scroll and
+  hunt. Now it's an **actionable upsell card** at that exact moment, with a direct CTA branching on state:
+  signed-in + billing on → **"Upgrade to Plus"** (starts the real Stripe checkout); guest + billing on → **"Sign in
+  for Plus"**; billing off (dev/waitlist) → **"See Plus"** (scrolls to the pricing section). Copy sharpened to name
+  the carrots (unlimited saving, AI assistant, price alerts) instead of pointing vaguely "below".
+- Reuses the proven `Monetization` checkout pattern (`startCheckout`/`openSignIn`); the upsell clears on a
+  successful save. `Planner.tsx` + one i18n key (`plus.seePricing`) + `styles.css` (Plus-accent card).
+  **Verified:** `npm run build` (tsc) clean; preview render clean (0 console errors, `#pricing` target present). The
+  402-gated flow itself follows the working checkout path (full in-browser run needs the CORS-configured backend).
+- (Catalog #2 pass: an ADDE-chair deepening of the thin dining markets returned **0 confirmed / 6 rejected** — ADDE
+  is delisted on DE/AT/IT/FI/GB/NO, the verifier refused to fabricate. The easy catalog wins are exhausted; it
+  stays at 1987 verified products. Free→Plus is the higher-leverage track.)
+
 ### Sprint 10.87 — Catalog depth for the thinnest (room × market) cells (current)
 - Filled the worst-stocked cells where a user had almost no choice: **hallway DK/GB/SE (2→5 each)**, **home-office
   DE/SI (3→6), AT (5→8)**, **dining-room DE (4→6), AT (6→7)**.

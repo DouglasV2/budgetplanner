@@ -488,8 +488,10 @@ const DICTIONARY: Record<string, Entry> = {
   'auth.signedInAs': { hr: 'Prijavljen kao {name}', en: 'Signed in as {name}' },
   'auth.signInError': { hr: 'Prijava nije uspjela. Pokušaj ponovno.', en: 'Sign-in failed. Please try again.' },
 
-  // Sprint 10.68: Plus upsell shown when a Free owner hits the saved-plan cap.
-  'plus.saveLimitUpsell': { hr: 'Dosegao si limit besplatnih spremljenih planova. Plus otključava neograničeno (vidi cijene niže).', en: 'You\'ve hit the Free saved-plan limit. Plus unlocks unlimited (see pricing below).' },
+  // Sprint 10.68: Plus upsell shown when a Free owner hits the saved-plan cap. Sprint 10.88: now an actionable
+  // card (upgrade / sign-in / see-pricing), so the message no longer points "below".
+  'plus.saveLimitUpsell': { hr: 'Dosegao si limit besplatnih spremljenih planova (3). Plus otključava neograničeno spremanje, AI asistenta i alerte.', en: 'You\'ve hit the Free saved-plan limit (3). Plus unlocks unlimited saving, the AI assistant and price alerts.' },
+  'plus.seePricing': { hr: 'Pogledaj Plus', en: 'See Plus' },
   // Sprint 10.54: feedback that acts. After the user rates the plan, offer the one-click fix for the complaint.
   'results.feedbackThanks': { hr: 'Hvala — drago nam je da pomaže.', en: 'Thanks — glad it helps.' },
   'results.feedbackThanksActable': { hr: 'Hvala. Da to odmah složim?', en: 'Thanks. Want me to sort that now?' },
