@@ -21,6 +21,9 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Sprint 10.69 — Stripe billing for Plus (hosted Checkout). Raw JDK HTTP, no SDK (consistent with the eBay/LLM
@@ -48,20 +51,28 @@ public class BillingService {
 
     private final StripeProperties properties;
     private final AppUserRepository userRepository;
+    private final StripeProcessedEventRepository processedEventRepository;
     private final StripeHttp http;
     private final ObjectMapper objectMapper;
+
+    // Subscription statuses that grant / revoke the Plus entitlement (Sprint 10.84).
+    private static final Set<String> PLUS_STATUSES = Set.of("active", "trialing");
+    private static final Set<String> ENDED_STATUSES = Set.of("past_due", "unpaid", "canceled", "incomplete_expired");
 
     // @Autowired marks this as THE constructor for Spring; without it the package-private test constructor below
     // makes the bean ambiguous and boot fails with "No default constructor found" (same trap as GoogleTokenVerifier).
     @Autowired
-    public BillingService(StripeProperties properties, AppUserRepository userRepository) {
-        this(properties, userRepository, new HttpClientStripeHttp(), new ObjectMapper());
+    public BillingService(StripeProperties properties, AppUserRepository userRepository,
+                          StripeProcessedEventRepository processedEventRepository) {
+        this(properties, userRepository, processedEventRepository, new HttpClientStripeHttp(), new ObjectMapper());
     }
 
     // Package-private: lets a test inject a fake transport (and exercise mapping + signature) without a network.
-    BillingService(StripeProperties properties, AppUserRepository userRepository, StripeHttp http, ObjectMapper objectMapper) {
+    BillingService(StripeProperties properties, AppUserRepository userRepository,
+                   StripeProcessedEventRepository processedEventRepository, StripeHttp http, ObjectMapper objectMapper) {
         this.properties = properties;
         this.userRepository = userRepository;
+        this.processedEventRepository = processedEventRepository;
         this.http = http;
         this.objectMapper = objectMapper;
     }
@@ -129,7 +140,7 @@ public class BillingService {
         return user.getPlan();
     }
 
-    /** Verifies Stripe's signature, then upgrades/downgrades on the relevant subscription events. */
+    /** Verifies Stripe's signature, then upgrades/downgrades on the relevant subscription events. Idempotent. */
     @Transactional
     public void handleWebhook(String payload, String signatureHeader) {
         if (!properties.webhookConfigured()) {
@@ -144,6 +155,13 @@ public class BillingService {
         } catch (IOException exception) {
             throw new InvalidWebhookException("Neispravan webhook payload.");
         }
+        // Idempotency: Stripe delivers at-least-once and retries on any non-2xx, so the same event arrives more than
+        // once. Skip one we've already applied — a duplicate must never double-apply a plan change.
+        String eventId = event.path("id").asText("");
+        if (!eventId.isBlank() && processedEventRepository.existsById(eventId)) {
+            log.debug("Stripe webhook {} already processed; skipping.", eventId);
+            return;
+        }
         String type = event.path("type").asText("");
         JsonNode object = event.path("data").path("object");
         switch (type) {
@@ -152,11 +170,16 @@ public class BillingService {
                 userRepository.findById(owner).ifPresent(user ->
                         applyPlus(user, text(object, "customer"), text(object, "subscription")));
             }
-            case "customer.subscription.deleted" -> {
-                String subscriptionId = object.path("id").asText("");
-                userRepository.findByStripeSubscriptionId(subscriptionId).ifPresent(this::applyFree);
-            }
+            // Drive the entitlement off the live subscription status, so a failed card (-> past_due/unpaid/canceled)
+            // actually loses Plus and a recovered card (-> active) regains it automatically — no dunning free-ride.
+            case "customer.subscription.created", "customer.subscription.updated" -> applySubscriptionStatus(object);
+            case "customer.subscription.deleted" -> resolveSubscriptionOwner(object).ifPresent(this::applyFree);
             default -> log.debug("Ignoring Stripe webhook event type: {}", type);
+        }
+        // Record AFTER dispatch, in the SAME transaction: if processing throws, this row rolls back too and Stripe's
+        // retry reprocesses; on success both commit, so a later retry of this id short-circuits above.
+        if (!eventId.isBlank()) {
+            processedEventRepository.save(new StripeProcessedEvent(eventId, type, Instant.now()));
         }
     }
 
@@ -193,6 +216,35 @@ public class BillingService {
         user.setStripeSubscriptionId(null);
         userRepository.save(user);
         log.info("Account downgraded to FREE — Stripe subscription ended (user={}).", user.getId());
+    }
+
+    /** Sets a user's plan from a subscription object's {@code status} (active/trialing -> Plus; ended -> Free). */
+    private void applySubscriptionStatus(JsonNode subscription) {
+        String status = subscription.path("status").asText("");
+        resolveSubscriptionOwner(subscription).ifPresent(user -> {
+            if (PLUS_STATUSES.contains(status)) {
+                applyPlus(user, text(subscription, "customer"), text(subscription, "id"));
+            } else if (ENDED_STATUSES.contains(status)) {
+                applyFree(user);
+            }
+            // 'incomplete' (awaiting the first payment) and unknown statuses: leave the plan unchanged.
+        });
+    }
+
+    /**
+     * Resolves the account a subscription event belongs to. For {@code customer.subscription.*} events the object's
+     * {@code id} IS the subscription id and {@code customer} the customer id. Prefer the subscription id, then fall
+     * back to the customer id — the subscription id can be absent if it wasn't stored at checkout.
+     */
+    private Optional<AppUser> resolveSubscriptionOwner(JsonNode subscription) {
+        String subscriptionId = subscription.path("id").asText("");
+        String customerId = subscription.path("customer").asText("");
+        Optional<AppUser> bySubscription = subscriptionId.isBlank()
+                ? Optional.empty() : userRepository.findByStripeSubscriptionId(subscriptionId);
+        if (bySubscription.isPresent()) {
+            return bySubscription;
+        }
+        return customerId.isBlank() ? Optional.empty() : userRepository.findByStripeCustomerId(customerId);
     }
 
     // --- Stripe webhook signature (HMAC-SHA256 over "<timestamp>.<payload>"); package-private for tests ---

@@ -30,6 +30,7 @@ class BillingServiceTest {
     private static final String WEBHOOK_SECRET = "whsec_test";
 
     private AppUserRepository userRepository;
+    private StripeProcessedEventRepository processedEventRepository;
     private FakeHttp http;
     private BillingService service;
 
@@ -37,9 +38,10 @@ class BillingServiceTest {
     void setUp() {
         userRepository = mock(AppUserRepository.class);
         when(userRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        processedEventRepository = mock(StripeProcessedEventRepository.class);
         http = new FakeHttp();
         StripeProperties properties = new StripeProperties(SECRET_KEY, "pk_test_x", "price_x", WEBHOOK_SECRET);
-        service = new BillingService(properties, userRepository, http, new ObjectMapper());
+        service = new BillingService(properties, userRepository, processedEventRepository, http, new ObjectMapper());
     }
 
     @Test
@@ -118,6 +120,50 @@ class BillingServiceTest {
     }
 
     @Test
+    void webhookIsIdempotentForAnAlreadyProcessedEvent() throws Exception {
+        // Stripe delivers at-least-once; a duplicate of an event we already applied must NOT re-apply anything.
+        String payload = "{\"id\":\"evt_1\",\"type\":\"checkout.session.completed\",\"data\":{\"object\":"
+                + "{\"client_reference_id\":\"u1\",\"customer\":\"cus_1\",\"subscription\":\"sub_1\"}}}";
+        when(processedEventRepository.existsById("evt_1")).thenReturn(true);
+
+        service.handleWebhook(payload, signed(payload));
+
+        verify(userRepository, never()).save(any());
+        verify(processedEventRepository, never()).save(any());
+    }
+
+    @Test
+    void webhookDowngradesToFreeWhenTheSubscriptionGoesPastDue() throws Exception {
+        // A failed card moves the subscription to past_due — the user must lose Plus, not keep it for free.
+        String payload = "{\"id\":\"evt_2\",\"type\":\"customer.subscription.updated\",\"data\":{\"object\":"
+                + "{\"id\":\"sub_1\",\"customer\":\"cus_1\",\"status\":\"past_due\"}}}";
+        AppUser plusUser = user("u1", "a@b.com", "PLUS");
+        plusUser.setStripeSubscriptionId("sub_1");
+        when(userRepository.findByStripeSubscriptionId("sub_1")).thenReturn(Optional.of(plusUser));
+
+        service.handleWebhook(payload, signed(payload));
+
+        assertThat(plusUser.getPlan()).isEqualTo("FREE");
+        verify(processedEventRepository).save(any(StripeProcessedEvent.class));
+    }
+
+    @Test
+    void webhookUpgradesViaCustomerFallbackWhenSubscriptionIdWasNotStored() throws Exception {
+        // The subscription id can be null at checkout.session.completed; a later subscription.updated must still
+        // resolve the account by its Stripe customer id.
+        String payload = "{\"id\":\"evt_3\",\"type\":\"customer.subscription.updated\",\"data\":{\"object\":"
+                + "{\"id\":\"sub_9\",\"customer\":\"cus_9\",\"status\":\"active\"}}}";
+        AppUser freeUser = user("u9", "c@d.com", "FREE");
+        when(userRepository.findByStripeSubscriptionId("sub_9")).thenReturn(Optional.empty());
+        when(userRepository.findByStripeCustomerId("cus_9")).thenReturn(Optional.of(freeUser));
+
+        service.handleWebhook(payload, signed(payload));
+
+        assertThat(freeUser.getPlan()).isEqualTo("PLUS");
+        assertThat(freeUser.getStripeSubscriptionId()).isEqualTo("sub_9");
+    }
+
+    @Test
     void webhookRejectsAnInvalidSignature() {
         assertThatThrownBy(() -> service.handleWebhook("{}", "t=1,v1=bad"))
                 .isInstanceOf(InvalidWebhookException.class);
@@ -160,6 +206,12 @@ class BillingServiceTest {
             hex.append(Character.forDigit(b & 0xF, 16));
         }
         return hex.toString();
+    }
+
+    /** A currently-valid Stripe-Signature header for the given payload. */
+    private static String signed(String payload) throws Exception {
+        long now = Instant.now().getEpochSecond();
+        return "t=" + now + ",v1=" + hmacHex(WEBHOOK_SECRET, now + "." + payload);
     }
 
     /** A fake Stripe transport: captures the last POST body / DELETE path, returns canned JSON. */

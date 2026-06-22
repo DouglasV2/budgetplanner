@@ -160,6 +160,23 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.84 — Stripe webhook hardening (idempotency + dunning lifecycle) (current)
+- **Idempotency.** Stripe delivers at-least-once and retries on any non-2xx, so the same event arrives more than
+  once; the handler applied it every time. Added a `stripe_processed_events` table (event id PK, **Flyway V2**) +
+  entity/repo; `handleWebhook` skips an event id it has already applied (recorded in the same transaction, so a
+  processing failure rolls back and Stripe's retry reprocesses). Safe to add non-idempotent side-effects later.
+- **Dunning lifecycle.** It only handled `checkout.session.completed` + `customer.subscription.deleted`, so a
+  failed card (→ `past_due`/`unpaid`/`canceled`) kept full Plus for free the whole dunning window. Now drives the
+  entitlement off the live subscription status: `customer.subscription.created|updated` → `active`/`trialing` keeps
+  Plus, `past_due`/`unpaid`/`canceled`/`incomplete_expired` downgrades to Free; a recovered card (→ active)
+  re-upgrades automatically. `incomplete` is left untouched.
+- **Customer fallback.** The subscription id can be null at `checkout.session.completed`; a later lifecycle event
+  now resolves the account by **Stripe customer id** (`findByStripeCustomerId`) when the subscription id wasn't
+  stored — so a churned user can't get stranded on Plus by a missed id.
+- Signature verification (HMAC, constant-time, replay window) was already correct — untouched. `BillingServiceTest`
+  +3 (idempotent duplicate, past_due downgrade, active-via-customer-fallback). Backend **242 tests / 0**; prod
+  image boots a fresh DB → Flyway applies V1+V2, `validate` passes, `stripe_processed_events` present.
+
 ### Sprint 10.83 — Flyway: coherent, durable prod schema management (current)
 - **The schema story was incoherent and a launch foot-gun.** Base `ddl-auto=create` (wipes the schema every
   restart); prod default `validate` **wouldn't boot a fresh managed DB** (nothing creates the tables); DEPLOY.md
