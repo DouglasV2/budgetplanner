@@ -160,6 +160,19 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.80 — Kitchen depth across 12 thin markets (verified, no fabrication) (current)
+- **+33 real IKEA products** filling the kitchen gap in every market that only had ~5–14 items: the two iconic
+  carts **RÅSKOG** (art. 30586783) + **NISSAFORS** (art. 40465733) and the **TORNVIKEN** wall shelf (art. 60391661),
+  which previously existed only in HR/ES/PT. Now added to **AT, DE, IT, FR, NL, GB, SK, SI, FI, SE, NO, DK** in each
+  market's **local currency** (RÅSKOG €29.99–€39.99 / 349 SEK / 349 NOK / 229 DKK / £29, etc.).
+- **Sourced then independently re-verified.** A 24-agent workflow fetched each market's IKEA page via the
+  number-trick (`/p/-<article>/`), then a **second agent re-fetched every URL** and confirmed name+price (default:
+  reject). **33 confirmed, 0 rejected.** The verifier caught and **corrected** wrong slugs the first pass produced
+  (FR/FI TORNVIKEN pointed at the 50 cm variant; SE slugs hit a category page; NL/SI 404 → bare-number fallback).
+- 3 SI rows kept the global IKEA image without a re-load → marked `imageVerified:false` (price+name verified). All
+  rows `reviewRating/reviewCount:null` (not verified). New `/catalog/real-ikea-kitchen-carts-10-80.json` + seeder
+  entry. `StoreLinkIntegrity` (+ the per-country runtime tests) validate the file; live-boot reseed confirmed.
+
 ### Sprint 10.79 — De-scope home-gym + kitchen-storage sourcing (current)
 - **home-gym de-scoped from the UX** (it always came back empty — no verified gym products; IKEA's DAJLIEN range
   is discontinued, Decathlon is feed-blocked). Removed from the **room picker** + the **quick-start templates**;

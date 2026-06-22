@@ -202,7 +202,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-ikea-es-kitchen.json",
             // Sprint 10.79: kitchen-storage depth — verified IKEA ES (TORNVIKEN/KUNGSFORS shelves) + a full PT
             // kitchen (carts + storage). Names + EUR prices + og:image read off ikea.com/{es,pt} on 2026-06-22.
-            "/catalog/real-ikea-kitchen-storage-10-79.json"
+            "/catalog/real-ikea-kitchen-storage-10-79.json",
+            // Sprint 10.80: RÅSKOG + NISSAFORS carts + TORNVIKEN wall shelf across 12 thin kitchen markets
+            // (AT/DE/IT/FR/NL/GB/SK/SI/FI/SE/NO/DK). Each row's name + local-currency price was fetched, then
+            // independently re-fetched by a second agent (33 confirmed, 0 rejected). 3 SI images not re-loaded
+            // (imageVerified=false). Verified on ikea.com/* on 2026-06-22; re-check before production.
+            "/catalog/real-ikea-kitchen-carts-10-80.json"
     );
 
     /**
