@@ -156,7 +156,7 @@ public class PromptIntelligenceService {
                 + "mustHaveCategories, alreadyHaveCategories, avoidCategories, colorPreferences, materialPreferences, "
                 + "qualityPreference, urgency, confidence, missingImportantInfo, userGoalSummary, normalizedPrompt, warnings.\n"
                 + "roomType MORA biti TOČNO jedna od ovih kanonskih engleskih vrijednosti: "
-                + "[living-room, bedroom, home-office, home-gym, kitchen, dining-room, hallway, bathroom]. "
+                + "[living-room, bedroom, home-office, kitchen, dining-room, hallway, bathroom]. "
                 + "PREVEDI korisnikovu riječ za sobu s bilo kojeg jezika u tu kanonsku vrijednost, npr.: "
                 + "cuisine/Küche/kuhinja/kök/keittiö → kitchen; chambre/Schlafzimmer/spavaća soba/sovrum/dormitorio/quarto → bedroom; "
                 + "salon/salotto/woonkamer/Wohnzimmer/dnevni boravak → living-room; bureau/oficina/radni kutak/studio → home-office; "

@@ -15,7 +15,9 @@ const rooms: Array<{ value: RoomType; label: string; icon: string; hint: string 
   { value: 'living-room', label: 'form.roomLivingRoomLabel', icon: '🛋️', hint: 'form.roomLivingRoomHint' },
   { value: 'home-office', label: 'form.roomHomeOfficeLabel', icon: '💻', hint: 'form.roomHomeOfficeHint' },
   { value: 'bedroom', label: 'form.roomBedroomLabel', icon: '🛏️', hint: 'form.roomBedroomHint' },
-  { value: 'home-gym', label: 'form.roomHomeGymLabel', icon: '🏋️', hint: 'form.roomHomeGymHint' },
+  // Sprint 10.79: home-gym de-scoped — no verified gym-equipment products (IKEA's DAJLIEN range is
+  // discontinued; Decathlon is feed-blocked), so the room always came back empty. Removed from the picker.
+  // The room type + backend maps stay (dormant) so it can be re-added once a sports-retailer feed exists.
   { value: 'dining-room', label: 'form.roomDiningRoomLabel', icon: '🍽️', hint: 'form.roomDiningRoomHint' },
   { value: 'kitchen', label: 'form.roomKitchenLabel', icon: '🍳', hint: 'form.roomKitchenHint' },
   { value: 'hallway', label: 'form.roomHallwayLabel', icon: '🚪', hint: 'form.roomHallwayHint' },
@@ -135,22 +137,6 @@ const starterTemplates: Array<{ title: string; subtitle: string; promptKey: stri
       retailerMode: 'multi',
       furnishingLevel: 'comfort',
       mustHaveCategories: ['desk', 'chair', 'storage', 'lighting'],
-      alreadyHaveCategories: []
-    }
-  },
-  {
-    title: 'form.templateHomeGymTitle',
-    subtitle: 'form.templateHomeGymSubtitle',
-    promptKey: 'form.templateHomeGymPrompt',
-    input: {
-      budget: 1200,
-      roomType: 'home-gym',
-      style: 'modern',
-      size: 16,
-      selectedRetailers: ['Decathlon', 'Pevex'],
-      retailerMode: 'multi',
-      furnishingLevel: 'basic',
-      mustHaveCategories: ['gym-equipment', 'storage', 'lighting'],
       alreadyHaveCategories: []
     }
   },

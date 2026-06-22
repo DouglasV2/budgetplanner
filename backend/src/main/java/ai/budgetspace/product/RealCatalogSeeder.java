@@ -199,7 +199,10 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-ikea-gb-rooms.json",
             // Sprint 10.77: kitchen depth for Spain (the thinnest kitchen market). Verified IKEA ES carts +
             // pendant, EUR prices + og:image read off ikea.com/es on 2026-06-21 (reviews left null — not verified).
-            "/catalog/real-ikea-es-kitchen.json"
+            "/catalog/real-ikea-es-kitchen.json",
+            // Sprint 10.79: kitchen-storage depth — verified IKEA ES (TORNVIKEN/KUNGSFORS shelves) + a full PT
+            // kitchen (carts + storage). Names + EUR prices + og:image read off ikea.com/{es,pt} on 2026-06-22.
+            "/catalog/real-ikea-kitchen-storage-10-79.json"
     );
 
     /**

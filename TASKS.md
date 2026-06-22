@@ -160,6 +160,20 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.79 — De-scope home-gym + kitchen-storage sourcing (current)
+- **home-gym de-scoped from the UX** (it always came back empty — no verified gym products; IKEA's DAJLIEN range
+  is discontinued, Decathlon is feed-blocked). Removed from the **room picker** + the **quick-start templates**;
+  removed from the **AI system prompt's roomType list** and the **rule-based extractor's gym→home-gym mapping**,
+  so neither path produces it. A gym prompt now falls to a default room (a non-empty plan) instead of an empty
+  home-gym. The `RoomType` + backend room→category maps stay (dormant) → one-line re-add once a sports feed exists.
+- **Verified kitchen-storage + kitchen sourcing (no fabrication):** +9 real IKEA products, names + EUR prices +
+  og:image read off ikea.com/{es,pt} on 2026-06-22 (reviews `null` — not verified):
+  - **ES kitchen-storage (was 0):** TORNVIKEN shelf €70, KUNGSFORS shelf €25.99, KUNGSFORS rail+shelf €81.96.
+  - **PT kitchen (was thin):** RÅSKOG/NISSAFORS/BEKVÄM/FÖRHÖJA carts + TORNVIKEN/KUNGSFORS storage (€20–139).
+  New `/catalog/real-ikea-kitchen-storage-10-79.json` + seeder entry. (Bare-number trick: VADHOLMA didn't resolve
+  → skipped; TORNVIKEN/KUNGSFORS/carts did.)
+- `PlannerIntentExtractorTest` updated for the de-scope; `StoreLinkIntegrity` validates the new JSON.
+
 ### Sprint 10.78 — Instant plan + AI refine (kill the 2s wait) (current)
 - Generation no longer makes the user stare at a ~2s LLM spinner. **Two-phase:** the frontend fires a fast
   deterministic plan AND the AI plan in parallel — paints the **rule-based draft in ~0.13s** (spinner off), shows

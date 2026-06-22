@@ -73,8 +73,13 @@ class PlannerIntentExtractorTest {
 
     @Test
     void basicLevelIsRecognised() {
-        assertThat(parse("Kućna teretana do 500 €, samo osnovno.").furnishingLevel()).isEqualTo("basic");
-        assertThat(parse("Kućna teretana do 500 €, samo osnovno.").roomType()).isEqualTo("home-gym");
+        assertThat(parse("Spavaća soba do 500 €, samo osnovno.").furnishingLevel()).isEqualTo("basic");
+    }
+
+    @Test
+    void gymPromptNoLongerMapsToHomeGym() {
+        // Sprint 10.79: home-gym is de-scoped (no verified gym products), so a gym prompt must NOT yield it.
+        assertThat(parse("Kućna teretana do 500 €, samo osnovno.").roomType()).isNotEqualTo("home-gym");
     }
 
     @Test

@@ -107,7 +107,8 @@ public class PlannerIntentExtractor {
         if (matches(text, "dnevn|boravak|living")) input = input.withRoomType("living-room");
         if (matches(text, "radni kutak|radni prostor|home office|\\bured\\b|office|posao")) input = input.withRoomType("home-office");
         if (matches(text, "spava|bedroom|spavac")) input = input.withRoomType("bedroom");
-        if (matches(text, "teretan|gym|trening|fitness")) input = input.withRoomType("home-gym");
+        // Sprint 10.79: home-gym de-scoped (no verified gym products) — a gym prompt no longer maps to it; the
+        // room defaults instead so the user still gets a (non-empty) plan rather than an empty home-gym.
         // Sprint 10.7: new rooms. Checked after the originals, so the last room mentioned wins.
         if (matches(text, "kuhinj|kitchen")) input = input.withRoomType("kitchen");
         if (matches(text, "blagovaon|trpezarij|dining")) input = input.withRoomType("dining-room");
