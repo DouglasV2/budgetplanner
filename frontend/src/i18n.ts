@@ -431,6 +431,8 @@ const DICTIONARY: Record<string, Entry> = {
   'results.emptyGetLabel': { hr: 'Dobit ćeš:', en: 'You\'ll get:' },
   'results.emptyGetItems': { hr: 'konkretne proizvode · ukupnu cijenu · popis za kupnju', en: 'concrete products · total price · shopping list' },
   'results.partialPlan': { hr: 'Plan je djelomičan', en: 'The plan is partial' },
+  // Sprint 10.105: free-beta notice for the one-time Design Session model (premium temporarily free).
+  'beta.notice': { hr: 'Rani beta pristup — sve Design Session funkcije su zasad besplatne dok poboljšavamo proizvod.', en: 'Early beta access — all Design Session features are free for now while we improve the product.' },
   'results.kitchenNote': { hr: 'Planiramo slobodnostojeći kuhinjski namještaj — otok/kolica, police i rasvjetu, ne ugradbene kuhinje po mjeri.', en: 'We plan freestanding kitchen furniture — island/cart, shelves and lighting, not fitted built-in kitchens.' },
   'results.kitchenFittedNote': { hr: 'Tražiš ugradbenu kuhinju po mjeri? BudgetSpace planira slobodnostojeći namještaj. Za kuhinju po mjeri koristi IKEA-in planer kuhinje ili posjeti trgovinu.', en: 'Looking for a fitted, made-to-measure kitchen? BudgetSpace plans freestanding pieces. For a fitted kitchen, use IKEA\'s kitchen planner or visit a store.' },
   'results.kitchenFittedLink': { hr: 'Otvori IKEA', en: 'Open IKEA' },

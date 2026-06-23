@@ -4249,6 +4249,30 @@ textarea {
   text-decoration: underline;
 }
 
+/* Sprint 10.105: free-beta notice for the one-time Design Session model — a slim, friendly pill. */
+.beta-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 1120px;
+  margin: 12px auto 0;
+  padding: 9px 16px;
+  border: 1px solid rgba(236, 122, 46, 0.25);
+  border-radius: 999px;
+  background: rgba(236, 122, 46, 0.08);
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+.beta-notice-badge {
+  font-size: 15px;
+}
+.beta-notice-text {
+  font-weight: 560;
+}
+
 .shopping-list-lead {
   margin: 0;
   color: #3f563a;

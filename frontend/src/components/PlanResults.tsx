@@ -899,6 +899,11 @@ export function PlanResults({
 
   return (
     <ResultShell>
+      {/* GATING SEAM (Sprint 10.105 — one-time Design Session model). In the free beta everything below is shown
+          for free (AuthContext premiumUnlocked === true). When one-time payments are wired, read `premiumUnlocked`
+          from useAuth() and, when it's false, render a PREVIEW here (recommended style + budget-by-category +
+          "N matching products found") instead of the full output, gating the exact products / store links /
+          alternatives / downloadable list behind a purchased session. No premium feature is gated during beta. */}
       {partialNotice && (
         <div className="partial-plan-note" role="status">
           <strong>{t('results.partialPlan')}</strong>

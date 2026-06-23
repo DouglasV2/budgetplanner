@@ -191,7 +191,7 @@ export function Planner() {
   const { market, config, setMarket, t } = useLocale();
   // Sprint 10.63: real auth. When the signed-in user changes (sign-in/out), the saved-plans inbox refetches so
   // the now account-owned plans (migrated from the guest session on first sign-in) appear.
-  const { user, openSignIn, billingEnabled, aiEnabled, plusEnabled } = useAuth();
+  const { user, openSignIn, billingEnabled, aiEnabled, betaMode } = useAuth();
   const isPlus = user?.plan === 'PLUS' || user?.plan === 'PRO';
   // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
   // the active market's language (the user can then edit freely).
@@ -568,22 +568,21 @@ export function Planner() {
       {!config.available && <div className="planner-notice market-note">{t('planner.marketComingSoon')}</div>}
 
       {notice && <div className="planner-notice">{notice}</div>}
-      {/* Sprint 10.103: the save-limit Plus upsell only shows when Plus is enabled. In the free beta the cap is
-          raised high (env) so it never fires anyway, and this card stays hidden so no Plus is advertised. */}
-      {plusEnabled && saveLimitHit && (
+      {/* Sprint 10.105: no upsell in the free beta. The save cap is raised high (env) so it never fires, and this
+          card stays hidden. When one-time payments are wired (betaMode=false) it becomes the Design Session unlock. */}
+      {!betaMode && saveLimitHit && (
         <div className="planner-upsell" role="status">
           <p className="planner-upsell-text">{t('plus.saveLimitUpsell')}</p>
           <div className="planner-upsell-actions">{upsellCta()}</div>
         </div>
       )}
-      {/* AI-allowance nudge: when AI is on and a non-Plus user's daily allowance is spent. With Plus enabled it's
-          the upgrade carrot; in the free beta (plusEnabled=false) it degrades to honest "come back tomorrow" copy
-          with no Plus mention and no upgrade CTA (Sprint 10.103). */}
+      {/* AI-allowance nudge: when AI is on and the daily allowance is spent. In the free beta it's honest "come
+          back tomorrow" copy with no price/CTA; when payments are wired (betaMode=false) it becomes the unlock. */}
       {aiEnabled && analysis && !analysis.aiUsed && !isPlus && !aiNudgeDismissed && (
         <div className="planner-upsell" role="status">
-          <p className="planner-upsell-text">{t(plusEnabled ? 'plus.aiUpsell' : 'plus.aiCapBeta')}</p>
+          <p className="planner-upsell-text">{t(betaMode ? 'plus.aiCapBeta' : 'plus.aiUpsell')}</p>
           <div className="planner-upsell-actions">
-            {plusEnabled && upsellCta()}
+            {!betaMode && upsellCta()}
             <button type="button" className="planner-upsell-dismiss" onClick={() => setAiNudgeDismissed(true)}>{t('plus.dismiss')}</button>
           </div>
         </div>

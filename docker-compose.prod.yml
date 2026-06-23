@@ -49,9 +49,11 @@ services:
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
       STRIPE_PLUS_PRICE_ID: ${STRIPE_PLUS_PRICE_ID:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-      # Sprint 10.103: FREE-BETA mode. Plus/pricing surface hidden (free app); flip to true when you go paid.
-      BUDGETSPACE_PLUS_ENABLED: ${BUDGETSPACE_PLUS_ENABLED:-false}
-      # Free beta: don't block saving — high cap so the 402 Plus-upsell never fires.
+      # Sprint 10.105: FREE BETA (one-time Design Session model, replaces subscriptions). true => all premium
+      # unlocked for free + beta notice, no prices/checkout. Flip BUDGETSPACE_BETA_MODE=false once one-time
+      # payments are wired to gate premium behind a purchased session.
+      BUDGETSPACE_BETA_MODE: ${BUDGETSPACE_BETA_MODE:-true}
+      # Free beta: don't block saving — high cap so the save cap never bites.
       BUDGETSPACE_PLUS_FREE_SAVED_LIMIT: ${BUDGETSPACE_PLUS_FREE_SAVED_LIMIT:-1000}
       # AI (Gemini) — blank key => deterministic rule-based fallback (no external calls, no cost). If you turn AI
       # on for the beta as a free taste, these caps bound the spend: monthly USD is the global hard stop, the

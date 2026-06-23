@@ -36,21 +36,21 @@ public class AuthController {
     private final ai.budgetspace.billing.StripeProperties stripeProperties;
     private final ai.budgetspace.billing.BillingService billingService;
     private final ai.budgetspace.ai.LlmClientFactory clientFactory;
-    // Sprint 10.103: master switch for the Plus/pricing surface. Default false → the free beta hides it; flip
-    // BUDGETSPACE_PLUS_ENABLED=true to bring Plus back (no code change).
-    private final boolean plusEnabled;
+    // Sprint 10.105: free-beta switch for the one-time Design Session model. Default true → all premium unlocked
+    // for free + beta notice; flip BUDGETSPACE_BETA_MODE=false once one-time payments are wired (no code change).
+    private final boolean betaMode;
 
     public AuthController(AuthService authService, AuthProperties properties,
                           ai.budgetspace.billing.StripeProperties stripeProperties,
                           ai.budgetspace.billing.BillingService billingService,
                           ai.budgetspace.ai.LlmClientFactory clientFactory,
-                          @Value("${budgetspace.plus.enabled:false}") boolean plusEnabled) {
+                          @Value("${budgetspace.beta-mode:true}") boolean betaMode) {
         this.authService = authService;
         this.properties = properties;
         this.stripeProperties = stripeProperties;
         this.billingService = billingService;
         this.clientFactory = clientFactory;
-        this.plusEnabled = plusEnabled;
+        this.betaMode = betaMode;
     }
 
     /** Sign in with a Google ID token. Sets the session cookie and returns the signed-in profile. */
@@ -70,7 +70,7 @@ public class AuthController {
         AuthUserDto user = authService.authenticate(sessionToken).map(AuthController::toDto).orElse(null);
         return new AuthMeResponse(user, properties.googleEnabled(),
                 properties.googleEnabled() ? properties.googleClientId() : null,
-                stripeProperties.configured(), clientFactory.activeClient().isPresent(), plusEnabled);
+                stripeProperties.configured(), clientFactory.activeClient().isPresent(), betaMode);
     }
 
     /** Sign out: delete the server session and clear the cookie. */

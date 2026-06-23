@@ -47,9 +47,9 @@ services:
       SENTRY_DSN: ${SENTRY_DSN:-}
       SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-dev}
       SENTRY_DEBUG: ${SENTRY_DEBUG:-false}
-      # Sprint 10.103: show the Plus/pricing surface in DEV so it can still be developed; prod defaults to false
-      # (free beta hides it). Set to false here too if you want to preview the beta (hidden-Plus) experience.
-      BUDGETSPACE_PLUS_ENABLED: ${BUDGETSPACE_PLUS_ENABLED:-true}
+      # Sprint 10.105: free beta (one-time Design Session model) — all premium unlocked + beta notice. Set
+      # BUDGETSPACE_BETA_MODE=false to preview the future paid (gated) experience locally.
+      BUDGETSPACE_BETA_MODE: ${BUDGETSPACE_BETA_MODE:-true}
       # Spring Boot DevTools auto-restart loops under a Docker bind mount (it watches target/classes,
       # which mvn spring-boot:run itself rewrites) → the backend kept restarting and requests in that
       # window failed with ERR_EMPTY_RESPONSE / "no Access-Control-Allow-Origin" in the browser. Keep

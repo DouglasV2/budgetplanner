@@ -233,9 +233,10 @@ export interface AuthMe {
   // Sprint 10.89: true when the AI layer is usable → show the "Plus = more AI" nudge only when upgrading would
   // actually unlock more AI (never when AI is off entirely).
   aiEnabled: boolean;
-  // Sprint 10.103: master switch for the Plus/pricing surface. false during the free beta → hide the pricing
-  // section + all in-app upsells. Re-enabled from the backend (BUDGETSPACE_PLUS_ENABLED) with no frontend change.
-  plusEnabled: boolean;
+  // Sprint 10.105: free-beta switch for the one-time "Design Session" model (replaces Plus/Pro subscriptions).
+  // true → all premium features unlocked for free + a beta notice, no prices/checkout. Backend-driven
+  // (BUDGETSPACE_BETA_MODE), so payments later flip on with no frontend rebuild.
+  betaMode: boolean;
 }
 
 /** Who (if anyone) is signed in, plus whether Google sign-in is available and the client id to render it. */

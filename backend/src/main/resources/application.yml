@@ -71,13 +71,13 @@ budgetspace:
       # A split-host deploy (frontend and backend on UNRELATED domains) needs None — which forces Secure on automatically.
       cookie-samesite: ${BUDGETSPACE_AUTH_COOKIE_SAMESITE:Lax} # Lax | Strict | None (None ⇒ Secure, HTTPS only)
       cleanup-cron: ${BUDGETSPACE_AUTH_SESSION_CLEANUP_CRON:0 30 3 * * *} # daily prune of expired/idle sessions
+  # Sprint 10.105: free-beta switch for the one-time "Design Session" model (replaces Plus/Pro subscriptions).
+  # true (default) → all premium features unlocked for free + a beta notice, no prices/checkout (surfaced as
+  # betaMode on /api/auth/me). Flip BUDGETSPACE_BETA_MODE=false once one-time payments are wired to gate premium.
+  beta-mode: ${BUDGETSPACE_BETA_MODE:true}
   plus:
-    # Sprint 10.103: master switch for the Plus/pricing surface. false (default) → free beta: the pricing section
-    # + in-app upsells are hidden (surfaced as plusEnabled on /api/auth/me). Flip BUDGETSPACE_PLUS_ENABLED=true
-    # to bring Plus back once you register a business + go paid — no code change. Dev compose sets it true.
-    enabled: ${BUDGETSPACE_PLUS_ENABLED:false}
-    # Sprint 10.68: Free tier may save this many plans before Plus is required (Plus = unlimited). In the free
-    # beta set this high (compose: 1000) so a free user is never blocked from saving (the 402 upsell can't fire).
+    # Sprint 10.68: Free tier may save this many plans before the cap (kept as a generic limit). In the free beta
+    # set this high (compose: 1000) so a user is never blocked from saving (the 402 path can't fire).
     free-saved-limit: ${BUDGETSPACE_PLUS_FREE_SAVED_LIMIT:3}
   stripe:
     # Sprint 10.69: Stripe billing for Plus (TEST). Secret key + price id are required to enable checkout; blank

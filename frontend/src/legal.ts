@@ -58,8 +58,8 @@ const HR: Record<LegalKey, LegalDoc> = {
       { heading: 'Račun', body: [
         'Za spremanje i AI asistenta prijavljuješ se Google računom; odgovoran si za njegovu sigurnost.',
       ] },
-      { heading: 'Plus pretplata', body: [
-        'Trenutno je usluga potpuno besplatna. Plus (planiran: 5,99 €/mjesečno preko Stripea, mjesečna obnova, otkaz bilo kad) tek je u pripremi; kad postane dostupan, primjenjivat će se i Stripeovi uvjeti.',
+      { heading: 'Design Session', body: [
+        'Trenutno je usluga potpuno besplatna (rana beta) — sve funkcije su otključane. Nema pretplate ni mjesečne naplate. U budućnosti planiramo jednokratnu naplatu po "Design Sessionu" (jedno plaćanje, bez obnove); cijena i uvjeti bit će jasno prikazani prije bilo kakve naplate.',
       ] },
       { heading: 'Prihvatljivo korištenje', body: [
         'Ne zloupotrebljavaj uslugu — bez automatiziranog preopterećenja ni pokušaja zaobilaženja ograničenja.',
@@ -127,8 +127,8 @@ const EN: Record<LegalKey, LegalDoc> = {
       { heading: 'Account', body: [
         'Saving and the AI assistant use Google sign-in; you are responsible for your account’s security.',
       ] },
-      { heading: 'Plus subscription', body: [
-        'The service is currently entirely free. Plus (planned: €5.99/month via Stripe, monthly renewal, cancel anytime) is not available yet; once it launches, Stripe’s terms will also apply.',
+      { heading: 'Design Session', body: [
+        'The service is currently entirely free (early beta) — all features are unlocked. There is no subscription and no recurring billing. In the future we plan a one-time charge per "Design Session" (a single payment, no renewal); the price and terms will be shown clearly before any charge.',
       ] },
       { heading: 'Acceptable use', body: [
         'Do not abuse the service — no automated overload or attempts to bypass limits.',

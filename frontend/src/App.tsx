@@ -2,7 +2,7 @@ import { AuthGate } from './components/AuthGate';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { HowItWorks } from './components/HowItWorks';
-import { Monetization } from './components/Monetization';
+import { BetaNotice } from './components/BetaNotice';
 import { Planner } from './components/Planner';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LocaleProvider } from './LocaleContext';
@@ -14,7 +14,7 @@ function isSharedPlanLink() {
 }
 
 function AppShell() {
-  const { user, loading, guestContinued, plusEnabled } = useAuth();
+  const { user, loading, guestContinued, betaMode } = useAuth();
   const shared = isSharedPlanLink();
   // Returning guests and shared-link recipients are decided synchronously (sessionStorage / pathname), so they
   // render immediately. Only a truly-undecided first visit waits for the /me round-trip — showing a neutral
@@ -29,11 +29,11 @@ function AppShell() {
   return (
     <main>
       <Header />
+      {/* Sprint 10.105: one-time Design Session model (no subscriptions). During the free beta a slim notice tells
+          users premium is temporarily free; the old subscription pricing section is no longer rendered. */}
+      {betaMode && <BetaNotice />}
       <Planner />
       <HowItWorks />
-      {/* Sprint 10.103: the Plus/pricing section is hidden during the free beta (plusEnabled=false from the
-          backend). Flip BUDGETSPACE_PLUS_ENABLED=true to bring it back — the component is untouched. */}
-      {plusEnabled && <Monetization />}
       <Footer />
       {showGate && <AuthGate />}
     </main>
