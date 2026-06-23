@@ -8,9 +8,15 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -170,6 +176,70 @@ class BillingServiceTest {
         verify(userRepository, never()).save(any());
     }
 
+    // --- Sprint 10.98: reconciliation backstop for dropped/missed webhooks ---
+
+    @Test
+    void reconcileDowngradesACanceledSubscriptionStillMarkedPlus() {
+        // Revenue leak: the customer.subscription.deleted/updated webhook was dropped, so a canceled user kept PLUS.
+        AppUser stale = user("u1", "a@b.com", "PLUS");
+        stale.setStripeSubscriptionId("sub_1");
+        when(userRepository.findByStripeSubscriptionIdIsNotNull()).thenReturn(List.of(stale));
+        http.getByPath.put("/v1/subscriptions/sub_1", "{\"id\":\"sub_1\",\"customer\":\"cus_1\",\"status\":\"canceled\"}");
+
+        assertThat(service.reconcileSubscriptions()).isEqualTo(1);
+        assertThat(stale.getPlan()).isEqualTo("FREE");
+        verify(userRepository).save(stale);
+    }
+
+    @Test
+    void reconcileUpgradesAPaidSubscriptionStuckOnFree() {
+        // Paid-no-access: the checkout.session.completed webhook was dropped, so the payer is still FREE.
+        AppUser stuck = user("u2", "c@d.com", "FREE");
+        stuck.setStripeSubscriptionId("sub_2");
+        when(userRepository.findByStripeSubscriptionIdIsNotNull()).thenReturn(List.of(stuck));
+        http.getByPath.put("/v1/subscriptions/sub_2", "{\"id\":\"sub_2\",\"customer\":\"cus_2\",\"status\":\"active\"}");
+
+        assertThat(service.reconcileSubscriptions()).isEqualTo(1);
+        assertThat(stuck.getPlan()).isEqualTo("PLUS");
+    }
+
+    @Test
+    void reconcileLeavesAnAlreadyCorrectSubscriptionUntouched() {
+        AppUser ok = user("u3", "e@f.com", "PLUS");
+        ok.setStripeSubscriptionId("sub_3");
+        when(userRepository.findByStripeSubscriptionIdIsNotNull()).thenReturn(List.of(ok));
+        http.getByPath.put("/v1/subscriptions/sub_3", "{\"id\":\"sub_3\",\"customer\":\"cus_3\",\"status\":\"active\"}");
+
+        assertThat(service.reconcileSubscriptions()).isZero();
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void reconcileSkipsAStripeErrorWithoutAWrongDowngradeAndStillFixesTheRest() {
+        // A transient Stripe error for one account must NOT downgrade it (that would be a wrong, harmful change) and
+        // must NOT abort the sweep — the reachable account is still corrected.
+        AppUser broken = user("u4", "g@h.com", "PLUS");
+        broken.setStripeSubscriptionId("sub_bad");
+        AppUser fixable = user("u5", "i@j.com", "PLUS");
+        fixable.setStripeSubscriptionId("sub_5");
+        when(userRepository.findByStripeSubscriptionIdIsNotNull()).thenReturn(List.of(broken, fixable));
+        http.failGetPaths.add("/v1/subscriptions/sub_bad");
+        http.getByPath.put("/v1/subscriptions/sub_5", "{\"id\":\"sub_5\",\"customer\":\"cus_5\",\"status\":\"canceled\"}");
+
+        assertThat(service.reconcileSubscriptions()).isEqualTo(1);
+        assertThat(broken.getPlan()).isEqualTo("PLUS"); // untouched on error — no wrong downgrade
+        assertThat(fixable.getPlan()).isEqualTo("FREE");
+    }
+
+    @Test
+    void reconcileDoesNothingWhenStripeIsNotConfigured() {
+        BillingService dormant = new BillingService(
+                new StripeProperties("", "", "", ""), userRepository, processedEventRepository, http, new ObjectMapper());
+
+        assertThat(dormant.reconcileSubscriptions()).isZero();
+        verify(userRepository, never()).findByStripeSubscriptionIdIsNotNull();
+    }
+
     @Test
     void cancelSubscriptionDeletesItAtStripe() {
         service.cancelSubscriptionQuietly("sub_1");
@@ -214,10 +284,12 @@ class BillingServiceTest {
         return "t=" + now + ",v1=" + hmacHex(WEBHOOK_SECRET, now + "." + payload);
     }
 
-    /** A fake Stripe transport: captures the last POST body / DELETE path, returns canned JSON. */
+    /** A fake Stripe transport: captures the last POST body / DELETE path, returns canned JSON (per-path for GET). */
     private static final class FakeHttp implements BillingService.StripeHttp {
         String postResponse = "{}";
         String getResponse = "{}";
+        final Map<String, String> getByPath = new HashMap<>();   // path -> canned JSON (falls back to getResponse)
+        final Set<String> failGetPaths = new HashSet<>();        // paths that simulate a Stripe error
         String lastPostBody;
         String lastDeletePath;
         boolean failDelete;
@@ -229,8 +301,11 @@ class BillingServiceTest {
         }
 
         @Override
-        public String get(String path, String secretKey) {
-            return getResponse;
+        public String get(String path, String secretKey) throws IOException {
+            if (failGetPaths.contains(path)) {
+                throw new IOException("Stripe API HTTP 500");
+            }
+            return getByPath.getOrDefault(path, getResponse);
         }
 
         @Override

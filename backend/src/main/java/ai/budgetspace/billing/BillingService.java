@@ -188,6 +188,49 @@ public class BillingService {
     }
 
     /**
+     * Sprint 10.98 — reconciliation backstop for dropped/missed webhooks. Stripe delivers webhooks at-least-once
+     * but can also DROP or delay them (or the endpoint can be briefly down), leaving the local plan out of sync:
+     * a canceled/past-due subscriber still on PLUS (revenue leak) or a paid subscriber stuck on FREE
+     * (paid-no-access). This periodically re-reads each stored subscription's LIVE status from Stripe and corrects
+     * any drift. Idempotent and safe to run often; writes only when a plan actually needs to change. A transient
+     * error for one account is logged and skipped so it never aborts the sweep. Dormant when Stripe isn't configured.
+     *
+     * @return the number of accounts whose plan was corrected.
+     */
+    @Transactional
+    public int reconcileSubscriptions() {
+        if (!properties.configured()) {
+            return 0;
+        }
+        int corrected = 0;
+        for (AppUser user : userRepository.findByStripeSubscriptionIdIsNotNull()) {
+            String subscriptionId = user.getStripeSubscriptionId();
+            try {
+                JsonNode subscription = objectMapper.readTree(
+                        http.get("/v1/subscriptions/" + urlPath(subscriptionId), properties.secretKey()));
+                String status = subscription.path("status").asText("");
+                if (PLUS_STATUSES.contains(status) && !"PLUS".equals(user.getPlan())) {
+                    applyPlus(user, text(subscription, "customer"), text(subscription, "id"));
+                    corrected++;
+                } else if (ENDED_STATUSES.contains(status) && !"FREE".equals(user.getPlan())) {
+                    applyFree(user);
+                    corrected++;
+                }
+                // Already-correct (active subscriber on PLUS, ended on FREE) or 'incomplete'/unknown: leave as-is.
+            } catch (Exception exception) {
+                if (exception instanceof InterruptedException) Thread.currentThread().interrupt();
+                // A transient Stripe/parse error for ONE account must not abort the whole sweep, and must NOT cause a
+                // wrong downgrade — skip this one, it gets re-checked on the next run.
+                log.warn("Stripe reconciliation skipped subscription {} — will retry next run.", subscriptionId, exception);
+            }
+        }
+        if (corrected > 0) {
+            log.info("Stripe reconciliation: corrected {} account plan(s) that had drifted from Stripe.", corrected);
+        }
+        return corrected;
+    }
+
+    /**
      * Sprint 10.73 — best-effort cancellation of a Stripe subscription, used when an account is deleted so a
      * removed account is never billed again. Never throws: a Stripe error (or unconfigured billing) must not
      * block the GDPR account deletion.

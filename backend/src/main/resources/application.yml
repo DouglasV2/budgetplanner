@@ -81,6 +81,9 @@ budgetspace:
     publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
     plus-price-id: ${STRIPE_PLUS_PRICE_ID:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    # Sprint 10.98: reconciliation backstop for dropped/missed webhooks — re-reads each subscription's live status
+    # from Stripe and repairs plan drift. No-op unless Stripe is configured (no surprise calls in dev). Default 6h.
+    reconcile-cron: ${BUDGETSPACE_STRIPE_RECONCILE_CRON:0 0 */6 * * *}
   real-catalog:
     # Seed the real IKEA/JYSK living-room catalog on startup (env BUDGETSPACE_REAL_CATALOG_SEED_ENABLED).
     seed-enabled: ${BUDGETSPACE_REAL_CATALOG_SEED_ENABLED:true}
