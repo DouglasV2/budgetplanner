@@ -160,6 +160,16 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.91 — Prompt test: fix European thousands-separator budgets (current)
+- Tested more prompts against the **live** parser. With AI off (the prod default), prompts are parsed by the
+  deterministic `PlannerIntentExtractor`, not the LLM — so that's the path that actually runs. Found a real bug:
+  a budget written in the **localized European format** — "1.500 €" or "1 500 €" — parsed as **500** (the digits
+  after the separator), so a user typing exactly the format the UI shows got a plan a third the intended size.
+- Fix: `findBudget` now accepts an optional dot/space thousands separator and strips it before parsing
+  ("1.500"/"1 500"/"2.000" → 1500/1500/2000); plain "1500" is unchanged. `PlannerIntentExtractorTest` +1.
+- (A full **AI/Gemini** prompt sweep still needs Docker up + AI enabled with a key — both are off right now; this
+  hardens the rule-based path that handles prompts in the meantime.)
+
 ### Sprint 10.90 — Drop the clumsy "decision headline" from results (current)
 - Removed the templated headline above the plan ("Za {budget} najisplativije je fokusirati se na {first}; {later}
   može čekati.") — it read awkwardly (it surfaced raw category labels like "sofa / kauč") and added nothing over the

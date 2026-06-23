@@ -72,6 +72,16 @@ class PlannerIntentExtractorTest {
     }
 
     @Test
+    void parsesEuropeanThousandsSeparatorBudget() {
+        // Sprint 10.91: "1.500 €" / "1 500 €" must read as 1500, not the "500" after the separator.
+        assertThat(parse("Dnevni boravak do 1.500 €, treba mi kauč.").budget()).isEqualTo(1500);
+        assertThat(parse("Imam 1 500 € za spavaću sobu.").budget()).isEqualTo(1500);
+        assertThat(parse("Kuhinja, budžet 2.000.").budget()).isEqualTo(2000);
+        // Plain (no separator) still parses unchanged.
+        assertThat(parse("Dnevni boravak do 1500 €.").budget()).isEqualTo(1500);
+    }
+
+    @Test
     void basicLevelIsRecognised() {
         assertThat(parse("Spavaća soba do 500 €, samo osnovno.").furnishingLevel()).isEqualTo("basic");
     }

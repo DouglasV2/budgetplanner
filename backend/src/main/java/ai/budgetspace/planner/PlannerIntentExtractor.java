@@ -305,9 +305,12 @@ public class PlannerIntentExtractor {
     }
 
     private Optional<Integer> findBudget(String text) {
+        // Sprint 10.91: accept European thousands separators — "1.500 €" / "1 500 €" must read as 1500, not the
+        // "500" after the separator. The number token allows dot/space grouping; strip them before parsing.
+        String number = "(\\d{1,3}(?:[.\\s]\\d{3})+|\\d{3,5})";
         List<Pattern> patterns = List.of(
-                Pattern.compile("(\\d{3,5})\\s*(?:€|eur|eura|euro)"),
-                Pattern.compile("(?:budget|budzet|do|ispod|maksimalno|maks|najvise|ne preko|ne vise od|imam|oko|otprilike)\\s*(\\d{3,5})")
+                Pattern.compile(number + "\\s*(?:€|eur|eura|euro)"),
+                Pattern.compile("(?:budget|budzet|do|ispod|maksimalno|maks|najvise|ne preko|ne vise od|imam|oko|otprilike)\\s*" + number)
         );
         int bestIndex = Integer.MAX_VALUE;
         Integer bestValue = null;
@@ -315,7 +318,7 @@ public class PlannerIntentExtractor {
             Matcher matcher = pattern.matcher(text);
             if (matcher.find() && matcher.start() < bestIndex) {
                 bestIndex = matcher.start();
-                bestValue = Integer.parseInt(matcher.group(1));
+                bestValue = Integer.parseInt(matcher.group(1).replaceAll("[.\\s]", ""));
             }
         }
         return Optional.ofNullable(bestValue);
