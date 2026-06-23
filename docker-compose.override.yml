@@ -42,6 +42,11 @@ services:
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
       STRIPE_PLUS_PRICE_ID: ${STRIPE_PLUS_PRICE_ID:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      # Sprint 10.96: Sentry error alerting. Blank SENTRY_DSN => Sentry disabled (dev logs to console as before).
+      # Set it in the gitignored root .env to test alerting locally; SENTRY_DEBUG=true prints send traces.
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-dev}
+      SENTRY_DEBUG: ${SENTRY_DEBUG:-false}
       # Spring Boot DevTools auto-restart loops under a Docker bind mount (it watches target/classes,
       # which mvn spring-boot:run itself rewrites) → the backend kept restarting and requests in that
       # window failed with ERR_EMPTY_RESPONSE / "no Access-Control-Allow-Origin" in the browser. Keep

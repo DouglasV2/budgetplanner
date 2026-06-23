@@ -57,6 +57,9 @@ services:
       # eBay PROD keys (rotated) — blank => dormant. eBay data is request-time, in-memory only, never persisted.
       BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID:-}
       BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET:-}
+      # Sentry error alerting (Sprint 10.96). Set SENTRY_DSN to alert on 500s / Stripe failures; blank => disabled.
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
     depends_on:
       postgres:
         condition: service_healthy

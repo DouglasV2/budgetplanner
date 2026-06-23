@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sprint 10.96 — logging config. Keeps Spring Boot's default console logging AND ships ERROR-level logs (with
+  stack traces) to Sentry so a production failure alerts the operator instead of dying in container stdout.
+
+  The Sentry DSN is intentionally NOT in this file: the appender reads it from the SENTRY_DSN environment variable
+  (Sentry's native lookup). Blank/unset SENTRY_DSN => Sentry initialises disabled (no-op), so local dev and any
+  un-configured deploy log to console exactly as before. Set SENTRY_DSN (+ optional SENTRY_ENVIRONMENT /
+  SENTRY_RELEASE) in the host secret store to turn alerting on. See DEPLOY.md §9.
+-->
+<configuration>
+  <!-- Spring Boot's standard console appender + level/colour defaults (so console output is unchanged). -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <!-- Toggle Sentry's own internal debug logging (event send/queue traces) via SENTRY_DEBUG=true; off by default. -->
+  <springProperty name="sentryDebug" source="sentry.debug" defaultValue="false"/>
+
+  <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
+    <options>
+      <!-- dsn omitted on purpose -> read from SENTRY_DSN env; empty => Sentry disabled. -->
+      <debug>${sentryDebug}</debug>
+    </options>
+    <!-- Only ERROR and above become Sentry events (the real failures); INFO+ ride along as breadcrumbs for context.
+         Expected client situations are logged at WARN/DEBUG (see GlobalExceptionHandler), so 4xx never alert. -->
+    <minimumEventLevel>ERROR</minimumEventLevel>
+    <minimumBreadcrumbLevel>INFO</minimumBreadcrumbLevel>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="SENTRY"/>
+  </root>
+</configuration>

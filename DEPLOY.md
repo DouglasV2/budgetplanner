@@ -113,8 +113,11 @@ The code is ready and **dormant until the secret is set** ([BillingService](back
 
 ### 9. Backups + monitoring
 - Enable **automated Postgres backups** on the managed DB (and test a restore once).
-- Add **error monitoring** (e.g. Sentry) — alerts on 500s, the AI budget breach, webhook failures. You can't watch
-  logs by hand.
+- **Error monitoring is wired (Sentry, Sprint 10.96)** — just turn it on: create a Sentry project, copy its DSN
+  (Settings → Client Keys) into **`SENTRY_DSN`**, and set **`SENTRY_ENVIRONMENT=production`**. Every ERROR-level log
+  (the catch-all 500s + Stripe failure paths) is then sent to Sentry with its stack trace, so you're alerted
+  instead of reading stdout by hand. Blank `SENTRY_DSN` ⇒ Sentry stays disabled (no-op). To confirm it works after
+  deploy, set `SENTRY_DEBUG=true` once and watch the send traces in the logs, then unset it.
 - Optional: a privacy-friendly analytics (Plausible) for the Free→Plus funnel.
 
 ## Post-deploy smoke test
@@ -143,5 +146,7 @@ The code is ready and **dormant until the secret is set** ([BillingService](back
 | `STRIPE_PLUS_PRICE_ID` | Live €5.99 price id | no |
 | `STRIPE_WEBHOOK_SECRET` | Webhook signing secret | **yes** |
 | `GEMINI_API_KEY` | Gemini key (rotated) | **yes** |
+| `SENTRY_DSN` | Sentry ingest DSN — error alerting; blank = disabled | no (write-only ingest key) |
+| `SENTRY_ENVIRONMENT` | tags Sentry events (`production`) | no |
 | `BUDGETSPACE_AI_MONTHLY_BUDGET_USD` | AI wallet hard stop | no |
 | `BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID` / `...CLIENTSECRET` | eBay PROD keys (rotated) | secret = the secret |
