@@ -212,7 +212,13 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // (BISSA/STÄLL/MACKAPÄR/TRONES/NISSEDAL, ALEX desk+drawers, MARKUS, DANDERYD, ODGER) into DK/GB/SE/
             // DE/SI/AT. Each row's name + local-currency price was fetched, then independently re-fetched by a
             // second agent (21 confirmed, 1 rejected for an article/URL mismatch). Verified on ikea.com/* 2026-06-22.
-            "/catalog/real-ikea-rooms-depth-10-87.json"
+            "/catalog/real-ikea-rooms-depth-10-87.json",
+            // Sprint 10.100: kitchen LIGHTING for the 6 markets that had zero (AT/FI/FR/GB/NO/SK) — so a kitchen
+            // plan there ships a pendant, not a lit-less room. SKURUP (all 6) + RANARP (AT/FR/GB/SK; FI+NO RANARP
+            // resolved to a category page → skipped, not forced). Localized name + local-currency price + verified
+            // og:image read live off ikea.com/<cc> on 2026-06-23 via the global article-number trick (80407114 /
+            // 20390970).
+            "/catalog/real-ikea-kitchen-lighting-10-100.json"
     );
 
     /**
