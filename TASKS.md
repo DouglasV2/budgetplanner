@@ -160,6 +160,21 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.92 — Live AI (Gemini) prompt sweep + confidence fix (current)
+- Enabled AI in dev (the key was already in the gitignored `.env`; recreated the container to load it) and ran a
+  **17-prompt live Gemini sweep**: HR + EN/DE/FR/ES/IT + NO/SE + tricky + garbage. **Verdict: AI prompt parsing is
+  strong** — multilingual room + category parsing correct; correct **non-EUR currency** (NOK 15000 / SEK 12000, no
+  conversion); European **"1.500 €" → 1500**; the already-have + exclude logic works ("već imam kauč… bez TV-a" →
+  kept rug+lighting, dropped sofa+tv); and **garbage/off-topic** ("asdfghjkl", "pizza", "12345") returns **no
+  hallucinated furniture** (empty categories) — exactly the "don't output nonsense" requirement. Plans return 3
+  variants × 6 items.
+- **Fixed a real issue the sweep exposed:** Gemini sometimes omitted `confidence`, which defaulted to 0.0 →
+  falsely triggered the low-confidence "we're unsure" nudge (10.75) on well-parsed plans (~3/17). Strengthened the
+  system prompt to ALWAYS return a meaningful confidence (0.8–1.0 for a clear description, < 0.4 for nonsense).
+  Re-verified live: clear prompts now **0.8–0.9**, garbage **0.1–0.2** — the nudge fires correctly.
+- Known minor edge (not fixed, rare): a foreign-currency-word budget in a different-currency market ("1500 euros"
+  in a GBP market) can keep the form's entered budget instead of the stated number.
+
 ### Sprint 10.91 — Prompt test: fix European thousands-separator budgets (current)
 - Tested more prompts against the **live** parser. With AI off (the prod default), prompts are parsed by the
   deterministic `PlannerIntentExtractor`, not the LLM — so that's the path that actually runs. Found a real bug:

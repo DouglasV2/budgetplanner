@@ -169,8 +169,10 @@ public class PromptIntelligenceService {
                 + "retaileri ∈ [IKEA, JYSK]. qualityPreference ∈ [budget, balanced, premium]. "
                 + "budget i roomSize su cijeli brojevi. budget vrati u valuti koju korisnik koristi (navedena niže) "
                 + "kao GOLI broj, BEZ pretvaranja u drugu valutu (npr. 15000 kr ostaje 15000, ne pretvaraj u eure). "
-                + "roomSize je u m². confidence je broj 0..1. "
-                + "Ako nešto nije navedeno, izostavi ili stavi null, i dodaj u missingImportantInfo. "
+                + "roomSize je u m². confidence je OBAVEZAN broj 0..1 — koliko si siguran u parsiranje: za jasan, "
+                + "smislen opis opremanja vrati 0.8–1.0; za nejasan, prazan ili besmislen/nepovezan opis vrati < 0.4. "
+                + "UVIJEK vrati confidence (nikad ga ne izostavi). "
+                + "Ako neki DRUGI podatak nije naveden, izostavi ga ili stavi null, i dodaj u missingImportantInfo. "
                 + "userGoalSummary i normalizedPrompt napiši na hrvatskom.";
     }
 
