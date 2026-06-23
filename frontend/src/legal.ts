@@ -19,11 +19,11 @@ export interface LegalDoc {
 const HR: Record<LegalKey, LegalDoc> = {
   privacy: {
     title: 'Pravila privatnosti',
-    updated: 'Zadnja izmjena: 20.06.2026.',
+    updated: 'Zadnja izmjena: 23.06.2026.',
     disclaimer: 'Predložak — daj ga pravniku na pregled i ispuni podatke u Impressumu prije javnog lansiranja.',
     sections: [
       { heading: 'Tko smo', body: [
-        'BudgetSpace je voditelj obrade tvojih osobnih podataka. Kontakt: [ispuni — email].',
+        'BudgetSpace je besplatan, nekomercijalni projekt (beta) i voditelj obrade tvojih osobnih podataka. Kontakt: budgetspace.ai@gmail.com.',
       ] },
       { heading: 'Koje podatke prikupljamo', body: [
         'Ako se prijaviš Googleom: ime, e-mail i profilnu sliku koje nam Google proslijedi.',
@@ -48,7 +48,7 @@ const HR: Record<LegalKey, LegalDoc> = {
   },
   terms: {
     title: 'Uvjeti korištenja',
-    updated: 'Zadnja izmjena: 20.06.2026.',
+    updated: 'Zadnja izmjena: 23.06.2026.',
     disclaimer: 'Predložak — daj ga pravniku na pregled prije javnog lansiranja.',
     sections: [
       { heading: 'Što je usluga', body: [
@@ -59,7 +59,7 @@ const HR: Record<LegalKey, LegalDoc> = {
         'Za spremanje i AI asistenta prijavljuješ se Google računom; odgovoran si za njegovu sigurnost.',
       ] },
       { heading: 'Plus pretplata', body: [
-        'Plus je 5,99 €/mjesečno, naplata preko Stripea, obnavlja se mjesečno i možeš ga otkazati bilo kad. Primjenjuju se i Stripeovi uvjeti.',
+        'Trenutno je usluga potpuno besplatna. Plus (planiran: 5,99 €/mjesečno preko Stripea, mjesečna obnova, otkaz bilo kad) tek je u pripremi; kad postane dostupan, primjenjivat će se i Stripeovi uvjeti.',
       ] },
       { heading: 'Prihvatljivo korištenje', body: [
         'Ne zloupotrebljavaj uslugu — bez automatiziranog preopterećenja ni pokušaja zaobilaženja ograničenja.',
@@ -74,17 +74,12 @@ const HR: Record<LegalKey, LegalDoc> = {
   },
   impressum: {
     title: 'Impressum',
-    updated: 'Zadnja izmjena: 20.06.2026.',
-    disclaimer: 'U Hrvatskoj/EU je Impressum zakonski obavezan. Ispuni stvarne podatke prije lansiranja.',
+    updated: 'Zadnja izmjena: 23.06.2026.',
+    disclaimer: 'BudgetSpace je trenutno besplatan, nekomercijalni projekt (beta) — ne prodajemo robu ni usluge i ne naplaćujemo. Kontakt je naveden niže. Kad uvedemo plaćeni Plus, ovdje će biti potpuni podaci poslovnog subjekta.',
     sections: [
       { heading: 'Pružatelj usluge', body: [
-        '[Ime i prezime / naziv obrta ili tvrtke]',
-        '[Adresa sjedišta]',
-        '[OIB]',
-        'E-mail: [kontakt e-mail]',
-      ] },
-      { heading: 'Odgovorna osoba', body: [
-        '[Ime i prezime odgovorne osobe]',
+        'BudgetSpace — besplatan, nekomercijalni projekt (beta).',
+        'E-mail: budgetspace.ai@gmail.com',
       ] },
     ],
   },
@@ -93,11 +88,11 @@ const HR: Record<LegalKey, LegalDoc> = {
 const EN: Record<LegalKey, LegalDoc> = {
   privacy: {
     title: 'Privacy Policy',
-    updated: 'Last updated: 2026-06-20',
+    updated: 'Last updated: 2026-06-23',
     disclaimer: 'Template — have a lawyer review it and complete the Impressum details before a public launch.',
     sections: [
       { heading: 'Who we are', body: [
-        'BudgetSpace is the controller of your personal data. Contact: [fill in — email].',
+        'BudgetSpace is a free, non-commercial project (beta) and the controller of your personal data. Contact: budgetspace.ai@gmail.com.',
       ] },
       { heading: 'What we collect', body: [
         'If you sign in with Google: the name, email and profile picture Google passes to us.',
@@ -122,7 +117,7 @@ const EN: Record<LegalKey, LegalDoc> = {
   },
   terms: {
     title: 'Terms of Use',
-    updated: 'Last updated: 2026-06-20',
+    updated: 'Last updated: 2026-06-23',
     disclaimer: 'Template — have a lawyer review it before a public launch.',
     sections: [
       { heading: 'What the service is', body: [
@@ -133,7 +128,7 @@ const EN: Record<LegalKey, LegalDoc> = {
         'Saving and the AI assistant use Google sign-in; you are responsible for your account’s security.',
       ] },
       { heading: 'Plus subscription', body: [
-        'Plus is €5.99/month, billed via Stripe, renews monthly and can be cancelled at any time. Stripe’s terms also apply.',
+        'The service is currently entirely free. Plus (planned: €5.99/month via Stripe, monthly renewal, cancel anytime) is not available yet; once it launches, Stripe’s terms will also apply.',
       ] },
       { heading: 'Acceptable use', body: [
         'Do not abuse the service — no automated overload or attempts to bypass limits.',
@@ -148,17 +143,12 @@ const EN: Record<LegalKey, LegalDoc> = {
   },
   impressum: {
     title: 'Impressum',
-    updated: 'Last updated: 2026-06-20',
-    disclaimer: 'An Impressum is legally required in Croatia/the EU. Fill in real details before launch.',
+    updated: 'Last updated: 2026-06-23',
+    disclaimer: 'BudgetSpace is currently a free, non-commercial project (beta) — we do not sell goods or services and we do not charge. Contact is below. Full business-entity details will appear here once paid Plus launches.',
     sections: [
       { heading: 'Service provider', body: [
-        '[Full name / trade or company name]',
-        '[Registered address]',
-        '[VAT / OIB]',
-        'Email: [contact email]',
-      ] },
-      { heading: 'Responsible person', body: [
-        '[Name of the responsible person]',
+        'BudgetSpace — a free, non-commercial project (beta).',
+        'Email: budgetspace.ai@gmail.com',
       ] },
     ],
   },
