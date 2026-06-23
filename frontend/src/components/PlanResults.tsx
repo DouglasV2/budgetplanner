@@ -207,41 +207,11 @@ function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   return plans.find((plan) => plan.name === preferredName)?.id ?? plans.find((plan) => plan.name === 'Najbolji izbor')?.id ?? plans[0].id;
 }
 
-function firstBuyText(t: Translate, steps: ReturnType<typeof purchaseSteps>) {
-  const first = steps.find((step) => step.priority === 'buy-first') ?? steps[0];
-  const items = first?.items
-    .slice(0, 3)
-    .map((item) => categoryLabels[item.product.category].toLowerCase())
-    .join(', ');
-  return items || t('results.basicPiecesAcc');
-}
-
-function laterText(t: Translate, steps: ReturnType<typeof purchaseSteps>) {
-  const later = steps.find((step) => step.priority === 'later');
-  if (later?.items.length) {
-    return later.items
-      .slice(0, 2)
-      .map((item) => categoryLabels[item.product.category].toLowerCase())
-      .join(', ');
-  }
-  const comfort = steps.find((step) => step.priority === 'add-comfort');
-  return comfort?.items[0] ? categoryLabels[comfort.items[0].product.category].toLowerCase() : t('results.smallStuff');
-}
-
 function decisionLabel(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
   const difference = input.budget - plan.total;
   if (difference < 0) return t('results.decisionNotIdeal');
   if (difference >= input.budget * 0.12) return t('results.decisionWorthSafe');
   return t('results.decisionWorthClose');
-}
-
-function decisionHeadline(t: Translate, plan: FurnishingPlan, input: PlannerInput, steps: ReturnType<typeof purchaseSteps>) {
-  const first = firstBuyText(t, steps);
-  const later = laterText(t, steps);
-  if (plan.total > input.budget) {
-    return t('results.decisionHeadlineOver', { amount: formatCurrency(plan.total - input.budget) });
-  }
-  return t('results.decisionHeadlineFocus', { budget: formatCurrency(input.budget), first, later });
 }
 
 function shortBudgetText(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
@@ -916,7 +886,6 @@ export function PlanResults({
               <span>{decisionLabel(t, selectedPlan, input)}</span>
               <strong>{selectedPlan.name}</strong>
             </div>
-            <h3>{decisionHeadline(t, selectedPlan, input, steps)}</h3>
             {summaryBullets.length > 0 ? (
               <ul className="purchase-summary">
                 {summaryBullets.map((line) => (

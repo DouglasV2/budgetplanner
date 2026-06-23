@@ -160,6 +160,13 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.90 — Drop the clumsy "decision headline" from results (current)
+- Removed the templated headline above the plan ("Za {budget} najisplativije je fokusirati se na {first}; {later}
+  može čekati.") — it read awkwardly (it surfaced raw category labels like "sofa / kauč") and added nothing over the
+  plan name + worth-it badge + purchase summary already shown right there. Owner call: superfluous, don't show it.
+- Removed the `<h3>` in `PlanResults` plus its now-unused builders (`decisionHeadline`/`firstBuyText`/`laterText`);
+  the decision-card keeps the badge, the plan name and the summary bullets. Frontend `tsc` build clean.
+
 ### Sprint 10.89 — Free→Plus: surface the AI carrot where it bites (current)
 - **The AI assistant is the stated Plus carrot, but the funnel never showed it at the value moment.** When a
   Free/guest owner's daily AI allowance is spent, the prompt silently falls back to the rule-based parser — no hint
