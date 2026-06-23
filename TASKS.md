@@ -160,6 +160,20 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Recently done
 
+### Sprint 10.93 — Honest, coherent Free→Plus pricing copy (current)
+- Read the pricing from the **user's perspective** and it was incoherent: the subtitle said "Plus **unlocks** … the
+  AI assistant" while the Free card said "AI assistant — a few plans a day". Both can't be true — and Free DOES have
+  AI (Gemini reads every prompt; per-tier caps = guest 3 / free 10 / plus 100 / pro 500 a day, then a rule-based
+  fallback). The subtitle also said "checkout coming soon" though Stripe shipped in 10.69, and the 12 non-HR/EN
+  message JSONs carried an even older subtitle ("no payment yet — pilot price"). Three stale/contradictory versions.
+- Rewrote **one honest subtitle**, applied across all 13 languages (hr/en in i18n.ts + a surgical 1-line change in
+  each of the 12 JSONs): "Plans are free and stay free — AI assistant included, a few a day. Plus is for furnishing
+  several rooms: unlimited saved plans, practically-unlimited AI, watermark-free sharing and price alerts." Plus now
+  leads with its **real** differentiator (unlimited saves), not AI (which Free already has); `plusTagline` reworded
+  ("…without limits" instead of "…who want AI help").
+- Verified live in the preview: the rendered HR pricing reads coherently (Free incl. AI; Plus = unlimited saves +
+  more AI + no watermark + alerts; no contradiction, no stale "coming soon"). Frontend build clean.
+
 ### Sprint 10.92 — Live AI (Gemini) prompt sweep + confidence fix (current)
 - Enabled AI in dev (the key was already in the gitignored `.env`; recreated the container to load it) and ran a
   **17-prompt live Gemini sweep**: HR + EN/DE/FR/ES/IT + NO/SE + tricky + garbage. **Verdict: AI prompt parsing is

@@ -56,8 +56,8 @@ const DICTIONARY: Record<string, Entry> = {
     en: 'Planning a room is free. Plus is for people who want more.'
   },
   'pricing.sub': {
-    hr: 'Generiranje planova je i ostaje besplatno. Plus otključava neograničeno spremanje, AI asistenta i upozorenja na cijene. Plaćanje stiže uskoro.',
-    en: 'Generating plans is free, and stays free. Plus unlocks unlimited saving, the AI assistant and price alerts. Checkout is coming soon.'
+    hr: 'Planovi su i ostaju besplatni — AI asistent uključen, par dnevno. Plus je za opremanje više soba: neograničeno spremljenih planova, praktički neograničen AI, dijeljenje bez watermarka i upozorenja na cijene.',
+    en: 'Plans are free and stay free — AI assistant included, a few a day. Plus is for furnishing several rooms: unlimited saved plans, practically-unlimited AI, watermark-free sharing and price alerts.'
   },
 
   'product.reviews': { hr: 'Recenzije u trgovini', en: 'Reviews in store' },
@@ -121,7 +121,7 @@ const DICTIONARY: Record<string, Entry> = {
   // Sprint 10.68: real Plus tier + honest waitlist (no checkout yet).
   'pricing.plusName': { hr: 'Plus', en: 'Plus' },
   'pricing.plusPrice': { hr: '5,99 €/mj', en: '€5.99/mo' },
-  'pricing.plusTagline': { hr: 'Za one koji slažu više soba i žele AI pomoć.', en: 'For people furnishing more rooms who want AI help.' },
+  'pricing.plusTagline': { hr: 'Za opremanje više soba — bez ograničenja.', en: 'For furnishing several rooms — without limits.' },
   'pricing.plusF1': { hr: 'Neograničeno spremljenih planova i prostora', en: 'Unlimited saved plans & spaces' },
   'pricing.plusF2': { hr: 'AI asistent — praktički neograničeno', en: 'AI assistant — practically unlimited' },
   'pricing.plusF3': { hr: 'Dijeljenje bez watermarka', en: 'Watermark-free sharing' },
