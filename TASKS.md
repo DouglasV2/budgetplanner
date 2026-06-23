@@ -1486,10 +1486,15 @@ needs `OPENAI_API_KEY`, backend env only).
 
 ## Backlog (next steps, roughly prioritised)
 
-1. **Turn on the LLM (OpenAI) carefully.** Set `BUDGETSPACE_AI_ENABLED=true`,
-   `BUDGETSPACE_LLM_PROVIDER=openai`, `OPENAI_API_KEY=...` (backend env only). Verify `AiUsageTracker`
-   caps (monthly USD / per-day / per-session). The rule-based path stays the fallback. Catalog depth
-   is now sufficient to test prompts without burning keys on "no products" runs.
+> **Status (as of Sprint 10.93):** this backlog predates the 10.6x–10.9x work. Several "next" items below
+> already SHIPPED — the LLM is **Gemini Flash** live end-to-end (not OpenAI), **Stripe** checkout + hardened
+> webhook shipped (10.69/10.84), **Flyway** owns the prod schema with `ddl-auto=validate` (10.83), and the AI
+> usage ledger is **persisted to the DB** (10.86). Treat MEMORY.md as the source of truth for current state.
+
+1. **[x] LLM is live (Gemini Flash, not OpenAI).** ✅ Shipped 10.66+: `BUDGETSPACE_AI_ENABLED=true`,
+   `BUDGETSPACE_LLM_PROVIDER=gemini`, `GEMINI_API_KEY=...` (backend env only); `AiUsageTracker` caps
+   (monthly USD / per-day / per-session) verified live across 15 markets. Rule-based path stays the fallback.
+   (The original plan named OpenAI; we switched to Gemini for the cheap default + free tier.)
 2. **More catalog depth where thin.** HR bathroom/hallway/kitchen (10.17); SI/AT/DE bathroom/hallway/
    kitchen IKEA (10.18); JYSK SI/DE hallway/kitchen (10.19). **Next:** new EU markets IKEA/JYSK (IT, FI —
    EUR; in progress 10.20); JYSK AT hallway/kitchen once jysk.at stock is feed/headless-readable;

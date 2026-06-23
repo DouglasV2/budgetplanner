@@ -19,13 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 
 /**
- * Sprint 10.63 — Google Sign-In + session endpoints. The session is an opaque, HttpOnly, SameSite=Lax cookie, so
- * it is never readable by JavaScript (XSS can't steal it) and rides along on same-site requests to the API.
+ * Sprint 10.63 — Google Sign-In + session endpoints. The session is an opaque, HttpOnly cookie, so it is never
+ * readable by JavaScript (XSS can't steal it). Its {@code SameSite} attribute is configurable (default {@code Lax}
+ * for a same-registrable-domain deploy; {@code None}+Secure for a split-host deploy where the frontend and backend
+ * live on unrelated domains) — see {@link AuthProperties#cookieSameSite()}.
  */
 @RestController
 public class AuthController {
 
-    /** The session cookie name. HttpOnly + SameSite=Lax; Secure is toggled per environment. */
+    /** The session cookie name. HttpOnly always; SameSite + Secure are toggled per environment. */
     static final String COOKIE = "bs_auth";
 
     private final AuthService authService;
@@ -91,10 +93,14 @@ public class AuthController {
     }
 
     private ResponseCookie sessionCookie(String value, Duration maxAge) {
+        String sameSite = properties.cookieSameSite();
+        // Browsers reject a SameSite=None cookie that isn't also Secure, so force Secure on for a split-host
+        // (None) deploy even if cookie-secure wasn't set — otherwise sign-in would silently break cross-site.
+        boolean secure = properties.cookieSecure() || "None".equals(sameSite);
         return ResponseCookie.from(COOKIE, value)
                 .httpOnly(true)
-                .secure(properties.cookieSecure())
-                .sameSite("Lax")
+                .secure(secure)
+                .sameSite(sameSite)
                 .path("/")
                 .maxAge(maxAge)
                 .build();

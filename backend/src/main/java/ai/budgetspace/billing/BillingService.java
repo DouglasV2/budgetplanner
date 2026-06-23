@@ -36,8 +36,12 @@ import java.util.Set;
  *       (authoritative), and if it's paid AND belongs to this account, flip the account to Plus. This makes dev
  *       work without a public webhook, and is an idempotent backstop in prod.</li>
  *   <li><strong>handleWebhook</strong> — the production path: verify Stripe's signature (HMAC-SHA256, timing-safe,
- *       timestamp tolerance), then upgrade on {@code checkout.session.completed} / downgrade on
- *       {@code customer.subscription.deleted}. Dormant until a webhook secret is configured.</li>
+ *       timestamp tolerance), then drive the Plus entitlement off the events:
+ *       {@code checkout.session.completed} grants Plus; {@code customer.subscription.created/updated} apply the
+ *       live subscription status (active/trialing → Plus; past_due/unpaid/canceled → Free, so a failed card loses
+ *       Plus — the dunning path); {@code customer.subscription.deleted} revokes. Dormant until a webhook secret is
+ *       configured. NOTE: the prod webhook endpoint MUST be subscribed to {@code customer.subscription.updated}
+ *       too, or the dunning downgrade never fires — see DEPLOY.md.</li>
  * </ul>
  *
  * <p>The secret key is sent only as the Stripe Bearer token — never logged or returned to the client.</p>

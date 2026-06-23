@@ -63,6 +63,13 @@ with `ddl-auto=validate` checking it. So in prod:
 ### 3. HTTPS + the session cookie
 - Serve everything over HTTPS (the host usually does this automatically).
 - Set **`BUDGETSPACE_AUTH_COOKIE_SECURE=true`** so the `bs_auth` session cookie is `Secure`.
+- **Cookie topology — read this before you pick where things live.** The `bs_auth` session cookie is
+  `SameSite=Lax` by default, which means **sign-in and Stripe checkout only work if the frontend and backend share
+  a registrable domain** (e.g. `yourdomain` + `api.yourdomain`). This is the recommended layout — pick it and you
+  do nothing here. **The trap:** a split-host setup (e.g. frontend on `*.vercel.app`, backend on `*.railway.app` —
+  unrelated domains) silently breaks auth, because a `Lax` cookie won't ride cross-site XHR. It works locally and
+  fails only in prod. If you must split hosts, set **`BUDGETSPACE_AUTH_COOKIE_SAMESITE=None`** (HTTPS required;
+  the app forces `Secure` on automatically for `None`).
 
 ### 4. Point the pieces at the prod domain
 - Build the frontend with **`VITE_API_BASE_URL=https://api.yourdomain`** (the backend's public URL).
@@ -83,9 +90,16 @@ with `ddl-auto=validate` checking it. So in prod:
 ### 6. Stripe webhook (the production billing path)
 The code is ready and **dormant until the secret is set** ([BillingService](backend/src/main/java/ai/budgetspace/billing/BillingService.java)).
 - Stripe Dashboard → Developers → Webhooks → **add endpoint** `https://api.yourdomain/api/billing/webhook`,
-  events: `checkout.session.completed` + `customer.subscription.deleted`.
+  events (subscribe to **all four** — the handler acts on each):
+  - `checkout.session.completed` — grants Plus on first payment.
+  - `customer.subscription.created` + `customer.subscription.updated` — drive Plus off the live subscription
+    status. **`updated` is the dunning path**: a failed card flips the sub to `past_due`/`unpaid` and the handler
+    downgrades to Free. **Omit `updated` and a non-paying customer keeps Plus for free** — the 10.84 dunning code
+    only ever runs if Stripe is sending you this event.
+  - `customer.subscription.deleted` — revokes Plus on cancellation.
 - Copy the signing secret into **`STRIPE_WEBHOOK_SECRET`**. The webhook then becomes the source of truth
-  (upgrade on completed, downgrade on cancel); account-deletion already cancels the subscription (10.73).
+  (status-driven grant/revoke); account-deletion already cancels the subscription (10.73). Duplicate deliveries are
+  idempotent (the event id is recorded once it's applied).
 
 ### 7. AI budget (already capped — just set the numbers)
 - `BUDGETSPACE_AI_ENABLED=true`, `BUDGETSPACE_LLM_PROVIDER=gemini`, `GEMINI_API_KEY=<rotated>`.
@@ -120,6 +134,7 @@ The code is ready and **dormant until the secret is set** ([BillingService](back
 | `HIBERNATE_DDL_AUTO` | `validate` (Flyway owns the schema; never `create`/`update` in prod) | no |
 | `BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED` | `false` in prod (the profile also forces this) | no |
 | `BUDGETSPACE_AUTH_COOKIE_SECURE` | `true` in prod | no |
+| `BUDGETSPACE_AUTH_COOKIE_SAMESITE` | `Lax` (same-domain, default) or `None` (split-host; forces Secure) | no |
 | `CORS_ALLOWED_ORIGINS` | prod frontend origin(s) | no |
 | `VITE_API_BASE_URL` (frontend build) | backend public URL | no |
 | `BUDGETSPACE_GOOGLE_CLIENTID` | Google OAuth client id | no (public) |

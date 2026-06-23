@@ -1,5 +1,12 @@
 # Next steps
 
+> **⚠️ HISTORICAL — superseded (kept as a sprint log).** This file plans Sprints 2–10.13b. As of **Sprint 10.93**
+> the big "later" items already shipped: the LLM is **Gemini Flash** live end-to-end (the doc says OpenAI),
+> **Stripe** checkout + hardened webhook shipped (10.69/10.84), **Flyway** owns the prod schema with
+> `ddl-auto=validate` (10.83), AI usage is **persisted to the DB** (10.86), and the app is production-ready
+> (all blocker/high audit items closed 10.81–10.86). **For current state and the live backlog, see `MEMORY.md`
+> and `TASKS.md` — not this file.**
+
 ## Sprint 2: make it feel real
 
 1. Add saved plans table.

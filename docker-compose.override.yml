@@ -17,6 +17,9 @@ services:
       # Value-free here on purpose — supplied via the gitignored root .env. Blank → Google sign-in is dormant
       # (guest-only, no fake auth). No client secret is needed (we verify the ID token, not the code flow).
       BUDGETSPACE_GOOGLE_CLIENTID: ${BUDGETSPACE_GOOGLE_CLIENTID:-}
+      # Session cookie SameSite (default Lax = same-domain dev). Set None to exercise the split-host path
+      # locally (None forces Secure on; browsers then only send it over HTTPS). See DEPLOY.md §3.
+      BUDGETSPACE_AUTH_COOKIE_SAMESITE: ${BUDGETSPACE_AUTH_COOKIE_SAMESITE:-Lax}
       # Sprint 10.64: eBay Browse API (live "Rabljeno", no DB persistence). Value-free here — App ID + the SECRET
       # Cert ID come from the gitignored root .env. Blank → eBay source dormant (no used items, no network call).
       BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID:-}

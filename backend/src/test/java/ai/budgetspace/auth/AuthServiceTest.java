@@ -48,7 +48,7 @@ class AuthServiceTest {
         when(sessionRepository.save(any(AuthSession.class))).thenAnswer(invocation -> invocation.getArgument(0));
         service = new AuthService(verifier, userRepository, sessionRepository, savedPlanRepository,
                 priceWatchRepository, plusInterestRepository,
-                new AuthProperties("client-123", 30, 7, false));
+                new AuthProperties("client-123", 30, 7, false, "Lax"));
     }
 
     @Test
