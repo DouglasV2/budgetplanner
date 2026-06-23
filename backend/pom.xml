@@ -81,6 +81,21 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <!-- Sprint 10.95: run integration tests (*IT) in the verify phase. Surefire (mvn test) still runs only the
+           fast, DB-free *Test unit suite and ignores *IT; the Docker-backed boot guard runs under `mvn verify`
+           (locally and in CI). Plugin version is managed by the Spring Boot parent. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

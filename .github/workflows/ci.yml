@@ -1,0 +1,67 @@
+name: CI
+
+# Sprint 10.95: minimal regression net. Runs on every push/PR to main.
+# - backend: full unit suite + the prod-schema boot guard (ProdSchemaBootIT) via `mvn verify`. The boot guard runs
+#   against a fresh Postgres service container (env BUDGETSPACE_BOOTTEST_DB_URL) so a schema change without a
+#   matching Flyway migration fails HERE instead of at prod boot.
+# - frontend: type-check + production build, so a TypeScript or bundler error can't reach a deploy unnoticed.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: backend (tests + prod-schema boot guard)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: budgetspace
+          POSTGRES_USER: budgetspace
+          POSTGRES_PASSWORD: budgetspace
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U budgetspace"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Activates ProdSchemaBootIT against the clean service-container DB (Flyway migrates V1..Vn, ddl-auto=validate).
+      BUDGETSPACE_BOOTTEST_DB_URL: jdbc:postgresql://localhost:5432/budgetspace
+      BUDGETSPACE_BOOTTEST_DB_USER: budgetspace
+      BUDGETSPACE_BOOTTEST_DB_PASSWORD: budgetspace
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Build, unit tests + prod-schema boot guard
+        working-directory: backend
+        run: |
+          chmod +x ./mvnw
+          ./mvnw --batch-mode --no-transfer-progress verify
+
+  frontend:
+    name: frontend (type-check + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install + build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
