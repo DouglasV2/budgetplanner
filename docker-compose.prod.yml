@@ -49,11 +49,20 @@ services:
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
       STRIPE_PLUS_PRICE_ID: ${STRIPE_PLUS_PRICE_ID:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-      # AI (Gemini) — blank key => deterministic rule-based fallback (no external calls, no cost).
+      # Sprint 10.103: FREE-BETA mode. Plus/pricing surface hidden (free app); flip to true when you go paid.
+      BUDGETSPACE_PLUS_ENABLED: ${BUDGETSPACE_PLUS_ENABLED:-false}
+      # Free beta: don't block saving — high cap so the 402 Plus-upsell never fires.
+      BUDGETSPACE_PLUS_FREE_SAVED_LIMIT: ${BUDGETSPACE_PLUS_FREE_SAVED_LIMIT:-1000}
+      # AI (Gemini) — blank key => deterministic rule-based fallback (no external calls, no cost). If you turn AI
+      # on for the beta as a free taste, these caps bound the spend: monthly USD is the global hard stop, the
+      # per-day + per-user/day caps stop one user (or the whole beta) running up Gemini cost.
       BUDGETSPACE_AI_ENABLED: ${BUDGETSPACE_AI_ENABLED:-false}
       BUDGETSPACE_LLM_PROVIDER: ${BUDGETSPACE_LLM_PROVIDER:-gemini}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      BUDGETSPACE_AI_MONTHLY_BUDGET_USD: ${BUDGETSPACE_AI_MONTHLY_BUDGET_USD:-10}
+      BUDGETSPACE_AI_MONTHLY_BUDGET_USD: ${BUDGETSPACE_AI_MONTHLY_BUDGET_USD:-5}
+      BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY: ${BUDGETSPACE_AI_MAX_REQUESTS_PER_DAY:-150}
+      BUDGETSPACE_AI_DAILY_GUEST: ${BUDGETSPACE_AI_DAILY_GUEST:-3}
+      BUDGETSPACE_AI_DAILY_FREE: ${BUDGETSPACE_AI_DAILY_FREE:-5}
       # eBay PROD keys (rotated) — blank => dormant. eBay data is request-time, in-memory only, never persisted.
       BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTID:-}
       BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET: ${BUDGETSPACE_MARKETPLACEFEEDS_EBAY_CLIENTSECRET:-}

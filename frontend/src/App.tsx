@@ -14,7 +14,7 @@ function isSharedPlanLink() {
 }
 
 function AppShell() {
-  const { user, loading, guestContinued } = useAuth();
+  const { user, loading, guestContinued, plusEnabled } = useAuth();
   const shared = isSharedPlanLink();
   // Returning guests and shared-link recipients are decided synchronously (sessionStorage / pathname), so they
   // render immediately. Only a truly-undecided first visit waits for the /me round-trip — showing a neutral
@@ -31,7 +31,9 @@ function AppShell() {
       <Header />
       <Planner />
       <HowItWorks />
-      <Monetization />
+      {/* Sprint 10.103: the Plus/pricing section is hidden during the free beta (plusEnabled=false from the
+          backend). Flip BUDGETSPACE_PLUS_ENABLED=true to bring it back — the component is untouched. */}
+      {plusEnabled && <Monetization />}
       <Footer />
       {showGate && <AuthGate />}
     </main>

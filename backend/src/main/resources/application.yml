@@ -72,7 +72,12 @@ budgetspace:
       cookie-samesite: ${BUDGETSPACE_AUTH_COOKIE_SAMESITE:Lax} # Lax | Strict | None (None ⇒ Secure, HTTPS only)
       cleanup-cron: ${BUDGETSPACE_AUTH_SESSION_CLEANUP_CRON:0 30 3 * * *} # daily prune of expired/idle sessions
   plus:
-    # Sprint 10.68: Free tier may save this many plans before Plus is required (Plus = unlimited).
+    # Sprint 10.103: master switch for the Plus/pricing surface. false (default) → free beta: the pricing section
+    # + in-app upsells are hidden (surfaced as plusEnabled on /api/auth/me). Flip BUDGETSPACE_PLUS_ENABLED=true
+    # to bring Plus back once you register a business + go paid — no code change. Dev compose sets it true.
+    enabled: ${BUDGETSPACE_PLUS_ENABLED:false}
+    # Sprint 10.68: Free tier may save this many plans before Plus is required (Plus = unlimited). In the free
+    # beta set this high (compose: 1000) so a free user is never blocked from saving (the 402 upsell can't fire).
     free-saved-limit: ${BUDGETSPACE_PLUS_FREE_SAVED_LIMIT:3}
   stripe:
     # Sprint 10.69: Stripe billing for Plus (TEST). Secret key + price id are required to enable checkout; blank

@@ -4,6 +4,7 @@ import ai.budgetspace.dto.AuthMeResponse;
 import ai.budgetspace.dto.AuthUserDto;
 import ai.budgetspace.dto.GoogleLoginRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -35,16 +36,21 @@ public class AuthController {
     private final ai.budgetspace.billing.StripeProperties stripeProperties;
     private final ai.budgetspace.billing.BillingService billingService;
     private final ai.budgetspace.ai.LlmClientFactory clientFactory;
+    // Sprint 10.103: master switch for the Plus/pricing surface. Default false → the free beta hides it; flip
+    // BUDGETSPACE_PLUS_ENABLED=true to bring Plus back (no code change).
+    private final boolean plusEnabled;
 
     public AuthController(AuthService authService, AuthProperties properties,
                           ai.budgetspace.billing.StripeProperties stripeProperties,
                           ai.budgetspace.billing.BillingService billingService,
-                          ai.budgetspace.ai.LlmClientFactory clientFactory) {
+                          ai.budgetspace.ai.LlmClientFactory clientFactory,
+                          @Value("${budgetspace.plus.enabled:false}") boolean plusEnabled) {
         this.authService = authService;
         this.properties = properties;
         this.stripeProperties = stripeProperties;
         this.billingService = billingService;
         this.clientFactory = clientFactory;
+        this.plusEnabled = plusEnabled;
     }
 
     /** Sign in with a Google ID token. Sets the session cookie and returns the signed-in profile. */
@@ -64,7 +70,7 @@ public class AuthController {
         AuthUserDto user = authService.authenticate(sessionToken).map(AuthController::toDto).orElse(null);
         return new AuthMeResponse(user, properties.googleEnabled(),
                 properties.googleEnabled() ? properties.googleClientId() : null,
-                stripeProperties.configured(), clientFactory.activeClient().isPresent());
+                stripeProperties.configured(), clientFactory.activeClient().isPresent(), plusEnabled);
     }
 
     /** Sign out: delete the server session and clear the cookie. */

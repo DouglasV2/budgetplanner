@@ -497,6 +497,8 @@ const DICTIONARY: Record<string, Entry> = {
   'plus.seePricing': { hr: 'Pogledaj Plus', en: 'See Plus' },
   // Sprint 10.89: shown when AI is on but a non-Plus owner's daily AI allowance is spent (plan fell back to rule-based).
   'plus.aiUpsell': { hr: 'Iskoristio si današnji besplatni AI. Plus = AI asistent koji razumije tvoj prompt i objašnjava plan — praktički neograničeno.', en: 'You\'ve used today\'s free AI. Plus = an AI assistant that understands your prompt and explains the plan — practically unlimited.' },
+  // Sprint 10.103: free-beta variant of the AI-cap nudge — no Plus mention, no upgrade CTA (Plus is hidden in beta).
+  'plus.aiCapBeta': { hr: 'Iskoristio si današnje besplatne AI prijedloge — plan je svejedno spreman. Vrati se sutra za još AI-ja.', en: 'You\'ve used today\'s free AI suggestions — your plan is ready anyway. Come back tomorrow for more AI.' },
   'plus.dismiss': { hr: 'Sakrij', en: 'Dismiss' },
   // Sprint 10.54: feedback that acts. After the user rates the plan, offer the one-click fix for the complaint.
   'results.feedbackThanks': { hr: 'Hvala — drago nam je da pomaže.', en: 'Thanks — glad it helps.' },

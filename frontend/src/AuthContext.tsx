@@ -11,6 +11,7 @@ interface AuthContextValue {
   googleClientId: string | null;
   billingEnabled: boolean;
   aiEnabled: boolean;
+  plusEnabled: boolean;
   loading: boolean;
   guestContinued: boolean;
   justUpgraded: boolean;
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [googleClientId, setGoogleClientId] = useState<string | null>(null);
   const [billingEnabled, setBillingEnabled] = useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
+  const [plusEnabled, setPlusEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [guestContinued, setGuestContinued] = useState<boolean>(readGuestContinued);
   const [justUpgraded, setJustUpgraded] = useState(false);
@@ -68,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setGoogleClientId(me.googleClientId);
       setBillingEnabled(me.billingEnabled);
       setAiEnabled(me.aiEnabled);
+      setPlusEnabled(me.plusEnabled);
 
       const params = new URLSearchParams(window.location.search);
       const plus = params.get('plus');
@@ -109,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     googleClientId,
     billingEnabled,
     aiEnabled,
+    plusEnabled,
     loading,
     guestContinued,
     justUpgraded,
@@ -132,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setGuest(true);
     }
-  }), [user, googleEnabled, googleClientId, billingEnabled, aiEnabled, loading, guestContinued, justUpgraded]);
+  }), [user, googleEnabled, googleClientId, billingEnabled, aiEnabled, plusEnabled, loading, guestContinued, justUpgraded]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
