@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Map;
 
@@ -17,6 +18,8 @@ import java.util.Map;
  * <ul>
  *   <li>{@link SavedPlanNotFoundException} (a shared /plan/&lt;id&gt; link whose plan is gone, or a non-owner)
  *       → {@code 404}, logged quietly — an expected client situation, not a server fault.</li>
+ *   <li>{@link NoResourceFoundException} (an unmapped path / missing static resource — mostly bots and scanners)
+ *       → {@code 404}, logged at debug so scan traffic never becomes a 500 or an ERROR-level Sentry event.</li>
  *   <li>{@link IllegalArgumentException} (bad input, e.g. a malformed replace request) → {@code 400}
  *       with the original message (these are already written in Croatian for the user).</li>
  *   <li>anything else → {@code 500} with a generic message; the real cause is logged at error level
@@ -39,6 +42,15 @@ public class GlobalExceptionHandler {
         // Sprint 10.68: a Free-tier owner hit the saved-plan cap → 402 so the frontend shows the Plus upsell.
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED)
                 .body(Map.of("error", "Dosegnut je limit besplatnih spremljenih planova.", "code", "PLAN_LIMIT"));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNoResource(NoResourceFoundException exception) {
+        // An unmapped path / missing static resource — mostly bots and vulnerability scanners (/wp-login.php, /.env).
+        // Return a proper 404 and log it at DEBUG, so scan noise never becomes a 500 OR an ERROR-level Sentry event
+        // that would drown out real failures.
+        log.debug("No resource for request: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Nije pronađeno."));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
