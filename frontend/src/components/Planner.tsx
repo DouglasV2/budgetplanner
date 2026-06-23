@@ -302,6 +302,10 @@ export function Planner() {
       setMarketNote(null);
     }
 
+    // Sprint 10.102: capture the typed prompt up front (the AI response clears input.prompt) so the kitchen
+    // scope note can tell a fitted-kitchen request from a normal one on the instant draft, not only after AI.
+    setSubmittedPrompt((effectiveInput.prompt ?? '').trim());
+
     setIsLoading(true);
     setError(null);
     setNotice(null);
@@ -617,6 +621,7 @@ export function Planner() {
         <PlanResults
           plans={plans}
           input={input}
+          submittedPrompt={submittedPrompt}
           secondHandSuggestions={secondHand}
           onReplace={handleReplace}
           onToggleLock={handleToggleLock}

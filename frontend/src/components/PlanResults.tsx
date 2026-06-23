@@ -26,6 +26,28 @@ import {
 import { useLocale } from '../LocaleContext';
 import { useAuth } from '../AuthContext';
 import { watchProduct } from '../api/client';
+import { marketConfig } from '../markets';
+
+// Sprint 10.102: honest kitchen scope. We plan FREESTANDING kitchen furniture (island/cart, shelves,
+// lighting), not fitted/built-in kitchens (the IKEA METOD-style measured system needs a layout planner +
+// installation, and has no single honest price). Detect when a prompt is really after a fitted kitchen so we
+// can set the expectation and point to IKEA's kitchen planner instead of silently returning loose pieces.
+// Diacritics are stripped before matching (same approach as markets.ts), so patterns are plain ASCII.
+const FITTED_KITCHEN_PATTERN =
+  /(metod|knoxhult|fitted|built[\s-]?in|einbaukuch|ugradben|vgradn|vstavan|inbouw|innebygd|indbygget|po mjeri|po meri|na mieru|su misura|sur mesure|equipee|op maat|a medida|por medida|embutid|etter mal|mattbestall|mittatilaus|componibile|integral|kompletn|komplett|complete|completa)/;
+
+function isFittedKitchenIntent(prompt?: string): boolean {
+  if (!prompt) return false;
+  const normalized = prompt.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+  return FITTED_KITCHEN_PATTERN.test(normalized);
+}
+
+// The fitted-kitchen pointer links to the user's own market IKEA site (where the kitchen planner lives) —
+// a market-aware homepage URL that always resolves, never a guessed deep link that could 404.
+function ikeaMarketUrl(market?: string): string {
+  const config = marketConfig(market);
+  return `https://www.ikea.com/${config.code.toLowerCase()}/${config.lang}/`;
+}
 
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
 
@@ -42,6 +64,9 @@ interface PlanResultsProps {
   isLoading?: boolean;
   error?: string | null;
   partialNotice?: string | null;
+  // Sprint 10.102: the prompt the user actually typed (input.prompt is cleared by the AI response), so the
+  // kitchen scope note can detect a fitted-kitchen request.
+  submittedPrompt?: string;
   // Sprint 10.51: matched second-hand listings, shown in a separate "Rabljeno" block (never in any total).
   secondHandSuggestions?: Product[];
 }
@@ -692,6 +717,7 @@ export function PlanResults({
   isLoading = false,
   error = null,
   partialNotice = null,
+  submittedPrompt = '',
   secondHandSuggestions = []
 }: PlanResultsProps) {
   const { t } = useLocale();
@@ -878,6 +904,23 @@ export function PlanResults({
           <strong>{t('results.partialPlan')}</strong>
           <span>{partialNotice}</span>
         </div>
+      )}
+      {input.roomType === 'kitchen' && (
+        isFittedKitchenIntent(submittedPrompt || input.prompt) ? (
+          <div className="kitchen-scope-note is-fitted" role="note">
+            <strong>{t('results.kitchenFittedNote')}</strong>
+            <a
+              className="kitchen-scope-link"
+              href={ikeaMarketUrl(input.market)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('results.kitchenFittedLink')} ↗
+            </a>
+          </div>
+        ) : (
+          <p className="kitchen-scope-note" role="note">{t('results.kitchenNote')}</p>
+        )
       )}
       <div className="plans-column decision-results-column">
         <article className="plan-card focused-plan-card decision-plan-card" key={selectedPlan.id}>
