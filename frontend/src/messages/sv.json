@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Spara hela lägenheten",
   "moveIn.savedApartment": "Sparade {count} rum till ”{name}”.",
   "moveIn.error": "Lägenhetsplanen är inte tillgänglig just nu. Försök igen om en stund.",
-  "moveIn.emptyHint": "Välj rummen och en total budget, sedan bygger vi planen för hela lägenheten."
+  "moveIn.emptyHint": "Välj rummen och en total budget, sedan bygger vi planen för hela lägenheten.",
+  "moveIn.budgetLow": "Med den här budgeten täcker du inte de viktigaste möblerna i varje rum — det fattas ungefär {amount}. Ta bort ett rum eller höj budgeten."
 }

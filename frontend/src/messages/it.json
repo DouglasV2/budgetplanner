@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Salva tutto l'appartamento",
   "moveIn.savedApartment": "Salvate {count} stanze in \"{name}\".",
   "moveIn.error": "Il piano dell'appartamento non è disponibile al momento. Riprova tra qualche minuto.",
-  "moveIn.emptyHint": "Scegli le stanze e un budget totale, poi crea il piano per tutto l'appartamento."
+  "moveIn.emptyHint": "Scegli le stanze e un budget totale, poi crea il piano per tutto l'appartamento.",
+  "moveIn.budgetLow": "Con questo budget non copri i pezzi base per ogni stanza — mancano circa {amount}. Togli una stanza o aumenta il budget."
 }

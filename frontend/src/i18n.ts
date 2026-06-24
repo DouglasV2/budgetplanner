@@ -221,6 +221,7 @@ const DICTIONARY: Record<string, Entry> = {
   'moveIn.savedApartment': { hr: 'Spremljeno {count} soba u „{name}”.', en: 'Saved {count} rooms to "{name}".' },
   'moveIn.error': { hr: 'Plan za stan trenutno nije moguć. Pokušaj ponovno za koju minutu.', en: 'The apartment plan isn\'t available right now. Please try again in a moment.' },
   'moveIn.emptyHint': { hr: 'Odaberi sobe i ukupni budžet, pa složi plan za cijeli stan.', en: 'Pick the rooms and a total budget, then build the whole-apartment plan.' },
+  'moveIn.budgetLow': { hr: 'S ovim budžetom ne pokrivaš osnovne komade za sve sobe — fali otprilike {amount}. Izbaci sobu ili podigni budžet.', en: 'This budget doesn\'t cover the basic pieces for every room — about {amount} short. Drop a room or raise the budget.' },
   // Sprint 10.78: shown while the instant draft is on screen and the AI is refining it in the background.
   'planner.refining': { hr: 'Dotjerujem prijedlog AI-em…', en: 'Refining your plan with AI…' },
   // Sprint 10.74 (C): shown when the AI couldn't really tell what was asked — the plan still renders below.

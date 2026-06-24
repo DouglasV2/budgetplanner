@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import type { FurnishingPlan, PlannerInput, RoomType, SavedPlanResponse } from '../types';
-import { generatePlanFast, savePlan } from '../api/client';
-import { allocateBudget, grandTotal } from '../utils/moveIn';
+import { generateMoveInPlan, savePlan } from '../api/client';
 import { formatCurrency } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
 
-// Sprint 10.109: Move-In ("Cijeli stan") — the apartment branch of the planner. It is fully self-contained
-// and reuses the EXISTING single-room engine: split one total budget across the chosen rooms (allocateBudget),
-// then call the normal /generate-fast once per room. The single-room flow in Planner.tsx is untouched.
+// Sprint 10.109: Move-In ("Cijeli stan") — the apartment branch of the planner. Self-contained; the single-room
+// flow in Planner.tsx is untouched. Phase 2 (10.110): the budget split is now CATALOG-FLOOR-AWARE and done on
+// the backend (POST /api/plans/generate-move-in) — each room first reserves its cheapest core pieces, and an
+// honest "budget too low" signal fires when the total can't cover every room's core.
 
 interface MoveInPlannerProps {
   // The current single-room form input — we inherit its shared settings (style, stores, market, location, size).
@@ -50,6 +50,8 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice }:
   const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(['living-room', 'bedroom']);
   const [totalBudget, setTotalBudget] = useState<number>(5000);
   const [results, setResults] = useState<RoomPlanResult[] | null>(null);
+  const [apartmentPartial, setApartmentPartial] = useState(false);
+  const [shortfall, setShortfall] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -64,7 +66,6 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice }:
       ...baseInput,
       roomType,
       budget,
-      // A clean, self-consistent prompt: gives the rule-based extractor context but never contradicts roomType.
       prompt: `${roomName} — ${formatCurrency(budget)}`,
       mustHaveCategories: [],
       alreadyHaveCategories: [],
@@ -81,37 +82,36 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice }:
     setError(null);
     setIsLoading(true);
     setResults(null);
+    setApartmentPartial(false);
+    setShortfall(0);
     try {
       // Keep a stable top-down order (by the picker list), independent of click order.
       const orderedRooms = MOVE_IN_ROOMS.filter((room) => selectedRooms.includes(room.value)).map((room) => room.value);
-      const allocations = allocateBudget(totalBudget, orderedRooms);
+      const response = await generateMoveInPlan(baseInput, orderedRooms, totalBudget);
 
-      const settled = await Promise.all(allocations.map(async (allocation) => {
-        const input = buildRoomInput(allocation.roomType, allocation.budget);
-        try {
-          const response = await generatePlanFast(input);
-          const plan = pickBestPlan(response.plans);
+      const mapped: RoomPlanResult[] = response.rooms
+        .map((room) => {
+          const plan = pickBestPlan(room.plans);
           if (!plan) return null;
           return {
-            roomType: allocation.roomType,
-            labelKey: MOVE_IN_ROOMS.find((room) => room.value === allocation.roomType)?.labelKey ?? '',
-            allocatedBudget: allocation.budget,
+            roomType: room.roomType,
+            labelKey: MOVE_IN_ROOMS.find((entry) => entry.value === room.roomType)?.labelKey ?? '',
+            allocatedBudget: room.allocatedBudget,
             plan,
-            input,
+            input: buildRoomInput(room.roomType, room.allocatedBudget),
             hasItems: plan.items.length > 0,
-            partial: !!response.partialPlan
+            partial: room.partial
           } as RoomPlanResult;
-        } catch {
-          return null;
-        }
-      }));
+        })
+        .filter((result): result is RoomPlanResult => result !== null);
 
-      const ok = settled.filter((result): result is RoomPlanResult => result !== null);
-      if (!ok.length) {
+      if (!mapped.length) {
         setError(t('moveIn.error'));
         return;
       }
-      setResults(ok);
+      setResults(mapped);
+      setApartmentPartial(response.apartmentPartial);
+      setShortfall(response.shortfall);
     } catch {
       setError(t('moveIn.error'));
     } finally {
@@ -140,7 +140,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice }:
     }
   }
 
-  const total = grandTotal(results?.map((result) => result.plan.total) ?? []);
+  const total = results ? results.reduce((sum, result) => sum + result.plan.total, 0) : 0;
   const over = total - totalBudget;
 
   return (
@@ -194,6 +194,9 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice }:
 
       {results && (
         <div className="move-in-results">
+          {apartmentPartial && (
+            <p className="move-in-budget-low" role="status">{t('moveIn.budgetLow', { amount: formatCurrency(shortfall) })}</p>
+          )}
           <div className="move-in-total-card">
             <span className="move-in-total-label">{t('moveIn.grandTotalLabel')}</span>
             <strong className="move-in-total-value">{formatCurrency(total)}</strong>

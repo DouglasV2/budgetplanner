@@ -75,6 +75,14 @@ public class PlannerService {
             Map.entry("bathroom", Set.of("lighting"))
     );
 
+    // Sprint 10.109 (Move-In): relative "how much furnishing this room typically needs" weights — they only set
+    // PROPORTIONS for splitting a whole-apartment budget's leftover (after each room's core floor is reserved).
+    private static final Map<String, Double> MOVE_IN_WEIGHTS = Map.ofEntries(
+            Map.entry("living-room", 1.4), Map.entry("bedroom", 1.2), Map.entry("kitchen", 1.0),
+            Map.entry("dining-room", 1.0), Map.entry("home-office", 0.9), Map.entry("home-gym", 0.9),
+            Map.entry("hallway", 0.5), Map.entry("bathroom", 0.5)
+    );
+
     private static final Map<String, String> ROOM_LABELS = Map.ofEntries(
             Map.entry("living-room", "dnevni boravak"),
             Map.entry("home-office", "radni kutak"),
@@ -115,6 +123,121 @@ public class PlannerService {
      */
     public PlanGenerationResponse generateResolved(PlannerInputDto resolvedInput) {
         return buildResponse(resolvedInput == null ? intentExtractor.enrich(null) : resolvedInput.normalized());
+    }
+
+    // Sprint 10.109 (Move-In / "Cijeli stan"): split ONE total budget across several rooms, then build a normal
+    // plan per room. The split is catalog-floor-aware — each room first reserves the cheapest available core
+    // pieces (so no room is starved below its essentials), then the remainder is shared by room weight. If the
+    // total can't even cover every room's core, we say so honestly (apartmentPartial + shortfall) instead of
+    // silently handing back starved rooms. Reuses the EXISTING single-room engine (buildResponse) per room.
+    public MoveInResponse generateMoveIn(MoveInRequestDto request) {
+        int total = request == null ? 0 : Math.max(0, request.totalBudget());
+        if (request == null || request.rooms() == null || request.rooms().isEmpty()) {
+            return new MoveInResponse(List.of(), BigDecimal.ZERO, total, false, BigDecimal.ZERO);
+        }
+        PlannerInputDto base = (request.base() == null
+                ? new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi", null, "best-value",
+                        "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0)
+                : request.base()).normalized();
+
+        // Known rooms only, de-duplicated, original order preserved.
+        List<String> rooms = new ArrayList<>(new LinkedHashSet<>(request.rooms().stream()
+                .map(room -> room == null ? "" : room.trim().toLowerCase(Locale.ROOT))
+                .filter(CATEGORY_FLOW_BY_ROOM::containsKey)
+                .toList()));
+        if (rooms.isEmpty()) {
+            return new MoveInResponse(List.of(), BigDecimal.ZERO, total, false, BigDecimal.ZERO);
+        }
+
+        double[] floors = new double[rooms.size()];
+        double sumFloors = 0;
+        for (int i = 0; i < rooms.size(); i++) {
+            floors[i] = coreFloor(base.withRoomType(rooms.get(i)));
+            sumFloors += floors[i];
+        }
+        boolean apartmentPartial = total > 0 && sumFloors > total;
+        double shortfall = apartmentPartial ? sumFloors - total : 0;
+
+        int[] alloc = allocateMoveIn(total, rooms, floors, sumFloors, apartmentPartial);
+
+        List<MoveInRoomDto> roomDtos = new ArrayList<>();
+        BigDecimal grandTotal = BigDecimal.ZERO;
+        for (int i = 0; i < rooms.size(); i++) {
+            String room = rooms.get(i);
+            PlannerInputDto roomInput = new PlannerInputDto(
+                    ROOM_LABELS.getOrDefault(room, room), Math.max(1, alloc[i]), room,
+                    base.style(), base.location(), base.size(), base.retailerMode(), base.selectedRetailers(),
+                    base.optimizationGoal(), base.furnishingLevel(), List.of(), List.of(), List.of(),
+                    base.preferredRetailers(), base.excludedRetailers(), base.maxStores(),
+                    base.colorPreferences(), base.materialPreferences(), base.market()
+            ).normalized();
+            // Use the SAME path as /generate-fast (the rule-based extractor) — its enrichment is what fills the
+            // full category set, so a room gets a COMPLETE plan (buildResponse alone returns a sparse one). The
+            // roomType is explicit and the prompt is just the room label, so the room is never mis-parsed.
+            PlanGenerationResponse resp = generate(roomInput);
+            FurnishingPlanDto best = resp.plans().isEmpty() ? null : resp.plans().get(0);
+            grandTotal = grandTotal.add(best == null ? BigDecimal.ZERO : best.total());
+            roomDtos.add(new MoveInRoomDto(room, alloc[i], resp.plans(), resp.partialPlan()));
+        }
+        return new MoveInResponse(roomDtos, grandTotal, total, apartmentPartial, BigDecimal.valueOf(Math.round(shortfall)));
+    }
+
+    // Cheapest available core pieces for a room+market — the minimum to give the room a complete core. A core
+    // category with no product contributes 0 (the room simply comes back partial from the planner).
+    private double coreFloor(PlannerInputDto roomInput) {
+        Set<String> core = CORE_CATEGORIES_BY_ROOM.getOrDefault(roomInput.roomType(), Set.of());
+        if (core.isEmpty()) return 0;
+        List<Product> catalog = marketCatalog(roomInput).stream()
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> hasTag(product.getRoomTags(), roomInput.roomType()))
+                .toList();
+        double floor = 0;
+        for (String category : core) {
+            floor += catalog.stream()
+                    .filter(product -> category.equalsIgnoreCase(product.getCategory()))
+                    .mapToDouble(product -> product.getPrice().doubleValue())
+                    .min().orElse(0);
+        }
+        return floor;
+    }
+
+    // Integer per-room budgets that sum EXACTLY to total. Feasible: floor + a weighted share of the remainder.
+    // Infeasible (floors can't all be met): split proportional to floors so every room still moves toward core.
+    // Package-private + static so it can be unit-tested without a catalog (MoveInAllocationTest).
+    static int[] allocateMoveIn(int total, List<String> rooms, double[] floors, double sumFloors, boolean infeasible) {
+        int n = rooms.size();
+        double[] ideal = new double[n];
+        double[] weights = new double[n];
+        double sumWeights = 0;
+        for (int i = 0; i < n; i++) {
+            weights[i] = MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0);
+            sumWeights += weights[i];
+        }
+        if (sumWeights <= 0) sumWeights = n;
+
+        if (infeasible && sumFloors > 0) {
+            for (int i = 0; i < n; i++) ideal[i] = total * floors[i] / sumFloors;
+        } else if (sumFloors > 0 && sumFloors <= total) {
+            double leftover = total - sumFloors;
+            for (int i = 0; i < n; i++) ideal[i] = floors[i] + leftover * weights[i] / sumWeights;
+        } else {
+            for (int i = 0; i < n; i++) ideal[i] = total * weights[i] / sumWeights;
+        }
+
+        int[] out = new int[n];
+        int used = 0;
+        double[] frac = new double[n];
+        for (int i = 0; i < n; i++) {
+            out[i] = (int) Math.floor(ideal[i]);
+            used += out[i];
+            frac[i] = ideal[i] - Math.floor(ideal[i]);
+        }
+        int remainder = total - used;
+        Integer[] order = new Integer[n];
+        for (int i = 0; i < n; i++) order[i] = i;
+        Arrays.sort(order, (a, b) -> Double.compare(frac[b], frac[a]));
+        for (int k = 0; k < remainder && n > 0; k++) out[order[k % n]]++;
+        return out;
     }
 
     private PlanGenerationResponse buildResponse(PlannerInputDto input) {

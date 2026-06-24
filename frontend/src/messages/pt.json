@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Guardar o apartamento inteiro",
   "moveIn.savedApartment": "Guardadas {count} divisões em \"{name}\".",
   "moveIn.error": "O plano do apartamento não está disponível neste momento. Tenta de novo dentro de alguns minutos.",
-  "moveIn.emptyHint": "Escolhe as divisões e um orçamento total e depois cria o plano do apartamento inteiro."
+  "moveIn.emptyHint": "Escolhe as divisões e um orçamento total e depois cria o plano do apartamento inteiro.",
+  "moveIn.budgetLow": "Com este orçamento não cobres as peças básicas de cada divisão — faltam cerca de {amount}. Tira uma divisão ou aumenta o orçamento."
 }

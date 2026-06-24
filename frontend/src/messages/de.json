@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Ganze Wohnung speichern",
   "moveIn.savedApartment": "{count} Räume in „{name}” gespeichert.",
   "moveIn.error": "Der Wohnungsplan ist gerade nicht verfügbar. Versuch es in ein paar Minuten noch mal.",
-  "moveIn.emptyHint": "Wähl die Räume und ein Gesamtbudget, dann erstell den Plan für die ganze Wohnung."
+  "moveIn.emptyHint": "Wähl die Räume und ein Gesamtbudget, dann erstell den Plan für die ganze Wohnung.",
+  "moveIn.budgetLow": "Mit diesem Budget sind nicht für jeden Raum die wichtigsten Möbel gedeckt — es fehlen etwa {amount}. Lass einen Raum weg oder erhöh das Budget."
 }

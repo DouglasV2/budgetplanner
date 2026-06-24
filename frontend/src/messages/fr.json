@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Enregistre tout l'appartement",
   "moveIn.savedApartment": "{count} pièces enregistrées dans « {name} ».",
   "moveIn.error": "Le plan de l'appartement n'est pas disponible pour le moment. Réessaie dans quelques minutes.",
-  "moveIn.emptyHint": "Choisis les pièces et un budget total, puis crée le plan pour tout l'appartement."
+  "moveIn.emptyHint": "Choisis les pièces et un budget total, puis crée le plan pour tout l'appartement.",
+  "moveIn.budgetLow": "Avec ce budget, les meubles de base ne sont pas couverts pour chaque pièce — il manque environ {amount}. Retire une pièce ou augmente le budget."
 }

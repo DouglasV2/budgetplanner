@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Tallenna koko asunto",
   "moveIn.savedApartment": "Tallennettu {count} huonetta tilaan ”{name}”.",
   "moveIn.error": "Asunnon suunnitelma ei ole juuri nyt saatavilla. Yritä uudelleen hetken kuluttua.",
-  "moveIn.emptyHint": "Valitse huoneet ja kokonaisbudjetti, niin kokoamme suunnitelman koko asunnolle."
+  "moveIn.emptyHint": "Valitse huoneet ja kokonaisbudjetti, niin kokoamme suunnitelman koko asunnolle.",
+  "moveIn.budgetLow": "Tällä budjetilla ei riitä perushuonekaluihin joka huoneeseen — noin {amount} puuttuu. Poista huone tai nosta budjettia."
 }

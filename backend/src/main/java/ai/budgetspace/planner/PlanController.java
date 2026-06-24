@@ -3,6 +3,8 @@ package ai.budgetspace.planner;
 import ai.budgetspace.dto.DesignAssistantResponse;
 import ai.budgetspace.dto.FurnishingPlanDto;
 import ai.budgetspace.auth.AuthService;
+import ai.budgetspace.dto.MoveInRequestDto;
+import ai.budgetspace.dto.MoveInResponse;
 import ai.budgetspace.dto.PlanGenerationResponse;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.PlannerIntentAnalysisDto;
@@ -50,6 +52,14 @@ public class PlanController {
     @PostMapping("/api/plans/generate-fast")
     public PlanGenerationResponse generateFast(@RequestBody PlannerInputDto input) {
         return plannerService.generate(input);
+    }
+
+    // Sprint 10.109 (Move-In / "Cijeli stan"): whole-apartment plan — split one total budget across the chosen
+    // rooms (catalog-floor-aware) and return a plan per room + a grand total. Rule-based, no AI/auth (like
+    // generate-fast); the per-room gating happens inside the planner.
+    @PostMapping("/api/plans/generate-move-in")
+    public MoveInResponse generateMoveIn(@RequestBody MoveInRequestDto request) {
+        return plannerService.generateMoveIn(request);
     }
 
     @PostMapping("/api/plans/replace")

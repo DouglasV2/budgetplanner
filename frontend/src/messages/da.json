@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Gem hele lejligheden",
   "moveIn.savedApartment": "Gemte {count} rum i \"{name}\".",
   "moveIn.error": "Planen for lejligheden er ikke tilgængelig lige nu. Prøv igen om et par minutter.",
-  "moveIn.emptyHint": "Vælg rummene og et samlet budget, og byg så planen for hele lejligheden."
+  "moveIn.emptyHint": "Vælg rummene og et samlet budget, og byg så planen for hele lejligheden.",
+  "moveIn.budgetLow": "Med dette budget dækker du ikke de vigtigste møbler i hvert rum — der mangler omkring {amount}. Fjern et rum eller hæv budgettet."
 }

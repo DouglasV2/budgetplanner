@@ -625,8 +625,9 @@ export function Planner() {
         <button type="button" className={scope === 'apartment' ? 'scope-option active' : 'scope-option'} aria-pressed={scope === 'apartment'} onClick={() => setScope('apartment')}>{t('moveIn.scopeApartment')}</button>
       </div>
 
-      {scope === 'single' ? (
-      <>
+      {/* Both panes stay MOUNTED; we toggle visibility so switching scope never loses your work
+          (the apartment results / a generated single-room plan persist across the toggle). */}
+      <div hidden={scope !== 'single'}>
       <div className="planner-layout">
         <div className="planner-panel">
           <PlannerForm input={input} onChange={setInput} onGenerate={handleGenerate} isLoading={isLoading} />
@@ -687,15 +688,16 @@ export function Planner() {
           )}
         </section>
       )}
-      </>
-      ) : (
+      </div>
+
+      <div hidden={scope !== 'apartment'}>
         <MoveInPlanner
           baseInput={input}
           activeSpace={activeSpace}
           onSavedPlan={(saved) => setSavedPlans((current) => [saved, ...current.filter((plan) => plan.id !== saved.id)])}
           onNotice={setNotice}
         />
-      )}
+      </div>
     </section>
   );
 }

@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Shrani celotno stanovanje",
   "moveIn.savedApartment": "Shranjenih {count} sob v „{name}“.",
   "moveIn.error": "Načrt za stanovanje trenutno ni na voljo. Poskusi znova čez nekaj minut.",
-  "moveIn.emptyHint": "Izberi sobe in skupni proračun, nato sestavi načrt za celotno stanovanje."
+  "moveIn.emptyHint": "Izberi sobe in skupni proračun, nato sestavi načrt za celotno stanovanje.",
+  "moveIn.budgetLow": "S tem proračunom ne pokriješ osnovnih kosov za vsako sobo — manjka približno {amount}. Odstrani sobo ali zvišaj proračun."
 }

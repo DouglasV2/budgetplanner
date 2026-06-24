@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Bewaar het hele appartement",
   "moveIn.savedApartment": "{count} kamers opgeslagen in \"{name}\".",
   "moveIn.error": "Het appartementsplan is nu niet beschikbaar. Probeer het over een paar minuten opnieuw.",
-  "moveIn.emptyHint": "Kies de kamers en een totaalbudget, en maak dan het plan voor het hele appartement."
+  "moveIn.emptyHint": "Kies de kamers en een totaalbudget, en maak dan het plan voor het hele appartement.",
+  "moveIn.budgetLow": "Met dit budget zijn niet de basisstukken voor elke kamer gedekt — er ontbreekt ongeveer {amount}. Laat een kamer weg of verhoog het budget."
 }

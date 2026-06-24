@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Ulož celý byt",
   "moveIn.savedApartment": "Uložených {count} miestností do „{name}“.",
   "moveIn.error": "Plán bytu momentálne nie je dostupný. Skús to znova o pár minút.",
-  "moveIn.emptyHint": "Vyber miestnosti a celkový rozpočet, potom zostav plán pre celý byt."
+  "moveIn.emptyHint": "Vyber miestnosti a celkový rozpočet, potom zostav plán pre celý byt.",
+  "moveIn.budgetLow": "S týmto rozpočtom nepokryješ základné kusy pre každú miestnosť — chýba približne {amount}. Odober miestnosť alebo zvýš rozpočet."
 }

@@ -1,4 +1,4 @@
-import type { DesignAssistant, FurnishingPlan, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, SavedPlanResponse } from '../types';
+import type { DesignAssistant, FurnishingPlan, MoveInApiResponse, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, RoomType, SavedPlanResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
@@ -97,6 +97,16 @@ export function generatePlanFast(input: PlannerInput) {
     method: 'POST',
     headers: { 'X-BudgetSpace-Session': sessionId() },
     body: JSON.stringify(input)
+  });
+}
+
+// Sprint 10.109 (Move-In / "Cijeli stan"): whole-apartment plan. The backend splits one total budget across
+// the chosen rooms (catalog-floor-aware) and returns a plan per room + a grand total. Rule-based, no AI.
+export function generateMoveInPlan(base: PlannerInput, rooms: RoomType[], totalBudget: number) {
+  return request<MoveInApiResponse>('/api/plans/generate-move-in', {
+    method: 'POST',
+    headers: { 'X-BudgetSpace-Session': sessionId() },
+    body: JSON.stringify({ base, rooms, totalBudget })
   });
 }
 

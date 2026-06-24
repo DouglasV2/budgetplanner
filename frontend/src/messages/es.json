@@ -527,5 +527,6 @@
   "moveIn.saveApartment": "Guardar todo el apartamento",
   "moveIn.savedApartment": "Se han guardado {count} habitaciones en «{name}».",
   "moveIn.error": "El plan del apartamento no está disponible en este momento. Inténtalo de nuevo dentro de unos minutos.",
-  "moveIn.emptyHint": "Elige las habitaciones y un presupuesto total, y crea el plan de todo el apartamento."
+  "moveIn.emptyHint": "Elige las habitaciones y un presupuesto total, y crea el plan de todo el apartamento.",
+  "moveIn.budgetLow": "Con este presupuesto no cubres las piezas básicas de cada habitación — faltan unos {amount}. Quita una habitación o sube el presupuesto."
 }

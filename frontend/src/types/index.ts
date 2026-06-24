@@ -261,4 +261,21 @@ export interface SavedPlanResponse {
   spaceName?: string;
 }
 
+// Sprint 10.109 (Move-In): the whole-apartment response — one entry per room (its allocated budget + the
+// normal 3 plan tiers) plus the grand total and an honest "budget too low" signal.
+export interface MoveInRoomPlan {
+  roomType: RoomType;
+  allocatedBudget: number;
+  plans: FurnishingPlan[];
+  partial: boolean;
+}
+
+export interface MoveInApiResponse {
+  rooms: MoveInRoomPlan[];
+  grandTotal: number;
+  totalBudget: number;
+  apartmentPartial: boolean;
+  shortfall: number;
+}
+
 export type PlanFeedback = 'useful' | 'too-expensive' | 'wrong-style' | 'too-many-stores';
