@@ -8,6 +8,7 @@ import { useLocale } from '../LocaleContext';
 import { detectMarketFromText, marketConfig } from '../markets';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
+import { MoveInPlanner } from './MoveInPlanner';
 
 const initialInput: PlannerInput = {
   prompt:
@@ -227,6 +228,9 @@ export function Planner() {
   const [activeSpace, setActiveSpace] = useState<string>(() => t('spaces.defaultName'));
   // Sprint 10.13 (#3): reversible "we picked your country from the prompt" note.
   const [marketNote, setMarketNote] = useState<string | null>(null);
+  // Sprint 10.109: planner scope. 'single' = the existing one-room flow (default, unchanged); 'apartment' =
+  // the Move-In multi-room mode. Purely additive — the single-room path below is untouched when scope='single'.
+  const [scope, setScope] = useState<'single' | 'apartment'>('single');
 
   async function refreshSavedPlans() {
     try {
@@ -614,6 +618,15 @@ export function Planner() {
         defaultSpaceName={t('spaces.defaultName')}
       />
 
+      {/* Sprint 10.109: scope switch — one room (default) vs the whole apartment. Same prompt/engine; the
+          apartment branch is a self-contained orchestration over the single-room generator. */}
+      <div className="scope-toggle" role="group" aria-label={t('moveIn.scopeAria')}>
+        <button type="button" className={scope === 'single' ? 'scope-option active' : 'scope-option'} aria-pressed={scope === 'single'} onClick={() => setScope('single')}>{t('moveIn.scopeSingle')}</button>
+        <button type="button" className={scope === 'apartment' ? 'scope-option active' : 'scope-option'} aria-pressed={scope === 'apartment'} onClick={() => setScope('apartment')}>{t('moveIn.scopeApartment')}</button>
+      </div>
+
+      {scope === 'single' ? (
+      <>
       <div className="planner-layout">
         <div className="planner-panel">
           <PlannerForm input={input} onChange={setInput} onGenerate={handleGenerate} isLoading={isLoading} />
@@ -673,6 +686,15 @@ export function Planner() {
             </ul>
           )}
         </section>
+      )}
+      </>
+      ) : (
+        <MoveInPlanner
+          baseInput={input}
+          activeSpace={activeSpace}
+          onSavedPlan={(saved) => setSavedPlans((current) => [saved, ...current.filter((plan) => plan.id !== saved.id)])}
+          onNotice={setNotice}
+        />
       )}
     </section>
   );

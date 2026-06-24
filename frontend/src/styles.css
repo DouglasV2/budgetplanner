@@ -4845,3 +4845,178 @@ textarea {
 .advanced-settings > .form-step {
   border-top: 1px solid rgba(20, 20, 30, 0.06);
 }
+
+/* Sprint 10.109: Move-In ("Cijeli stan") scope toggle + multi-room results. */
+.scope-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 0 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+}
+.scope-option {
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.scope-option.active {
+  background: var(--clay);
+  color: #fff;
+}
+
+.move-in-form h3 {
+  margin: 0 0 4px;
+}
+.move-in-form > p {
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+.move-in-rooms-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.move-in-count {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.move-in-empty-hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 12px 0 0;
+}
+
+.move-in-results {
+  margin-top: 22px;
+}
+.move-in-total-card {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.move-in-total-label {
+  color: var(--muted);
+  font-weight: 600;
+}
+.move-in-total-value {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  color: var(--ink);
+}
+.move-in-total-budget {
+  color: var(--muted);
+}
+.move-in-status {
+  margin-left: auto;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+.move-in-status.within {
+  color: var(--sage);
+  background: rgba(95, 114, 87, 0.12);
+}
+.move-in-status.over {
+  color: var(--orange-dark);
+  background: rgba(207, 95, 42, 0.12);
+}
+
+.move-in-room-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.move-in-room-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--white);
+  padding: 14px 16px;
+}
+.move-in-room-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.move-in-room-head strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+.move-in-room-budget {
+  color: var(--muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.move-in-room-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 8px;
+}
+.move-in-room-total {
+  font-weight: 700;
+  color: var(--ink);
+}
+.move-in-room-count,
+.move-in-room-stores {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.move-in-room-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hairline);
+}
+.move-in-room-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.move-in-room-items li span:first-child {
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.move-in-room-items li.move-in-more {
+  justify-content: flex-start;
+  color: var(--muted);
+  border-bottom: none;
+}
+.move-in-room-partial {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.move-in-room-empty {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin: 6px 0 0;
+}
+.move-in-save {
+  margin-top: 18px;
+}
