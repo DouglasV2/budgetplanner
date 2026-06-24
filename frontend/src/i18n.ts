@@ -195,7 +195,7 @@ const DICTIONARY: Record<string, Entry> = {
   'planner.aiInsightAria': { hr: 'Što je AI razumio', en: 'What the AI understood' },
   'planner.aiUnderstood': { hr: 'AI je razumio tvoju želju', en: 'The AI understood your wish' },
   'planner.weUnderstood': { hr: 'Što smo razumjeli iz opisa', en: 'What we understood from your description' },
-  'planner.unsure': { hr: 'Nismo sigurni oko: {list}. Možeš doraditi opis ili podesiti polja lijevo.', en: 'We\'re not sure about: {list}. You can refine the description or adjust the fields on the left.' },
+  'planner.unsure': { hr: 'Za precizniji plan možeš dodati npr. stil, boje ili materijale — ili podesi polja lijevo.', en: 'For a sharper plan you can add e.g. style, colours or materials — or tweak the fields on the left.' },
   // Sprint 10.78: shown while the instant draft is on screen and the AI is refining it in the background.
   'planner.refining': { hr: 'Dotjerujem prijedlog AI-em…', en: 'Refining your plan with AI…' },
   // Sprint 10.74 (C): shown when the AI couldn't really tell what was asked — the plan still renders below.

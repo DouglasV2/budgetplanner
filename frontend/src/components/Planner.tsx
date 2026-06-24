@@ -651,9 +651,9 @@ export function Planner() {
           </div>
           {analysis.userGoalSummary && <p className="ai-insight-summary">{analysis.userGoalSummary}</p>}
           {(analysis.missingImportantInfo?.length ?? 0) > 0 && (
-            <p className="ai-insight-unsure">
-              {t('planner.unsure', { list: analysis.missingImportantInfo!.join(', ') })}
-            </p>
+            // Sprint 10.107: a generic refine hint — never echo the AI's raw schema field names
+            // (preferredRetailers, qualityPreference, …) to the user.
+            <p className="ai-insight-unsure">{t('planner.unsure')}</p>
           )}
         </section>
       )}
