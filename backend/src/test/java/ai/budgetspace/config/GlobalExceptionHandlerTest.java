@@ -56,4 +56,22 @@ class GlobalExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+
+    // Sprint 10.106: a bad client request (malformed/wrong-typed/missing param) must be a 400 — not a 500 that
+    // also fires a Sentry alert. Bots and typos hit these constantly once live.
+    @Test
+    void malformedOrWrongTypedRequestReturns400NotA500() {
+        ResponseEntity<Map<String, String>> response = handler.handleBadClientRequest(
+                new org.springframework.web.bind.MissingServletRequestParameterException("budget", "int"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void wrongHttpMethodReturns405NotA500() throws Exception {
+        ResponseEntity<Map<String, String>> response = handler.handleMethodNotSupported(
+                new org.springframework.web.HttpRequestMethodNotSupportedException("GET"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
+    }
 }

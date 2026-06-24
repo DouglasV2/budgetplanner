@@ -6,8 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Map;
@@ -60,6 +65,31 @@ public class GlobalExceptionHandler {
                 ? "Zahtjev nije ispravan."
                 : exception.getMessage();
         return ResponseEntity.badRequest().body(Map.of("error", message));
+    }
+
+    // Sprint 10.106 (security hardening): Spring MVC framework errors for a BAD CLIENT REQUEST — malformed/
+    // unreadable JSON, a wrong-typed or missing parameter — are the client's fault, not ours. Map them to a clean
+    // 400 logged at DEBUG, so routine bot/scanner/typo traffic never becomes a 500 OR an ERROR-level Sentry alert.
+    @ExceptionHandler({
+            HttpMessageNotReadableException.class,
+            MissingServletRequestParameterException.class,
+            MethodArgumentTypeMismatchException.class
+    })
+    public ResponseEntity<Map<String, String>> handleBadClientRequest(Exception exception) {
+        log.debug("Bad request rejected: {}", exception.getClass().getSimpleName());
+        return ResponseEntity.badRequest().body(Map.of("error", "Zahtjev nije ispravan."));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, String>> handleMethodNotSupported(HttpRequestMethodNotSupportedException exception) {
+        log.debug("Method not allowed: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(Map.of("error", "Metoda nije dopuštena."));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<Map<String, String>> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException exception) {
+        log.debug("Unsupported media type: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(Map.of("error", "Nepodržan tip sadržaja."));
     }
 
     @ExceptionHandler(Exception.class)
