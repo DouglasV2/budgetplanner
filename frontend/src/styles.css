@@ -85,10 +85,22 @@ a {
   top: 12px;
   z-index: 20;
   backdrop-filter: blur(20px);
-  background: rgba(255, 253, 248, 0.85);
+  /* Near-opaque so content scrolling underneath doesn't bleed through the bar. */
+  background: rgba(255, 253, 248, 0.97);
   border: 1px solid var(--hairline);
   border-radius: 16px;
   box-shadow: var(--shadow-sm);
+}
+/* Mask the 12px gap above the floating header so scrolled content never peeks over its top edge. */
+.header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -14px;
+  height: 14px;
+  background: var(--paper);
+  pointer-events: none;
 }
 
 .brand {
@@ -4939,8 +4951,9 @@ textarea {
 
 .move-in-room-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
+  /* auto-FIT (not auto-fill) so a couple of rooms stretch to fill the row instead of leaving empty tracks. */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
   margin-top: 16px;
 }
 .move-in-room-card {
@@ -4990,16 +5003,25 @@ textarea {
 .move-in-room-items li {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  padding: 5px 0;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 0;
   font-size: 0.88rem;
   border-bottom: 1px solid var(--hairline);
 }
 .move-in-room-items li span:first-child {
+  flex: 1;
+  min-width: 0;
   color: var(--ink-soft);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* The price never wraps to a second line. */
+.move-in-room-items li span:last-child {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .move-in-room-items li.move-in-more {
   justify-content: flex-start;
