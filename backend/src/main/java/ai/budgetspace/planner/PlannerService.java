@@ -112,8 +112,9 @@ public class PlannerService {
     }
 
     public PlanGenerationResponse generate(PlannerInputDto rawInput) {
-        // Rule-based path: parse the prompt with the deterministic extractor, then plan.
-        return buildResponse(intentExtractor.enrich(rawInput == null ? null : rawInput.normalized()));
+        // Rule-based path: parse the prompt with the deterministic extractor, then plan. Never focused —
+        // the deterministic extractor doesn't classify item-vs-room intent (the AI path does).
+        return buildResponse(intentExtractor.enrich(rawInput == null ? null : rawInput.normalized()), false);
     }
 
     /**
@@ -122,7 +123,13 @@ public class PlannerService {
      * still picks only real products from the catalog.
      */
     public PlanGenerationResponse generateResolved(PlannerInputDto resolvedInput) {
-        return buildResponse(resolvedInput == null ? intentExtractor.enrich(null) : resolvedInput.normalized());
+        return generateResolved(resolvedInput, false);
+    }
+
+    // Sprint 10.114: the AI-resolved path can flag a specific-item request (specificItemsOnly) → a focused plan
+    // (only the named pieces, in the room they belong to) instead of the room's full core kit.
+    public PlanGenerationResponse generateResolved(PlannerInputDto resolvedInput, boolean focused) {
+        return buildResponse(resolvedInput == null ? intentExtractor.enrich(null) : resolvedInput.normalized(), focused);
     }
 
     // Sprint 10.109 (Move-In / "Cijeli stan"): split ONE total budget across several rooms, then build a normal
@@ -240,11 +247,15 @@ public class PlannerService {
         return out;
     }
 
-    private PlanGenerationResponse buildResponse(PlannerInputDto input) {
+    private PlanGenerationResponse buildResponse(PlannerInputDto rawInput, boolean focused) {
+        // Sprint 10.114: focused mode. When the AI flags a specific-item request (not a whole-room description),
+        // plan AROUND those pieces — switch to the room they belong to and include only them — instead of
+        // forcing the room's full core kit and burying the requested item as a cheap afterthought.
+        PlannerInputDto input = focused ? withInferredRoom(rawInput) : rawInput;
         List<FurnishingPlanDto> plans = List.of(
-                buildPlan(input, "value"),
-                buildPlan(input, "budget"),
-                buildPlan(input, "stretch")
+                buildPlan(input, "value", focused),
+                buildPlan(input, "budget", focused),
+                buildPlan(input, "stretch", focused)
         );
         List<String> missingImportant = missingImportantCategories(input);
         boolean partial = !missingImportant.isEmpty();
@@ -390,14 +401,14 @@ public class PlannerService {
         return recalculate(plan, input, orderItemsForShopping(input, nextItems));
     }
 
-    private FurnishingPlanDto buildPlan(PlannerInputDto input, String mode) {
+    private FurnishingPlanDto buildPlan(PlannerInputDto input, String mode, boolean focused) {
         double multiplier = switch (mode) {
             case "stretch" -> 1.12;
             case "value" -> 0.98;
             default -> 0.82;
         };
         double planBudget = input.budget() * multiplier;
-        List<String> categories = new ArrayList<>(desiredCategories(input));
+        List<String> categories = new ArrayList<>(focused ? focusedCategories(input) : desiredCategories(input));
         Set<String> picked = new LinkedHashSet<>();
         Set<String> currentRetailers = new LinkedHashSet<>();
         List<PlanItemDto> items = new ArrayList<>();
@@ -1136,6 +1147,41 @@ public class PlannerService {
             case "value" -> "Uravnoteženo za " + input.size() + " m²: prvo glavni komadi, pa udobnost, pa detalji ako stanu. " + storeText + ".";
             default -> "Prvo čuva budžet za " + room + " u " + input.location() + ", pa slaže kupnju po važnosti. " + storeText + ".";
         };
+    }
+
+    // Sprint 10.114: the room each furniture category primarily belongs to — so a focused request for e.g. a
+    // mattress or wardrobe plans in the bedroom (and isn't filtered out as a non-living-room category).
+    // Room-agnostic categories (rug/lighting/storage/decor/gym-equipment) are intentionally omitted.
+    private static final Map<String, String> CATEGORY_HOME_ROOM = Map.ofEntries(
+            Map.entry("sofa", "living-room"), Map.entry("tv-unit", "living-room"),
+            Map.entry("bed", "bedroom"), Map.entry("mattress", "bedroom"), Map.entry("nightstand", "bedroom"),
+            Map.entry("wardrobe", "bedroom"), Map.entry("dresser", "bedroom"),
+            Map.entry("desk", "home-office"),
+            // 'chair' and 'table' are intentionally omitted — ambiguous (armchair vs office chair; coffee vs
+            // dining table) — so a focused request for them stays in the room the user/context implies.
+            Map.entry("dining-table", "dining-room"), Map.entry("dining-chair", "dining-room"),
+            Map.entry("kitchen-cart", "kitchen"), Map.entry("kitchen-storage", "kitchen")
+    );
+
+    // Switch the room to the one the first requested item belongs to (mattress/wardrobe → bedroom, etc.) so the
+    // item is valid for the room and the catalog is scoped correctly.
+    private PlannerInputDto withInferredRoom(PlannerInputDto input) {
+        for (String category : input.mustHaveCategories()) {
+            String home = CATEGORY_HOME_ROOM.get(category == null ? "" : category.toLowerCase(Locale.ROOT));
+            if (home != null && !home.equals(input.roomType())) {
+                return input.withRoomType(home);
+            }
+        }
+        return input;
+    }
+
+    // In focused mode the plan contains ONLY what the user asked for (minus anything they already have).
+    private List<String> focusedCategories(PlannerInputDto input) {
+        LinkedHashSet<String> categories = new LinkedHashSet<>(input.mustHaveCategories());
+        input.alreadyHaveCategories().forEach(categories::remove);
+        return categories.stream()
+                .sorted(Comparator.comparingInt(category -> categoryOrder(input.roomType(), category)))
+                .toList();
     }
 
     private List<String> desiredCategories(PlannerInputDto input) {

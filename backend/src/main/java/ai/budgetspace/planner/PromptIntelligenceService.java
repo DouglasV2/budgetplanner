@@ -106,7 +106,7 @@ public class PromptIntelligenceService {
                 enriched.preferredRetailers(), enriched.mustHaveCategories(), enriched.alreadyHaveCategories(),
                 List.of(), enriched.colorPreferences(), enriched.materialPreferences(),
                 qualityFromGoal(enriched.optimizationGoal(), enriched.furnishingLevel()), null,
-                hadPrompt ? 0.6 : 0.4, List.of(), null, prompt, List.of(), false, "rule-based");
+                hadPrompt ? 0.6 : 0.4, List.of(), null, prompt, List.of(), false, "rule-based", false);
         return analysis.withMeta(false, "rule-based", prompt);
     }
 
@@ -154,7 +154,10 @@ public class PromptIntelligenceService {
                 + "Ne izmišljaj proizvode, cijene ni URL-ove — samo parametre planiranja.\n"
                 + "Ključevi (koristi točno ove nazive): roomType, budget, currency, roomSize, style, preferredRetailers, "
                 + "mustHaveCategories, alreadyHaveCategories, avoidCategories, colorPreferences, materialPreferences, "
-                + "qualityPreference, urgency, confidence, missingImportantInfo, userGoalSummary, normalizedPrompt, warnings.\n"
+                + "qualityPreference, urgency, confidence, missingImportantInfo, userGoalSummary, normalizedPrompt, warnings, specificItemsOnly.\n"
+                + "specificItemsOnly: boolean — true ako korisnik traži SAMO konkretne komade koje je naveo "
+                + "(npr. 'tražim dobar stol', 'samo lampa do 80', 'ormar za spavaću', '6 stolica'), a NE opremanje cijele sobe. "
+                + "Kad je true, navedi te komade u mustHaveCategories. false ako želi opremiti cijelu sobu.\n"
                 + "roomType MORA biti TOČNO jedna od ovih kanonskih engleskih vrijednosti: "
                 + "[living-room, bedroom, home-office, kitchen, dining-room, hallway, bathroom]. "
                 + "PREVEDI korisnikovu riječ za sobu s bilo kojeg jezika u tu kanonsku vrijednost, npr.: "
@@ -204,7 +207,7 @@ public class PromptIntelligenceService {
                 validCategories(a.alreadyHaveCategories()), validCategories(a.avoidCategories()),
                 lowerAll(a.colorPreferences()), lowerAll(a.materialPreferences()),
                 quality, a.urgency(), a.confidence(), a.missingImportantInfo(), a.userGoalSummary(),
-                a.normalizedPrompt(), a.warnings(), a.aiUsed(), a.source());
+                a.normalizedPrompt(), a.warnings(), a.aiUsed(), a.source(), a.specificItemsOnly());
     }
 
     private List<String> validCategories(List<String> values) {

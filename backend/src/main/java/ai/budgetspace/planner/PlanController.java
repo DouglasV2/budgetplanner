@@ -41,7 +41,7 @@ public class PlanController {
         Caller caller = resolveCaller(authToken, sessionId);
         PlannerIntentAnalysisDto analysis = promptIntelligenceService.analyze(input, caller.countingKey(), caller.tier());
         PlanGenerationResponse response = analysis.aiUsed()
-                ? plannerService.generateResolved(promptIntelligenceService.toPlannerInput(analysis, input))
+                ? plannerService.generateResolved(promptIntelligenceService.toPlannerInput(analysis, input), analysis.specificItemsOnly())
                 : plannerService.generate(input);
         return response.withAnalysis(analysis);
     }
