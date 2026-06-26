@@ -1,6 +1,7 @@
 package ai.budgetspace.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 
@@ -14,19 +15,21 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record PlannerIntentAnalysisDto(
-        String roomType,
+        // Sprint 10.111: these scalars are array-tolerant — the LLM occasionally returns them as a list
+        // (e.g. style ["warm","modern"]); without this the whole parse fails and AI silently never fires.
+        @JsonDeserialize(using = FlexibleStringDeserializer.class) String roomType,
         Integer budget,
-        String currency,
+        @JsonDeserialize(using = FlexibleStringDeserializer.class) String currency,
         Integer roomSize,
-        String style,
+        @JsonDeserialize(using = FlexibleStringDeserializer.class) String style,
         List<String> preferredRetailers,
         List<String> mustHaveCategories,
         List<String> alreadyHaveCategories,
         List<String> avoidCategories,
         List<String> colorPreferences,
         List<String> materialPreferences,
-        String qualityPreference,
-        String urgency,
+        @JsonDeserialize(using = FlexibleStringDeserializer.class) String qualityPreference,
+        @JsonDeserialize(using = FlexibleStringDeserializer.class) String urgency,
         Double confidence,
         List<String> missingImportantInfo,
         String userGoalSummary,
