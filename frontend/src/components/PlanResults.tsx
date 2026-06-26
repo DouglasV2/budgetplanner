@@ -222,6 +222,34 @@ function defaultSummary(t: Translate, plan: FurnishingPlan, input: PlannerInput)
   });
 }
 
+// Sprint 10.112: localized narrative for non-HR locales. The backend's rich plan narrative (advisorNote,
+// budgetStatus, reasons, roles, …) is Croatian-only; for any other language we build clean localized text
+// from i18n + plan data so a non-HR user never sees Croatian mixed into a localized UI.
+function localBudgetStatus(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
+  const diff = input.budget - plan.total;
+  if (diff < 0) return t('results.budgetOverBy', { amount: formatCurrency(-diff) });
+  if (plan.total <= input.budget * 0.85) return t('results.budgetComfortable');
+  return t('results.budgetFits');
+}
+
+function localStoreAdvice(t: Translate, plan: FurnishingPlan) {
+  return plan.retailersUsed.length <= 1
+    ? t('results.storeAdviceOne')
+    : t('results.storeAdviceMany', { count: plan.retailersUsed.length });
+}
+
+function localRole(t: Translate, priority: ShoppingPriority) {
+  if (priority === 'buy-first') return t('results.roleBuyFirst');
+  if (priority === 'add-comfort') return t('results.roleComfort');
+  return t('results.roleLater');
+}
+
+function localReason(t: Translate, priority: ShoppingPriority) {
+  if (priority === 'buy-first') return t('results.reasonBuyFirst');
+  if (priority === 'add-comfort') return t('results.reasonComfort');
+  return t('results.reasonLater');
+}
+
 function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   if (!plans.length) return null;
   const preferredName = input.optimizationGoal === 'lowest-price' || input.furnishingLevel === 'basic'
@@ -720,7 +748,9 @@ export function PlanResults({
   submittedPrompt = '',
   secondHandSuggestions = []
 }: PlanResultsProps) {
-  const { t } = useLocale();
+  const { t, config } = useLocale();
+  // Sprint 10.112: for any non-Croatian locale the backend's Croatian narrative is replaced by localized text.
+  const localize = config.lang !== 'hr';
   const [copiedPlanId, setCopiedPlanId] = useState<string | null>(null);
   const [savingPlanId, setSavingPlanId] = useState<string | null>(null);
   const [feedbackByPlan, setFeedbackByPlan] = useState<Record<string, PlanFeedback>>({});
@@ -932,16 +962,16 @@ export function PlanResults({
           <div className="decision-card">
             <div className="decision-topline">
               <span>{decisionLabel(t, selectedPlan, input)}</span>
-              <strong>{selectedPlan.name}</strong>
+              <strong>{localize ? tier : selectedPlan.name}</strong>
             </div>
-            {summaryBullets.length > 0 ? (
+            {!localize && summaryBullets.length > 0 ? (
               <ul className="purchase-summary">
                 {summaryBullets.map((line) => (
                   <li key={line}>{line}</li>
                 ))}
               </ul>
             ) : (
-              <p>{selectedPlan.advisorNote || defaultSummary(t, selectedPlan, input)}</p>
+              <p>{localize ? defaultSummary(t, selectedPlan, input) : (selectedPlan.advisorNote || defaultSummary(t, selectedPlan, input))}</p>
             )}
 
             <div className="decision-metrics" aria-label={t('results.planKeyInfo')}>
@@ -962,7 +992,7 @@ export function PlanResults({
             {showBudgetBlock && (
               <div className="budget-pressure-strip">
                 <strong>{t('results.budgetTight')}</strong>
-                {repairTips.length > 0 ? (
+                {!localize && repairTips.length > 0 ? (
                   <ul>
                     {repairTips.map((tip) => (
                       <li key={tip}>{tip}</li>
@@ -979,10 +1009,10 @@ export function PlanResults({
             )}
 
             <div className="store-advice-strip">
-              {trip.recommendation}
+              {localize ? localStoreAdvice(t, selectedPlan) : trip.recommendation}
             </div>
 
-            {selectedPlan.storeLimitNote && (
+            {!localize && selectedPlan.storeLimitNote && (
               <div className="store-limit-note">{selectedPlan.storeLimitNote}</div>
             )}
 
@@ -1075,10 +1105,10 @@ export function PlanResults({
                           {locked && <span>{t('results.kept')}</span>}
                         </div>
                         <small className="product-shop-note">{priceTierLabel(t, product)} · {productCheckLabel(t, product)}</small>
-                        {product.deliveryNote && <small className="product-delivery-note">{product.deliveryNote}</small>}
+                        {product.deliveryNote && <small className="product-delivery-note">{localize ? t('results.deliveryNoteGeneric') : product.deliveryNote}</small>}
                         <div className="product-reason-box compact-reason-box">
-                          <span>{item.shoppingRole || t('results.whyThis')}</span>
-                          <p>{reason}</p>
+                          <span>{localize ? localRole(t, priority) : (item.shoppingRole || t('results.whyThis'))}</span>
+                          <p>{localize ? localReason(t, priority) : reason}</p>
                         </div>
                         <div className="product-actions decision-product-actions">
                           {openUrl ? (
@@ -1206,14 +1236,14 @@ export function PlanResults({
 
             <div className="plan-summary-box">
               <span>{t('results.whatYouGet')}</span>
-              <p>{selectedPlan.summary || defaultSummary(t, selectedPlan, input)}</p>
-              <small>{selectedPlan.budgetStatus}</small>
+              <p>{localize ? defaultSummary(t, selectedPlan, input) : (selectedPlan.summary || defaultSummary(t, selectedPlan, input))}</p>
+              <small>{localize ? localBudgetStatus(t, selectedPlan, input) : selectedPlan.budgetStatus}</small>
             </div>
 
             <div className="plan-card-header compact-plan-header">
               <div>
-                <span className="plan-label">{selectedPlan.label}</span>
-                <h3>{selectedPlan.name}</h3>
+                {!localize && <span className="plan-label">{selectedPlan.label}</span>}
+                <h3>{localize ? tier : selectedPlan.name}</h3>
                 {tier && <small className="plan-tier">{t('results.tierEquipment', { tier })}</small>}
               </div>
               <div className={overBudget ? 'total over' : 'total'}>{formatCurrency(selectedPlan.total)}</div>
@@ -1222,11 +1252,11 @@ export function PlanResults({
             <div className="plan-explainer-grid">
               <div>
                 <span>{t('results.whoIsThisFor')}</span>
-                <p>{selectedPlan.goodFor || t('results.whoIsThisForDefault')}</p>
+                <p>{localize ? t('results.whoIsThisForDefault') : (selectedPlan.goodFor || t('results.whoIsThisForDefault'))}</p>
               </div>
               <div>
                 <span>{t('results.whatToWatch')}</span>
-                <p>{selectedPlan.tradeoff || selectedPlan.description}</p>
+                <p>{localize ? t('results.tradeoffDefault') : (selectedPlan.tradeoff || selectedPlan.description || t('results.tradeoffDefault'))}</p>
               </div>
             </div>
 
@@ -1234,7 +1264,7 @@ export function PlanResults({
               <div className="tradeoff-card save">
                 <span>{t('results.howToLowerPrice')}</span>
                 <ul>
-                  {(selectedPlan.savingTips?.length ? selectedPlan.savingTips : [t('results.savingTipDefault')]).map((tip) => (
+                  {(!localize && selectedPlan.savingTips?.length ? selectedPlan.savingTips : [t('results.savingTipDefault')]).map((tip) => (
                     <li key={tip}>{tip}</li>
                   ))}
                 </ul>
@@ -1242,7 +1272,7 @@ export function PlanResults({
               <div className="tradeoff-card upgrade">
                 <span>{t('results.ifYouCanAddMore')}</span>
                 <ul>
-                  {(selectedPlan.upgradeTips?.length ? selectedPlan.upgradeTips : [t('results.upgradeTipDefault')]).map((tip) => (
+                  {(!localize && selectedPlan.upgradeTips?.length ? selectedPlan.upgradeTips : [t('results.upgradeTipDefault')]).map((tip) => (
                     <li key={tip}>{tip}</li>
                   ))}
                 </ul>

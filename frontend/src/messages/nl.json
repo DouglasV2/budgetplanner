@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "{count} kamers opgeslagen in \"{name}\".",
   "moveIn.error": "Het appartementsplan is nu niet beschikbaar. Probeer het over een paar minuten opnieuw.",
   "moveIn.emptyHint": "Kies de kamers en een totaalbudget, en maak dan het plan voor het hele appartement.",
-  "moveIn.budgetLow": "Met dit budget zijn niet de basisstukken voor elke kamer gedekt — er ontbreekt ongeveer {amount}. Laat een kamer weg of verhoog het budget."
+  "moveIn.budgetLow": "Met dit budget zijn niet de basisstukken voor elke kamer gedekt — er ontbreekt ongeveer {amount}. Laat een kamer weg of verhoog het budget.",
+  "results.budgetComfortable": "Ruim binnen budget — er blijft ruimte over voor levering, extra's of een kleine upgrade.",
+  "results.budgetFits": "Past binnen budget — het plan is veilig, maar er is weinig ruimte voor grote wijzigingen.",
+  "results.budgetOverBy": "{amount} over budget — één stuk kan wachten, of zoek een goedkopere optie.",
+  "results.tradeoffDefault": "Het plan zet de hoofdstukken eerst; details en upgrades komen wanneer het budget het toelaat.",
+  "results.deliveryNoteGeneric": "Controleer levering of afhalen voor je koopt.",
+  "results.roleBuyFirst": "Basis van de kamer",
+  "results.roleComfort": "Voor warmte en comfort",
+  "results.roleLater": "Afwerkend detail",
+  "results.reasonBuyFirst": "Een hoofdstuk — je bouwt de rest eromheen, dus dit komt eerst.",
+  "results.reasonComfort": "Voegt comfort en warmte toe zodra de hoofdstukken er staan.",
+  "results.reasonLater": "Een mooi detail dat kan wachten als het budget krap is.",
+  "results.storeAdviceOne": "Alles komt uit één winkel — één ritje en je bent klaar.",
+  "results.storeAdviceMany": "Het plan gebruikt {count} winkels om het budget in toom te houden.",
+  "results.quickCheaperSuffix": "Maak een goedkopere versie en spaar je budget.",
+  "results.quickNicerSuffix": "Maak een mooiere, samenhangende versie.",
+  "results.quickSingleStoreSuffix": "Zet alles uit één winkel: {retailer}."
 }

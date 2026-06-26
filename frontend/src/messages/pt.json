@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Guardadas {count} divisões em \"{name}\".",
   "moveIn.error": "O plano do apartamento não está disponível neste momento. Tenta de novo dentro de alguns minutos.",
   "moveIn.emptyHint": "Escolhe as divisões e um orçamento total e depois cria o plano do apartamento inteiro.",
-  "moveIn.budgetLow": "Com este orçamento não cobres as peças básicas de cada divisão — faltam cerca de {amount}. Tira uma divisão ou aumenta o orçamento."
+  "moveIn.budgetLow": "Com este orçamento não cobres as peças básicas de cada divisão — faltam cerca de {amount}. Tira uma divisão ou aumenta o orçamento.",
+  "results.budgetComfortable": "Cabe bem no orçamento — sobra margem para entrega, extras ou uma pequena melhoria.",
+  "results.budgetFits": "Cabe no orçamento — o plano é seguro, mas há pouca margem para grandes mudanças.",
+  "results.budgetOverBy": "Ultrapassa o orçamento em {amount} — um artigo pode esperar, ou procura uma opção mais barata.",
+  "results.tradeoffDefault": "O plano põe as peças principais primeiro; os detalhes e as melhorias vêm quando o orçamento permitir.",
+  "results.deliveryNoteGeneric": "Verifica a entrega ou a recolha antes de comprar.",
+  "results.roleBuyFirst": "A base da divisão",
+  "results.roleComfort": "Para calor e conforto",
+  "results.roleLater": "Toque final",
+  "results.reasonBuyFirst": "Uma peça principal — constróis o resto à volta dela, por isso vem primeiro.",
+  "results.reasonComfort": "Acrescenta conforto e calor assim que as peças principais estiverem no lugar.",
+  "results.reasonLater": "Um detalhe bonito que pode esperar se o orçamento estiver apertado.",
+  "results.storeAdviceOne": "Está tudo na mesma loja — uma deslocação e está feito.",
+  "results.storeAdviceMany": "O plano usa {count} lojas para controlar melhor o orçamento.",
+  "results.quickCheaperSuffix": "Cria uma versão mais barata e poupa o orçamento.",
+  "results.quickNicerSuffix": "Cria uma versão mais bonita e harmoniosa.",
+  "results.quickSingleStoreSuffix": "Junta tudo numa só loja: {retailer}."
 }

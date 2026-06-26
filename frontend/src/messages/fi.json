@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Tallennettu {count} huonetta tilaan ”{name}”.",
   "moveIn.error": "Asunnon suunnitelma ei ole juuri nyt saatavilla. Yritä uudelleen hetken kuluttua.",
   "moveIn.emptyHint": "Valitse huoneet ja kokonaisbudjetti, niin kokoamme suunnitelman koko asunnolle.",
-  "moveIn.budgetLow": "Tällä budjetilla ei riitä perushuonekaluihin joka huoneeseen — noin {amount} puuttuu. Poista huone tai nosta budjettia."
+  "moveIn.budgetLow": "Tällä budjetilla ei riitä perushuonekaluihin joka huoneeseen — noin {amount} puuttuu. Poista huone tai nosta budjettia.",
+  "results.budgetComfortable": "Mahtuu mukavasti budjettiin — tilaa jää toimitukselle, pikkujutuille tai pienelle päivitykselle.",
+  "results.budgetFits": "Mahtuu budjettiin — suunnitelma on turvallinen, mutta tilaa isoille muutoksille ei juuri ole.",
+  "results.budgetOverBy": "Budjetti ylittyy {amount} — yksi tuote voi odottaa, tai etsi edullisempi vaihtoehto.",
+  "results.tradeoffDefault": "Suunnitelma laittaa pääkalusteet ensin; yksityiskohdat ja päivitykset tulevat, kun budjetti antaa myöten.",
+  "results.deliveryNoteGeneric": "Tarkista toimitus tai nouto ennen ostoa.",
+  "results.roleBuyFirst": "Tilan perusta",
+  "results.roleComfort": "Lämpöä ja mukavuutta",
+  "results.roleLater": "Viimeistelyn yksityiskohta",
+  "results.reasonBuyFirst": "Pääkaluste — sen ympärille rakennat muut, joten se tulee ensin.",
+  "results.reasonComfort": "Tuo tilaan mukavuutta ja lämpöä, kun pääkalusteet ovat paikallaan.",
+  "results.reasonLater": "Mukava yksityiskohta, joka voi odottaa jos budjetti on tiukka.",
+  "results.storeAdviceOne": "Kaikki on yhdestä kaupasta — yksi reissu ja valmista.",
+  "results.storeAdviceMany": "Suunnitelma käyttää {count} kauppaa, jotta budjetti pysyy kurissa.",
+  "results.quickCheaperSuffix": "Kokoa edullisempi versio ja säästä budjettia.",
+  "results.quickNicerSuffix": "Kokoa tyylikkäämpi ja yhtenäisempi versio.",
+  "results.quickSingleStoreSuffix": "Kokoa kaikki yhdestä kaupasta: {retailer}."
 }

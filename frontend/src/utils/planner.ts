@@ -195,7 +195,8 @@ export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) 
     `${tLabel('share.budget')}: ${formatCurrency(input.budget)}`,
     `${tLabel('share.total')}: ${formatCurrency(plan.total)}${plan.total <= input.budget ? ` · ${tLabel('share.remains', { amount: formatCurrency(input.budget - plan.total) })}` : ` · ${tLabel('share.over', { amount: formatCurrency(plan.total - input.budget) })}`}`,
     `${tLabel('share.stores')}: ${plan.retailersUsed.join(', ') || tLabel('share.none')}`,
-    plan.advisorNote ? `${tLabel('share.short')}: ${plan.advisorNote}` : '',
+    // Sprint 10.112: the backend advisorNote is Croatian-only — omit it from the shared text so a non-HR
+    // user's copied list never mixes languages (the list itself uses localized labels + real product names).
     '',
     tLabel('share.byStore'),
     ...storeSections

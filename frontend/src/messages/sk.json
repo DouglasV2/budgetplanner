@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Uložených {count} miestností do „{name}“.",
   "moveIn.error": "Plán bytu momentálne nie je dostupný. Skús to znova o pár minút.",
   "moveIn.emptyHint": "Vyber miestnosti a celkový rozpočet, potom zostav plán pre celý byt.",
-  "moveIn.budgetLow": "S týmto rozpočtom nepokryješ základné kusy pre každú miestnosť — chýba približne {amount}. Odober miestnosť alebo zvýš rozpočet."
+  "moveIn.budgetLow": "S týmto rozpočtom nepokryješ základné kusy pre každú miestnosť — chýba približne {amount}. Odober miestnosť alebo zvýš rozpočet.",
+  "results.budgetComfortable": "Pohodlne v rámci rozpočtu — zostáva priestor na dopravu, drobnosti alebo malé vylepšenie.",
+  "results.budgetFits": "Stane sa do rozpočtu — plán je bezpečný, ale nie je veľa priestoru na väčšie zmeny.",
+  "results.budgetOverBy": "Nad rozpočet o {amount} — jedna vec môže počkať alebo skús nájsť lacnejšiu možnosť.",
+  "results.tradeoffDefault": "Plán dáva na prvé miesto hlavné kusy; detaily a vylepšenia prídu, keď to rozpočet dovolí.",
+  "results.deliveryNoteGeneric": "Pred kúpou skontroluj dopravu alebo vyzdvihnutie.",
+  "results.roleBuyFirst": "Základ miestnosti",
+  "results.roleComfort": "Pre teplo a pohodlie",
+  "results.roleLater": "Záverečný detail",
+  "results.reasonBuyFirst": "Hlavný kus — okolo neho skladáš zvyšok, preto ide prvý.",
+  "results.reasonComfort": "Pridáva pohodlie a teplo, keď sú hlavné kusy na mieste.",
+  "results.reasonLater": "Pekný detail, ktorý môže počkať, ak je rozpočet tesný.",
+  "results.storeAdviceOne": "Všetko je z jedného obchodu — jeden výjazd a hotovo.",
+  "results.storeAdviceMany": "Plán používa {count} obchody, aby lepšie ustrážil rozpočet.",
+  "results.quickCheaperSuffix": "Zostav lacnejšiu verziu a ustráž rozpočet.",
+  "results.quickNicerSuffix": "Zostav krajšiu a zladenejšiu verziu.",
+  "results.quickSingleStoreSuffix": "Zostav všetko z jedného obchodu: {retailer}."
 }

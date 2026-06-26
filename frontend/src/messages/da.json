@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Gemte {count} rum i \"{name}\".",
   "moveIn.error": "Planen for lejligheden er ikke tilgængelig lige nu. Prøv igen om et par minutter.",
   "moveIn.emptyHint": "Vælg rummene og et samlet budget, og byg så planen for hele lejligheden.",
-  "moveIn.budgetLow": "Med dette budget dækker du ikke de vigtigste møbler i hvert rum — der mangler omkring {amount}. Fjern et rum eller hæv budgettet."
+  "moveIn.budgetLow": "Med dette budget dækker du ikke de vigtigste møbler i hvert rum — der mangler omkring {amount}. Fjern et rum eller hæv budgettet.",
+  "results.budgetComfortable": "Holder sig godt inden for budgettet — der er plads til levering, ekstra ting eller en lille opgradering.",
+  "results.budgetFits": "Passer til budgettet — planen er sikker, men der er ikke meget plads til store ændringer.",
+  "results.budgetOverBy": "Over budgettet med {amount} — én vare kan vente, eller find en billigere mulighed.",
+  "results.tradeoffDefault": "Planen tager hovedmøblerne først; detaljer og opgraderinger kommer, når budgettet tillader det.",
+  "results.deliveryNoteGeneric": "Tjek levering eller afhentning, før du køber.",
+  "results.roleBuyFirst": "Rummets fundament",
+  "results.roleComfort": "For varme og komfort",
+  "results.roleLater": "Det sidste pift",
+  "results.reasonBuyFirst": "Et hovedmøbel — du bygger resten op omkring det, så det kommer først.",
+  "results.reasonComfort": "Tilføjer komfort og varme, når hovedmøblerne er på plads.",
+  "results.reasonLater": "En fin detalje, der kan vente, hvis budgettet er stramt.",
+  "results.storeAdviceOne": "Alt er fra én butik — én tur, og så er du færdig.",
+  "results.storeAdviceMany": "Planen bruger {count} butikker for at holde budgettet i skak.",
+  "results.quickCheaperSuffix": "Lav en billigere version og hold budgettet.",
+  "results.quickNicerSuffix": "Lav en pænere og mere sammenhængende version.",
+  "results.quickSingleStoreSuffix": "Saml alt fra én butik: {retailer}."
 }

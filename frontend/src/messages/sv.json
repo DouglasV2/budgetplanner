@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Sparade {count} rum till ”{name}”.",
   "moveIn.error": "Lägenhetsplanen är inte tillgänglig just nu. Försök igen om en stund.",
   "moveIn.emptyHint": "Välj rummen och en total budget, sedan bygger vi planen för hela lägenheten.",
-  "moveIn.budgetLow": "Med den här budgeten täcker du inte de viktigaste möblerna i varje rum — det fattas ungefär {amount}. Ta bort ett rum eller höj budgeten."
+  "moveIn.budgetLow": "Med den här budgeten täcker du inte de viktigaste möblerna i varje rum — det fattas ungefär {amount}. Ta bort ett rum eller höj budgeten.",
+  "results.budgetComfortable": "Ryms bekvämt inom budget – det finns utrymme kvar för frakt, extra detaljer eller en liten uppgradering.",
+  "results.budgetFits": "Ryms inom budget – planen är säker, men det finns inte mycket utrymme för större ändringar.",
+  "results.budgetOverBy": "Över budget med {amount} – en sak kan vänta, eller leta efter ett billigare alternativ.",
+  "results.tradeoffDefault": "Planen sätter huvuddelarna först; detaljer och uppgraderingar kommer när budgeten tillåter.",
+  "results.deliveryNoteGeneric": "Kolla frakt eller upphämtning innan du köper.",
+  "results.roleBuyFirst": "Rummets grund",
+  "results.roleComfort": "För värme och komfort",
+  "results.roleLater": "Finputsning",
+  "results.reasonBuyFirst": "En huvuddel – du bygger resten runt den, så den kommer först.",
+  "results.reasonComfort": "Ger komfort och värme när huvuddelarna är på plats.",
+  "results.reasonLater": "En fin detalj som kan vänta om budgeten är knapp.",
+  "results.storeAdviceOne": "Allt är från en butik – en tur och du är klar.",
+  "results.storeAdviceMany": "Planen använder {count} butiker för att hålla budgeten i schack.",
+  "results.quickCheaperSuffix": "Bygg en billigare version och håll budgeten.",
+  "results.quickNicerSuffix": "Bygg en snyggare och mer enhetlig version.",
+  "results.quickSingleStoreSuffix": "Lägg allt från en butik: {retailer}."
 }

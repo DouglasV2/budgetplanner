@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Salvate {count} stanze in \"{name}\".",
   "moveIn.error": "Il piano dell'appartamento non è disponibile al momento. Riprova tra qualche minuto.",
   "moveIn.emptyHint": "Scegli le stanze e un budget totale, poi crea il piano per tutto l'appartamento.",
-  "moveIn.budgetLow": "Con questo budget non copri i pezzi base per ogni stanza — mancano circa {amount}. Togli una stanza o aumenta il budget."
+  "moveIn.budgetLow": "Con questo budget non copri i pezzi base per ogni stanza — mancano circa {amount}. Togli una stanza o aumenta il budget.",
+  "results.budgetComfortable": "Rientra comodamente nel budget — resta margine per la consegna, gli extra o un piccolo upgrade.",
+  "results.budgetFits": "Rientra nel budget — il piano è sicuro, ma c'è poco margine per grandi cambiamenti.",
+  "results.budgetOverBy": "Sfora il budget di {amount} — un articolo può aspettare, oppure cerca un'opzione più economica.",
+  "results.tradeoffDefault": "Il piano mette al primo posto i pezzi principali; dettagli e upgrade arrivano quando il budget lo permette.",
+  "results.deliveryNoteGeneric": "Verifica consegna o ritiro prima di comprare.",
+  "results.roleBuyFirst": "Base della stanza",
+  "results.roleComfort": "Per calore e comfort",
+  "results.roleLater": "Tocco finale",
+  "results.reasonBuyFirst": "Un pezzo principale — gli costruisci intorno il resto, quindi viene per primo.",
+  "results.reasonComfort": "Aggiunge comfort e calore una volta sistemati i pezzi principali.",
+  "results.reasonLater": "Un bel dettaglio che può aspettare se il budget è stretto.",
+  "results.storeAdviceOne": "È tutto da un solo negozio — un giro e hai finito.",
+  "results.storeAdviceMany": "Il piano usa {count} negozi per tenere il budget sotto controllo.",
+  "results.quickCheaperSuffix": "Crea una versione più economica e rispetta il budget.",
+  "results.quickNicerSuffix": "Crea una versione più bella e coordinata.",
+  "results.quickSingleStoreSuffix": "Metti tutto da un solo negozio: {retailer}."
 }

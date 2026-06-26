@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "{count} pièces enregistrées dans « {name} ».",
   "moveIn.error": "Le plan de l'appartement n'est pas disponible pour le moment. Réessaie dans quelques minutes.",
   "moveIn.emptyHint": "Choisis les pièces et un budget total, puis crée le plan pour tout l'appartement.",
-  "moveIn.budgetLow": "Avec ce budget, les meubles de base ne sont pas couverts pour chaque pièce — il manque environ {amount}. Retire une pièce ou augmente le budget."
+  "moveIn.budgetLow": "Avec ce budget, les meubles de base ne sont pas couverts pour chaque pièce — il manque environ {amount}. Retire une pièce ou augmente le budget.",
+  "results.budgetComfortable": "Bien dans le budget — il reste de la marge pour la livraison, des extras ou une petite amélioration.",
+  "results.budgetFits": "Tient dans le budget — le plan est sûr, mais il y a peu de marge pour de gros changements.",
+  "results.budgetOverBy": "Dépasse le budget de {amount} — un article peut attendre, ou cherche une option moins chère.",
+  "results.tradeoffDefault": "Le plan met d'abord les pièces principales ; les détails et les améliorations viennent quand le budget le permet.",
+  "results.deliveryNoteGeneric": "Vérifie la livraison ou le retrait avant d'acheter.",
+  "results.roleBuyFirst": "La base de la pièce",
+  "results.roleComfort": "Pour la chaleur et le confort",
+  "results.roleLater": "Touche finale",
+  "results.reasonBuyFirst": "Une pièce principale — tu construis le reste autour d'elle, donc elle vient en premier.",
+  "results.reasonComfort": "Ajoute du confort et de la chaleur une fois les pièces principales en place.",
+  "results.reasonLater": "Un joli détail qui peut attendre si le budget est serré.",
+  "results.storeAdviceOne": "Tout vient d'un seul magasin — un seul déplacement et c'est fait.",
+  "results.storeAdviceMany": "Le plan utilise {count} magasins pour mieux maîtriser le budget.",
+  "results.quickCheaperSuffix": "Compose une version moins chère et préserve le budget.",
+  "results.quickNicerSuffix": "Compose une version plus belle et plus harmonieuse.",
+  "results.quickSingleStoreSuffix": "Mets tout dans un seul magasin : {retailer}."
 }

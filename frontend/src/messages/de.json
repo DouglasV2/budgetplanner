@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "{count} Räume in „{name}” gespeichert.",
   "moveIn.error": "Der Wohnungsplan ist gerade nicht verfügbar. Versuch es in ein paar Minuten noch mal.",
   "moveIn.emptyHint": "Wähl die Räume und ein Gesamtbudget, dann erstell den Plan für die ganze Wohnung.",
-  "moveIn.budgetLow": "Mit diesem Budget sind nicht für jeden Raum die wichtigsten Möbel gedeckt — es fehlen etwa {amount}. Lass einen Raum weg oder erhöh das Budget."
+  "moveIn.budgetLow": "Mit diesem Budget sind nicht für jeden Raum die wichtigsten Möbel gedeckt — es fehlen etwa {amount}. Lass einen Raum weg oder erhöh das Budget.",
+  "results.budgetComfortable": "Liegt bequem im Budget — es bleibt Spielraum für Lieferung, Extras oder ein kleines Upgrade.",
+  "results.budgetFits": "Passt ins Budget — der Plan ist sicher, aber viel Spielraum für große Änderungen bleibt nicht.",
+  "results.budgetOverBy": "Überschreitet das Budget um {amount} — ein Teil kann warten, oder such eine günstigere Option.",
+  "results.tradeoffDefault": "Der Plan stellt die Hauptteile in den Vordergrund; Details und Upgrades kommen, wenn das Budget es zulässt.",
+  "results.deliveryNoteGeneric": "Prüf vor dem Kauf Lieferung oder Abholung.",
+  "results.roleBuyFirst": "Basis des Raums",
+  "results.roleComfort": "Für Wärme und Komfort",
+  "results.roleLater": "Letzter Schliff",
+  "results.reasonBuyFirst": "Ein Hauptteil — den Rest baust du drumherum auf, deshalb kommt es zuerst.",
+  "results.reasonComfort": "Sorgt für Komfort und Wärme, sobald die Hauptteile stehen.",
+  "results.reasonLater": "Ein schönes Detail, das warten kann, wenn das Budget knapp ist.",
+  "results.storeAdviceOne": "Alles aus einem Geschäft — ein Weg und fertig.",
+  "results.storeAdviceMany": "Der Plan nutzt {count} Geschäfte, um das Budget besser einzuhalten.",
+  "results.quickCheaperSuffix": "Stell eine günstigere Version zusammen und schon dein Budget.",
+  "results.quickNicerSuffix": "Stell eine schönere, stimmigere Version zusammen.",
+  "results.quickSingleStoreSuffix": "Stell alles aus einem Geschäft zusammen: {retailer}."
 }

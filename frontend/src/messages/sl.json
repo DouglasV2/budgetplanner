@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Shranjenih {count} sob v „{name}“.",
   "moveIn.error": "Načrt za stanovanje trenutno ni na voljo. Poskusi znova čez nekaj minut.",
   "moveIn.emptyHint": "Izberi sobe in skupni proračun, nato sestavi načrt za celotno stanovanje.",
-  "moveIn.budgetLow": "S tem proračunom ne pokriješ osnovnih kosov za vsako sobo — manjka približno {amount}. Odstrani sobo ali zvišaj proračun."
+  "moveIn.budgetLow": "S tem proračunom ne pokriješ osnovnih kosov za vsako sobo — manjka približno {amount}. Odstrani sobo ali zvišaj proračun.",
+  "results.budgetComfortable": "Udobno znotraj proračuna — ostaja prostor za dostavo, dodatke ali manjšo nadgradnjo.",
+  "results.budgetFits": "Stane v proračun — načrt je varen, a ni veliko prostora za večje spremembe.",
+  "results.budgetOverBy": "Čez proračun za {amount} — ena stvar lahko počaka ali poišči cenejšo možnost.",
+  "results.tradeoffDefault": "Načrt postavi glavne kose na prvo mesto; podrobnosti in nadgradnje pridejo, ko proračun dopušča.",
+  "results.deliveryNoteGeneric": "Pred nakupom preveri dostavo ali prevzem.",
+  "results.roleBuyFirst": "Temelj prostora",
+  "results.roleComfort": "Za toplino in udobje",
+  "results.roleLater": "Zaključni detajl",
+  "results.reasonBuyFirst": "Glavni kos — okoli njega sestaviš ostalo, zato gre prvi.",
+  "results.reasonComfort": "Doda udobje in toplino prostoru, ko so glavni kosi tu.",
+  "results.reasonLater": "Lep detajl, ki lahko počaka, če je proračun tesen.",
+  "results.storeAdviceOne": "Vse je iz ene trgovine — en obhod in končano.",
+  "results.storeAdviceMany": "Načrt uporablja {count} trgovin, da bolje varuje proračun.",
+  "results.quickCheaperSuffix": "Sestavi cenejšo različico in ohrani proračun.",
+  "results.quickNicerSuffix": "Sestavi lepšo in bolj usklajeno različico.",
+  "results.quickSingleStoreSuffix": "Sestavi vse iz ene trgovine: {retailer}."
 }

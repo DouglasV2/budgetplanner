@@ -511,7 +511,7 @@ export function Planner() {
         ...nextInput,
         optimizationGoal: 'lowest-price' as OptimizationGoal,
         furnishingLevel: 'basic',
-        prompt: `${nextInput.prompt}\n\nSloži jeftiniju verziju i čuvaj budžet.`
+        prompt: `${nextInput.prompt}\n\n${t('results.quickCheaperSuffix')}`
       };
     }
 
@@ -520,7 +520,7 @@ export function Planner() {
         ...nextInput,
         optimizationGoal: 'style-match' as OptimizationGoal,
         furnishingLevel: 'complete',
-        prompt: `${nextInput.prompt}\n\nSloži ljepšu i skladniju verziju.`
+        prompt: `${nextInput.prompt}\n\n${t('results.quickNicerSuffix')}`
       };
     }
 
@@ -539,7 +539,7 @@ export function Planner() {
         retailerMode: 'single',
         selectedRetailers: [retailer],
         optimizationGoal: 'least-stores' as OptimizationGoal,
-        prompt: `${nextInput.prompt}\n\nSloži sve iz jedne trgovine: ${retailer}.`
+        prompt: `${nextInput.prompt}\n\n${t('results.quickSingleStoreSuffix', { retailer })}`
       };
     }
 

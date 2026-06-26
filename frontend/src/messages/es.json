@@ -528,5 +528,21 @@
   "moveIn.savedApartment": "Se han guardado {count} habitaciones en «{name}».",
   "moveIn.error": "El plan del apartamento no está disponible en este momento. Inténtalo de nuevo dentro de unos minutos.",
   "moveIn.emptyHint": "Elige las habitaciones y un presupuesto total, y crea el plan de todo el apartamento.",
-  "moveIn.budgetLow": "Con este presupuesto no cubres las piezas básicas de cada habitación — faltan unos {amount}. Quita una habitación o sube el presupuesto."
+  "moveIn.budgetLow": "Con este presupuesto no cubres las piezas básicas de cada habitación — faltan unos {amount}. Quita una habitación o sube el presupuesto.",
+  "results.budgetComfortable": "Entra con holgura en el presupuesto — queda margen para la entrega, extras o una pequeña mejora.",
+  "results.budgetFits": "Entra en el presupuesto — el plan es seguro, pero queda poco margen para cambios grandes.",
+  "results.budgetOverBy": "Se pasa del presupuesto en {amount} — un artículo puede esperar, o busca una opción más barata.",
+  "results.tradeoffDefault": "El plan pone primero las piezas principales; los detalles y las mejoras vienen cuando el presupuesto lo permite.",
+  "results.deliveryNoteGeneric": "Comprueba la entrega o la recogida antes de comprar.",
+  "results.roleBuyFirst": "La base del espacio",
+  "results.roleComfort": "Para calidez y comodidad",
+  "results.roleLater": "Toque final",
+  "results.reasonBuyFirst": "Una pieza principal — montas el resto a su alrededor, por eso va primero.",
+  "results.reasonComfort": "Aporta comodidad y calidez una vez que están las piezas principales.",
+  "results.reasonLater": "Un detalle bonito que puede esperar si el presupuesto está ajustado.",
+  "results.storeAdviceOne": "Todo es de una sola tienda — un viaje y listo.",
+  "results.storeAdviceMany": "El plan usa {count} tiendas para cuidar mejor el presupuesto.",
+  "results.quickCheaperSuffix": "Crea una versión más barata y cuida el presupuesto.",
+  "results.quickNicerSuffix": "Crea una versión más bonita y armoniosa.",
+  "results.quickSingleStoreSuffix": "Pon todo de una sola tienda: {retailer}."
 }
