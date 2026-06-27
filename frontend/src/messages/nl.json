@@ -549,5 +549,7 @@
   "results.outOfScopeElectronics": "tv's of elektronica",
   "results.outOfScopeAppliances": "huishoudelijke apparaten (airco, wasmachine…)",
   "results.outOfScopeMaterials": "bouwmaterialen (laminaat, tegels…)",
-  "results.outOfScopeOutdoor": "tuin- of buitenmeubels"
+  "results.outOfScopeOutdoor": "tuin- of buitenmeubels",
+  "results.multiRoomNotice": "Je hebt meer dan één ruimte beschreven. De modus „Hele appartement” maakt voor elke ruimte een plan en verdeelt het budget — dit is een plan voor maar één ruimte.",
+  "results.multiRoomCta": "Schakel over naar Hele appartement"
 }

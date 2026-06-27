@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePlan, generatePlanFast, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
-import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
+import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
 import { detectOutOfScope } from '../utils/outOfScope';
+import { detectMultiRoom } from '../utils/multiRoom';
 import type { PlanGenerationResponse } from '../api/client';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
@@ -232,6 +233,8 @@ export function Planner() {
   // Sprint 10.109: planner scope. 'single' = the existing one-room flow (default, unchanged); 'apartment' =
   // the Move-In multi-room mode. Purely additive — the single-room path below is untouched when scope='single'.
   const [scope, setScope] = useState<'single' | 'apartment'>('single');
+  // Sprint 10.116: when a free-text prompt names several rooms, this seeds the Move-In mode the nudge switches to.
+  const [moveInSeed, setMoveInSeed] = useState<{ rooms: RoomType[]; budget: number } | null>(null);
 
   async function refreshSavedPlans() {
     try {
@@ -565,6 +568,9 @@ export function Planner() {
     ? 'results.outOfScopeOutdoor'
     : 'results.outOfScopeMaterials';
 
+  // Sprint 10.116: the prompt named several rooms — the single-room plan can't do that; nudge to Cijeli stan.
+  const multiRoom = plans.length > 0 ? detectMultiRoom(submittedPrompt) : null;
+
   return (
     <section className="planner-section shell" id="planner">
       <div className="section-heading left planner-heading-row">
@@ -646,6 +652,23 @@ export function Planner() {
           <span>{t('results.outOfScopeNotice', { what: t(outOfScopeWhatKey) })}</span>
         </div>
       )}
+      {multiRoom && (
+        <div className="out-of-scope-banner multi-room-banner" role="note">
+          <span className="out-of-scope-mark" aria-hidden="true">i</span>
+          <span className="multi-room-text">{t('results.multiRoomNotice')}</span>
+          <button
+            type="button"
+            className="multi-room-cta"
+            onClick={() => {
+              setMoveInSeed({ rooms: multiRoom.rooms, budget: input.budget });
+              setScope('apartment');
+              document.getElementById('planner')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
+            {t('results.multiRoomCta')}
+          </button>
+        </div>
+      )}
       <div className="planner-layout">
         <div className="planner-panel">
           <PlannerForm input={input} onChange={setInput} onGenerate={handleGenerate} isLoading={isLoading} />
@@ -714,6 +737,7 @@ export function Planner() {
           activeSpace={activeSpace}
           onSavedPlan={(saved) => setSavedPlans((current) => [saved, ...current.filter((plan) => plan.id !== saved.id)])}
           onNotice={setNotice}
+          seed={moveInSeed}
         />
       </div>
     </section>

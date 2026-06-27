@@ -549,5 +549,7 @@
   "results.outOfScopeElectronics": "televizorjev ali elektronike",
   "results.outOfScopeAppliances": "gospodinjskih aparatov (klima, pralni stroj…)",
   "results.outOfScopeMaterials": "gradbenega materiala (laminat, ploščice…)",
-  "results.outOfScopeOutdoor": "vrtnega/zunanjega pohištva"
+  "results.outOfScopeOutdoor": "vrtnega/zunanjega pohištva",
+  "results.multiRoomNotice": "Opisal si več kot eno sobo. Način „Celotno stanovanje” naredi načrt za vsako in razdeli proračun — to je načrt samo za eno.",
+  "results.multiRoomCta": "Preklopi na Celotno stanovanje"
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FurnishingPlan, PlannerInput, RoomType, SavedPlanResponse } from '../types';
 import { generateMoveInPlan, savePlan } from '../api/client';
 import { formatCurrency } from '../utils/planner';
@@ -16,6 +16,9 @@ interface MoveInPlannerProps {
   activeSpace: string;
   onSavedPlan: (plan: SavedPlanResponse) => void;
   onNotice: (message: string) => void;
+  // Sprint 10.116: when the user is nudged here from a multi-room free-text prompt, pre-fill the rooms it found
+  // + the budget they typed. A fresh object each nudge so the effect re-applies.
+  seed?: { rooms: RoomType[]; budget: number } | null;
 }
 
 const MOVE_IN_ROOMS: Array<{ value: RoomType; labelKey: string; icon: string }> = [
@@ -45,7 +48,7 @@ function pickBestPlan(plans: FurnishingPlan[]): FurnishingPlan | null {
   return plans.find((plan) => plan.name === 'Najbolji izbor') ?? plans[Math.min(1, plans.length - 1)] ?? plans[0];
 }
 
-export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice }: MoveInPlannerProps) {
+export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, seed }: MoveInPlannerProps) {
   const { t } = useLocale();
   const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(['living-room', 'bedroom']);
   const [totalBudget, setTotalBudget] = useState<number>(5000);
@@ -55,6 +58,14 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice }:
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Sprint 10.116: apply a seed (from the multi-room nudge) — pre-select the detected rooms + typed budget.
+  useEffect(() => {
+    if (seed && seed.rooms.length) {
+      setSelectedRooms(seed.rooms);
+      if (seed.budget > 0) setTotalBudget(seed.budget);
+    }
+  }, [seed]);
 
   function toggleRoom(room: RoomType) {
     setSelectedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));

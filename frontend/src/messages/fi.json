@@ -549,5 +549,7 @@
   "results.outOfScopeElectronics": "televisioita tai elektroniikkaa",
   "results.outOfScopeAppliances": "kodinkoneita (ilmastointi, pesukone…)",
   "results.outOfScopeMaterials": "rakennusmateriaaleja (laminaatti, laatat…)",
-  "results.outOfScopeOutdoor": "ulko- tai puutarhakalusteita"
+  "results.outOfScopeOutdoor": "ulko- tai puutarhakalusteita",
+  "results.multiRoomNotice": "Kuvasit useamman kuin yhden huoneen. ”Koko asunto” -tila suunnittelee jokaisen ja jakaa budjetin — tämä on suunnitelma vain yhdelle.",
+  "results.multiRoomCta": "Vaihda Koko asunto -tilaan"
 }

@@ -623,6 +623,9 @@ const DICTIONARY: Record<string, Entry> = {
   'results.outOfScopeAppliances': { hr: 'kućanske uređaje (klima, perilica…)', en: 'home appliances (AC, washing machine…)' },
   'results.outOfScopeMaterials': { hr: 'građevinski materijal (laminat, pločice…)', en: 'building materials (laminate, tiles…)' },
   'results.outOfScopeOutdoor': { hr: 'vanjski/vrtni namještaj', en: 'outdoor/garden furniture' },
+  // Sprint 10.116: nudge to "Cijeli stan" (Move-In) when a free-text prompt names several rooms.
+  'results.multiRoomNotice': { hr: 'Opisao si više prostorija. „Cijeli stan” mod složi plan za svaku i podijeli budžet — ovo je plan samo za jednu.', en: 'You described more than one room. "Whole apartment" mode plans each one and splits the budget — this is a plan for just one.' },
+  'results.multiRoomCta': { hr: 'Prebaci na Cijeli stan', en: 'Switch to Whole apartment' },
   'results.scoreFit': { hr: 'Koliko prati želje', en: 'How well it matches your wishes' },
   'results.scoreStyle': { hr: 'Usklađen izgled', en: 'Style consistency' },
   'results.scoreShopping': { hr: 'Kupnja', en: 'Shopping' },

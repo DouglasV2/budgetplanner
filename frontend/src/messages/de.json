@@ -549,5 +549,7 @@
   "results.outOfScopeElectronics": "Fernseher oder Elektronik",
   "results.outOfScopeAppliances": "Haushaltsgeräte (Klimaanlage, Waschmaschine…)",
   "results.outOfScopeMaterials": "Baumaterial (Laminat, Fliesen…)",
-  "results.outOfScopeOutdoor": "Garten- oder Außenmöbel"
+  "results.outOfScopeOutdoor": "Garten- oder Außenmöbel",
+  "results.multiRoomNotice": "Du hast mehr als einen Raum beschrieben. Der Modus „Ganze Wohnung“ plant jeden einzeln und teilt das Budget auf – dies ist ein Plan für nur einen.",
+  "results.multiRoomCta": "Zu „Ganze Wohnung“ wechseln"
 }

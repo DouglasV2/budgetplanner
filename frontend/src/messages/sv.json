@@ -549,5 +549,7 @@
   "results.outOfScopeElectronics": "tv-apparater eller elektronik",
   "results.outOfScopeAppliances": "vitvaror (AC, tvättmaskin …)",
   "results.outOfScopeMaterials": "byggmaterial (laminat, kakel …)",
-  "results.outOfScopeOutdoor": "utemöbler eller trädgårdsmöbler"
+  "results.outOfScopeOutdoor": "utemöbler eller trädgårdsmöbler",
+  "results.multiRoomNotice": "Du beskrev mer än ett rum. Läget ”Hela lägenheten” planerar varje rum och delar upp budgeten – det här är en plan för bara ett.",
+  "results.multiRoomCta": "Byt till Hela lägenheten"
 }

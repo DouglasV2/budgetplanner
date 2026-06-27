@@ -549,5 +549,7 @@
   "results.outOfScopeElectronics": "televízory ani elektroniku",
   "results.outOfScopeAppliances": "domáce spotrebiče (klimatizáciu, práčku…)",
   "results.outOfScopeMaterials": "stavebné materiály (laminát, dlažbu…)",
-  "results.outOfScopeOutdoor": "záhradný/vonkajší nábytok"
+  "results.outOfScopeOutdoor": "záhradný/vonkajší nábytok",
+  "results.multiRoomNotice": "Opísal si viac než jednu miestnosť. Režim „Celý byt” naplánuje každú z nich a rozdelí rozpočet — toto je plán len pre jednu.",
+  "results.multiRoomCta": "Prepnúť na Celý byt"
 }

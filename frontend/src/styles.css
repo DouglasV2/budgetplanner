@@ -5080,3 +5080,26 @@ textarea {
   font-size: 0.85rem;
   font-style: italic;
 }
+/* Sprint 10.116: multi-room nudge — same banner but with a one-click "switch to Cijeli stan" action. */
+.multi-room-banner {
+  align-items: center;
+}
+.multi-room-text {
+  flex: 1;
+}
+.multi-room-cta {
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--clay);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.multi-room-cta:hover {
+  background: var(--orange-dark);
+}
