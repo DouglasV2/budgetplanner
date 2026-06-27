@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Sprint 10.10 — structured understanding of a user's free-text prompt, produced either by the LLM
@@ -39,10 +40,17 @@ public record PlannerIntentAnalysisDto(
         String source,
         // Sprint 10.114: true when the user wants ONLY the specific piece(s) they named (e.g. "a good table"),
         // not to furnish a whole room — the planner then builds a focused plan around those pieces.
-        boolean specificItemsOnly
+        boolean specificItemsOnly,
+        // Sprint 10.120: per-category counts the user asked for (e.g. {"dining-chair":6}). Tolerant-parsed so a
+        // weird LLM shape never crashes the intent parse; the planner multiplies the picked item by this count.
+        @JsonDeserialize(using = FlexibleQuantityMapDeserializer.class) Map<String, Integer> quantities
 ) {
     private static <T> List<T> orEmpty(List<T> value) {
         return value == null ? List.of() : value;
+    }
+
+    private static Map<String, Integer> orEmptyMap(Map<String, Integer> value) {
+        return value == null ? Map.of() : value;
     }
 
     /** Returns a copy with metadata filled and all nullable collections/confidence normalised. */
@@ -54,7 +62,7 @@ public record PlannerIntentAnalysisDto(
                 orEmpty(preferredRetailers), orEmpty(mustHaveCategories), orEmpty(alreadyHaveCategories),
                 orEmpty(avoidCategories), orEmpty(colorPreferences), orEmpty(materialPreferences),
                 qualityPreference, urgency, safeConfidence, orEmpty(missingImportantInfo),
-                userGoalSummary, prompt, orEmpty(warnings), aiUsed, source, specificItemsOnly);
+                userGoalSummary, prompt, orEmpty(warnings), aiUsed, source, specificItemsOnly, orEmptyMap(quantities));
     }
 
     /** Low confidence → the UI should tell the user we're unsure rather than acting certain. */

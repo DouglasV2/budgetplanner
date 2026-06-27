@@ -461,12 +461,18 @@ public class PlannerService {
                 for (int j = i; j < categories.size(); j++) totalWeight += categoryWeight(input.roomType(), categories.get(j));
                 perItemTarget = spendTarget(remaining, categoryWeight(input.roomType(), category), totalWeight, mode, preferQuality);
             }
-            Product product = pickBest(category, input, remaining, mode, picked, currentRetailers, perItemTarget);
+            // Sprint 10.120: honour a requested count (e.g. "6 dining chairs"). The per-UNIT budget and target
+            // are the category share divided by the count, so N units fit the budget instead of one item being
+            // picked and shipped alone. The line total is unit price * count.
+            int qty = quantityFor(input, category);
+            double remainingPerUnit = qty > 1 ? remaining / qty : remaining;
+            double perUnitTarget = qty > 1 ? perItemTarget / qty : perItemTarget;
+            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget);
             if (product == null) continue;
 
             picked.add(product.getId());
             currentRetailers.add(product.getRetailer());
-            total += product.getPrice().doubleValue();
+            total += product.getPrice().doubleValue() * qty;
             items.add(createPlanItem(product, input, mode, ""));
         }
 
@@ -711,7 +717,7 @@ public class PlannerService {
 
     private FurnishingPlanDto calculatePlan(String id, String name, String label, String description, PlannerInputDto input, List<PlanItemDto> items) {
         List<PlanItemDto> cleanItems = cleanPlanItems(input, items);
-        double total = cleanItems.stream().mapToDouble(item -> item.product().price().doubleValue()).sum();
+        double total = cleanItems.stream().mapToDouble(item -> item.product().price().doubleValue() * Math.max(1, item.quantity())).sum();
         List<String> retailersUsed = cleanItems.stream()
                 .map(item -> item.product().retailer())
                 .distinct()
@@ -759,8 +765,8 @@ public class PlannerService {
         List<StoreTotalDto> stores = grouped.entrySet().stream()
                 .map(entry -> new StoreTotalDto(
                         entry.getKey(),
-                        money(entry.getValue().stream().mapToDouble(item -> item.product().price().doubleValue()).sum()),
-                        entry.getValue().size()))
+                        money(entry.getValue().stream().mapToDouble(item -> item.product().price().doubleValue() * Math.max(1, item.quantity())).sum()),
+                        entry.getValue().stream().mapToInt(item -> Math.max(1, item.quantity())).sum()))
                 .sorted(Comparator.comparing(StoreTotalDto::total).reversed())
                 .toList();
 
@@ -850,7 +856,7 @@ public class PlannerService {
     }
 
     private double sumPrice(List<PlanItemDto> items) {
-        return items.stream().mapToDouble(item -> item.product().price().doubleValue()).sum();
+        return items.stream().mapToDouble(item -> item.product().price().doubleValue() * Math.max(1, item.quantity())).sum();
     }
 
     private int indexOfId(List<PlanItemDto> items, String id) {
@@ -956,8 +962,19 @@ public class PlannerService {
                 prefix + buildReason(product, input, mode),
                 priorityForCategory(input.roomType(), category),
                 roleForCategory(input.roomType(), category),
-                stepForCategory(input.roomType(), category)
+                stepForCategory(input.roomType(), category),
+                quantityFor(input, category)
         );
+    }
+
+    // Sprint 10.120: how many of this category the user asked for (e.g. 6 dining chairs). Defaults to 1;
+    // clamped to a sane furniture maximum so a typo ("60 chairs") can't blow up a plan.
+    private int quantityFor(PlannerInputDto input, String category) {
+        java.util.Map<String, Integer> q = input.quantities();
+        if (q == null || q.isEmpty()) return 1;
+        Integer n = q.get(category);
+        if (n == null || n < 1) return 1;
+        return Math.min(n, 12);
     }
 
     private PlanItemDto enrichExistingItem(PlanItemDto item, PlannerInputDto input) {
@@ -968,7 +985,8 @@ public class PlannerService {
                 item.reason(),
                 item.shoppingPriority() == null ? priorityForCategory(input.roomType(), category) : item.shoppingPriority(),
                 item.shoppingRole() == null ? roleForCategory(input.roomType(), category) : item.shoppingRole(),
-                item.stepTitle() == null ? stepForCategory(input.roomType(), category) : item.stepTitle()
+                item.stepTitle() == null ? stepForCategory(input.roomType(), category) : item.stepTitle(),
+                Math.max(1, item.quantity())
         );
     }
 

@@ -18,9 +18,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -106,7 +108,7 @@ public class PromptIntelligenceService {
                 enriched.preferredRetailers(), enriched.mustHaveCategories(), enriched.alreadyHaveCategories(),
                 List.of(), enriched.colorPreferences(), enriched.materialPreferences(),
                 qualityFromGoal(enriched.optimizationGoal(), enriched.furnishingLevel()), null,
-                hadPrompt ? 0.6 : 0.4, List.of(), null, prompt, List.of(), false, "rule-based", false);
+                hadPrompt ? 0.6 : 0.4, List.of(), null, prompt, List.of(), false, "rule-based", false, Map.of());
         return analysis.withMeta(false, "rule-based", prompt);
     }
 
@@ -123,7 +125,11 @@ public class PromptIntelligenceService {
         String style = analysis.style() != null && KNOWN_STYLES.contains(analysis.style().toLowerCase(Locale.ROOT))
                 ? analysis.style().toLowerCase(Locale.ROOT) : base.style();
         int ceiling = Markets.budgetCeiling(Markets.currencyFor(base.market()));
-        int budget = analysis.budget() == null ? base.budget() : clamp(analysis.budget(), Math.max(1, ceiling / 90), ceiling);
+        // Sprint 10.120: a full-room budget below ceiling/90 (~100€) is unrealistic so we floor it; but a FOCUSED
+        // single-item request ("a lamp up to 60€") has a legitimately small budget — use a much lower floor so we
+        // don't silently inflate the user's stated max and then blow past it.
+        int budgetFloor = analysis.specificItemsOnly() ? Math.max(1, ceiling / 900) : Math.max(1, ceiling / 90);
+        int budget = analysis.budget() == null ? base.budget() : clamp(analysis.budget(), budgetFloor, ceiling);
         int size = analysis.roomSize() == null ? base.size() : clamp(analysis.roomSize(), 8, 60);
 
         List<String> mustHave = validCategories(analysis.mustHaveCategories());
@@ -141,7 +147,7 @@ public class PromptIntelligenceService {
                 optimizationGoal, furnishingLevel, mustHave, new ArrayList<>(alreadyHave), base.lockedProductIds(),
                 preferred, base.excludedRetailers(), base.maxStores(),
                 lowerAll(analysis.colorPreferences()), lowerAll(analysis.materialPreferences()), base.market()
-        ).normalized();
+        ).normalized().withQuantities(validQuantities(analysis.quantities()));
     }
 
     // --- LLM prompt construction ---
@@ -154,7 +160,10 @@ public class PromptIntelligenceService {
                 + "Ne izmišljaj proizvode, cijene ni URL-ove — samo parametre planiranja.\n"
                 + "Ključevi (koristi točno ove nazive): roomType, budget, currency, roomSize, style, preferredRetailers, "
                 + "mustHaveCategories, alreadyHaveCategories, avoidCategories, colorPreferences, materialPreferences, "
-                + "qualityPreference, urgency, confidence, missingImportantInfo, userGoalSummary, normalizedPrompt, warnings, specificItemsOnly.\n"
+                + "qualityPreference, urgency, confidence, missingImportantInfo, userGoalSummary, normalizedPrompt, warnings, specificItemsOnly, quantities.\n"
+                + "quantities: objekt {kategorija: cijeli_broj} SAMO za komade kojih korisnik traži VIŠE od jednog "
+                + "(npr. '6 stolica' → {\"dining-chair\":6}, '2 noćna ormarića' → {\"nightstand\":2}). Koristi kanonske "
+                + "engleske nazive kategorija. Ako je količina 1 ili nije navedena, izostavi je.\n"
                 + "specificItemsOnly: boolean — true ako korisnik traži SAMO konkretne komade koje je naveo "
                 + "(npr. 'tražim dobar stol', 'samo lampa do 80', 'ormar za spavaću', '6 stolica'), a NE opremanje cijele sobe. "
                 + "Kad je true, navedi te komade u mustHaveCategories. false ako želi opremiti cijelu sobu.\n"
@@ -177,7 +186,8 @@ public class PromptIntelligenceService {
                 + "smislen opis opremanja vrati 0.8–1.0; za nejasan, prazan ili besmislen/nepovezan opis vrati < 0.4. "
                 + "UVIJEK vrati confidence (nikad ga ne izostavi). "
                 + "Ako neki DRUGI podatak nije naveden, izostavi ga ili stavi null, i dodaj u missingImportantInfo. "
-                + "userGoalSummary i normalizedPrompt napiši na hrvatskom.";
+                + "userGoalSummary napiši na ISTOM JEZIKU kojim korisnik piše (zrcali korisnikov jezik — to se "
+                + "prikazuje korisniku). normalizedPrompt napiši na hrvatskom (interno).";
     }
 
     private String userPrompt(PlannerInputDto input, String prompt) {
@@ -198,7 +208,10 @@ public class PromptIntelligenceService {
         String style = a.style() != null && KNOWN_STYLES.contains(a.style().toLowerCase(Locale.ROOT))
                 ? a.style().toLowerCase(Locale.ROOT) : null;
         int ceiling = Markets.budgetCeiling(currency);
-        Integer budget = a.budget() == null ? null : clamp(a.budget(), Math.max(1, ceiling / 90), ceiling);
+        // Sprint 10.120: focused single-item requests have a legitimately small budget ("a lamp up to 60€"),
+        // so don't floor them at ceiling/90 (~100) — that silently inflated the user's stated max.
+        int budgetFloor = a.specificItemsOnly() ? Math.max(1, ceiling / 900) : Math.max(1, ceiling / 90);
+        Integer budget = a.budget() == null ? null : clamp(a.budget(), budgetFloor, ceiling);
         Integer size = a.roomSize() == null ? null : clamp(a.roomSize(), 8, 60);
         String quality = a.qualityPreference() != null && QUALITY_PREFERENCES.contains(a.qualityPreference().toLowerCase(Locale.ROOT))
                 ? a.qualityPreference().toLowerCase(Locale.ROOT) : null;
@@ -208,7 +221,7 @@ public class PromptIntelligenceService {
                 validCategories(a.alreadyHaveCategories()), validCategories(a.avoidCategories()),
                 lowerAll(a.colorPreferences()), lowerAll(a.materialPreferences()),
                 quality, a.urgency(), a.confidence(), a.missingImportantInfo(), a.userGoalSummary(),
-                a.normalizedPrompt(), a.warnings(), a.aiUsed(), a.source(), a.specificItemsOnly());
+                a.normalizedPrompt(), a.warnings(), a.aiUsed(), a.source(), a.specificItemsOnly(), validQuantities(a.quantities()));
     }
 
     private List<String> validCategories(List<String> values) {
@@ -218,6 +231,17 @@ public class PromptIntelligenceService {
             ProductTaxonomy.normalizeCategory(value).ifPresent(out::add);
         }
         return new ArrayList<>(out);
+    }
+
+    // Sprint 10.120: keep only known categories, drop counts < 1, clamp to a sane furniture maximum.
+    private Map<String, Integer> validQuantities(Map<String, Integer> values) {
+        if (values == null || values.isEmpty()) return Map.of();
+        LinkedHashMap<String, Integer> out = new LinkedHashMap<>();
+        values.forEach((key, count) -> {
+            if (count == null || count < 1) return;
+            ProductTaxonomy.normalizeCategory(key).ifPresent(cat -> out.put(cat, Math.min(count, 12)));
+        });
+        return out;
     }
 
     private List<String> validRetailers(List<String> values) {

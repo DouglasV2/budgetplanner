@@ -208,6 +208,8 @@ export interface PlanItem {
   shoppingPriority?: ShoppingPriority;
   shoppingRole?: string;
   stepTitle?: string;
+  // Sprint 10.120: how many of this product the plan includes (e.g. 6 dining chairs). Line total = price * quantity.
+  quantity?: number;
 }
 
 export interface StoreTotal {

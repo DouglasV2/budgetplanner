@@ -187,7 +187,11 @@ export function resolveStoreTrip(plan: FurnishingPlan): StoreTrip {
 export function formatPlanForSharing(plan: FurnishingPlan, input: PlannerInput) {
   const storeSections = getRetailerBreakdown(plan).flatMap((entry) => [
     `${entry.retailer} — ${tLabel('share.items', { count: entry.count })} — ${formatCurrency(entry.total)}`,
-    ...entry.items.map((item) => `- ${item.product.name} — ${formatCurrency(item.product.price)} (${shoppingPriorityLabels[item.shoppingPriority ?? 'later']})`),
+    ...entry.items.map((item) => {
+      const q = item.quantity && item.quantity > 1 ? item.quantity : 1;
+      const label = q > 1 ? `${q} × ${item.product.name}` : item.product.name;
+      return `- ${label} — ${formatCurrency(item.product.price * q)} (${shoppingPriorityLabels[item.shoppingPriority ?? 'later']})`;
+    }),
     ''
   ]);
 

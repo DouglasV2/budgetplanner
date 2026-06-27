@@ -751,6 +751,15 @@ input[type='range'] {
   white-space: nowrap;
 }
 
+/* Sprint 10.120: per-unit price under the line total when a quantity > 1 is requested ("6 × 80 €"). */
+.qty-unit-note {
+  display: block;
+  font-weight: 500;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: right;
+}
+
 .meta-line {
   display: flex;
   gap: 8px;

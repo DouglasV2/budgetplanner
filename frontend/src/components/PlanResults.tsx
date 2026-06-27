@@ -594,15 +594,18 @@ function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: Planne
               <strong>{formatCurrency(entry.total)}</strong>
             </div>
             <ul>
-              {entry.items.map((item) => (
+              {entry.items.map((item) => {
+                const q = item.quantity && item.quantity > 1 ? item.quantity : 1;
+                return (
                 <li key={item.product.id}>
-                  <span>{item.product.name}</span>
+                  <span>{q > 1 ? `${q} × ${item.product.name}` : item.product.name}</span>
                   {isCheckInStore(item.product)
                     ? <small className="check-store-tag">{t('results.availCheckStore')}</small>
                     : <small>{shoppingPriorityLabels[priorityForItem(item, input.roomType)]}</small>}
-                  <strong>{formatCurrency(item.product.price)}</strong>
+                  <strong>{formatCurrency(item.product.price * q)}</strong>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         ))}
@@ -1053,6 +1056,8 @@ export function PlanResults({
                   const market = marketBadge(product);
                   const illustration = usesFallbackImage(product);
                   const sale = saleInfo(product);
+                  // Sprint 10.120: show the requested count ("6 ×") and the line total (price × count).
+                  const qty = item.quantity && item.quantity > 1 ? item.quantity : 1;
                   return (
                     <div className={locked ? 'product-row locked decision-product-row' : 'product-row decision-product-row'} key={product.id}>
                       <img
@@ -1063,12 +1068,15 @@ export function PlanResults({
                       />
                       <div className="product-info">
                         <div className="product-title-line">
-                          <strong>{product.name}</strong>
+                          <strong>{qty > 1 ? `${qty} × ${product.name}` : product.name}</strong>
                           <span>
-                            {formatCurrency(product.price)}
+                            {formatCurrency(product.price * qty)}
+                            {qty > 1 && (
+                              <small className="qty-unit-note">{qty} × {formatCurrency(product.price)}</small>
+                            )}
                             {sale && (
                               <s className="original-price" title={t('results.regularPrice', { price: formatCurrency(sale.original) })}>
-                                {formatCurrency(sale.original)}
+                                {formatCurrency(sale.original * qty)}
                               </s>
                             )}
                           </span>

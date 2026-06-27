@@ -1,6 +1,7 @@
 package ai.budgetspace.dto;
 
 import java.util.List;
+import java.util.Map;
 
 public record PlannerInputDto(
         String prompt,
@@ -24,7 +25,10 @@ public record PlannerInputDto(
         List<String> colorPreferences,
         List<String> materialPreferences,
         // Sprint 10.13: market/country (e.g. HR, SI, AT, DE). Filters the catalog and drives currency.
-        String market
+        String market,
+        // Sprint 10.120: per-category counts the user asked for (e.g. {"dining-chair":6}); the planner
+        // multiplies the picked item by this count (price and budget). Empty = one of each (the old behaviour).
+        Map<String, Integer> quantities
 ) {
     /**
      * Backwards-compatible constructor for callers created before Sprint 10.7 added colour/material
@@ -53,6 +57,37 @@ public record PlannerInputDto(
                 lockedProductIds, preferredRetailers, excludedRetailers, maxStores, List.of(), List.of(), "HR");
     }
 
+    /**
+     * Backwards-compatible constructor for the Sprint 10.7–10.13 signature (before 10.120 added quantities).
+     * Keeps every existing 19-arg {@code new PlannerInputDto(...)} call site valid; quantities default to empty.
+     */
+    public PlannerInputDto(
+            String prompt,
+            int budget,
+            String roomType,
+            String style,
+            String location,
+            int size,
+            String retailerMode,
+            List<String> selectedRetailers,
+            String optimizationGoal,
+            String furnishingLevel,
+            List<String> mustHaveCategories,
+            List<String> alreadyHaveCategories,
+            List<String> lockedProductIds,
+            List<String> preferredRetailers,
+            List<String> excludedRetailers,
+            int maxStores,
+            List<String> colorPreferences,
+            List<String> materialPreferences,
+            String market
+    ) {
+        this(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
+                optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories,
+                lockedProductIds, preferredRetailers, excludedRetailers, maxStores,
+                colorPreferences, materialPreferences, market, Map.of());
+    }
+
     public PlannerInputDto normalized() {
         return new PlannerInputDto(
                 // Sprint 10.67 (security audit): bound the prompt so an oversized body can't run up LLM tokens
@@ -75,8 +110,13 @@ public record PlannerInputDto(
                 Math.max(0, maxStores),
                 colorPreferences == null ? List.of() : colorPreferences,
                 materialPreferences == null ? List.of() : materialPreferences,
-                blank(market) ? "HR" : market.trim().toUpperCase(java.util.Locale.ROOT)
+                blank(market) ? "HR" : market.trim().toUpperCase(java.util.Locale.ROOT),
+                quantities == null ? Map.of() : quantities
         );
+    }
+
+    public PlannerInputDto withQuantities(Map<String, Integer> nextQuantities) {
+        return copy().quantities(nextQuantities).build();
     }
 
     public PlannerInputDto withMarket(String nextMarket) {
@@ -165,6 +205,7 @@ public record PlannerInputDto(
         private List<String> colorPreferences;
         private List<String> materialPreferences;
         private String market;
+        private Map<String, Integer> quantities;
 
         private Builder(PlannerInputDto source) {
             this.prompt = source.prompt();
@@ -186,6 +227,7 @@ public record PlannerInputDto(
             this.colorPreferences = source.colorPreferences();
             this.materialPreferences = source.materialPreferences();
             this.market = source.market();
+            this.quantities = source.quantities();
         }
 
         private Builder budget(int value) { this.budget = value; return this; }
@@ -205,12 +247,13 @@ public record PlannerInputDto(
         private Builder colorPreferences(List<String> value) { this.colorPreferences = value; return this; }
         private Builder materialPreferences(List<String> value) { this.materialPreferences = value; return this; }
         private Builder market(String value) { this.market = value; return this; }
+        private Builder quantities(Map<String, Integer> value) { this.quantities = value; return this; }
 
         private PlannerInputDto build() {
             return new PlannerInputDto(
                     prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                     optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds,
-                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences, market
+                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences, market, quantities
             ).normalized();
         }
     }
