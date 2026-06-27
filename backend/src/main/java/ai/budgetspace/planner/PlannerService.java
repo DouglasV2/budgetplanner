@@ -444,9 +444,21 @@ public class PlannerService {
             preferredRetailerForFewStores(input, categories, mode).ifPresent(currentRetailers::add);
         }
 
-        for (String category : categories) {
+        // Sprint 10.118: when the user asked for a specific good item (focused) or signalled quality,
+        // the plan should SPEND toward the budget on nicer pieces instead of flooring to the cheapest.
+        boolean preferQuality = prefersQuality(input, focused);
+        for (int i = 0; i < categories.size(); i++) {
+            String category = categories.get(i);
             double remaining = planBudget - total;
-            Product product = pickBest(category, input, remaining, mode, picked, currentRetailers);
+            // Give this category a weighted, fair share of what's left (core pieces get more), so a
+            // full room stays complete while a focused 1–2 item request gets a properly nice piece.
+            double perItemTarget = 0;
+            if (preferQuality && !mode.equals("budget")) {
+                double totalWeight = 0;
+                for (int j = i; j < categories.size(); j++) totalWeight += categoryWeight(input.roomType(), categories.get(j));
+                perItemTarget = spendTarget(remaining, categoryWeight(input.roomType(), category), totalWeight, mode);
+            }
+            Product product = pickBest(category, input, remaining, mode, picked, currentRetailers, preferQuality, perItemTarget);
             if (product == null) continue;
 
             picked.add(product.getId());
@@ -476,7 +488,8 @@ public class PlannerService {
         return calculatePlan(mode, name, label, describePlan(mode, input, repairedTotal, retailersInPlan), input, orderItemsForShopping(input, repairedItems));
     }
 
-    private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers) {
+    private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers,
+                            boolean preferQuality, double perItemTarget) {
         List<String> allowedRetailers = selectedRetailers(input);
         boolean coreCategory = isCoreCategory(input.roomType(), category);
         double realisticLimit = coreCategory && !mode.equals("budget")
@@ -490,11 +503,11 @@ public class PlannerService {
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
                 .filter(product -> product.getPrice().doubleValue() <= realisticLimit || mode.equals("stretch"))
-                .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers)))
+                .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers, preferQuality, perItemTarget)))
                 .orElse(null);
     }
 
-    private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers) {
+    private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, boolean preferQuality, double perItemTarget) {
         double styleScore = styleMatches(product, input.style()) ? 38 : 12;
         double roomScore = hasTag(product.getRoomTags(), input.roomType()) ? 36 : 0;
         double ratingScore = product.getRating() * 5;
@@ -503,7 +516,14 @@ public class PlannerService {
         double price = product.getPrice().doubleValue();
 
         double priceBias;
-        if (input.optimizationGoal().equals("lowest-price") || mode.equals("budget")) {
+        if (preferQuality && !mode.equals("budget") && perItemTarget > 0) {
+            // Sprint 10.118: spend-up. Reward using the per-item budget share (peaks at the target),
+            // with a gentle penalty above it so a full room stays complete. This replaces the
+            // cheapest-wins bias so "a good/quality/best X" picks a nicer tier within budget.
+            double ratio = price / perItemTarget;
+            priceBias = 26.0 * Math.min(1.0, ratio);
+            if (ratio > 1.0) priceBias -= 12.0 * Math.min(1.0, ratio - 1.0);
+        } else if (input.optimizationGoal().equals("lowest-price") || mode.equals("budget")) {
             priceBias = Math.max(0, 34 - price / 18);
         } else if (mode.equals("value")) {
             priceBias = Math.max(0, 20 - price / 55);
@@ -527,6 +547,33 @@ public class PlannerService {
                 + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus
                 + preferredRetailerBonus + requestedBonus + storeCapBonus + dataQualityBonus
                 + preferenceBonus;
+    }
+
+    // Sprint 10.118: should this plan spend toward the budget on nicer pieces instead of flooring to the
+    // cheapest? Yes when the user asked for a specific good item (focused) or signalled quality. The AI's
+    // qualityPreference is unreliable for "dobar"/"najbolji" (it maps them to balanced), so focused is the
+    // primary, reliable trigger; an explicit style-match/complete choice (form or AI premium) also counts.
+    private boolean prefersQuality(PlannerInputDto input, boolean focused) {
+        return focused
+                || "style-match".equals(input.optimizationGoal())
+                || "complete".equals(input.furnishingLevel());
+    }
+
+    // Target spend for ONE item when the plan should use the budget. A weighted, fair share of what's left
+    // (core pieces get more than secondary ones), scaled by tier: value aims a little under the share,
+    // stretch fills it. Catalog price ceilings keep small categories (rug/decor) cheap on their own.
+    private double spendTarget(double remaining, double myWeight, double totalWeight, String mode) {
+        if (totalWeight <= 0 || remaining <= 0) return 0;
+        double factor = switch (mode) {
+            case "stretch" -> 1.05;
+            case "value" -> 0.85;
+            default -> 0.6;
+        };
+        return Math.max(0, remaining * (myWeight / totalWeight) * factor);
+    }
+
+    private double categoryWeight(String roomType, String category) {
+        return isCoreCategory(roomType, category) ? 2.5 : 1.0;
     }
 
     // Sprint 10.7: gently prefer products whose colour/material tags match what the user asked for
@@ -621,7 +668,7 @@ public class PlannerService {
     }
 
     private double scoreReplacement(Product product, ProductDto current, PlannerInputDto input, String mode, String changeType, Set<String> currentRetailers) {
-        double base = scoreProduct(product, input, mode, currentRetailers);
+        double base = scoreProduct(product, input, mode, currentRetailers, false, 0);
         double price = product.getPrice().doubleValue();
         double currentPrice = current.price().doubleValue();
         double retailerVariety = product.getRetailer().equals(current.retailer()) ? 0 : 8;
@@ -1087,7 +1134,7 @@ public class PlannerService {
 
         for (String category : desired) {
             if (pickedCategories.contains(category) || input.alreadyHaveCategories().contains(category)) continue;
-            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers);
+            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, false, 0);
             if (option != null) {
                 tips.add("Za oko " + money(option.getPrice().doubleValue()) + " možeš dodati " + categoryLabel(category).toLowerCase(Locale.ROOT) + " i prostor će izgledati potpunije.");
             }

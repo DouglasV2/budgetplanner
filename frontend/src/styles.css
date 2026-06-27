@@ -696,7 +696,7 @@ input[type='range'] {
 
 .product-row {
   display: grid;
-  grid-template-columns: 112px 1fr;
+  grid-template-columns: 124px 1fr;
   gap: 14px;
   padding: 12px;
   border-radius: 24px;
@@ -705,11 +705,15 @@ input[type='range'] {
 }
 
 .product-row img {
-  width: 112px;
-  height: 112px;
-  object-fit: cover;
+  width: 124px;
+  height: 124px;
+  /* Show the whole piece of furniture (contain) instead of zooming into a crop (cover).
+     Retailer product photos sit on a white background, so a white frame + a little padding
+     blends seamlessly and the item reads clearly. */
+  object-fit: contain;
   border-radius: 18px;
-  background: var(--sand);
+  background: #fff;
+  padding: 6px;
 }
 
 /* Grouped item display for PlanResults
@@ -1557,6 +1561,7 @@ textarea:focus {
   display: grid;
   gap: 6px;
   margin: 4px 0 10px;
+  padding: 0 20px;
 }
 
 .spaces-control-label {
@@ -1607,6 +1612,7 @@ textarea:focus {
   align-items: baseline;
   gap: 8px;
   margin-bottom: 6px;
+  padding: 0 20px;
 }
 
 .space-group-head > strong {
@@ -4359,7 +4365,9 @@ textarea {
   .shopping-list-card,
   .saved-plans-inbox summary,
   .saved-plans-toolbar,
-  .saved-plans-list {
+  .saved-plans-list,
+  .spaces-control,
+  .space-group-head {
     padding-left: 14px;
     padding-right: 14px;
   }
