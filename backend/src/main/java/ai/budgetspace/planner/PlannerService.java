@@ -452,13 +452,16 @@ public class PlannerService {
             double remaining = planBudget - total;
             // Give this category a weighted, fair share of what's left (core pieces get more), so a
             // full room stays complete while a focused 1–2 item request gets a properly nice piece.
+            // Sprint 10.119: the VALUE tier always aims to USE the budget (so "Najbolji izbor" is a real
+            // step up from "Najjeftinije", not identical to it); the STRETCH tier only spends up when the
+            // user signalled quality/focused (its own price bias still drives the balanced splurge tier).
             double perItemTarget = 0;
-            if (preferQuality && !mode.equals("budget")) {
+            if (mode.equals("value") || (preferQuality && !mode.equals("budget"))) {
                 double totalWeight = 0;
                 for (int j = i; j < categories.size(); j++) totalWeight += categoryWeight(input.roomType(), categories.get(j));
-                perItemTarget = spendTarget(remaining, categoryWeight(input.roomType(), category), totalWeight, mode);
+                perItemTarget = spendTarget(remaining, categoryWeight(input.roomType(), category), totalWeight, mode, preferQuality);
             }
-            Product product = pickBest(category, input, remaining, mode, picked, currentRetailers, preferQuality, perItemTarget);
+            Product product = pickBest(category, input, remaining, mode, picked, currentRetailers, perItemTarget);
             if (product == null) continue;
 
             picked.add(product.getId());
@@ -489,7 +492,7 @@ public class PlannerService {
     }
 
     private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers,
-                            boolean preferQuality, double perItemTarget) {
+                            double perItemTarget) {
         List<String> allowedRetailers = selectedRetailers(input);
         boolean coreCategory = isCoreCategory(input.roomType(), category);
         double realisticLimit = coreCategory && !mode.equals("budget")
@@ -503,11 +506,11 @@ public class PlannerService {
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
                 .filter(product -> product.getPrice().doubleValue() <= realisticLimit || mode.equals("stretch"))
-                .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers, preferQuality, perItemTarget)))
+                .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers, perItemTarget)))
                 .orElse(null);
     }
 
-    private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, boolean preferQuality, double perItemTarget) {
+    private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, double perItemTarget) {
         double styleScore = styleMatches(product, input.style()) ? 38 : 12;
         double roomScore = hasTag(product.getRoomTags(), input.roomType()) ? 36 : 0;
         double ratingScore = product.getRating() * 5;
@@ -516,10 +519,11 @@ public class PlannerService {
         double price = product.getPrice().doubleValue();
 
         double priceBias;
-        if (preferQuality && !mode.equals("budget") && perItemTarget > 0) {
-            // Sprint 10.118: spend-up. Reward using the per-item budget share (peaks at the target),
+        if (perItemTarget > 0) {
+            // Sprint 10.118/10.119: spend-up. Reward using the per-item budget share (peaks at the target),
             // with a gentle penalty above it so a full room stays complete. This replaces the
-            // cheapest-wins bias so "a good/quality/best X" picks a nicer tier within budget.
+            // cheapest-wins bias so the value tier (and a focused/quality request) picks a nicer tier
+            // within budget instead of flooring to the cheapest.
             double ratio = price / perItemTarget;
             priceBias = 26.0 * Math.min(1.0, ratio);
             if (ratio > 1.0) priceBias -= 12.0 * Math.min(1.0, ratio - 1.0);
@@ -562,11 +566,14 @@ public class PlannerService {
     // Target spend for ONE item when the plan should use the budget. A weighted, fair share of what's left
     // (core pieces get more than secondary ones), scaled by tier: value aims a little under the share,
     // stretch fills it. Catalog price ceilings keep small categories (rug/decor) cheap on their own.
-    private double spendTarget(double remaining, double myWeight, double totalWeight, String mode) {
+    private double spendTarget(double remaining, double myWeight, double totalWeight, String mode, boolean preferQuality) {
         if (totalWeight <= 0 || remaining <= 0) return 0;
+        // value: a plain (balanced) plan aims at ~0.6 of its weighted share so it clearly beats the
+        // cheapest tier yet leaves headroom; a quality/focused request aims higher (0.85). stretch only
+        // gets a target when quality/focused (else it keeps its own price bias for the balanced splurge).
         double factor = switch (mode) {
-            case "stretch" -> 1.05;
-            case "value" -> 0.85;
+            case "stretch" -> preferQuality ? 1.05 : 0.9;
+            case "value" -> preferQuality ? 0.85 : 0.6;
             default -> 0.6;
         };
         return Math.max(0, remaining * (myWeight / totalWeight) * factor);
@@ -668,7 +675,7 @@ public class PlannerService {
     }
 
     private double scoreReplacement(Product product, ProductDto current, PlannerInputDto input, String mode, String changeType, Set<String> currentRetailers) {
-        double base = scoreProduct(product, input, mode, currentRetailers, false, 0);
+        double base = scoreProduct(product, input, mode, currentRetailers, 0);
         double price = product.getPrice().doubleValue();
         double currentPrice = current.price().doubleValue();
         double retailerVariety = product.getRetailer().equals(current.retailer()) ? 0 : 8;
@@ -1134,7 +1141,7 @@ public class PlannerService {
 
         for (String category : desired) {
             if (pickedCategories.contains(category) || input.alreadyHaveCategories().contains(category)) continue;
-            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, false, 0);
+            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, 0);
             if (option != null) {
                 tips.add("Za oko " + money(option.getPrice().doubleValue()) + " možeš dodati " + categoryLabel(category).toLowerCase(Locale.ROOT) + " i prostor će izgledati potpunije.");
             }
