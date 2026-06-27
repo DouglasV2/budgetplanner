@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePlan, generatePlanFast, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
+import { detectOutOfScope } from '../utils/outOfScope';
 import type { PlanGenerationResponse } from '../api/client';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
@@ -553,6 +554,17 @@ export function Planner() {
   const lowConfidence = !!analysis && analysis.aiUsed === true && submittedPrompt.length > 0
     && (analysis.confidence ?? 1) < 0.4;
 
+  // Sprint 10.115: honest out-of-scope banner — when the typed prompt clearly asks for things we don't sell
+  // (electronics / appliances / building materials), say so plainly. Deterministic + localized (not AI text).
+  const outOfScope = plans.length > 0 ? detectOutOfScope(submittedPrompt) : null;
+  const outOfScopeWhatKey = outOfScope === 'electronics'
+    ? 'results.outOfScopeElectronics'
+    : outOfScope === 'appliances'
+    ? 'results.outOfScopeAppliances'
+    : outOfScope === 'outdoor'
+    ? 'results.outOfScopeOutdoor'
+    : 'results.outOfScopeMaterials';
+
   return (
     <section className="planner-section shell" id="planner">
       <div className="section-heading left planner-heading-row">
@@ -628,6 +640,12 @@ export function Planner() {
       {/* Both panes stay MOUNTED; we toggle visibility so switching scope never loses your work
           (the apartment results / a generated single-room plan persist across the toggle). */}
       <div hidden={scope !== 'single'}>
+      {outOfScope && (
+        <div className="out-of-scope-banner" role="note">
+          <span className="out-of-scope-mark" aria-hidden="true">i</span>
+          <span>{t('results.outOfScopeNotice', { what: t(outOfScopeWhatKey) })}</span>
+        </div>
+      )}
       <div className="planner-layout">
         <div className="planner-panel">
           <PlannerForm input={input} onChange={setInput} onGenerate={handleGenerate} isLoading={isLoading} />

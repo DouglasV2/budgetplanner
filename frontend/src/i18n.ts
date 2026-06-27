@@ -617,6 +617,12 @@ const DICTIONARY: Record<string, Entry> = {
   'results.quickCheaperSuffix': { hr: 'Složi jeftiniju verziju i čuvaj budžet.', en: 'Make a cheaper version and keep the budget.' },
   'results.quickNicerSuffix': { hr: 'Složi ljepšu i skladniju verziju.', en: 'Make a nicer, more cohesive version.' },
   'results.quickSingleStoreSuffix': { hr: 'Složi sve iz jedne trgovine: {retailer}.', en: 'Put everything from one store: {retailer}.' },
+  // Sprint 10.115: honest out-of-scope banner (deterministic, NOT AI text). {what} names what we don't sell.
+  'results.outOfScopeNotice': { hr: 'BudgetSpace slaže plan za namještaj — {what} ne nudimo. Za to probaj specijaliziranu trgovinu, a ovdje opiši namještaj koji trebaš pa ti složimo plan.', en: 'BudgetSpace builds furniture plans — we don\'t sell {what}. Try a specialist store for that; here, describe the furniture you need and we\'ll plan it.' },
+  'results.outOfScopeElectronics': { hr: 'TV-e ni elektroniku', en: 'TVs or electronics' },
+  'results.outOfScopeAppliances': { hr: 'kućanske uređaje (klima, perilica…)', en: 'home appliances (AC, washing machine…)' },
+  'results.outOfScopeMaterials': { hr: 'građevinski materijal (laminat, pločice…)', en: 'building materials (laminate, tiles…)' },
+  'results.outOfScopeOutdoor': { hr: 'vanjski/vrtni namještaj', en: 'outdoor/garden furniture' },
   'results.scoreFit': { hr: 'Koliko prati želje', en: 'How well it matches your wishes' },
   'results.scoreStyle': { hr: 'Usklađen izgled', en: 'Style consistency' },
   'results.scoreShopping': { hr: 'Kupnja', en: 'Shopping' },

@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Plán používa {count} obchody, aby lepšie ustrážil rozpočet.",
   "results.quickCheaperSuffix": "Zostav lacnejšiu verziu a ustráž rozpočet.",
   "results.quickNicerSuffix": "Zostav krajšiu a zladenejšiu verziu.",
-  "results.quickSingleStoreSuffix": "Zostav všetko z jedného obchodu: {retailer}."
+  "results.quickSingleStoreSuffix": "Zostav všetko z jedného obchodu: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace zostavuje plány na nábytok — {what} nepredávame. Na to skús špecializovaný obchod; tu opíš nábytok, ktorý potrebuješ, a my ti ho naplánujeme.",
+  "results.outOfScopeElectronics": "televízory ani elektroniku",
+  "results.outOfScopeAppliances": "domáce spotrebiče (klimatizáciu, práčku…)",
+  "results.outOfScopeMaterials": "stavebné materiály (laminát, dlažbu…)",
+  "results.outOfScopeOutdoor": "záhradný/vonkajší nábytok"
 }

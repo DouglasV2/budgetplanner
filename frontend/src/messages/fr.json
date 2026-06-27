@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Le plan utilise {count} magasins pour mieux maîtriser le budget.",
   "results.quickCheaperSuffix": "Compose une version moins chère et préserve le budget.",
   "results.quickNicerSuffix": "Compose une version plus belle et plus harmonieuse.",
-  "results.quickSingleStoreSuffix": "Mets tout dans un seul magasin : {retailer}."
+  "results.quickSingleStoreSuffix": "Mets tout dans un seul magasin : {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace crée des plans pour meubler — nous ne vendons pas {what}. Pour ça, adresse-toi à un magasin spécialisé ; ici, décris les meubles qu'il te faut et on te prépare un plan.",
+  "results.outOfScopeElectronics": "de téléviseurs ni d'électronique",
+  "results.outOfScopeAppliances": "d'électroménager (clim, lave-linge…)",
+  "results.outOfScopeMaterials": "de matériaux de construction (stratifié, carrelage…)",
+  "results.outOfScopeOutdoor": "de mobilier d'extérieur/de jardin"
 }

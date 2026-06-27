@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "O plano usa {count} lojas para controlar melhor o orçamento.",
   "results.quickCheaperSuffix": "Cria uma versão mais barata e poupa o orçamento.",
   "results.quickNicerSuffix": "Cria uma versão mais bonita e harmoniosa.",
-  "results.quickSingleStoreSuffix": "Junta tudo numa só loja: {retailer}."
+  "results.quickSingleStoreSuffix": "Junta tudo numa só loja: {retailer}.",
+  "results.outOfScopeNotice": "O BudgetSpace cria planos de mobiliário — não vendemos {what}. Para isso, procura uma loja especializada; aqui, descreve o mobiliário de que precisas e nós planeamo-lo.",
+  "results.outOfScopeElectronics": "TVs ou eletrónica",
+  "results.outOfScopeAppliances": "eletrodomésticos (ar condicionado, máquina de lavar…)",
+  "results.outOfScopeMaterials": "materiais de construção (laminado, azulejos…)",
+  "results.outOfScopeOutdoor": "mobiliário de exterior/jardim"
 }

@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Il piano usa {count} negozi per tenere il budget sotto controllo.",
   "results.quickCheaperSuffix": "Crea una versione più economica e rispetta il budget.",
   "results.quickNicerSuffix": "Crea una versione più bella e coordinata.",
-  "results.quickSingleStoreSuffix": "Metti tutto da un solo negozio: {retailer}."
+  "results.quickSingleStoreSuffix": "Metti tutto da un solo negozio: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace crea piani per i mobili — {what} non li vendiamo. Per quello prova un negozio specializzato; qui descrivi i mobili che ti servono e ti prepariamo il piano.",
+  "results.outOfScopeElectronics": "TV o elettronica",
+  "results.outOfScopeAppliances": "elettrodomestici (climatizzatori, lavatrici…)",
+  "results.outOfScopeMaterials": "materiali da costruzione (laminato, piastrelle…)",
+  "results.outOfScopeOutdoor": "mobili da esterno/giardino"
 }

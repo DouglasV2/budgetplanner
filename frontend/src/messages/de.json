@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Der Plan nutzt {count} Geschäfte, um das Budget besser einzuhalten.",
   "results.quickCheaperSuffix": "Stell eine günstigere Version zusammen und schon dein Budget.",
   "results.quickNicerSuffix": "Stell eine schönere, stimmigere Version zusammen.",
-  "results.quickSingleStoreSuffix": "Stell alles aus einem Geschäft zusammen: {retailer}."
+  "results.quickSingleStoreSuffix": "Stell alles aus einem Geschäft zusammen: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace erstellt Einrichtungspläne — {what} verkaufen wir nicht. Dafür schau in einem Fachgeschäft; hier beschreibst du die Möbel, die du brauchst, und wir planen sie.",
+  "results.outOfScopeElectronics": "Fernseher oder Elektronik",
+  "results.outOfScopeAppliances": "Haushaltsgeräte (Klimaanlage, Waschmaschine…)",
+  "results.outOfScopeMaterials": "Baumaterial (Laminat, Fliesen…)",
+  "results.outOfScopeOutdoor": "Garten- oder Außenmöbel"
 }

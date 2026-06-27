@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Planen använder {count} butiker för att hålla budgeten i schack.",
   "results.quickCheaperSuffix": "Bygg en billigare version och håll budgeten.",
   "results.quickNicerSuffix": "Bygg en snyggare och mer enhetlig version.",
-  "results.quickSingleStoreSuffix": "Lägg allt från en butik: {retailer}."
+  "results.quickSingleStoreSuffix": "Lägg allt från en butik: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace bygger möbelplaner – vi säljer inte {what}. Prova en specialbutik för det; här beskriver du möblerna du behöver så planerar vi dem.",
+  "results.outOfScopeElectronics": "tv-apparater eller elektronik",
+  "results.outOfScopeAppliances": "vitvaror (AC, tvättmaskin …)",
+  "results.outOfScopeMaterials": "byggmaterial (laminat, kakel …)",
+  "results.outOfScopeOutdoor": "utemöbler eller trädgårdsmöbler"
 }

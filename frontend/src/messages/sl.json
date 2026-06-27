@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Načrt uporablja {count} trgovin, da bolje varuje proračun.",
   "results.quickCheaperSuffix": "Sestavi cenejšo različico in ohrani proračun.",
   "results.quickNicerSuffix": "Sestavi lepšo in bolj usklajeno različico.",
-  "results.quickSingleStoreSuffix": "Sestavi vse iz ene trgovine: {retailer}."
+  "results.quickSingleStoreSuffix": "Sestavi vse iz ene trgovine: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace sestavlja načrte za pohištvo — {what} ne prodajamo. Za to se obrni na specializirano trgovino; tukaj pa opiši pohištvo, ki ga potrebuješ, in ti sestavimo načrt.",
+  "results.outOfScopeElectronics": "televizorjev ali elektronike",
+  "results.outOfScopeAppliances": "gospodinjskih aparatov (klima, pralni stroj…)",
+  "results.outOfScopeMaterials": "gradbenega materiala (laminat, ploščice…)",
+  "results.outOfScopeOutdoor": "vrtnega/zunanjega pohištva"
 }

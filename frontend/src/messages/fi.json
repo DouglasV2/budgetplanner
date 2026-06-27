@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Suunnitelma käyttää {count} kauppaa, jotta budjetti pysyy kurissa.",
   "results.quickCheaperSuffix": "Kokoa edullisempi versio ja säästä budjettia.",
   "results.quickNicerSuffix": "Kokoa tyylikkäämpi ja yhtenäisempi versio.",
-  "results.quickSingleStoreSuffix": "Kokoa kaikki yhdestä kaupasta: {retailer}."
+  "results.quickSingleStoreSuffix": "Kokoa kaikki yhdestä kaupasta: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace kokoaa kalustesuunnitelmia — emme myy {what}. Käytä siihen erikoisliikettä; täällä voit kuvailla tarvitsemasi kalusteet, niin kokoamme suunnitelman.",
+  "results.outOfScopeElectronics": "televisioita tai elektroniikkaa",
+  "results.outOfScopeAppliances": "kodinkoneita (ilmastointi, pesukone…)",
+  "results.outOfScopeMaterials": "rakennusmateriaaleja (laminaatti, laatat…)",
+  "results.outOfScopeOutdoor": "ulko- tai puutarhakalusteita"
 }

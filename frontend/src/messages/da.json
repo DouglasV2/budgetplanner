@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Planen bruger {count} butikker for at holde budgettet i skak.",
   "results.quickCheaperSuffix": "Lav en billigere version og hold budgettet.",
   "results.quickNicerSuffix": "Lav en pænere og mere sammenhængende version.",
-  "results.quickSingleStoreSuffix": "Saml alt fra én butik: {retailer}."
+  "results.quickSingleStoreSuffix": "Saml alt fra én butik: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace bygger møbelplaner — vi sælger ikke {what}. Prøv en specialbutik til det; her kan du beskrive de møbler, du har brug for, så lægger vi en plan.",
+  "results.outOfScopeElectronics": "tv'er eller elektronik",
+  "results.outOfScopeAppliances": "hvidevarer (aircondition, vaskemaskine…)",
+  "results.outOfScopeMaterials": "byggematerialer (laminat, fliser…)",
+  "results.outOfScopeOutdoor": "have- eller udendørsmøbler"
 }

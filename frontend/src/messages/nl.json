@@ -544,5 +544,10 @@
   "results.storeAdviceMany": "Het plan gebruikt {count} winkels om het budget in toom te houden.",
   "results.quickCheaperSuffix": "Maak een goedkopere versie en spaar je budget.",
   "results.quickNicerSuffix": "Maak een mooiere, samenhangende versie.",
-  "results.quickSingleStoreSuffix": "Zet alles uit één winkel: {retailer}."
+  "results.quickSingleStoreSuffix": "Zet alles uit één winkel: {retailer}.",
+  "results.outOfScopeNotice": "BudgetSpace stelt meubelplannen samen — {what} verkopen we niet. Probeer daarvoor een speciaalzaak; beschrijf hier de meubels die je nodig hebt en wij maken het plan.",
+  "results.outOfScopeElectronics": "tv's of elektronica",
+  "results.outOfScopeAppliances": "huishoudelijke apparaten (airco, wasmachine…)",
+  "results.outOfScopeMaterials": "bouwmaterialen (laminaat, tegels…)",
+  "results.outOfScopeOutdoor": "tuin- of buitenmeubels"
 }
