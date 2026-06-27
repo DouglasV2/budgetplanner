@@ -551,5 +551,6 @@
   "results.outOfScopeMaterials": "materiali da costruzione (laminato, piastrelle…)",
   "results.outOfScopeOutdoor": "mobili da esterno/giardino",
   "results.multiRoomNotice": "Hai descritto più di una stanza. La modalità «Tutto l'appartamento» pianifica ciascuna e suddivide il budget — questo è un piano per una sola.",
-  "results.multiRoomCta": "Passa a Tutto l'appartamento"
+  "results.multiRoomCta": "Passa a Tutto l'appartamento",
+  "cat.textiles": "Tessili"
 }

@@ -161,7 +161,9 @@ public final class ProductTaxonomy {
             "kitchen-cart",
             "nightstand",
             "wardrobe",
-            "dresser"
+            "dresser",
+            // Sprint 10.117: soft furnishings (curtains, cushions, throws).
+            "textiles"
     );
 
     public static final Set<String> KNOWN_STYLES = Set.of(
@@ -330,6 +332,9 @@ public final class ProductTaxonomy {
         alias(aliases, "nightstand", "nightstand", "noćni ormarić", "nocni ormaric", "noćni ormar");
         alias(aliases, "wardrobe", "wardrobe", "ormar za odjeću", "ormar za odjecu", "garderobni ormar", "plakar");
         alias(aliases, "dresser", "dresser", "komoda s ladicama", "ladičar", "ladicar");
+        // Sprint 10.117: soft furnishings (curtains, cushions, throws/blankets).
+        alias(aliases, "textiles", "textiles", "tekstil", "zavjese", "zavjesa", "jastuci", "jastuk", "ukrasni jastuk",
+                "deke", "deka", "dekica", "pledovi", "pled", "prekrivač", "prekrivac", "curtains", "cushions", "throws", "blanket");
         return Map.copyOf(aliases);
     }
 

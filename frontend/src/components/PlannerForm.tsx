@@ -88,9 +88,9 @@ const categoryOrder: ProductCategory[] = [
 ];
 
 const categoryOrderByRoom: Record<RoomType, ProductCategory[]> = {
-  'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
+  'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'textiles', 'decor'],
   'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
-  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'dresser', 'storage', 'lighting', 'rug', 'decor'],
+  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'dresser', 'storage', 'lighting', 'rug', 'textiles', 'decor'],
   'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor'],
   kitchen: ['kitchen-cart', 'kitchen-storage', 'lighting', 'storage', 'decor'],
   'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],

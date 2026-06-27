@@ -551,5 +551,6 @@
   "results.outOfScopeMaterials": "stavebné materiály (laminát, dlažbu…)",
   "results.outOfScopeOutdoor": "záhradný/vonkajší nábytok",
   "results.multiRoomNotice": "Opísal si viac než jednu miestnosť. Režim „Celý byt” naplánuje každú z nich a rozdelí rozpočet — toto je plán len pre jednu.",
-  "results.multiRoomCta": "Prepnúť na Celý byt"
+  "results.multiRoomCta": "Prepnúť na Celý byt",
+  "cat.textiles": "Textílie"
 }

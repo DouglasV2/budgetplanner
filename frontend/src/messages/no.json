@@ -551,5 +551,6 @@
   "results.outOfScopeMaterials": "byggematerialer (laminat, fliser …)",
   "results.outOfScopeOutdoor": "ute- eller hagemøbler",
   "results.multiRoomNotice": "Du beskrev mer enn ett rom. «Hele leiligheten»-modus lager en plan for hvert av dem og fordeler budsjettet – dette er en plan for bare ett rom.",
-  "results.multiRoomCta": "Bytt til Hele leiligheten"
+  "results.multiRoomCta": "Bytt til Hele leiligheten",
+  "cat.textiles": "Tekstiler"
 }

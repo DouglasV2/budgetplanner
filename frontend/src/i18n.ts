@@ -667,6 +667,7 @@ const DICTIONARY: Record<string, Entry> = {
   'cat.nightstand': { hr: 'Noćni ormarić', en: 'Nightstand' },
   'cat.wardrobe': { hr: 'Ormar za odjeću', en: 'Wardrobe' },
   'cat.dresser': { hr: 'Komoda s ladicama', en: 'Chest of drawers' },
+  'cat.textiles': { hr: 'Tekstil', en: 'Textiles' },
   'priority.buy-first': { hr: 'Ključno', en: 'Essential' },
   'priority.add-comfort': { hr: 'Udobnost', en: 'Comfort' },
   'priority.later': { hr: 'Kasnije', en: 'Later' },

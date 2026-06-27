@@ -551,5 +551,6 @@
   "results.outOfScopeMaterials": "materiales de construcción (laminado, baldosas…)",
   "results.outOfScopeOutdoor": "muebles de exterior/jardín",
   "results.multiRoomNotice": "Describiste más de una habitación. El modo «Todo el apartamento» planifica cada una y reparte el presupuesto; este es un plan para una sola.",
-  "results.multiRoomCta": "Cambiar a Todo el apartamento"
+  "results.multiRoomCta": "Cambiar a Todo el apartamento",
+  "cat.textiles": "Textiles"
 }

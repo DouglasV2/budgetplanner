@@ -551,5 +551,6 @@
   "results.outOfScopeMaterials": "materiais de construção (laminado, azulejos…)",
   "results.outOfScopeOutdoor": "mobiliário de exterior/jardim",
   "results.multiRoomNotice": "Descreveu mais do que uma divisão. O modo “Apartamento inteiro” planeia cada uma e divide o orçamento — este é um plano apenas para uma.",
-  "results.multiRoomCta": "Mudar para Apartamento inteiro"
+  "results.multiRoomCta": "Mudar para Apartamento inteiro",
+  "cat.textiles": "Têxteis"
 }

@@ -218,7 +218,9 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // resolved to a category page → skipped, not forced). Localized name + local-currency price + verified
             // og:image read live off ikea.com/<cc> on 2026-06-23 via the global article-number trick (80407114 /
             // 20390970).
-            "/catalog/real-ikea-kitchen-lighting-10-100.json"
+            "/catalog/real-ikea-kitchen-lighting-10-100.json",
+            // Sprint 10.117: HR soft furnishings (curtains/cushions/throws), IKEA + JYSK, web-verified live.
+            "/catalog/real-hr-textiles.json"
     );
 
     /**

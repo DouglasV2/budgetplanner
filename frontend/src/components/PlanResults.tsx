@@ -103,9 +103,9 @@ function labelCategories(t: Translate, categories: ProductCategory[]) {
 // Room specific category order. The order follows the way a person usually buys:
 // big pieces first, then comfort, then details.
 const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
-  'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'decor'],
+  'living-room': ['sofa', 'tv-unit', 'table', 'rug', 'lighting', 'storage', 'textiles', 'decor'],
   'home-office': ['desk', 'chair', 'storage', 'lighting', 'decor'],
-  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'dresser', 'storage', 'lighting', 'decor'],
+  bedroom: ['bed', 'mattress', 'nightstand', 'wardrobe', 'dresser', 'storage', 'lighting', 'textiles', 'decor'],
   'home-gym': ['gym-equipment', 'storage', 'lighting', 'decor'],
   kitchen: ['kitchen-cart', 'kitchen-storage', 'lighting', 'storage', 'decor'],
   'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],
@@ -158,7 +158,9 @@ const FALLBACK_IMAGES: Record<ProductCategory, string> = {
   'kitchen-cart': 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
   nightstand: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
   wardrobe: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
-  dresser: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70'
+  dresser: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
+  // Soft furnishings — reuse the rug placeholder (textiles are imageVerified, so this fallback rarely shows).
+  textiles: 'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=240&q=70'
 };
 
 function priorityForItem(item: PlanItem, roomType: RoomType): ShoppingPriority {

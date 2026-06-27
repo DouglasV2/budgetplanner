@@ -551,5 +551,6 @@
   "results.outOfScopeMaterials": "de matériaux de construction (stratifié, carrelage…)",
   "results.outOfScopeOutdoor": "de mobilier d'extérieur/de jardin",
   "results.multiRoomNotice": "Vous avez décrit plusieurs pièces. Le mode « Tout l'appartement » planifie chacune d'elles et répartit le budget — ceci n'est un plan que pour une seule.",
-  "results.multiRoomCta": "Passer à Tout l'appartement"
+  "results.multiRoomCta": "Passer à Tout l'appartement",
+  "cat.textiles": "Textiles"
 }

@@ -76,7 +76,8 @@ export const categoryLabels: Record<ProductCategory, string> = localisedLabels<P
   'kitchen-cart': 'cat.kitchen-cart',
   nightstand: 'cat.nightstand',
   wardrobe: 'cat.wardrobe',
-  dresser: 'cat.dresser'
+  dresser: 'cat.dresser',
+  textiles: 'cat.textiles'
 });
 
 export const roomLabels: Record<RoomType, string> = localisedLabels<RoomType>({

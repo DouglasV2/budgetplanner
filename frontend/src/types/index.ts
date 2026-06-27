@@ -94,7 +94,8 @@ export type ProductCategory =
   | 'kitchen-cart'
   | 'nightstand'
   | 'wardrobe'
-  | 'dresser';
+  | 'dresser'
+  | 'textiles';
 
 export interface Product {
   id: string;
