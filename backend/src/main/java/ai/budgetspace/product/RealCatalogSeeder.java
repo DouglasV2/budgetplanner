@@ -230,7 +230,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-fr-deepen-10-126.json",
             "/catalog/real-ikea-it-deepen-10-126.json",
             "/catalog/real-ikea-fi-deepen-10-126.json",
-            "/catalog/real-ikea-pt-deepen-10-126.json"
+            "/catalog/real-ikea-pt-deepen-10-126.json",
+            // Sprint 10.127: JYSK depth for FI/IT/PT (JYSK operates in all three; product pages serve a static
+            // JSON-LD price + og:image). Sourced from JYSK category pages, every product deterministically
+            // re-fetched (live price + name from og:title + og:image resolved), deduped vs the catalog. Adds
+            // value/variety (budget-standard) to complement the IKEA premium depth above.
+            "/catalog/real-fi-deepen-10-127.json",
+            "/catalog/real-it-deepen-10-127.json",
+            "/catalog/real-pt-deepen-10-127.json"
     );
 
     /**
