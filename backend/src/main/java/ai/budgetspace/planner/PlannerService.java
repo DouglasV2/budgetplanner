@@ -481,6 +481,12 @@ public class PlannerService {
             double remainingPerUnit = qty > 1 ? remaining / qty : remaining;
             double perUnitTarget = qty > 1 ? perItemTarget / qty : perItemTarget;
             Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget);
+            // Sprint 10.122: the user explicitly asked for this category (focused or must-have) but nothing fits
+            // the budget/cap — rather than an empty tier ("Najbolji izbor" with no items, which looks broken),
+            // offer the cheapest real option. The budget status then honestly shows it's above the stated cap.
+            if (product == null && (focused || input.mustHaveCategories().contains(category))) {
+                product = cheapestInCategory(category, input, picked, Double.MAX_VALUE);
+            }
             if (product == null) continue;
 
             picked.add(product.getId());

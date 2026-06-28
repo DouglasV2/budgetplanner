@@ -183,6 +183,8 @@ public class PromptIntelligenceService {
                 + "gym-equipment, dining-table, dining-chair, kitchen-storage, kitchen-cart, nightstand, wardrobe, dresser, textiles].\n"
                 + "textiles = zavjese, ukrasni jastuci, deke/pledovi/prekrivači (meki tekstil).\n"
                 + "retaileri ∈ [IKEA, JYSK]. qualityPreference ∈ [budget, balanced, premium]. "
+                + "Izvuci budget i kad je naveden NEPRECIZNO: 'oko 6000 kr' / 'omkring 6000' / 'around 2000' / "
+                + "'~1500 €' / 'do 600' / 'maks 800' / 'budžet bi bio nekih 1300' → uzmi taj broj kao budget. "
                 + "budget i roomSize su cijeli brojevi. budget vrati u valuti koju korisnik koristi (navedena niže) "
                 + "kao GOLI broj, BEZ pretvaranja u drugu valutu (npr. 15000 kr ostaje 15000, ne pretvaraj u eure). "
                 + "roomSize je u m². confidence je OBAVEZAN broj 0..1 — koliko si siguran u parsiranje: za jasan, "
