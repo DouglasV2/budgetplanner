@@ -237,7 +237,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // value/variety (budget-standard) to complement the IKEA premium depth above.
             "/catalog/real-fi-deepen-10-127.json",
             "/catalog/real-it-deepen-10-127.json",
-            "/catalog/real-pt-deepen-10-127.json"
+            "/catalog/real-pt-deepen-10-127.json",
+            // Sprint 10.128: JYSK DK depth (49 real products, all images verified, DKK price tiers). DK product
+            // pages nest directly under the category path; NO/SE/SI nest one level deeper (their top "bed/sofa"
+            // pages are sub-category listings, not products) so they were correctly dropped here (the missing
+            // og:image flagged them) and need a deeper crawl next round.
+            "/catalog/real-dk-deepen-10-128.json"
     );
 
     /**
