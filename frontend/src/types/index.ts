@@ -47,7 +47,9 @@ export type RoomType =
   | 'kitchen'
   | 'dining-room'
   | 'hallway'
-  | 'bathroom';
+  | 'bathroom'
+  // Sprint 10.121: studio / one-room flat (combined living + bedroom).
+  | 'studio';
 
 export type StyleType =
   | 'bright'

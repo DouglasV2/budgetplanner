@@ -94,6 +94,8 @@
   "planner.designTitle": "Designassistent",
   "planner.designHint": "En kort beskrivelse av planen din (snart generert av en AI-modell).",
   "form.roomLivingRoomLabel": "Stue",
+  "form.roomStudioLabel": "Ettromsleilighet",
+  "form.roomStudioHint": "seng + stue i ett",
   "form.roomLivingRoomHint": "sofa, TV-benk, teppe",
   "form.roomHomeOfficeLabel": "Hjemmekontor",
   "form.roomHomeOfficeHint": "skrivebord, stol, belysning",

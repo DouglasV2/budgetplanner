@@ -94,6 +94,8 @@
   "planner.designTitle": "Assistant de design",
   "planner.designHint": "Une brève description de ton plan (bientôt générée par un modèle AI).",
   "form.roomLivingRoomLabel": "Salon",
+  "form.roomStudioLabel": "Studio",
+  "form.roomStudioHint": "lit + salon en un",
   "form.roomLivingRoomHint": "canapé, meuble TV, tapis",
   "form.roomHomeOfficeLabel": "Bureau à domicile",
   "form.roomHomeOfficeHint": "bureau, chaise, éclairage",

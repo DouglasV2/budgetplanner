@@ -88,7 +88,8 @@ export const roomLabels: Record<RoomType, string> = localisedLabels<RoomType>({
   kitchen: 'form.roomKitchenLabel',
   'dining-room': 'form.roomDiningRoomLabel',
   hallway: 'form.roomHallwayLabel',
-  bathroom: 'form.roomBathroomLabel'
+  bathroom: 'form.roomBathroomLabel',
+  studio: 'form.roomStudioLabel'
 });
 
 export const furnishingLevelLabels: Record<FurnishingLevel, string> = localisedLabels<FurnishingLevel>({

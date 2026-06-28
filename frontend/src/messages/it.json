@@ -94,6 +94,8 @@
   "planner.designTitle": "Assistente di design",
   "planner.designHint": "Una breve descrizione del tuo piano (presto generata da un modello AI).",
   "form.roomLivingRoomLabel": "Soggiorno",
+  "form.roomStudioLabel": "Monolocale",
+  "form.roomStudioHint": "letto + soggiorno in uno",
   "form.roomLivingRoomHint": "divano, mobile TV, tappeto",
   "form.roomHomeOfficeLabel": "Ufficio in casa",
   "form.roomHomeOfficeHint": "scrivania, sedia, illuminazione",

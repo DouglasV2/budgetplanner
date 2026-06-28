@@ -94,6 +94,8 @@
   "planner.designTitle": "Pomočnik za oblikovanje",
   "planner.designHint": "Kratek opis tvojega načrta (kmalu ga bo ustvaril model AI).",
   "form.roomLivingRoomLabel": "Dnevna soba",
+  "form.roomStudioLabel": "Garsonjera",
+  "form.roomStudioHint": "postelja + dnevna v enem",
   "form.roomLivingRoomHint": "kavč, TV-komoda, preproga",
   "form.roomHomeOfficeLabel": "Domača pisarna",
   "form.roomHomeOfficeHint": "miza, stol, razsvetljava",

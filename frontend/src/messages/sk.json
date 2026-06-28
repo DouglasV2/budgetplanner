@@ -94,6 +94,8 @@
   "planner.designTitle": "Dizajnový asistent",
   "planner.designHint": "Krátky opis tvojho plánu (čoskoro generovaný pomocou AI modelu).",
   "form.roomLivingRoomLabel": "Obývačka",
+  "form.roomStudioLabel": "Garsónka",
+  "form.roomStudioHint": "posteľ + obývačka v jednom",
   "form.roomLivingRoomHint": "pohovka, TV skrinka, koberec",
   "form.roomHomeOfficeLabel": "Domáca kancelária",
   "form.roomHomeOfficeHint": "stôl, stolička, osvetlenie",

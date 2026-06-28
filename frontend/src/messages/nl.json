@@ -94,6 +94,8 @@
   "planner.designTitle": "Designassistent",
   "planner.designHint": "Een korte beschrijving van je plan (binnenkort gegenereerd door een AI-model).",
   "form.roomLivingRoomLabel": "Woonkamer",
+  "form.roomStudioLabel": "Studio",
+  "form.roomStudioHint": "bed + woonkamer in één",
   "form.roomLivingRoomHint": "bank, tv-meubel, tapijt",
   "form.roomHomeOfficeLabel": "Thuiskantoor",
   "form.roomHomeOfficeHint": "bureau, stoel, verlichting",

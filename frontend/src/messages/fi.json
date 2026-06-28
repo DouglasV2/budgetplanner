@@ -94,6 +94,8 @@
   "planner.designTitle": "Sisustusassistentti",
   "planner.designHint": "Lyhyt kuvaus suunnitelmastasi (pian AI-mallin tuottama).",
   "form.roomLivingRoomLabel": "Olohuone",
+  "form.roomStudioLabel": "Yksiö",
+  "form.roomStudioHint": "sänky + olohuone yhdessä",
   "form.roomLivingRoomHint": "sohva, TV-taso, matto",
   "form.roomHomeOfficeLabel": "Kotitoimisto",
   "form.roomHomeOfficeHint": "työpöytä, tuoli, valaistus",

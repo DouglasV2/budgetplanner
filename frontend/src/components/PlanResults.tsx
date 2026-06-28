@@ -110,7 +110,8 @@ const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
   kitchen: ['kitchen-cart', 'kitchen-storage', 'lighting', 'storage', 'decor'],
   'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],
   hallway: ['storage', 'lighting', 'rug', 'decor'],
-  bathroom: ['storage', 'lighting', 'decor']
+  bathroom: ['storage', 'lighting', 'decor'],
+  studio: ['bed', 'mattress', 'sofa', 'wardrobe', 'table', 'storage', 'lighting', 'tv-unit', 'rug', 'nightstand', 'textiles', 'decor']
 };
 
 const TIER_LABEL_KEYS: Record<string, string> = {
@@ -135,7 +136,8 @@ const CORE_BY_ROOM: Record<RoomType, ProductCategory[]> = {
   kitchen: ['kitchen-cart'],
   'dining-room': ['dining-table', 'dining-chair'],
   hallway: ['storage'],
-  bathroom: ['storage']
+  bathroom: ['storage'],
+  studio: ['bed', 'mattress', 'sofa']
 };
 
 const FALLBACK_IMAGES: Record<ProductCategory, string> = {

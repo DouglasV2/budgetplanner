@@ -46,7 +46,11 @@ public class PlannerService {
             Map.entry("kitchen", List.of("kitchen-cart", "kitchen-storage", "lighting", "storage", "decor")),
             Map.entry("dining-room", List.of("dining-table", "dining-chair", "lighting", "rug", "storage", "decor")),
             Map.entry("hallway", List.of("storage", "lighting", "rug", "decor")),
-            Map.entry("bathroom", List.of("storage", "lighting", "decor"))
+            Map.entry("bathroom", List.of("storage", "lighting", "decor")),
+            // Sprint 10.121: studio/one-room flat = living + bedroom combined (you sleep AND live here), so the
+            // flow carries the essentials of both, sleeping pieces first. Products come from the living-room AND
+            // bedroom catalog pools (see ROOM_CATALOG_TAGS / matchesRoom).
+            Map.entry("studio", List.of("bed", "mattress", "sofa", "wardrobe", "table", "storage", "lighting", "tv-unit", "rug", "nightstand", "textiles"))
     );
 
     // Najvažnije (buy-first) po prostoru.
@@ -59,7 +63,8 @@ public class PlannerService {
             Map.entry("kitchen", Set.of("kitchen-cart")),
             Map.entry("dining-room", Set.of("dining-table", "dining-chair")),
             Map.entry("hallway", Set.of("storage")),
-            Map.entry("bathroom", Set.of("storage"))
+            Map.entry("bathroom", Set.of("storage")),
+            Map.entry("studio", Set.of("bed", "mattress", "sofa"))
     );
 
     // Za ugodniji prostor (add-comfort) po prostoru. Sve ostalo u flowu je "može kasnije".
@@ -72,7 +77,8 @@ public class PlannerService {
             Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
             Map.entry("hallway", Set.of("lighting", "rug")),
-            Map.entry("bathroom", Set.of("lighting"))
+            Map.entry("bathroom", Set.of("lighting")),
+            Map.entry("studio", Set.of("wardrobe", "table", "storage", "lighting", "rug", "textiles"))
     );
 
     // Sprint 10.109 (Move-In): relative "how much furnishing this room typically needs" weights — they only set
@@ -92,7 +98,14 @@ public class PlannerService {
             Map.entry("kitchen", "kuhinja"),
             Map.entry("dining-room", "blagovaonica"),
             Map.entry("hallway", "hodnik"),
-            Map.entry("bathroom", "kupaonica")
+            Map.entry("bathroom", "kupaonica"),
+            Map.entry("studio", "garsonijera")
+    );
+
+    // Sprint 10.121: which catalog room-tags a roomType draws products from. Studio is a combined living+bedroom,
+    // so it pulls from both pools; every other room maps to itself.
+    private static final Map<String, List<String>> ROOM_CATALOG_TAGS = Map.of(
+            "studio", List.of("living-room", "bedroom")
     );
 
     private final ProductRepository productRepository;
@@ -320,7 +333,7 @@ public class PlannerService {
     private List<String> missingImportantCategories(PlannerInputDto input) {
         Set<String> usableCategories = marketCatalog(input).stream()
                 .filter(ProductTaxonomy::canEnterPlanner)
-                .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                .filter(product -> matchesRoom(product, input.roomType()))
                 .map(product -> product.getCategory() == null ? "" : product.getCategory().toLowerCase(Locale.ROOT))
                 .collect(Collectors.toSet());
         Set<String> alreadyHave = new LinkedHashSet<>(input.alreadyHaveCategories());
@@ -420,7 +433,7 @@ public class PlannerService {
             List<Product> lockedProducts = marketCatalog(input).stream()
                     .filter(product -> lockedIds.contains(product.getId()))
                     .filter(ProductTaxonomy::canEnterPlanner)
-                    .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                    .filter(product -> matchesRoom(product, input.roomType()))
                     .sorted(Comparator.comparingInt(product -> lockedOrder.indexOf(product.getId())))
                     .toList();
 
@@ -507,7 +520,7 @@ public class PlannerService {
 
         return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
-                .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                .filter(product -> matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
@@ -518,7 +531,7 @@ public class PlannerService {
 
     private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, double perItemTarget) {
         double styleScore = styleMatches(product, input.style()) ? 38 : 12;
-        double roomScore = hasTag(product.getRoomTags(), input.roomType()) ? 36 : 0;
+        double roomScore = matchesRoom(product, input.roomType()) ? 36 : 0;
         double ratingScore = product.getRating() * 5;
         double stockScore = product.isInStock() ? 10 : -80;
         double discountScore = product.getOriginalPrice() != null ? 8 : 0;
@@ -661,7 +674,7 @@ public class PlannerService {
 
         return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(current.category()))
-                .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                .filter(product -> matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> !blockedIds.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
@@ -870,7 +883,7 @@ public class PlannerService {
         List<String> allowed = selectedRetailers(input);
         return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
-                .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                .filter(product -> matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> allowed.contains(product.getRetailer()))
                 .filter(product -> !excludeIds.contains(product.getId()))
@@ -1364,7 +1377,7 @@ public class PlannerService {
             Optional<Product> cheapest = marketCatalog(input).stream()
                     .filter(product -> product.getRetailer().equals(retailer))
                     .filter(product -> product.getCategory().equalsIgnoreCase(category))
-                    .filter(product -> hasTag(product.getRoomTags(), input.roomType()))
+                    .filter(product -> matchesRoom(product, input.roomType()))
                     .filter(ProductTaxonomy::canEnterPlanner)
                     .min(Comparator.comparing(Product::getPrice));
             if (cheapest.isPresent()) {
@@ -1481,6 +1494,15 @@ public class PlannerService {
         return Arrays.stream(csv.split(","))
                 .map(String::trim)
                 .anyMatch(value -> value.equalsIgnoreCase(tag.trim()));
+    }
+
+    // Sprint 10.121: does this product belong to the requested room? For a studio that means EITHER the
+    // living-room or bedroom catalog pool; every other room maps to itself.
+    private boolean matchesRoom(Product product, String roomType) {
+        for (String tag : ROOM_CATALOG_TAGS.getOrDefault(roomType, List.of(roomType))) {
+            if (hasTag(product.getRoomTags(), tag)) return true;
+        }
+        return false;
     }
 
     private BigDecimal money(double value) {

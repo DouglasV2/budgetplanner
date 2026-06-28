@@ -184,7 +184,9 @@ public final class ProductTaxonomy {
             "kitchen",
             "dining-room",
             "hallway",
-            "bathroom"
+            "bathroom",
+            // Sprint 10.121: studio / one-room flat (combined living + bedroom).
+            "studio"
     );
 
     private static final Map<String, String> CATEGORY_ALIASES = categoryAliases();
@@ -360,6 +362,12 @@ public final class ProductTaxonomy {
         alias(aliases, "dining-room", "dining-room", "dining room", "dining", "blagovaonica", "blagovaonicu", "trpezarija");
         alias(aliases, "hallway", "hallway", "hodnik", "predsoblje", "ulazni prostor");
         alias(aliases, "bathroom", "bathroom", "kupaonica", "kupaonicu", "kupaona", "kupatilo");
+        // Sprint 10.121: studio / one-room flat across the 15 markets' languages.
+        alias(aliases, "studio", "studio", "garsonijera", "garsonjera", "garsonijeru", "studio apartman",
+                "studio apartment", "studio flat", "bedsit", "monolocale", "einzimmerwohnung", "einzimmer",
+                "garconniere", "garçonnière", "yksiö", "yksio", "estudio", "estúdio", "monoambiente", "kitnet",
+                "garsónka", "garsonka", "ettromsleilighet", "etta", "etværelses", "etvaerelses", "studiootje",
+                "eenkamerappartement", "studette");
         return Map.copyOf(aliases);
     }
 

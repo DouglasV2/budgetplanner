@@ -94,6 +94,8 @@
   "planner.designTitle": "Design-Assistent",
   "planner.designHint": "Eine kurze Beschreibung deines Plans (bald von einem AI-Modell generiert).",
   "form.roomLivingRoomLabel": "Wohnzimmer",
+  "form.roomStudioLabel": "Einzimmerwohnung",
+  "form.roomStudioHint": "Bett + Wohnen in einem",
   "form.roomLivingRoomHint": "Sofa, TV-Möbel, Teppich",
   "form.roomHomeOfficeLabel": "Homeoffice",
   "form.roomHomeOfficeHint": "Schreibtisch, Stuhl, Beleuchtung",

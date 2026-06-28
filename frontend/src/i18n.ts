@@ -236,6 +236,8 @@ const DICTIONARY: Record<string, Entry> = {
   // Sprint 10.28: planner form (rooms, styles, levels, goals, sizes, templates, form sections).
   'form.roomLivingRoomLabel': { hr: 'Dnevni boravak', en: 'Living room' },
   'form.roomLivingRoomHint': { hr: 'kauč, TV komoda, tepih', en: 'sofa, TV unit, rug' },
+  'form.roomStudioLabel': { hr: 'Garsonijera / studio', en: 'Studio' },
+  'form.roomStudioHint': { hr: 'krevet + dnevni u jednom', en: 'bed + living in one' },
   'form.roomHomeOfficeLabel': { hr: 'Radni kutak', en: 'Home office' },
   'form.roomHomeOfficeHint': { hr: 'stol, stolica, rasvjeta', en: 'desk, chair, lighting' },
   'form.roomBedroomLabel': { hr: 'Spavaća soba', en: 'Bedroom' },
