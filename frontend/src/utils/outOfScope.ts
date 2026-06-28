@@ -12,7 +12,9 @@ const ELECTRONICS = /\b(televizor|televizij|television|fernseher|televisore|smar
 const TV_BARE = /\btv\b/;
 const INCHES = /\b\d{2}\s*("|''|inc|incha|inch|zoll|pollic)/; // e.g. "55 inca", "55 inch"
 
-const APPLIANCES = /\b(klima|klimatizacij|klimaanlage|air[\s-]*condition|perilic|sushilic|susilic|washing\s*machine|dryer|wasmachine|waschmaschine|hladnjak|frizider|fridge|refrigerator|kuhlschrank|frigorifer|zamrzivac|freezer|stednjak|pecnic|stove|oven|cooker|herd|forno|cappa|napa|mikrovaln|microwave|mikrowelle|microonde|dishwasher|geschirrspuler|lavastovigl|perilica\s*posud|bojler|boiler|usisavac|vacuum|staubsauger|aspirapolvere|sushilo)\b/;
+// Sprint 10.124: broadened across the 15 markets' languages and fixed inflected stems (\bperilic\b never
+// matched "perilica"). Text is accent-stripped (NFD) before matching, so patterns are written accent-free.
+const APPLIANCES = /\b(klima|klimatizacij|klimaanlage|klimatsk\w*|air[\s-]*condition\w*|luftkondition\w*|aircond\w*|airco|aire\s*acondicion\w*|ar\s*condicionad\w*|climatiseur|climatisation|ilmastoint\w*|perilic\w*|ves[\s-]*masin\w*|washing\s*machine|lavadora|lavatrice|lave[\s-]*linge|machine\s*a\s*laver|tvattmaskin\w*|vaskemaskin\w*|pesukone|pralni\s*stroj|pracka|dryer|susilic\w*|wasmachine|waschmaschine|hladnjak|frizider|fridge|refrigerator|kuhlschrank|frigorifer\w*|frigorific\w*|frigo\b|nevera|koelkast|jaakaappi|hladilnik|chladnick\w*|kylskap|kjoleskap|koleskab|zamrzivac|freezer|gefrierschrank|congelador|stednjak|pecnic|stove|oven|cooker|herd|forno|cappa|napa|mikrovaln\w*|microwave|mikrowelle|microond\w*|dishwasher|geschirrspuler|lavastovigl\w*|lavavajilla\w*|lave[\s-]*vaisselle|diskmaskin\w*|opvaskemask\w*|astianpesukone|pomivalni\s*stroj|perilica\s*posud\w*|bojler|boiler|usisavac|vacuum|staubsauger|aspirapolvere|sushilo)\b/;
 
 const MATERIALS = /\b(laminat|laminate|parket|parquet|plocic|keramik|tiles|fliesen|piastrell|carrelage|zbuka|plaster|verputz|gips|cement|beton|estrich|izolacij|insulation)\b/;
 

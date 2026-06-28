@@ -97,7 +97,7 @@ const categoryOrderByRoom: Record<RoomType, ProductCategory[]> = {
   'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],
   hallway: ['storage', 'lighting', 'rug', 'decor'],
   bathroom: ['storage', 'lighting', 'decor'],
-  studio: ['bed', 'mattress', 'sofa', 'wardrobe', 'table', 'storage', 'lighting', 'tv-unit', 'rug', 'nightstand', 'textiles', 'decor']
+  studio: ['bed', 'mattress', 'sofa', 'dining-table', 'wardrobe', 'table', 'storage', 'lighting', 'tv-unit', 'rug', 'nightstand', 'textiles', 'decor']
 };
 
 const sizePresets = [

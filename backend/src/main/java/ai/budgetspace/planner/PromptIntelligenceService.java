@@ -135,6 +135,9 @@ public class PromptIntelligenceService {
         List<String> mustHave = validCategories(analysis.mustHaveCategories());
         Set<String> alreadyHave = new LinkedHashSet<>(validCategories(analysis.alreadyHaveCategories()));
         alreadyHave.addAll(validCategories(analysis.avoidCategories())); // avoid == don't add to the plan
+        // Sprint 10.124: "I already have a bed" implies a usable bed — don't then sell an expensive mattress the
+        // user never asked for. (Skipped if they explicitly listed a mattress as a must-have, handled below.)
+        if (alreadyHave.contains("bed")) alreadyHave.add("mattress");
         alreadyHave.removeAll(mustHave);
         List<String> preferred = validRetailers(analysis.preferredRetailers());
 
@@ -182,6 +185,10 @@ public class PromptIntelligenceService {
                 + "kategorije ∈ [sofa, tv-unit, table, rug, lighting, storage, decor, bed, mattress, desk, chair, "
                 + "gym-equipment, dining-table, dining-chair, kitchen-storage, kitchen-cart, nightstand, wardrobe, dresser, textiles].\n"
                 + "textiles = zavjese, ukrasni jastuci, deke/pledovi/prekrivači (meki tekstil).\n"
+                + "table = NISKI klub/dnevni stolić (coffee/side table — klub stolić, Couchtisch, soffbord, tavolino, "
+                + "mesa de centro). dining-table = stol ZA JELO (Esstisch, matbord, mesa de comedor/jantar, tavolo da "
+                + "pranzo, ruokapöytä, blagovaonski stol, spisebord, eettafel) — ako korisnik traži stol za "
+                + "blagovanje/jelo/objedovanje, koristi dining-table (i dining-chair za stolice), NIKAD table.\n"
                 + "retaileri ∈ [IKEA, JYSK]. qualityPreference ∈ [budget, balanced, premium]. "
                 + "Izvuci budget i kad je naveden NEPRECIZNO: 'oko 6000 kr' / 'omkring 6000' / 'around 2000' / "
                 + "'~1500 €' / 'do 600' / 'maks 800' / 'budžet bi bio nekih 1300' → uzmi taj broj kao budget. "

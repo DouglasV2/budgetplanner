@@ -50,7 +50,7 @@ public class PlannerService {
             // Sprint 10.121: studio/one-room flat = living + bedroom combined (you sleep AND live here), so the
             // flow carries the essentials of both, sleeping pieces first. Products come from the living-room AND
             // bedroom catalog pools (see ROOM_CATALOG_TAGS / matchesRoom).
-            Map.entry("studio", List.of("bed", "mattress", "sofa", "wardrobe", "table", "storage", "lighting", "tv-unit", "rug", "nightstand", "textiles"))
+            Map.entry("studio", List.of("bed", "mattress", "sofa", "dining-table", "wardrobe", "table", "storage", "lighting", "tv-unit", "rug", "nightstand", "textiles"))
     );
 
     // Najvažnije (buy-first) po prostoru.
@@ -78,7 +78,7 @@ public class PlannerService {
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
             Map.entry("hallway", Set.of("lighting", "rug")),
             Map.entry("bathroom", Set.of("lighting")),
-            Map.entry("studio", Set.of("wardrobe", "table", "storage", "lighting", "rug", "textiles"))
+            Map.entry("studio", Set.of("dining-table", "wardrobe", "table", "storage", "lighting", "rug", "textiles"))
     );
 
     // Sprint 10.109 (Move-In): relative "how much furnishing this room typically needs" weights — they only set
@@ -105,7 +105,7 @@ public class PlannerService {
     // Sprint 10.121: which catalog room-tags a roomType draws products from. Studio is a combined living+bedroom,
     // so it pulls from both pools; every other room maps to itself.
     private static final Map<String, List<String>> ROOM_CATALOG_TAGS = Map.of(
-            "studio", List.of("living-room", "bedroom")
+            "studio", List.of("living-room", "bedroom", "dining-room")
     );
 
     private final ProductRepository productRepository;

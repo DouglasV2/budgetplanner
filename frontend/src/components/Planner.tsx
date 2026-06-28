@@ -366,9 +366,11 @@ export function Planner() {
     setAnalysis(response.intentAnalysis ?? null);
     setSecondHand(response.secondHandSuggestions ?? []);
     const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
+    // Sprint 10.124: use the LOCALIZED generic notice — the backend catalogWarning is Croatian-only and lists
+    // the room's core categories (often not what a focused user asked for), so it leaked Croatian + wrong info.
     setPartialNotice(!hasAnyItems
       ? t('planner.partialNone')
-      : (response.partialPlan ? (response.catalogWarning ?? t('planner.partialBest')) : null));
+      : (response.partialPlan ? t('planner.partialBest') : null));
     if (isFinal) {
       setSubmittedPrompt((effectiveInput.prompt ?? '').trim());
       setGenerationCount((count) => count + 1);
