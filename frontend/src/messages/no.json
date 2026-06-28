@@ -94,6 +94,7 @@
   "planner.designTitle": "Designassistent",
   "planner.designHint": "En kort beskrivelse av planen din (snart generert av en AI-modell).",
   "form.roomLivingRoomLabel": "Stue",
+  "results.dimensionNotice": "Vi kan ennå ikke filtrere etter nøyaktige mål (f.eks. bredde). Sjekk målene på produktsiden før kjøp.",
   "form.roomStudioLabel": "Ettromsleilighet",
   "form.roomStudioHint": "seng + stue i ett",
   "form.roomLivingRoomHint": "sofa, TV-benk, teppe",

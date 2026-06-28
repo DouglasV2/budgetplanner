@@ -94,6 +94,7 @@
   "planner.designTitle": "Design-Assistent",
   "planner.designHint": "Eine kurze Beschreibung deines Plans (bald von einem AI-Modell generiert).",
   "form.roomLivingRoomLabel": "Wohnzimmer",
+  "results.dimensionNotice": "Wir können noch nicht nach exakten Maßen filtern (z. B. Breite). Prüfe die Maße auf der Produktseite vor dem Kauf.",
   "form.roomStudioLabel": "Einzimmerwohnung",
   "form.roomStudioHint": "Bett + Wohnen in einem",
   "form.roomLivingRoomHint": "Sofa, TV-Möbel, Teppich",

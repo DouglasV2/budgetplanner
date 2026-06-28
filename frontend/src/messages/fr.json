@@ -94,6 +94,7 @@
   "planner.designTitle": "Assistant de design",
   "planner.designHint": "Une brève description de ton plan (bientôt générée par un modèle AI).",
   "form.roomLivingRoomLabel": "Salon",
+  "results.dimensionNotice": "Nous ne pouvons pas encore filtrer par dimensions exactes (p. ex. la largeur). Vérifiez les mesures sur la page produit avant d'acheter.",
   "form.roomStudioLabel": "Studio",
   "form.roomStudioHint": "lit + salon en un",
   "form.roomLivingRoomHint": "canapé, meuble TV, tapis",

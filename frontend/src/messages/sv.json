@@ -94,6 +94,7 @@
   "planner.designTitle": "Designassistent",
   "planner.designHint": "En kort beskrivning av din plan (snart genererad av en AI-modell).",
   "form.roomLivingRoomLabel": "Vardagsrum",
+  "results.dimensionNotice": "Vi kan ännu inte filtrera efter exakta mått (t.ex. bredd). Kontrollera måtten på produktsidan före köp.",
   "form.roomStudioLabel": "Etta",
   "form.roomStudioHint": "säng + vardagsrum i ett",
   "form.roomLivingRoomHint": "soffa, tv-bänk, matta",

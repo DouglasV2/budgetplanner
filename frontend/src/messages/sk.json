@@ -94,6 +94,7 @@
   "planner.designTitle": "Dizajnový asistent",
   "planner.designHint": "Krátky opis tvojho plánu (čoskoro generovaný pomocou AI modelu).",
   "form.roomLivingRoomLabel": "Obývačka",
+  "results.dimensionNotice": "Zatiaľ nevieme filtrovať podľa presných rozmerov (napr. šírky). Pred kúpou skontroluj rozmery na stránke produktu.",
   "form.roomStudioLabel": "Garsónka",
   "form.roomStudioHint": "posteľ + obývačka v jednom",
   "form.roomLivingRoomHint": "pohovka, TV skrinka, koberec",

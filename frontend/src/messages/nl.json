@@ -94,6 +94,7 @@
   "planner.designTitle": "Designassistent",
   "planner.designHint": "Een korte beschrijving van je plan (binnenkort gegenereerd door een AI-model).",
   "form.roomLivingRoomLabel": "Woonkamer",
+  "results.dimensionNotice": "We kunnen nog niet filteren op exacte afmetingen (bijv. breedte). Controleer de maten op de productpagina vóór aankoop.",
   "form.roomStudioLabel": "Studio",
   "form.roomStudioHint": "bed + woonkamer in één",
   "form.roomLivingRoomHint": "bank, tv-meubel, tapijt",

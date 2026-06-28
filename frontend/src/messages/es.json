@@ -94,6 +94,7 @@
   "planner.designTitle": "Asistente de diseño",
   "planner.designHint": "Una breve descripción de tu plan (próximamente generada por un modelo de IA).",
   "form.roomLivingRoomLabel": "Salón",
+  "results.dimensionNotice": "Todavía no podemos filtrar por dimensiones exactas (p. ej. el ancho). Comprueba las medidas en la página del producto antes de comprar.",
   "form.roomStudioLabel": "Estudio",
   "form.roomStudioHint": "cama + salón en uno",
   "form.roomLivingRoomHint": "sofá, mueble de TV, alfombra",

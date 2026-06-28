@@ -94,6 +94,7 @@
   "planner.designTitle": "Pomočnik za oblikovanje",
   "planner.designHint": "Kratek opis tvojega načrta (kmalu ga bo ustvaril model AI).",
   "form.roomLivingRoomLabel": "Dnevna soba",
+  "results.dimensionNotice": "Zaenkrat ne moremo filtrirati po točnih merah (npr. širini). Pred nakupom preveri mere na strani izdelka.",
   "form.roomStudioLabel": "Garsonjera",
   "form.roomStudioHint": "postelja + dnevna v enem",
   "form.roomLivingRoomHint": "kavč, TV-komoda, preproga",

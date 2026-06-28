@@ -94,6 +94,7 @@
   "planner.designTitle": "Sisustusassistentti",
   "planner.designHint": "Lyhyt kuvaus suunnitelmastasi (pian AI-mallin tuottama).",
   "form.roomLivingRoomLabel": "Olohuone",
+  "results.dimensionNotice": "Emme voi vielä suodattaa tarkkojen mittojen mukaan (esim. leveys). Tarkista mitat tuotesivulta ennen ostoa.",
   "form.roomStudioLabel": "Yksiö",
   "form.roomStudioHint": "sänky + olohuone yhdessä",
   "form.roomLivingRoomHint": "sohva, TV-taso, matto",

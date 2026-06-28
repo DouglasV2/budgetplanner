@@ -94,6 +94,7 @@
   "planner.designTitle": "Assistente di design",
   "planner.designHint": "Una breve descrizione del tuo piano (presto generata da un modello AI).",
   "form.roomLivingRoomLabel": "Soggiorno",
+  "results.dimensionNotice": "Non possiamo ancora filtrare per dimensioni esatte (es. la larghezza). Controlla le misure sulla pagina del prodotto prima di acquistare.",
   "form.roomStudioLabel": "Monolocale",
   "form.roomStudioHint": "letto + soggiorno in uno",
   "form.roomLivingRoomHint": "divano, mobile TV, tappeto",

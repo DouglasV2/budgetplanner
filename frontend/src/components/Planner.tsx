@@ -3,6 +3,7 @@ import { generatePlan, generatePlanFast, getDesignSummary, getSavedPlan, listSav
 import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
 import { detectOutOfScope } from '../utils/outOfScope';
+import { detectDimensionConstraint } from '../utils/dimensions';
 import { detectMultiRoom } from '../utils/multiRoom';
 import type { PlanGenerationResponse } from '../api/client';
 import { useAuth } from '../AuthContext';
@@ -560,6 +561,7 @@ export function Planner() {
   // Sprint 10.115: honest out-of-scope banner — when the typed prompt clearly asks for things we don't sell
   // (electronics / appliances / building materials), say so plainly. Deterministic + localized (not AI text).
   const outOfScope = plans.length > 0 ? detectOutOfScope(submittedPrompt) : null;
+  const dimensionConstraint = plans.length > 0 && detectDimensionConstraint(submittedPrompt);
   const outOfScopeWhatKey = outOfScope === 'electronics'
     ? 'results.outOfScopeElectronics'
     : outOfScope === 'appliances'
@@ -650,6 +652,12 @@ export function Planner() {
         <div className="out-of-scope-banner" role="note">
           <span className="out-of-scope-mark" aria-hidden="true">i</span>
           <span>{t('results.outOfScopeNotice', { what: t(outOfScopeWhatKey) })}</span>
+        </div>
+      )}
+      {dimensionConstraint && (
+        <div className="out-of-scope-banner" role="note">
+          <span className="out-of-scope-mark" aria-hidden="true">i</span>
+          <span>{t('results.dimensionNotice')}</span>
         </div>
       )}
       {multiRoom && (
