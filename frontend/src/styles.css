@@ -618,6 +618,15 @@ input[type='range'] {
 .choice span {
   font-size: 1.4rem;
 }
+/* Sprint 10.142: the room icon is now an inline line-icon (was an emoji). Centre it; it inherits the choice's
+   text colour (muted when inactive, ink when active) so it reads as part of the design, not a stuck-on glyph. */
+.choice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clay);
+  opacity: 0.92;
+}
 
 .choice.active {
   color: var(--ink);
@@ -955,7 +964,8 @@ textarea:focus {
 .generate-button {
   border: 0;
   cursor: pointer;
-  border-radius: 22px;
+  /* Sprint 10.142: 22px read a touch bubbly; 15px is crisper/more editorial without going sharp-cornered. */
+  border-radius: 15px;
   padding: 16px 18px;
   background: linear-gradient(135deg, var(--ink), #47392c);
   color: white;

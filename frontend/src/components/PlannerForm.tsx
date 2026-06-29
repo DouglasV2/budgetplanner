@@ -3,6 +3,7 @@ import type { FurnishingLevel, OptimizationGoal, PlannerInput, ProductCategory, 
 import { categoryLabels, formatCurrency, retailersForMarket } from '../utils/planner';
 import { MARKETS, citiesForMarket } from '../markets';
 import { useLocale } from '../LocaleContext';
+import { RoomIcon } from './icons';
 
 interface PlannerFormProps {
   input: PlannerInput;
@@ -11,18 +12,18 @@ interface PlannerFormProps {
   isLoading?: boolean;
 }
 
-const rooms: Array<{ value: RoomType; label: string; icon: string; hint: string }> = [
-  { value: 'living-room', label: 'form.roomLivingRoomLabel', icon: '🛋️', hint: 'form.roomLivingRoomHint' },
-  { value: 'home-office', label: 'form.roomHomeOfficeLabel', icon: '💻', hint: 'form.roomHomeOfficeHint' },
-  { value: 'bedroom', label: 'form.roomBedroomLabel', icon: '🛏️', hint: 'form.roomBedroomHint' },
-  { value: 'studio', label: 'form.roomStudioLabel', icon: '🏠', hint: 'form.roomStudioHint' },
+const rooms: Array<{ value: RoomType; label: string; hint: string }> = [
+  { value: 'living-room', label: 'form.roomLivingRoomLabel', hint: 'form.roomLivingRoomHint' },
+  { value: 'home-office', label: 'form.roomHomeOfficeLabel', hint: 'form.roomHomeOfficeHint' },
+  { value: 'bedroom', label: 'form.roomBedroomLabel', hint: 'form.roomBedroomHint' },
+  { value: 'studio', label: 'form.roomStudioLabel', hint: 'form.roomStudioHint' },
   // Sprint 10.79: home-gym de-scoped — no verified gym-equipment products (IKEA's DAJLIEN range is
   // discontinued; Decathlon is feed-blocked), so the room always came back empty. Removed from the picker.
   // The room type + backend maps stay (dormant) so it can be re-added once a sports-retailer feed exists.
-  { value: 'dining-room', label: 'form.roomDiningRoomLabel', icon: '🍽️', hint: 'form.roomDiningRoomHint' },
-  { value: 'kitchen', label: 'form.roomKitchenLabel', icon: '🍳', hint: 'form.roomKitchenHint' },
-  { value: 'hallway', label: 'form.roomHallwayLabel', icon: '🚪', hint: 'form.roomHallwayHint' },
-  { value: 'bathroom', label: 'form.roomBathroomLabel', icon: '🛁', hint: 'form.roomBathroomHint' }
+  { value: 'dining-room', label: 'form.roomDiningRoomLabel', hint: 'form.roomDiningRoomHint' },
+  { value: 'kitchen', label: 'form.roomKitchenLabel', hint: 'form.roomKitchenHint' },
+  { value: 'hallway', label: 'form.roomHallwayLabel', hint: 'form.roomHallwayHint' },
+  { value: 'bathroom', label: 'form.roomBathroomLabel', hint: 'form.roomBathroomHint' }
 ];
 
 const styles: Array<{ value: StyleType; label: string; hint: string }> = [
@@ -370,7 +371,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 key={room.value}
                 onClick={() => onChange({ ...input, roomType: room.value })}
               >
-                <span>{room.icon}</span>
+                <span className="choice-icon"><RoomIcon room={room.value} /></span>
                 <strong>{t(room.label)}</strong>
                 <small>{t(room.hint)}</small>
               </button>

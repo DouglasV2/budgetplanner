@@ -3,6 +3,7 @@ import type { FurnishingPlan, PlannerInput, Product, RoomType, SavedPlanResponse
 import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
+import { RoomIcon } from './icons';
 
 // Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
 // plan that lists prices but can't be clicked through to the store isn't actually shoppable. Mirrors PlanResults.
@@ -51,14 +52,14 @@ interface MoveInPlannerProps {
   seed?: { rooms: RoomType[]; budget: number } | null;
 }
 
-const MOVE_IN_ROOMS: Array<{ value: RoomType; labelKey: string; icon: string }> = [
-  { value: 'living-room', labelKey: 'form.roomLivingRoomLabel', icon: '🛋️' },
-  { value: 'bedroom', labelKey: 'form.roomBedroomLabel', icon: '🛏️' },
-  { value: 'home-office', labelKey: 'form.roomHomeOfficeLabel', icon: '💻' },
-  { value: 'dining-room', labelKey: 'form.roomDiningRoomLabel', icon: '🍽️' },
-  { value: 'kitchen', labelKey: 'form.roomKitchenLabel', icon: '🍳' },
-  { value: 'hallway', labelKey: 'form.roomHallwayLabel', icon: '🚪' },
-  { value: 'bathroom', labelKey: 'form.roomBathroomLabel', icon: '🛁' }
+const MOVE_IN_ROOMS: Array<{ value: RoomType; labelKey: string }> = [
+  { value: 'living-room', labelKey: 'form.roomLivingRoomLabel' },
+  { value: 'bedroom', labelKey: 'form.roomBedroomLabel' },
+  { value: 'home-office', labelKey: 'form.roomHomeOfficeLabel' },
+  { value: 'dining-room', labelKey: 'form.roomDiningRoomLabel' },
+  { value: 'kitchen', labelKey: 'form.roomKitchenLabel' },
+  { value: 'hallway', labelKey: 'form.roomHallwayLabel' },
+  { value: 'bathroom', labelKey: 'form.roomBathroomLabel' }
 ];
 
 interface RoomPlanResult {
@@ -303,7 +304,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                 aria-pressed={selectedRooms.includes(room.value)}
                 onClick={() => toggleRoom(room.value)}
               >
-                <span>{room.icon}</span>
+                <span className="choice-icon"><RoomIcon room={room.value} /></span>
                 <strong>{t(room.labelKey)}</strong>
               </button>
             ))}
