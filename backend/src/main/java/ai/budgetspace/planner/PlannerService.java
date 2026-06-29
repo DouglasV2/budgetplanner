@@ -549,9 +549,13 @@ public class PlannerService {
             // with a gentle penalty above it so a full room stays complete. This replaces the
             // cheapest-wins bias so the value tier (and a focused/quality request) picks a nicer tier
             // within budget instead of flooring to the cheapest.
+            // Sprint 10.137: peak raised 26 -> 34 so the per-item budget target competes with styleScore (38) and
+            // reliably pulls the pick up to the mid tier instead of a style-matching cheap SKU winning every time
+            // (the cause of the DE/ES/IT under-fill). Gentle over-penalty keeps a full room complete; the hard
+            // budget cap in repairBudget is the real ceiling, so a strong pull-to-target is safe.
             double ratio = price / perItemTarget;
-            priceBias = 26.0 * Math.min(1.0, ratio);
-            if (ratio > 1.0) priceBias -= 12.0 * Math.min(1.0, ratio - 1.0);
+            priceBias = 34.0 * Math.min(1.0, ratio);
+            if (ratio > 1.0) priceBias -= 15.0 * Math.min(1.0, ratio - 1.0);
         } else if (input.optimizationGoal().equals("lowest-price") || mode.equals("budget")) {
             priceBias = Math.max(0, 34 - price / 18);
         } else if (mode.equals("value")) {
@@ -596,9 +600,13 @@ public class PlannerService {
         // value: a plain (balanced) plan aims at ~0.6 of its weighted share so it clearly beats the
         // cheapest tier yet leaves headroom; a quality/focused request aims higher (0.85). stretch only
         // gets a target when quality/focused (else it keeps its own price bias for the balanced splurge).
+        // Sprint 10.137: balanced value raised 0.6 -> 0.75 so the RECOMMENDED plan actually uses a generous budget
+        // (DE/ES/IT full-rooms were landing at 32-52% fill, reaching for bottom SKUs). Safe now that repairBudget
+        // hard-caps value at the stated budget (it down-tiers even core items if needed), so aiming higher can't
+        // blow the budget. Reaching mid-tier also surfaces local retailers the cheapest-bias never picked.
         double factor = switch (mode) {
             case "stretch" -> preferQuality ? 1.05 : 0.9;
-            case "value" -> preferQuality ? 0.85 : 0.6;
+            case "value" -> preferQuality ? 0.85 : 0.75;
             default -> 0.6;
         };
         return Math.max(0, remaining * (myWeight / totalWeight) * factor);
@@ -868,6 +876,32 @@ public class PlannerService {
                         .orElse(null);
                 if (target == null) break;
                 working.removeIf(item -> item.product().id().equals(target.product().id()));
+            }
+        }
+
+        // Sprint 10.137: the VALUE (headline) plan must not exceed the stated budget. If trimming optionals wasn't
+        // enough, the overage is in PROTECTED core/must-have items — a count set ("6 chairs + table") or a bed+
+        // mattress on a tiny budget. Down-tier those to their cheapest in-category option too (keep them PRESENT so
+        // the room stays complete; never drop a core piece). Stretch is the deliberate "spend a bit more" tier, so
+        // it's left free to exceed. If even the cheapest essentials still overrun, the plan stays honestly over
+        // (the UI flags it) — that floor is physically unavoidable.
+        if (!"stretch".equals(mode)) {
+            List<String> protectedByPrice = working.stream()
+                    .filter(item -> protectedCats.contains(item.product().category()))
+                    .sorted(Comparator.comparing((PlanItemDto item) -> item.product().price()).reversed())
+                    .map(item -> item.product().id())
+                    .toList();
+            for (String id : protectedByPrice) {
+                if (sumPrice(working) <= budget) break;
+                int pos = indexOfId(working, id);
+                if (pos < 0) continue;
+                PlanItemDto item = working.get(pos);
+                Set<String> usedIds = working.stream().map(other -> other.product().id()).collect(Collectors.toCollection(LinkedHashSet::new));
+                usedIds.remove(id);
+                Product cheaper = cheapestInCategory(item.product().category(), input, usedIds, item.product().price().doubleValue());
+                if (cheaper != null) {
+                    working.set(pos, createPlanItem(cheaper, input, mode, "Povoljnija opcija da plan stane u budžet: "));
+                }
             }
         }
 
@@ -1347,6 +1381,21 @@ public class PlannerService {
                 : input.selectedRetailers();
         if ("single".equals(input.retailerMode()) && !base.isEmpty()) {
             base = List.of(base.get(0));
+        } else {
+            // Sprint 10.137: market-aware default. The retailer chips default to a generic cross-market (HR-centric)
+            // list; intersected with a non-HR market this often left only IKEA, so each market's LOCAL stores (ES
+            // Kenay/Banak/Merkamueble, IT Conforama, FR Camif, the JYSK depth in FR/IT/PT, ...) never surfaced and
+            // plans under-filled + looked single-retailer. If the requested set names a store that doesn't even sell
+            // in this market, it's the generic default — not a deliberate in-market narrowing — so shop ALL of this
+            // market's stores. A deliberate in-market pick (every requested store sells here) is honored as-is.
+            Set<String> marketRetailers = marketCatalog(input).stream()
+                    .map(Product::getRetailer)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            boolean genericDefault = base.stream().anyMatch(retailer -> !marketRetailers.contains(retailer));
+            if (genericDefault && !marketRetailers.isEmpty()) {
+                base = new ArrayList<>(marketRetailers);
+            }
         }
 
         Set<String> excluded = input.excludedRetailers() == null

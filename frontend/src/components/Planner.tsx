@@ -258,12 +258,15 @@ export function Planner() {
   useEffect(() => {
     setInput((current) => {
       if (current.market === market) return current;
-      // Sprint 10.30: when the country changes, keep only the stores that exist in the new market and
-      // fall back to that market's stores if none of the previous picks are available — so switching to
-      // e.g. IT never leaves an HR-only store selected (which would yield an empty plan).
+      // Sprint 10.137: when the country changes, default to ALL of the new market's stores (incl. its local
+      // retailers), not just the overlap with the previous market's picks. The old intersection collapsed to
+      // just IKEA for non-HR markets (e.g. ES, where Kenay/Banak/Merkamueble were dropped), so local depth never
+      // surfaced and plans under-filled. Single-store mode keeps a single store (mapped into the new market).
       const allowed = retailersForMarket(market);
-      const kept = current.selectedRetailers.filter((retailer) => allowed.includes(retailer));
-      return { ...current, market, selectedRetailers: kept.length ? kept : allowed };
+      const nextRetailers = current.retailerMode === 'single'
+        ? [current.selectedRetailers.find((retailer) => allowed.includes(retailer)) ?? allowed[0] ?? 'IKEA']
+        : allowed;
+      return { ...current, market, selectedRetailers: nextRetailers };
     });
   }, [market]);
 
