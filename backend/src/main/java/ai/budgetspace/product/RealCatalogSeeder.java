@@ -250,7 +250,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // SI 67). GB/AT remain IKEA-only (no usable JYSK).
             "/catalog/real-no-deepen-10-130.json",
             "/catalog/real-se-deepen-10-130.json",
-            "/catalog/real-si-deepen-10-130.json"
+            "/catalog/real-si-deepen-10-130.json",
+            // Sprint 10.132: GB IKEA depth (89 products) by porting plain global article numbers we already had
+            // in other markets to /gb/en/p/-{article}/ (curl, no agents); each re-fetched + verified (live GBP
+            // price + og:image). GB has no JYSK (not in UK), so IKEA-only; fills thin GB categories (storage,
+            // decor, lighting, dressers, tables). Combo s-articles skipped (need a slug); GB already has those.
+            "/catalog/real-ikea-gb-deepen-10-132.json"
     );
 
     /**
