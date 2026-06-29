@@ -16,10 +16,14 @@ services:
       BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED: ${BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED:-true}
       # Allow both the old (5173) and the new (5180) frontend port so the browser Origin matches.
       CORS_ALLOWED_ORIGINS: http://localhost:5180,http://127.0.0.1:5180,http://localhost:5173,http://127.0.0.1:5173
-      # Sprint 10.63: the PUBLIC Google OAuth Web client id (the audience the backend checks on each ID token).
-      # Value-free here on purpose — supplied via the gitignored root .env. Blank → Google sign-in is dormant
-      # (guest-only, no fake auth). No client secret is needed (we verify the ID token, not the code flow).
+      # Sprint 10.63: the PUBLIC Google OAuth Web client id. Value-free here — supplied via the gitignored root .env.
       BUDGETSPACE_GOOGLE_CLIENTID: ${BUDGETSPACE_GOOGLE_CLIENTID:-}
+      # Sprint 10.149: server-side OAuth redirect login. The client SECRET comes from the gitignored .env (add it
+      # from the Google Cloud Console OAuth client). The redirect URI must be registered in that OAuth client's
+      # "Authorized redirect URIs". post-login-redirect = the frontend app URL we return to after sign-in.
+      BUDGETSPACE_GOOGLE_CLIENTSECRET: ${BUDGETSPACE_GOOGLE_CLIENTSECRET:-}
+      BUDGETSPACE_GOOGLE_REDIRECT_URI: ${BUDGETSPACE_GOOGLE_REDIRECT_URI:-http://localhost:8090/api/auth/google/callback}
+      BUDGETSPACE_AUTH_POST_LOGIN_REDIRECT: ${BUDGETSPACE_AUTH_POST_LOGIN_REDIRECT:-http://localhost:5180}
       # Session cookie SameSite (default Lax = same-domain dev). Set None to exercise the split-host path
       # locally (None forces Secure on; browsers then only send it over HTTPS). See DEPLOY.md §3.
       BUDGETSPACE_AUTH_COOKIE_SAMESITE: ${BUDGETSPACE_AUTH_COOKIE_SAMESITE:-Lax}

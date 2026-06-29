@@ -49,7 +49,13 @@ services:
       # No localhost fallback in prod — the app fails fast at boot if this is missing.
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?set CORS_ALLOWED_ORIGINS to your frontend origin}
       BUDGETSPACE_AUTH_COOKIE_SECURE: ${BUDGETSPACE_AUTH_COOKIE_SECURE:-true}
+      # Sprint 10.149: server-side OAuth redirect sign-in. All three required for Google sign-in (client id is
+      # public; the SECRET + the registered redirect URI come from your .env / secret store). Post-login redirect
+      # = the frontend app URL the callback returns to.
       BUDGETSPACE_GOOGLE_CLIENTID: ${BUDGETSPACE_GOOGLE_CLIENTID:-}
+      BUDGETSPACE_GOOGLE_CLIENTSECRET: ${BUDGETSPACE_GOOGLE_CLIENTSECRET:-}
+      BUDGETSPACE_GOOGLE_REDIRECT_URI: ${BUDGETSPACE_GOOGLE_REDIRECT_URI:-}
+      BUDGETSPACE_AUTH_POST_LOGIN_REDIRECT: ${BUDGETSPACE_AUTH_POST_LOGIN_REDIRECT:-/}
       # Stripe — set live values to enable billing; blank => billing dormant (Plus CTA falls back to the waitlist).
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}

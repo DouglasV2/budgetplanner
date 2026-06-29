@@ -37,7 +37,7 @@ class GoogleTokenVerifierTest {
     void setUp() throws Exception {
         signingKey = new RSAKeyGenerator(2048).keyID("kid-1").generate();
         JWKSource<SecurityContext> source = new ImmutableJWKSet<>(new JWKSet(signingKey.toPublicJWK()));
-        verifier = new GoogleTokenVerifier(new AuthProperties(CLIENT_ID, 30, 7, false, "Lax"), source);
+        verifier = new GoogleTokenVerifier(new AuthProperties(CLIENT_ID, "", "", "/", 30, 7, false, "Lax"), source);
     }
 
     @Test
@@ -95,7 +95,7 @@ class GoogleTokenVerifierTest {
 
     @Test
     void refusesToVerifyWhenGoogleSignInIsNotConfigured() throws Exception {
-        GoogleTokenVerifier dormant = new GoogleTokenVerifier(new AuthProperties("", 30, 7, false, "Lax"),
+        GoogleTokenVerifier dormant = new GoogleTokenVerifier(new AuthProperties("", "", "", "/", 30, 7, false, "Lax"),
                 new ImmutableJWKSet<>(new JWKSet(signingKey.toPublicJWK())));
         String token = sign(signingKey, baseClaims().build());
         assertThatThrownBy(() -> dormant.verify(token)).isInstanceOf(GoogleSignInUnavailableException.class);

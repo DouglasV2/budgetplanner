@@ -61,7 +61,10 @@ public class GoogleTokenVerifier {
      * Verifies the ID token and returns the identity it carries, or throws {@link InvalidGoogleTokenException}.
      */
     public GoogleIdentity verify(String idToken) {
-        if (!properties.googleEnabled()) {
+        // Verifying an ID token only needs the client id (the required audience) — NOT the full redirect-login
+        // config (secret + redirect URI). Sprint 10.149: gate on the client id directly, since googleEnabled()
+        // now means "the whole redirect flow is configured".
+        if (properties.googleClientId().isBlank()) {
             throw new GoogleSignInUnavailableException("Google prijava nije konfigurirana (nema client id).");
         }
         if (idToken == null || idToken.isBlank()) {

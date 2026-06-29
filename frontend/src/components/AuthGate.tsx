@@ -2,16 +2,29 @@
 // continue as a guest. It never blocks a shared /plan/<id> link (that bypass is decided in App). When Google
 // sign-in isn't configured yet, the button is an honest disabled placeholder — no fake auth — but "continue as
 // guest" always works, so the app is never truly locked.
-import { useState } from 'react';
+// Sprint 10.149: "Continue with Google" is now a plain link to the SERVER-SIDE OAuth redirect flow (a full-page
+// navigation), replacing the GIS One-Tap/FedCM button that Google silently throttled per-browser. The callback
+// bounces back with ?login=error on failure, which we surface here.
+import { useEffect, useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
-import { GoogleSignInButton } from './GoogleSignInButton';
+import { googleStartUrl } from '../api/client';
 import { BrandMark } from './BrandMark';
 
 export function AuthGate() {
-  const { googleEnabled, googleClientId, continueAsGuest } = useAuth();
+  const { googleEnabled, continueAsGuest } = useAuth();
   const { t } = useLocale();
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('login') === 'error') {
+      setError(t('auth.signInError'));
+      params.delete('login');
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash);
+    }
+  }, [t]);
 
   return (
     <div className="auth-gate" role="dialog" aria-modal="true" aria-labelledby="auth-gate-title">
@@ -24,8 +37,11 @@ export function AuthGate() {
         <p className="auth-gate-sub">{t('auth.gateSubtitle')}</p>
 
         <div className="auth-gate-actions">
-          {googleEnabled && googleClientId ? (
-            <GoogleSignInButton clientId={googleClientId} onError={setError} />
+          {googleEnabled ? (
+            <a className="google-signin-button google-signin-link" href={googleStartUrl()}>
+              <span className="g-mark" aria-hidden="true">G</span>
+              <span>{t('account.signInGoogle')}</span>
+            </a>
           ) : (
             <button type="button" className="google-signin-button" disabled title={t('account.signInTooltip')}>
               <span className="g-mark" aria-hidden="true">G</span>

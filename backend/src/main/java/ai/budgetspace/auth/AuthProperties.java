@@ -6,15 +6,18 @@ import org.springframework.stereotype.Component;
 /**
  * Sprint 10.63 — auth configuration, read from the environment (same env-driven pattern as the rest of the app).
  *
- * <p>The Google client id is PUBLIC (it identifies the OAuth app to Google and is embedded in the frontend
- * button); it is not a secret. When it is blank, Google sign-in is dormant and the app is guest-only — no fake
- * logged-in state is ever fabricated. No client secret is read here: we verify the Google ID token locally
- * against Google's published keys, we do not run the server-side authorization-code flow.</p>
+ * <p>Sprint 10.149: sign-in is the SERVER-SIDE OAuth 2.0 authorization-code (redirect) flow, not the browser GIS
+ * One-Tap/FedCM token flow. The redirect flow is immune to Google's per-browser One-Tap "cooldown" (which silently
+ * blocked re-sign-in with no error), so it works reliably in every browser. It needs the OAuth client SECRET (to
+ * exchange the code) and a registered redirect URI — both are read here. The client id stays public.</p>
  */
 @Component
 public class AuthProperties {
 
     private final String googleClientId;
+    private final String googleClientSecret;
+    private final String googleRedirectUri;
+    private final String postLoginRedirect;
     private final int sessionTtlDays;
     private final int sessionIdleDays;
     private final boolean cookieSecure;
@@ -22,11 +25,17 @@ public class AuthProperties {
 
     public AuthProperties(
             @Value("${budgetspace.auth.google.client-id:}") String googleClientId,
+            @Value("${budgetspace.auth.google.client-secret:}") String googleClientSecret,
+            @Value("${budgetspace.auth.google.redirect-uri:}") String googleRedirectUri,
+            @Value("${budgetspace.auth.post-login-redirect:/}") String postLoginRedirect,
             @Value("${budgetspace.auth.session.ttl-days:30}") int sessionTtlDays,
             @Value("${budgetspace.auth.session.idle-days:7}") int sessionIdleDays,
             @Value("${budgetspace.auth.session.cookie-secure:false}") boolean cookieSecure,
             @Value("${budgetspace.auth.session.cookie-samesite:Lax}") String cookieSameSite) {
         this.googleClientId = googleClientId == null ? "" : googleClientId.trim();
+        this.googleClientSecret = googleClientSecret == null ? "" : googleClientSecret.trim();
+        this.googleRedirectUri = googleRedirectUri == null ? "" : googleRedirectUri.trim();
+        this.postLoginRedirect = (postLoginRedirect == null || postLoginRedirect.isBlank()) ? "/" : postLoginRedirect.trim();
         this.sessionTtlDays = sessionTtlDays;
         this.sessionIdleDays = sessionIdleDays;
         this.cookieSecure = cookieSecure;
@@ -44,14 +53,38 @@ public class AuthProperties {
         };
     }
 
-    /** The public Google OAuth Web client id, or "" when not configured. */
+    /** The Google OAuth Web client id (public — identifies the app to Google), or "" when not configured. */
     public String googleClientId() {
         return googleClientId;
     }
 
-    /** True when a Google client id is configured — i.e. real Google sign-in is available. */
+    /** The Google OAuth client SECRET — required for the server-side code exchange. Never sent to the browser. */
+    public String googleClientSecret() {
+        return googleClientSecret;
+    }
+
+    /** The backend callback URL registered in the OAuth client (Authorized redirect URIs). */
+    public String googleRedirectUri() {
+        return googleRedirectUri;
+    }
+
+    /** Where the backend sends the browser after a successful (or failed) login — the frontend app URL. */
+    public String postLoginRedirect() {
+        return postLoginRedirect;
+    }
+
+    /**
+     * True when the full server-side redirect login flow is configured (client id + secret + redirect URI). This
+     * is what {@code googleEnabled} reports now: the frontend should only offer "Continue with Google" when the
+     * flow will actually complete.
+     */
+    public boolean redirectLoginConfigured() {
+        return !googleClientId.isBlank() && !googleClientSecret.isBlank() && !googleRedirectUri.isBlank();
+    }
+
+    /** True when real Google sign-in is available (the redirect flow is fully configured). */
     public boolean googleEnabled() {
-        return !googleClientId.isBlank();
+        return redirectLoginConfigured();
     }
 
     /** Absolute lifetime of a session before it must be re-established. */

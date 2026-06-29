@@ -36,6 +36,16 @@ export function getGuestSessionId(): string {
   return sessionId();
 }
 
+/**
+ * Sprint 10.149: the server-side OAuth redirect login URL. The "Continue with Google" button just navigates here
+ * (a full-page redirect); the backend bounces to Google and back, sets the session cookie, and returns to the app.
+ * Immune to the GIS One-Tap/FedCM cooldown that silently blocked re-sign-in. The guest id rides along so a first
+ * sign-in still claims the guest's saved plans.
+ */
+export function googleStartUrl(): string {
+  return `${API_BASE_URL}/api/auth/google/start?guest=${encodeURIComponent(getGuestSessionId())}`;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   let response: Response;
   try {

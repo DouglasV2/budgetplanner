@@ -81,6 +81,14 @@ budgetspace:
     # run the authorization-code flow.
     google:
       client-id: ${BUDGETSPACE_GOOGLE_CLIENTID:}
+      # Sprint 10.149: sign-in is the SERVER-SIDE OAuth authorization-code (redirect) flow — immune to the GIS
+      # One-Tap/FedCM per-browser cooldown that silently blocked re-sign-in. It needs the OAuth client SECRET (to
+      # exchange the code; NEVER sent to the browser) + the registered redirect URI (the backend callback). All
+      # three (client-id + client-secret + redirect-uri) must be set for Google sign-in to be offered.
+      client-secret: ${BUDGETSPACE_GOOGLE_CLIENTSECRET:}
+      redirect-uri: ${BUDGETSPACE_GOOGLE_REDIRECT_URI:}
+    # Where the OAuth callback redirects the browser after login (the frontend app URL). Dev: http://localhost:5180.
+    post-login-redirect: ${BUDGETSPACE_AUTH_POST_LOGIN_REDIRECT:/}
     session:
       ttl-days: ${BUDGETSPACE_AUTH_SESSION_TTL_DAYS:30}      # absolute session lifetime
       idle-days: ${BUDGETSPACE_AUTH_SESSION_IDLE_DAYS:7}     # auto-logout after this many days of inactivity
