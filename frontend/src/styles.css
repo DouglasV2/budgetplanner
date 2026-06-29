@@ -475,7 +475,15 @@ label span,
 
 .section,
 .planner-section {
-  padding: 110px 0;
+  padding: 72px 0;
+}
+/* Sprint 10.145: the planner→"Kako radi" gap was ~220px (planner padding-bottom 110 + how padding-top 110).
+   Tighten that specific boundary hard so the page doesn't open into a big empty beige void. */
+.planner-section {
+  padding-bottom: 20px;
+}
+#how {
+  padding-top: 36px;
 }
 
 .section-heading {
@@ -4291,27 +4299,33 @@ textarea {
 }
 
 /* Sprint 10.105: free-beta notice for the one-time Design Session model — a slim, friendly pill. */
+/* Sprint 10.145: reworked from a centered pill-with-emoji announcement (too conventional) to a slim,
+   left-aligned product note — a solid BETA tag + the message, no bubble. */
 .beta-notice {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 10px;
   max-width: 1120px;
-  margin: 12px auto 0;
-  padding: 9px 16px;
-  border: 1px solid rgba(236, 122, 46, 0.25);
-  border-radius: 999px;
-  background: rgba(236, 122, 46, 0.08);
-  color: var(--ink);
-  font-size: 13.5px;
+  margin: 14px auto 2px;
+  padding: 0 4px;
+  color: var(--ink-soft);
+  font-size: 13px;
   line-height: 1.4;
-  text-align: center;
+  text-align: left;
 }
-.beta-notice-badge {
-  font-size: 15px;
+.beta-tag {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--clay);
+  padding: 3px 8px;
+  border-radius: 6px;
 }
 .beta-notice-text {
-  font-weight: 560;
+  font-weight: 500;
 }
 
 .shopping-list-lead {
