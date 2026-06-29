@@ -129,18 +129,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     continueAsGuest: () => setGuest(true),
     openSignIn: () => setGuest(false),
     signOut: async () => {
+      // Sprint 10.148: the GIS-canonical sign-out — tell Google Identity Services the user signed out so a later
+      // re-sign-in starts clean (no stale auto-select). No-op if GIS isn't loaded. (10.147's hard reload here made
+      // sign-in worse — reverted to the simple in-place sign-out.)
+      try {
+        (window as unknown as { google?: { accounts?: { id?: { disableAutoSelect?: () => void } } } })
+          .google?.accounts?.id?.disableAutoSelect?.();
+      } catch {
+        // GIS not present yet — nothing to clear.
+      }
       try {
         await authLogout();
       } catch {
-        // Even if the network call fails, we still reset below so the UI reflects signed-out.
+        // Even if the network call fails, drop the local user so the UI reflects signed-out immediately.
       }
-      // Sprint 10.147: stay in the app as a guest after logout (don't bounce to the front door), but HARD-RELOAD
-      // so the next Google sign-in starts from a CLEAN Google Identity Services state. Without the reload, GIS
-      // held stale auth state from the prior sign-in, so re-opening the sign-in dialog and signing in again
-      // silently did nothing ("Prijava ne radi nakon odjave"). A reload is the reliable reset.
       setUser(null);
+      // Keep them in the app as a guest after signing out, rather than bouncing back to the front door.
       setGuest(true);
-      window.location.reload();
     },
     // Sprint 10.72: GDPR erasure. The backend deletes the account + data and clears the cookie; reflect it
     // locally by dropping the user and staying in the app as a guest. Errors propagate so the dialog can show them.
