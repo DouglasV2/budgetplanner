@@ -122,6 +122,40 @@ class PlannerIntentExtractorTest {
                 .contains("dining-table");
     }
 
+    @Test
+    void fallbackClassifiesRoomsInOtherMarketLanguages() {
+        // Sprint 10.135: when the LLM is down/throttled/capped, the rule-based fallback must still get the room
+        // right in every market's language. Before this, any non-HR/EN prompt collapsed to living-room (no bed).
+        assertThat(parse("Schlafzimmer komplett einrichten, Budget 2000 €.").roomType()).isEqualTo("bedroom"); // DE
+        assertThat(parse("Voglio arredare la camera da letto.").roomType()).isEqualTo("bedroom"); // IT
+        assertThat(parse("Aménager ma chambre.").roomType()).isEqualTo("bedroom"); // FR
+        assertThat(parse("Amueblar el salón por completo.").roomType()).isEqualTo("living-room"); // ES
+        assertThat(parse("Wohnzimmer einrichten.").roomType()).isEqualTo("living-room"); // DE
+        assertThat(parse("Indret stuen.").roomType()).isEqualTo("living-room"); // DK definite form
+        assertThat(parse("Sisustan keittiön.").roomType()).isEqualTo("kitchen"); // FI
+        assertThat(parse("Amueblar el comedor.").roomType()).isEqualTo("dining-room"); // ES
+    }
+
+    @Test
+    void fallbackDetectsStudioAcrossLanguages() {
+        // Sprint 10.135: studio is the combined-room container (must include a bed). The fallback now detects it
+        // in every market, not just HR/EN — otherwise a throttled studio prompt shipped a bedless living room.
+        assertThat(parse("Opremam garsonijeru, sve u jednom.").roomType()).isEqualTo("studio"); // HR
+        assertThat(parse("Furnish my studio apartment.").roomType()).isEqualTo("studio"); // EN
+        assertThat(parse("Arredare un monolocale.").roomType()).isEqualTo("studio"); // IT
+        assertThat(parse("Einzimmerwohnung einrichten.").roomType()).isEqualTo("studio"); // DE
+        assertThat(parse("Sisustan yksiön.").roomType()).isEqualTo("studio"); // FI
+    }
+
+    @Test
+    void fallbackReadsNonEuroAndMultilingualBudgets() {
+        // Sprint 10.135: kr / £ / non-HR verbs, not just "… €" (amounts stay within the default EUR ceiling 9000).
+        assertThat(parse("Indret stuen, omkring 9000 kr.").budget()).isEqualTo(9000); // DK kr
+        assertThat(parse("Furnish the living room, around 1800.").budget()).isEqualTo(1800); // EN verb
+        assertThat(parse("Wohnzimmer, circa 2000 €.").budget()).isEqualTo(2000); // DE verb
+        assertThat(parse("Living room for £1800.").budget()).isEqualTo(1800); // GBP symbol
+    }
+
     private PlannerInputDto parse(String prompt) {
         return extractor.enrich(base(prompt));
     }

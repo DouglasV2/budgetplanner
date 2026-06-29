@@ -104,16 +104,24 @@ public class PlannerIntentExtractor {
     }
 
     private PlannerInputDto applyRoom(String text, PlannerInputDto input) {
-        if (matches(text, "dnevn|boravak|living")) input = input.withRoomType("living-room");
-        if (matches(text, "radni kutak|radni prostor|home office|\\bured\\b|office|posao")) input = input.withRoomType("home-office");
-        if (matches(text, "spava|bedroom|spavac")) input = input.withRoomType("bedroom");
+        // Sprint 10.135: the room keywords are MULTILINGUAL so the rule-based fallback (used when the LLM call
+        // fails / is throttled / the daily AI cap is spent) still classifies the room in every market's language.
+        // Before this, a non-HR/EN prompt silently fell back to living-room (no bed, ignored budget) on any LLM
+        // hiccup. "Last match wins", so a later-checked room overrides; the studio container is checked last.
+        if (matches(text, "dnevn|boravak|living|wohnzimmer|wohnraum|soggiorno|salotto|salon|sejour|woonkamer|zitkamer|obyvack|obyvacia|sala de estar|olohuone|vardagsrum|\\bstue")) input = input.withRoomType("living-room");
+        if (matches(text, "radni kutak|radni prostor|home office|homeoffice|\\bured\\b|\\boffice\\b|posao|arbeitszimmer|\\bburo\\b|ufficio|bureau|werkkamer|kantoor|pracovn|oficina|despacho|escritorio|tyohuone|kotitoimisto|kontor")) input = input.withRoomType("home-office");
+        if (matches(text, "spava|bedroom|spavac|schlafzimmer|camera da letto|chambre|slaapkamer|spalna|dormitorio|habitacion|recamara|quarto|makuuhuone|soverom|sovrum|sovevaer")) input = input.withRoomType("bedroom");
         // Sprint 10.79: home-gym de-scoped (no verified gym products) — a gym prompt no longer maps to it; the
         // room defaults instead so the user still gets a (non-empty) plan rather than an empty home-gym.
         // Sprint 10.7: new rooms. Checked after the originals, so the last room mentioned wins.
-        if (matches(text, "kuhinj|kitchen")) input = input.withRoomType("kitchen");
-        if (matches(text, "blagovaon|trpezarij|dining")) input = input.withRoomType("dining-room");
-        if (matches(text, "hodnik|predsoblje|hallway")) input = input.withRoomType("hallway");
-        if (matches(text, "kupaon|kupatil|bathroom")) input = input.withRoomType("bathroom");
+        if (matches(text, "kuhinj|kitchen|kuche|cucina|cuisine|keuken|kuchyn|cocina|cozinha|keitti|kjokken|kokken")) input = input.withRoomType("kitchen");
+        if (matches(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|comedor|sala de jantar|ruokailu|spisestue|matsal")) input = input.withRoomType("dining-room");
+        if (matches(text, "hodnik|predsoblje|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b")) input = input.withRoomType("hallway");
+        if (matches(text, "kupaon|kupatil|bathroom|badezimmer|\\bbad\\b|bagno|salle de bain|badkamer|kupelna|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum")) input = input.withRoomType("bathroom");
+        // Studio / one-room apartment is the COMBINED-room container (bed + seating + dining in one space); checked
+        // last so it wins over any single-room word it co-occurs with. Bare "studio" leans studio-flat here (the
+        // common furnishing sense); a rare IT/ES "studio/estudio"=home-office is left to the (primary) AI path.
+        if (matches(text, "garsonijer|garsonjer|garson|garzon|\\bstudio\\b|bedsit|one-room|one room|jednosob|einzimmer|monolocale|monolokal|studette|eenkamer|monoambiente|kitnet|yksio|ettrom|ettrums|\\betta\\b")) input = input.withRoomType("studio");
         return input;
     }
 
@@ -307,10 +315,16 @@ public class PlannerIntentExtractor {
     private Optional<Integer> findBudget(String text) {
         // Sprint 10.91: accept European thousands separators — "1.500 €" / "1 500 €" must read as 1500, not the
         // "500" after the separator. The number token allows dot/space grouping; strip them before parsing.
+        // Sprint 10.135: multilingual + multi-currency so the rule-based fallback reads the budget in every market —
+        // non-EUR amounts ("9000 kr", "£1800") and non-HR verbs ("around/circa/hasta/omkring/bis ...") — not just
+        // "… €". Without this, a Danish "omkring 9000 kr" found no budget and silently fell back to the 1500 default.
         String number = "(\\d{1,3}(?:[.\\s]\\d{3})+|\\d{3,5})";
+        String currency = "(?:€|eur|eura|euro|kr|kroner|kronor|nok|sek|dkk|kn|kuna|gbp|pund|pounds)";
+        String verbs = "(?:budget|budzet|budjet|do|ispod|maksimalno|maks|max|maximum|maximal|najvise|ne preko|ne vise od|imam|oko|otprilike|around|about|approx|circa|cirka|\\bca\\b|etwa|environ|jusqu|fino a|hasta|alrededor|\\bate\\b|omkring|runt|noin|under|up to|bis)";
         List<Pattern> patterns = List.of(
-                Pattern.compile(number + "\\s*(?:€|eur|eura|euro)"),
-                Pattern.compile("(?:budget|budzet|do|ispod|maksimalno|maks|najvise|ne preko|ne vise od|imam|oko|otprilike)\\s*" + number)
+                Pattern.compile(number + "\\s*" + currency),
+                Pattern.compile("(?:£|\\$)\\s*" + number),
+                Pattern.compile(verbs + "\\s*" + number)
         );
         int bestIndex = Integer.MAX_VALUE;
         Integer bestValue = null;
