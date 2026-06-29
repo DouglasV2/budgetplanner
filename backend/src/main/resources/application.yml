@@ -47,6 +47,14 @@ server:
     include-message: never
     include-binding-errors: never
     include-exception: false
+  # Sprint 10.140 (perf): gzip the API responses. Plan JSON is the heavy payload (a full plan + 3 tiers can be
+  # tens of KB); compressing it cuts transfer ~70-80% over slow/mobile links. Tomcat only compresses responses
+  # at/above min-response-size, so tiny JSON (auth/me, errors) is left uncompressed. The frontend's static bundle
+  # is already gzipped by nginx (frontend/nginx.conf) — this covers the dynamic API side.
+  compression:
+    enabled: true
+    mime-types: application/json,application/javascript,text/css,text/html,text/plain,image/svg+xml
+    min-response-size: 1024
 
 management:
   # Sprint 10.85: expose ONLY health (liveness + readiness) for host/load-balancer probes — nothing else
