@@ -132,11 +132,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         await authLogout();
       } catch {
-        // Even if the network call fails, drop the local user so the UI reflects signed-out immediately.
+        // Even if the network call fails, we still reset below so the UI reflects signed-out.
       }
+      // Sprint 10.147: stay in the app as a guest after logout (don't bounce to the front door), but HARD-RELOAD
+      // so the next Google sign-in starts from a CLEAN Google Identity Services state. Without the reload, GIS
+      // held stale auth state from the prior sign-in, so re-opening the sign-in dialog and signing in again
+      // silently did nothing ("Prijava ne radi nakon odjave"). A reload is the reliable reset.
       setUser(null);
-      // Keep them in the app as a guest after signing out, rather than bouncing back to the front door.
       setGuest(true);
+      window.location.reload();
     },
     // Sprint 10.72: GDPR erasure. The backend deletes the account + data and clears the cookie; reflect it
     // locally by dropping the user and staying in the app as a guest. Errors propagate so the dialog can show them.

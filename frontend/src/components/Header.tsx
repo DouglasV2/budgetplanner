@@ -1,6 +1,7 @@
 import { MARKETS } from '../markets';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
+import { BrandMark } from './BrandMark';
 
 // Sprint 10.146: the header was a floating rounded "pill bar" (border-radius + shadow + float gap) with a
 // gray-pill nav — both classic AI/template tells (founder-flagged). Reworked into a clean full-bleed flush
@@ -14,7 +15,7 @@ export function Header() {
     <header className="header">
       <div className="header-inner shell">
         <a className="brand" href="#top" aria-label="BudgetSpace">
-          <span className="brand-mark">B</span>
+          <BrandMark />
           <span>BudgetSpace</span>
         </a>
         <nav className="nav" aria-label={t('aria.mainNav')}>

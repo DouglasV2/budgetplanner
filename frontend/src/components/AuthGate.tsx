@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import { BrandMark } from './BrandMark';
 
 export function AuthGate() {
   const { googleEnabled, googleClientId, continueAsGuest } = useAuth();
@@ -16,7 +17,7 @@ export function AuthGate() {
     <div className="auth-gate" role="dialog" aria-modal="true" aria-labelledby="auth-gate-title">
       <div className="auth-gate-card">
         <div className="auth-gate-brand">
-          <span className="brand-mark">B</span>
+          <BrandMark />
           <span>BudgetSpace</span>
         </div>
         <h1 id="auth-gate-title">{t('auth.gateTitle')}</h1>
