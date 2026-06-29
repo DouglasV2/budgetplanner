@@ -37,7 +37,9 @@ public class AdminEndpointGuardFilter extends OncePerRequestFilter {
 
     private final boolean adminEnabled;
 
-    public AdminEndpointGuardFilter(@Value("${budgetspace.admin-endpoints.enabled:true}") boolean adminEnabled) {
+    // Sprint 10.135: the @Value fallback is FALSE too (fail-safe) — if the property is missing entirely, the guard
+    // blocks rather than exposes. The real default lives in application.yml (also false now); dev opts in via env.
+    public AdminEndpointGuardFilter(@Value("${budgetspace.admin-endpoints.enabled:false}") boolean adminEnabled) {
         this.adminEnabled = adminEnabled;
     }
 
