@@ -615,15 +615,14 @@ export function Planner() {
 
   return (
     <section className="planner-section shell" id="planner">
+      {/* Sprint 10.144: dropped the floating "Složeno planova / 0" stat card — an empty "0" stat reads as a
+          generic AI-dashboard mockup (founder flagged the hero as AI-evski). The hero is now a clean, confident
+          left-aligned editorial header at a comfortable measure. */}
       <div className="section-heading left planner-heading-row">
         <div>
           <span className="eyebrow">{t('planner.eyebrow')}</span>
           <h2>{t('planner.heading')}</h2>
           <p>{t('planner.subheading')}</p>
-        </div>
-        <div className="demo-status">
-          <span>{t('planner.plansBuilt')}</span>
-          <strong>{generationCount}</strong>
         </div>
       </div>
 

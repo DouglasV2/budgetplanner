@@ -907,7 +907,11 @@ input[type='range'] {
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  max-width: none;
+  /* Sprint 10.144: stat card removed — constrain the hero to a comfortable editorial measure (left-aligned). */
+  max-width: 720px;
+}
+.planner-heading-row p {
+  max-width: 54ch;
 }
 
 .demo-status {
