@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "ulko- tai puutarhakalusteita",
   "results.multiRoomNotice": "Kuvasit useamman kuin yhden huoneen. ”Koko asunto” -tila suunnittelee jokaisen ja jakaa budjetin — tämä on suunnitelma vain yhdelle.",
   "results.multiRoomCta": "Vaihda Koko asunto -tilaan",
-  "cat.textiles": "Tekstiilit"
+  "cat.textiles": "Tekstiilit",
+  "moveIn.byStore": "Mistä ostaa — myymälöittäin",
+  "moveIn.printList": "Tulosta lista",
+  "moveIn.removeItem": "Poista tämä kappale",
+  "moveIn.swapItem": "Vaihda samankaltaiseen kappaleeseen"
 }

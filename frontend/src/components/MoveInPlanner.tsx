@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FurnishingPlan, PlannerInput, Product, RoomType, SavedPlanResponse } from '../types';
-import { generateMoveInPlan, savePlan, trackProductClick } from '../api/client';
+import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
 
@@ -9,6 +9,29 @@ import { useLocale } from '../LocaleContext';
 function storeUrl(product: Product): string {
   const url = product.productUrl || product.url || '';
   return url.startsWith('http') ? url : '';
+}
+
+const qtyOf = (item: { quantity?: number }) => (item.quantity && item.quantity > 1 ? item.quantity : 1);
+
+// Sprint 10.138: localStorage draft so the room picks + budget survive a reload (only numbers/room ids — no PII).
+const MOVE_IN_DRAFT_KEY = 'budgetspace.moveInDraft';
+
+// Sprint 10.138: "what to buy where" — roll every item across all rooms up by retailer (count + total), so a
+// multi-room shop is actually plannable ("at IKEA grab 9 pieces for 1.240 €").
+function aggregateByStore(results: RoomPlanResult[]): Array<{ retailer: string; count: number; total: number }> {
+  const byStore = new Map<string, { count: number; total: number }>();
+  for (const result of results) {
+    for (const item of result.plan.items) {
+      const qty = qtyOf(item);
+      const current = byStore.get(item.product.retailer) ?? { count: 0, total: 0 };
+      current.count += qty;
+      current.total += item.product.price * qty;
+      byStore.set(item.product.retailer, current);
+    }
+  }
+  return [...byStore.entries()]
+    .map(([retailer, value]) => ({ retailer, ...value }))
+    .sort((a, b) => b.total - a.total);
 }
 
 // Sprint 10.109: Move-In ("Cijeli stan") — the apartment branch of the planner. Self-contained; the single-room
@@ -57,8 +80,23 @@ function pickBestPlan(plans: FurnishingPlan[]): FurnishingPlan | null {
 
 export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, seed }: MoveInPlannerProps) {
   const { t } = useLocale();
-  const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(['living-room', 'bedroom']);
-  const [totalBudget, setTotalBudget] = useState<number>(5000);
+  // Sprint 10.138: hydrate the room picks + budget from the last session (localStorage draft) so a reload or a
+  // return visit doesn't reset the form. Falls back to sensible defaults.
+  const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(() => {
+    try {
+      const draft = JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
+      if (draft && Array.isArray(draft.rooms) && draft.rooms.length) return draft.rooms as RoomType[];
+    } catch { /* ignore */ }
+    return ['living-room', 'bedroom'];
+  });
+  const [totalBudget, setTotalBudget] = useState<number>(() => {
+    try {
+      const draft = JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
+      if (draft && typeof draft.budget === 'number' && draft.budget > 0) return draft.budget;
+    } catch { /* ignore */ }
+    return 5000;
+  });
+  const [swapping, setSwapping] = useState<string | null>(null);
   const [results, setResults] = useState<RoomPlanResult[] | null>(null);
   const [apartmentPartial, setApartmentPartial] = useState(false);
   const [shortfall, setShortfall] = useState(0);
@@ -73,6 +111,13 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
       if (seed.budget > 0) setTotalBudget(seed.budget);
     }
   }, [seed]);
+
+  // Sprint 10.138: persist the room picks + budget (draft) so the next visit starts where the user left off.
+  useEffect(() => {
+    try {
+      localStorage.setItem(MOVE_IN_DRAFT_KEY, JSON.stringify({ rooms: selectedRooms, budget: totalBudget }));
+    } catch { /* ignore quota/private-mode */ }
+  }, [selectedRooms, totalBudget]);
 
   function toggleRoom(room: RoomType) {
     setSelectedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));
@@ -158,8 +203,70 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
     }
   }
 
+  // Sprint 10.138: let the user drop a piece they don't want — recompute the room (and apartment) total locally.
+  function removeItem(roomType: RoomType, productId: string) {
+    setResults((prev) => prev && prev.map((result) => {
+      if (result.roomType !== roomType) return result;
+      const items = result.plan.items.filter((item) => item.product.id !== productId);
+      return {
+        ...result,
+        hasItems: items.length > 0,
+        plan: {
+          ...result.plan,
+          items,
+          total: items.reduce((sum, item) => sum + item.product.price * qtyOf(item), 0),
+          retailersUsed: [...new Set(items.map((item) => item.product.retailer))]
+        }
+      };
+    }));
+  }
+
+  // Sprint 10.138: swap a piece for a similar one (same /api/plans/replace the single-room plan uses; it returns
+  // the whole updated room plan, so we just splice it back in).
+  async function swapItem(roomType: RoomType, productId: string) {
+    const room = results?.find((result) => result.roomType === roomType);
+    if (!room) return;
+    setSwapping(productId);
+    try {
+      const updated = await replaceProduct(room.plan, room.input, productId, 'similar');
+      setResults((prev) => prev && prev.map((result) => (result.roomType === roomType ? { ...result, plan: updated, hasItems: updated.items.length > 0 } : result)));
+    } catch {
+      onNotice(t('moveIn.error'));
+    } finally {
+      setSwapping(null);
+    }
+  }
+
+  // Sprint 10.138: a plain-text shopping list (per room: pieces + prices + store links) the user can paste into
+  // Notes / a message / email and actually take shopping. Mirrors the single-room share text.
+  function buildApartmentList(list: RoomPlanResult[]): string {
+    const grand = list.reduce((sum, result) => sum + result.plan.total, 0);
+    const lines = [`${t('moveIn.grandTotalLabel')}: ${formatCurrency(grand)} ${t('moveIn.ofBudget', { budget: formatCurrency(totalBudget) })}`];
+    for (const result of list) {
+      if (!result.hasItems) continue;
+      lines.push('', `${t(result.labelKey)} — ${formatCurrency(result.plan.total)}`);
+      for (const item of result.plan.items) {
+        const qty = qtyOf(item);
+        const name = qty > 1 ? `${qty} × ${item.product.name}` : item.product.name;
+        const url = storeUrl(item.product);
+        lines.push(`- ${name} — ${formatCurrency(item.product.price * qty)}${url ? ` ${url}` : ''}`);
+      }
+    }
+    lines.push('', t('results.shareFooter'));
+    return lines.join('\n');
+  }
+
+  async function copyList() {
+    if (!results) return;
+    try {
+      await navigator.clipboard.writeText(buildApartmentList(results));
+      onNotice(t('results.listCopied'));
+    } catch { /* clipboard blocked (e.g. insecure context) — no-op */ }
+  }
+
   const total = results ? results.reduce((sum, result) => sum + result.plan.total, 0) : 0;
   const over = total - totalBudget;
+  const storeRollup = results ? aggregateByStore(results) : [];
 
   return (
     <div className="move-in">
@@ -224,6 +331,12 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             </span>
           </div>
 
+          {/* Sprint 10.138: take the list with you — copy as text (paste into Notes / a message) or print it. */}
+          <div className="move-in-actions no-print">
+            <button type="button" className="move-in-action-btn" onClick={() => void copyList()}>{t('results.copyShoppingList')}</button>
+            <button type="button" className="move-in-action-btn" onClick={() => window.print()}>{t('moveIn.printList')}</button>
+          </div>
+
           <div className="move-in-room-cards">
             {results.map((result) => (
               <article className="move-in-room-card" key={result.roomType}>
@@ -250,7 +363,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                         const lineTotal = item.product.price * qty;
                         const openUrl = storeUrl(item.product);
                         return (
-                          <li key={item.product.id}>
+                          <li key={item.product.id} className="move-in-item">
                             {openUrl ? (
                               <a
                                 className="move-in-item-row move-in-item-link"
@@ -269,6 +382,28 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                                 <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
                               </div>
                             )}
+                            {/* Sprint 10.138: swap for a similar piece / drop it — not buttons inside the <a> (invalid). */}
+                            <span className="move-in-item-actions no-print">
+                              <button
+                                type="button"
+                                className="move-in-item-act"
+                                title={t('moveIn.swapItem')}
+                                aria-label={t('moveIn.swapItem')}
+                                disabled={swapping === item.product.id}
+                                onClick={() => void swapItem(result.roomType, item.product.id)}
+                              >
+                                {swapping === item.product.id ? '…' : '⇄'}
+                              </button>
+                              <button
+                                type="button"
+                                className="move-in-item-act move-in-item-remove"
+                                title={t('moveIn.removeItem')}
+                                aria-label={t('moveIn.removeItem')}
+                                onClick={() => removeItem(result.roomType, item.product.id)}
+                              >
+                                ×
+                              </button>
+                            </span>
                           </li>
                         );
                       })}
@@ -282,7 +417,22 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             ))}
           </div>
 
-          <button type="button" className="generate-button move-in-save" disabled={saving} onClick={() => void saveApartment()}>
+          {/* Sprint 10.138: "what to buy where" — every piece rolled up by store so a multi-room shop is plannable. */}
+          {storeRollup.length > 0 && (
+            <div className="move-in-by-store">
+              <span className="move-in-by-store-title">{t('moveIn.byStore')}</span>
+              <ul>
+                {storeRollup.map((store) => (
+                  <li key={store.retailer}>
+                    <span className="move-in-store-name">{store.retailer}</span>
+                    <span className="move-in-store-meta">{t('moveIn.itemsCount', { count: store.count })} · {formatCurrency(store.total)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <button type="button" className="generate-button move-in-save no-print" disabled={saving} onClick={() => void saveApartment()}>
             {t('moveIn.saveApartment')}
           </button>
         </div>

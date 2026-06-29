@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "ute- eller hagemøbler",
   "results.multiRoomNotice": "Du beskrev mer enn ett rom. «Hele leiligheten»-modus lager en plan for hvert av dem og fordeler budsjettet – dette er en plan for bare ett rom.",
   "results.multiRoomCta": "Bytt til Hele leiligheten",
-  "cat.textiles": "Tekstiler"
+  "cat.textiles": "Tekstiler",
+  "moveIn.byStore": "Hvor du kjøper — per butikk",
+  "moveIn.printList": "Skriv ut listen",
+  "moveIn.removeItem": "Fjern denne delen",
+  "moveIn.swapItem": "Bytt til en lignende del"
 }

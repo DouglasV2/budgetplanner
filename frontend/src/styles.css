@@ -5018,6 +5018,9 @@ textarea {
   border-top: 1px solid var(--hairline);
 }
 .move-in-room-items li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 6px 0;
   font-size: 0.88rem;
   border-bottom: 1px solid var(--hairline);
@@ -5027,9 +5030,43 @@ textarea {
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   color: inherit;
   text-decoration: none;
+}
+/* Sprint 10.138: per-item swap / remove. Subtle by default, clearer on row hover/focus; always visible on touch. */
+.move-in-item-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.move-in-item-act {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  opacity: 0.5;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 6px;
+  transition: opacity 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.move-in-room-items li:hover .move-in-item-act,
+.move-in-item-act:focus-visible {
+  opacity: 1;
+}
+.move-in-item-act:hover {
+  background: var(--surface-2, rgba(0, 0, 0, 0.05));
+  color: var(--accent);
+}
+.move-in-item-act.move-in-item-remove:hover {
+  color: #c0392b;
+}
+.move-in-item-act:disabled {
+  cursor: default;
+  opacity: 0.4;
 }
 .move-in-item-name {
   flex: 1;
@@ -5078,6 +5115,76 @@ a.move-in-item-link:hover .move-in-item-price::after {
   color: var(--muted);
   font-size: 0.88rem;
   margin: 6px 0 0;
+}
+/* Sprint 10.138: copy / print the whole-apartment shopping list. */
+.move-in-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -4px 0 4px;
+}
+.move-in-action-btn {
+  border: 1px solid var(--hairline);
+  background: var(--surface, #fff);
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 7px 14px;
+  border-radius: 999px;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.move-in-action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* Sprint 10.138: "what to buy where" — per-store rollup across the whole apartment. */
+.move-in-by-store {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--surface-2, rgba(0, 0, 0, 0.02));
+}
+.move-in-by-store-title {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.move-in-by-store ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.move-in-by-store li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 0;
+}
+.move-in-by-store li + li {
+  border-top: 1px solid var(--hairline);
+}
+.move-in-store-name {
+  font-weight: 600;
+}
+.move-in-store-meta {
+  flex-shrink: 0;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+/* Sprint 10.138: print-friendly shopping list — Ctrl+P (or the Print button) drops all the app chrome and the
+   per-item action buttons, leaving just the plan. Same trick works for any results panel marked to keep. */
+@media print {
+  body * { visibility: hidden; }
+  .move-in-results, .move-in-results * { visibility: visible; }
+  .move-in-results { position: absolute; left: 0; top: 0; width: 100%; }
+  .no-print, .move-in-item-actions { display: none !important; }
+  .move-in-item-link .move-in-item-name { color: #000 !important; text-decoration: none !important; }
+  a.move-in-item-link .move-in-item-price::after { content: ''; }
 }
 .move-in-save {
   margin-top: 18px;

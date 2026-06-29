@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "záhradný/vonkajší nábytok",
   "results.multiRoomNotice": "Opísal si viac než jednu miestnosť. Režim „Celý byt” naplánuje každú z nich a rozdelí rozpočet — toto je plán len pre jednu.",
   "results.multiRoomCta": "Prepnúť na Celý byt",
-  "cat.textiles": "Textílie"
+  "cat.textiles": "Textílie",
+  "moveIn.byStore": "Kde kúpiť — podľa obchodu",
+  "moveIn.printList": "Vytlačiť zoznam",
+  "moveIn.removeItem": "Odstrániť tento kus",
+  "moveIn.swapItem": "Vymeniť za podobný kus"
 }

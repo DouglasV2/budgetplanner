@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "mobili da esterno/giardino",
   "results.multiRoomNotice": "Hai descritto più di una stanza. La modalità «Tutto l'appartamento» pianifica ciascuna e suddivide il budget — questo è un piano per una sola.",
   "results.multiRoomCta": "Passa a Tutto l'appartamento",
-  "cat.textiles": "Tessili"
+  "cat.textiles": "Tessili",
+  "moveIn.byStore": "Dove comprare — per negozio",
+  "moveIn.printList": "Stampa la lista",
+  "moveIn.removeItem": "Rimuovi questo pezzo",
+  "moveIn.swapItem": "Sostituisci con un pezzo simile"
 }

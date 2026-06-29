@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "vrtnega/zunanjega pohištva",
   "results.multiRoomNotice": "Opisal si več kot eno sobo. Način „Celotno stanovanje” naredi načrt za vsako in razdeli proračun — to je načrt samo za eno.",
   "results.multiRoomCta": "Preklopi na Celotno stanovanje",
-  "cat.textiles": "Tekstil"
+  "cat.textiles": "Tekstil",
+  "moveIn.byStore": "Kje kupiti — po trgovini",
+  "moveIn.printList": "Natisni seznam",
+  "moveIn.removeItem": "Odstrani ta kos",
+  "moveIn.swapItem": "Zamenjaj s podobnim kosom"
 }

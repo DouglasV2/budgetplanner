@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "mobiliário de exterior/jardim",
   "results.multiRoomNotice": "Descreveu mais do que uma divisão. O modo “Apartamento inteiro” planeia cada uma e divide o orçamento — este é um plano apenas para uma.",
   "results.multiRoomCta": "Mudar para Apartamento inteiro",
-  "cat.textiles": "Têxteis"
+  "cat.textiles": "Têxteis",
+  "moveIn.byStore": "Onde comprar — por loja",
+  "moveIn.printList": "Imprimir a lista",
+  "moveIn.removeItem": "Remover esta peça",
+  "moveIn.swapItem": "Trocar por uma peça semelhante"
 }

@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "de mobilier d'extérieur/de jardin",
   "results.multiRoomNotice": "Vous avez décrit plusieurs pièces. Le mode « Tout l'appartement » planifie chacune d'elles et répartit le budget — ceci n'est un plan que pour une seule.",
   "results.multiRoomCta": "Passer à Tout l'appartement",
-  "cat.textiles": "Textiles"
+  "cat.textiles": "Textiles",
+  "moveIn.byStore": "Où acheter — par magasin",
+  "moveIn.printList": "Imprimer la liste",
+  "moveIn.removeItem": "Retirer cette pièce",
+  "moveIn.swapItem": "Remplacer par une pièce similaire"
 }

@@ -45,6 +45,19 @@ function readSharedPlanIdFromUrl() {
   return match?.[1] ?? null;
 }
 
+// Sprint 10.138: remember the user's last typed prompt + budget across reloads (single-room form). Stores only
+// the prompt text + budget number — no PII. We persist only an EDITED prompt (not the seeded example), so a
+// fresh visitor still gets the localised example and locale switching can still re-seed it.
+const PLANNER_DRAFT_KEY = 'budgetspace.plannerDraft';
+function readPlannerDraft(): { prompt?: string; budget?: number } | null {
+  try {
+    const raw = localStorage.getItem(PLANNER_DRAFT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 function planSearchText(savedPlan: SavedPlanResponse) {
   return [
     savedPlan.plan.name,
@@ -199,11 +212,23 @@ export function Planner() {
   const isPlus = user?.plan === 'PLUS' || user?.plan === 'PRO';
   // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
   // the active market's language (the user can then edit freely).
-  const [input, setInput] = useState<PlannerInput>(() => ({ ...initialInput, prompt: t('planner.examplePrompt'), market }));
+  const exampleSeed = t('planner.examplePrompt');
+  // Sprint 10.138: hydrate the last EDITED prompt + budget from localStorage (a returning user picks up where
+  // they left off). A fresh user (no draft) still gets the localised example.
+  const [input, setInput] = useState<PlannerInput>(() => {
+    const draft = readPlannerDraft();
+    return {
+      ...initialInput,
+      prompt: draft?.prompt ? draft.prompt : exampleSeed,
+      budget: draft?.budget && draft.budget > 0 ? draft.budget : initialInput.budget,
+      market
+    };
+  });
   // The example prompt is seeded from t() at mount, but a non-HR market's translations are lazy-loaded, so the
   // first seed can be the English fallback. Re-seed it once the language overlay arrives (t() identity changes
   // on langReady) — but only while the textarea still holds the seeded example, so a user's edits are never lost.
-  const seededPromptRef = useRef<string>(input.prompt);
+  // The ref tracks the SEEDED EXAMPLE (not a restored draft), so a restored custom prompt is never re-seeded away.
+  const seededPromptRef = useRef<string>(exampleSeed);
   const [plans, setPlans] = useState<FurnishingPlan[]>([]);
   const [savedPlans, setSavedPlans] = useState<SavedPlanResponse[]>([]);
   const [savedSearch, setSavedSearch] = useState('');
@@ -279,6 +304,16 @@ export function Planner() {
     seededPromptRef.current = next;
     setInput((current) => (current.prompt === prevSeed && current.prompt !== next ? { ...current, prompt: next } : current));
   }, [t]);
+
+  // Sprint 10.138: persist the prompt + budget — but only an EDITED prompt (≠ the seeded example), so a fresh
+  // visitor still gets the localised example and locale re-seeding keeps working. Restored on next mount above.
+  useEffect(() => {
+    try {
+      if (input.prompt && input.prompt !== seededPromptRef.current) {
+        localStorage.setItem(PLANNER_DRAFT_KEY, JSON.stringify({ prompt: input.prompt, budget: input.budget }));
+      }
+    } catch { /* ignore quota / private mode */ }
+  }, [input.prompt, input.budget]);
 
   useEffect(() => {
     const sharedPlanId = readSharedPlanIdFromUrl();

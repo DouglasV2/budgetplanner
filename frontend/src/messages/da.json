@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "have- eller udendørsmøbler",
   "results.multiRoomNotice": "Du beskrev mere end ét rum. Tilstanden „Hele lejligheden” planlægger hvert rum og fordeler budgettet — det her er en plan for kun ét.",
   "results.multiRoomCta": "Skift til Hele lejligheden",
-  "cat.textiles": "Tekstiler"
+  "cat.textiles": "Tekstiler",
+  "moveIn.byStore": "Hvor du køber — pr. butik",
+  "moveIn.printList": "Udskriv listen",
+  "moveIn.removeItem": "Fjern denne del",
+  "moveIn.swapItem": "Byt til en lignende del"
 }

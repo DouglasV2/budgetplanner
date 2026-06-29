@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "Garten- oder Außenmöbel",
   "results.multiRoomNotice": "Du hast mehr als einen Raum beschrieben. Der Modus „Ganze Wohnung“ plant jeden einzeln und teilt das Budget auf – dies ist ein Plan für nur einen.",
   "results.multiRoomCta": "Zu „Ganze Wohnung“ wechseln",
-  "cat.textiles": "Textilien"
+  "cat.textiles": "Textilien",
+  "moveIn.byStore": "Wo kaufen — nach Geschäft",
+  "moveIn.printList": "Liste drucken",
+  "moveIn.removeItem": "Dieses Teil entfernen",
+  "moveIn.swapItem": "Gegen ein ähnliches Teil tauschen"
 }

@@ -555,5 +555,9 @@
   "results.outOfScopeOutdoor": "utemöbler eller trädgårdsmöbler",
   "results.multiRoomNotice": "Du beskrev mer än ett rum. Läget ”Hela lägenheten” planerar varje rum och delar upp budgeten – det här är en plan för bara ett.",
   "results.multiRoomCta": "Byt till Hela lägenheten",
-  "cat.textiles": "Textilier"
+  "cat.textiles": "Textilier",
+  "moveIn.byStore": "Var du köper — per butik",
+  "moveIn.printList": "Skriv ut listan",
+  "moveIn.removeItem": "Ta bort den här delen",
+  "moveIn.swapItem": "Byt mot en liknande del"
 }
