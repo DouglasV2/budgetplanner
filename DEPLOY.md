@@ -42,6 +42,14 @@ base (dev) profile wins** — `ddl-auto=create` (drops & rebuilds the whole sche
 + subscriptions) and PUBLIC admin/catalog-mutation endpoints. As belt-and-suspenders also set
 **`BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED=false`**.
 
+### 0b. Right-size the instance + JVM heap (memory)
+Pick a backend instance with **≥512 MB RAM (1 GB comfortable)** and set **`JAVA_OPTS=-XX:MaxRAMPercentage=75.0`**
+(already the default in `docker-compose.prod.yml`; on Railway/Fly set it as a service env var). The JVM otherwise
+may not size its heap to the container limit and can OOM under load. **The catalog size is NOT the constraint** —
+~2.4k products is only a few MB in memory; the JVM baseline (Spring Boot + Hibernate, ~250–400 MB) is what sizes
+the instance, so adding catalog depth doesn't change this. `MaxRAMPercentage=75` leaves ~25% for metaspace/threads
+(don't go to 100). Catalog filtering is in-memory + O(N) but trivial at this size; revisit only past ~10k products.
+
 ### 1. Rotate every secret shared during development
 The Stripe secret key, Gemini key and eBay **PROD** Cert ID were pasted in chat — treat them as compromised.
 Generate fresh ones and put them ONLY in the host's secret store (never in git, never in `VITE_*`):
@@ -133,6 +141,7 @@ The code is ready and **dormant until the secret is set** ([BillingService](back
 | Variable | What | Secret? |
 |---|---|---|
 | `SPRING_PROFILES_ACTIVE` | **`prod`** — load-bearing; baked into the backend image | no |
+| `JAVA_OPTS` | JVM flags; default `-XX:MaxRAMPercentage=75.0` — cap heap so a small instance doesn't OOM | no |
 | `DATABASE_URL` / `DATABASE_USERNAME` / `DATABASE_PASSWORD` | Managed Postgres | password = secret |
 | `HIBERNATE_DDL_AUTO` | `validate` (Flyway owns the schema; never `create`/`update` in prod) | no |
 | `BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED` | `false` in prod (the profile also forces this) | no |

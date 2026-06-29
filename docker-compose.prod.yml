@@ -34,6 +34,12 @@ services:
     environment:
       # Redundant with the image's baked-in default, but explicit here so the run path is self-documenting.
       SPRING_PROFILES_ACTIVE: prod
+      # Sprint 10.131: cap the JVM heap to a % of the container so a small host (Railway/Fly 512MB-1GB) can't OOM.
+      # The Dockerfile runs `java $JAVA_OPTS -jar`, so this flows through. The catalog is only a few MB in memory;
+      # the JVM baseline (Spring + Hibernate ~250-400MB) is what sizes the instance, NOT the number of products.
+      # MaxRAMPercentage=75 => heap = 75% of the container limit, leaving headroom for metaspace/threads. Use a
+      # >=512MB instance (1GB comfortable). On Railway/Fly set JAVA_OPTS as a service env var to override this.
+      JAVA_OPTS: ${JAVA_OPTS:--XX:MaxRAMPercentage=75.0}
       DATABASE_URL: ${DATABASE_URL:-jdbc:postgresql://postgres:5432/budgetspace}
       DATABASE_USERNAME: ${POSTGRES_USER:-budgetspace}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in your .env / host secret store}
