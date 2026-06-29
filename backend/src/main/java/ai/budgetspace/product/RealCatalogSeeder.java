@@ -255,7 +255,11 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // in other markets to /gb/en/p/-{article}/ (curl, no agents); each re-fetched + verified (live GBP
             // price + og:image). GB has no JYSK (not in UK), so IKEA-only; fills thin GB categories (storage,
             // decor, lighting, dressers, tables). Combo s-articles skipped (need a slug); GB already has those.
-            "/catalog/real-ikea-gb-deepen-10-132.json"
+            "/catalog/real-ikea-gb-deepen-10-132.json",
+            // Sprint 10.133: AT IKEA depth (152 products) via the same global-article port as GB — jysk.at is
+            // JS-gated so AT is IKEA-only; the port fills all 17 categories (incl. premium beds/mattresses/sofas).
+            // AT 107 -> ~259. Curl, no agents.
+            "/catalog/real-ikea-at-deepen-10-133.json"
     );
 
     /**
