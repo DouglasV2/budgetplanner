@@ -242,7 +242,15 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // pages nest directly under the category path; NO/SE/SI nest one level deeper (their top "bed/sofa"
             // pages are sub-category listings, not products) so they were correctly dropped here (the missing
             // og:image flagged them) and need a deeper crawl next round.
-            "/catalog/real-dk-deepen-10-128.json"
+            "/catalog/real-dk-deepen-10-128.json",
+            // Sprint 10.130: JYSK depth for NO/SE/SI via their SITEMAPS (their category tree nests products a
+            // level deeper than DK/FI, so the category-crawl missed them; the sitemap lists product URLs). Every
+            // product re-fetched + verified (live JSON-LD price in NOK/SEK/EUR, og:image required so category +
+            // SEO-guide pages were dropped, name from og:title). 240 products incl. wardrobes (NO 90 / SE 83 /
+            // SI 67). GB/AT remain IKEA-only (no usable JYSK).
+            "/catalog/real-no-deepen-10-130.json",
+            "/catalog/real-se-deepen-10-130.json",
+            "/catalog/real-si-deepen-10-130.json"
     );
 
     /**
