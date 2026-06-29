@@ -36,7 +36,7 @@ const HR: Record<LegalKey, LegalDoc> = {
         'Koristimo jedan nužni kolačić za prijavu (bs_auth) — bez njega prijava ne radi. Nemamo reklamne ni kolačiće za praćenje.',
       ] },
       { heading: 'S kim dijelimo podatke', body: [
-        'Google (prijava), Stripe (naplata Plusa), davatelj AI usluge (obrada upita) i eBay (prikaz rabljenih oglasa). Tvoje podatke ne prodajemo.',
+        'Google (prijava), Stripe (naplata Plusa), davatelj AI usluge (obrada upita), eBay (prikaz rabljenih oglasa) i Sentry (praćenje tehničkih grešaka). Tvoje podatke ne prodajemo.',
       ] },
       { heading: 'Koliko dugo čuvamo', body: [
         'Dok ne obrišeš račun ili dok ti sesija ne istekne. Račun i sve povezane podatke možeš obrisati u aplikaciji ("Obriši račun").',
@@ -105,7 +105,7 @@ const EN: Record<LegalKey, LegalDoc> = {
         'We use a single strictly-necessary sign-in cookie (bs_auth) — sign-in does not work without it. We use no advertising or tracking cookies.',
       ] },
       { heading: 'Who we share with', body: [
-        'Google (sign-in), Stripe (Plus billing), the AI provider (processing prompts) and eBay (showing second-hand listings). We do not sell your data.',
+        'Google (sign-in), Stripe (Plus billing), the AI provider (processing prompts), eBay (showing second-hand listings) and Sentry (technical error monitoring). We do not sell your data.',
       ] },
       { heading: 'How long we keep it', body: [
         'Until you delete your account or your session expires. You can delete your account and all related data in the app ("Delete account").',
