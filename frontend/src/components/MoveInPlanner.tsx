@@ -233,14 +233,16 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                         <span className="move-in-room-stores">{result.plan.retailersUsed.join(' + ')}</span>
                       )}
                     </div>
+                    {/* Sprint 10.129: show the FULL per-room list. The old "first 4 + (+N)" hid most of the
+                        room behind an unclickable counter — useless when the user is deciding what to buy for
+                        each room. Whole-apartment plans are only a few rooms, so the complete list is scannable. */}
                     <ul className="move-in-room-items">
-                      {result.plan.items.slice(0, 4).map((item) => (
+                      {result.plan.items.map((item) => (
                         <li key={item.product.id}>
                           <span>{item.product.name}</span>
                           <span>{formatCurrency(item.product.price)}</span>
                         </li>
                       ))}
-                      {result.plan.items.length > 4 && <li className="move-in-more">+{result.plan.items.length - 4}</li>}
                     </ul>
                     {result.partial && <small className="move-in-room-partial">{t('moveIn.partialRoom')}</small>}
                   </>
