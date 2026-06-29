@@ -4880,7 +4880,8 @@ textarea {
   display: inline-flex;
   gap: 4px;
   padding: 4px;
-  margin: 0 0 18px;
+  /* Sprint 10.141: breathe from the "Tvoji planovi" panel above it (was margin-top 0 → cramped against it). */
+  margin: 26px 0 20px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--card);
@@ -5121,7 +5122,8 @@ a.move-in-item-link:hover .move-in-item-price::after {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: -4px 0 4px;
+  /* Sprint 10.141: breathe from the total card (was a negative top margin that pulled these up tight). */
+  margin: 14px 0 4px;
 }
 .move-in-action-btn {
   border: 1px solid var(--hairline);
