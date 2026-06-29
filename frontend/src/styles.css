@@ -1114,7 +1114,7 @@ textarea:focus {
 .product-actions a,
 .share-button {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.68);
   color: var(--ink);
   padding: 9px 12px;
@@ -1545,7 +1545,7 @@ textarea:focus {
 
 .share-btn {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: var(--white, #fff);
   color: var(--ink);
   padding: 8px 15px;
@@ -1615,7 +1615,7 @@ textarea:focus {
 
 .space-new-input {
   border: 1px dashed var(--hairline);
-  border-radius: 999px;
+  border-radius: 12px;
   background: transparent;
   padding: 5px 13px;
   font-size: 0.84rem;
@@ -1645,7 +1645,7 @@ textarea:focus {
 
 .space-continue {
   border: 1px solid rgba(236, 122, 46, 0.4);
-  border-radius: 999px;
+  border-radius: 12px;
   background: rgba(236, 122, 46, 0.08);
   color: var(--orange-dark);
   padding: 5px 12px;
@@ -1864,7 +1864,7 @@ textarea:focus {
   border: 1px solid rgba(236, 122, 46, 0.22);
   background: rgba(236, 122, 46, 0.09);
   color: var(--orange-dark);
-  border-radius: 999px;
+  border-radius: 12px;
   padding: 9px 12px;
   cursor: pointer;
   font-weight: 620;
@@ -1985,7 +1985,7 @@ textarea:focus {
 
 .planner-upsell-cta {
   border: 1px solid var(--orange);
-  border-radius: 999px;
+  border-radius: 12px;
   background: var(--orange);
   color: #fff;
   font-weight: 660;
@@ -2182,7 +2182,7 @@ textarea:focus {
 
 .feedback-buttons button {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.68);
   color: var(--ink);
   padding: 9px 12px;
@@ -2210,7 +2210,7 @@ textarea:focus {
 
 .feedback-action-button {
   border: 1px solid rgba(95, 114, 87, 0.34);
-  border-radius: 999px;
+  border-radius: 12px;
   background: rgba(95, 114, 87, 0.12);
   color: #3f563a;
   padding: 8px 16px;
@@ -2415,7 +2415,7 @@ textarea {
 
 .preset {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.62);
   padding: 10px 9px;
   cursor: pointer;
@@ -2852,7 +2852,7 @@ textarea {
 .improved-missing-box button {
   width: fit-content;
   border: 1px solid rgba(236, 122, 46, 0.28);
-  border-radius: 999px;
+  border-radius: 12px;
   background: rgba(236, 122, 46, 0.1);
   color: var(--orange-dark);
   padding: 9px 12px;
@@ -3339,7 +3339,7 @@ textarea {
 
 .replacement-menu button {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: #fff;
   padding: 9px 11px;
   font-weight: 620;
@@ -3704,7 +3704,7 @@ textarea {
 
 .saved-plan-actions button {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: #fff;
   padding: 9px 12px;
   color: var(--ink);
@@ -3861,7 +3861,7 @@ textarea {
   gap: 10px;
   padding: 9px 16px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: #fff;
   color: var(--ink, #1f1d1a);
   font-weight: 620;
@@ -3909,7 +3909,7 @@ textarea {
 
 .account-signin-link {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: #fff;
   color: var(--orange-dark);
   font-weight: 640;
@@ -3957,7 +3957,7 @@ textarea {
 .header-signin,
 .header-signout {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: #fff;
   color: var(--ink);
   font-weight: 620;
@@ -4028,7 +4028,7 @@ textarea {
 
 .auth-gate-guest {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: #fff;
   color: var(--ink);
   font-weight: 640;
@@ -4585,7 +4585,7 @@ textarea {
   margin-top: 4px;
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: #fff;
   color: #2b3240;
   font-weight: 620;
@@ -4613,14 +4613,14 @@ textarea {
   flex: 1;
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   padding: 9px 14px;
   font-size: 0.88rem;
 }
 
 .pricing-waitlist button {
   border: 1px solid var(--orange);
-  border-radius: 999px;
+  border-radius: 12px;
   background: var(--orange);
   color: #fff;
   font-weight: 640;
@@ -4653,7 +4653,7 @@ textarea {
   margin-top: 4px;
   width: 100%;
   border: 1px solid var(--orange);
-  border-radius: 999px;
+  border-radius: 12px;
   background: var(--orange);
   color: #fff;
   font-weight: 660;
@@ -4803,7 +4803,7 @@ textarea {
 
 .confirm-cancel,
 .confirm-delete {
-  border-radius: 999px;
+  border-radius: 12px;
   padding: 10px 20px;
   font-weight: 620;
   cursor: pointer;
@@ -5142,7 +5142,7 @@ a.move-in-item-link:hover .move-in-item-price::after {
   cursor: pointer;
   font-size: 0.85rem;
   padding: 7px 14px;
-  border-radius: 999px;
+  border-radius: 12px;
   transition: border-color 0.12s ease, color 0.12s ease;
 }
 .move-in-action-btn:hover {
