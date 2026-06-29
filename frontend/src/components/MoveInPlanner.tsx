@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
-import type { FurnishingPlan, PlannerInput, RoomType, SavedPlanResponse } from '../types';
-import { generateMoveInPlan, savePlan } from '../api/client';
+import type { FurnishingPlan, PlannerInput, Product, RoomType, SavedPlanResponse } from '../types';
+import { generateMoveInPlan, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
+
+// Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
+// plan that lists prices but can't be clicked through to the store isn't actually shoppable. Mirrors PlanResults.
+function storeUrl(product: Product): string {
+  const url = product.productUrl || product.url || '';
+  return url.startsWith('http') ? url : '';
+}
 
 // Sprint 10.109: Move-In ("Cijeli stan") — the apartment branch of the planner. Self-contained; the single-room
 // flow in Planner.tsx is untouched. Phase 2 (10.110): the budget split is now CATALOG-FLOOR-AWARE and done on
@@ -237,12 +244,34 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                         room behind an unclickable counter — useless when the user is deciding what to buy for
                         each room. Whole-apartment plans are only a few rooms, so the complete list is scannable. */}
                     <ul className="move-in-room-items">
-                      {result.plan.items.map((item) => (
-                        <li key={item.product.id}>
-                          <span>{item.product.name}</span>
-                          <span>{formatCurrency(item.product.price)}</span>
-                        </li>
-                      ))}
+                      {result.plan.items.map((item) => {
+                        const qty = item.quantity && item.quantity > 1 ? item.quantity : 1;
+                        const name = qty > 1 ? `${qty} × ${item.product.name}` : item.product.name;
+                        const lineTotal = item.product.price * qty;
+                        const openUrl = storeUrl(item.product);
+                        return (
+                          <li key={item.product.id}>
+                            {openUrl ? (
+                              <a
+                                className="move-in-item-row move-in-item-link"
+                                href={openUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={t('results.openInStore')}
+                                onClick={() => trackProductClick(result.plan.id, item.product)}
+                              >
+                                <span className="move-in-item-name">{name}</span>
+                                <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
+                              </a>
+                            ) : (
+                              <div className="move-in-item-row">
+                                <span className="move-in-item-name">{name}</span>
+                                <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                     {result.partial && <small className="move-in-room-partial">{t('moveIn.partialRoom')}</small>}
                   </>
