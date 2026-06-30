@@ -114,10 +114,14 @@ const ROOM_CATEGORY_ORDER: Record<RoomType, ProductCategory[]> = {
   studio: ['bed', 'mattress', 'sofa', 'dining-table', 'wardrobe', 'table', 'storage', 'lighting', 'tv-unit', 'rug', 'nightstand', 'textiles', 'decor']
 };
 
+// Sprint 10.155: key the tier label off the STABLE plan id (budget/value/stretch), not the Croatian plan.name.
+// The backend's HR names are display strings; matching logic on them silently breaks the tier label the moment a
+// name is reworded. id↔name (PlannerService.tierName): value="Najbolji izbor", budget="Najjeftinije",
+// stretch="Ljepša verzija".
 const TIER_LABEL_KEYS: Record<string, string> = {
-  'Najbolji izbor': 'results.tierComfort',
-  'Najjeftinije': 'results.tierBasic',
-  'Ljepša verzija': 'results.tierComplete'
+  budget: 'results.tierBasic',
+  value: 'results.tierComfort',
+  stretch: 'results.tierComplete'
 };
 
 const STEP_ORDER = ['buy-first', 'add-comfort', 'later'] as const;
@@ -256,12 +260,12 @@ function localReason(t: Translate, priority: ShoppingPriority) {
 
 function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   if (!plans.length) return null;
-  const preferredName = input.optimizationGoal === 'lowest-price' || input.furnishingLevel === 'basic'
-    ? 'Najjeftinije'
+  const preferredId = input.optimizationGoal === 'lowest-price' || input.furnishingLevel === 'basic'
+    ? 'budget'
     : input.optimizationGoal === 'style-match' || input.furnishingLevel === 'complete'
-    ? 'Ljepša verzija'
-    : 'Najbolji izbor';
-  return plans.find((plan) => plan.name === preferredName)?.id ?? plans.find((plan) => plan.name === 'Najbolji izbor')?.id ?? plans[0].id;
+    ? 'stretch'
+    : 'value';
+  return plans.find((plan) => plan.id === preferredId)?.id ?? plans.find((plan) => plan.id === 'value')?.id ?? plans[0].id;
 }
 
 function decisionLabel(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
@@ -926,7 +930,7 @@ export function PlanResults({
     );
   }
 
-  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans.find((plan) => plan.name === 'Najbolji izbor') ?? plans[0];
+  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans.find((plan) => plan.id === 'value') ?? plans[0];
   const overBudget = selectedPlan.total > input.budget;
   const breakdown = getRetailerBreakdown(selectedPlan);
   const trip = resolveStoreTrip(selectedPlan);
@@ -936,8 +940,8 @@ export function PlanResults({
   const showBudgetBlock = repairTips.length > 0 || budgetTight;
   const missing = missingForRoom(selectedPlan, input);
   const steps = purchaseSteps(selectedPlan, input.roomType);
-  const tier = TIER_LABEL_KEYS[selectedPlan.name]
-    ? t(TIER_LABEL_KEYS[selectedPlan.name])
+  const tier = TIER_LABEL_KEYS[selectedPlan.id]
+    ? t(TIER_LABEL_KEYS[selectedPlan.id])
     : furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
   const selectedFeedback = feedbackByPlan[selectedPlan.id];
   const selectedFix = selectedFeedback ? FEEDBACK_ACTION[selectedFeedback] : undefined;
@@ -1239,7 +1243,7 @@ export function PlanResults({
                 const planOverBudget = plan.total > input.budget;
                 // Sprint 10.153: localize the tier name here too (was the one ungated site → Croatian "Najbolji
                 // izbor" etc. leaked into the compare-versions grid for every non-HR / read-in-English user).
-                const planTier = TIER_LABEL_KEYS[plan.name] ? t(TIER_LABEL_KEYS[plan.name]) : plan.name;
+                const planTier = TIER_LABEL_KEYS[plan.id] ? t(TIER_LABEL_KEYS[plan.id]) : plan.name;
                 return (
                   <button type="button" key={plan.id} className={active ? 'plan-choice-card active' : 'plan-choice-card'} onClick={() => setSelectedPlanId(plan.id)}>
                     <span>{localize ? planTier : plan.name}</span>

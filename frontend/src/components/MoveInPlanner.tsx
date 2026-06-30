@@ -72,11 +72,12 @@ interface RoomPlanResult {
   partial: boolean;
 }
 
-// The 3 tiers come back as "Najjeftinije" / "Najbolji izbor" / "Ljepša verzija" (backend names are stable HR).
-// For the apartment overview we default to the balanced "best value" tier per room.
+// The 3 tiers come back with stable ids budget/value/stretch (plan.name is a Croatian display string).
+// Sprint 10.155: match on the stable id, not the HR name, so a reworded plan.name can't silently break the
+// default pick. For the apartment overview we default to the balanced "value" tier per room.
 function pickBestPlan(plans: FurnishingPlan[]): FurnishingPlan | null {
   if (!plans.length) return null;
-  return plans.find((plan) => plan.name === 'Najbolji izbor') ?? plans[Math.min(1, plans.length - 1)] ?? plans[0];
+  return plans.find((plan) => plan.id === 'value') ?? plans[Math.min(1, plans.length - 1)] ?? plans[0];
 }
 
 export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, seed }: MoveInPlannerProps) {
