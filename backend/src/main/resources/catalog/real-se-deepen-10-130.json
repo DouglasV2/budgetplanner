@@ -560,34 +560,6 @@
   "dataQualityNotes": "Naziv + cijena (SEK) verificirani na jysk.se 2026-06-28 (catalog-deepen 10-130)."
  },
  {
-  "externalId": "jysk-se-hyllor-t-limfjorden-3-dorrar-2st-pk-natu-185",
-  "name": "Hyllor t/LIMFJORDEN 3 dörrar 2st/pk natur vildekfärgad",
-  "retailer": "JYSK",
-  "category": "wardrobe",
-  "price": 185,
-  "productUrl": "https://jysk.se/forvaring/garderobsinredning-och-tillbehor/hyllor-t-limfjorden-3-dorrar-2st-pk-natur-vildekfargad",
-  "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/236344",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "SE",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK SE",
-  "sourceReference": "jysk-se-deepen-10-130",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (SEK) verificirani na jysk.se 2026-06-28 (catalog-deepen 10-130)."
- },
- {
   "externalId": "jysk-se-modulsoffa-oksby-3-sits-schaslong-m-forv-5699",
   "name": "Modulsoffa OKSBY 3-sits schäslong m/förvaring sand tyg",
   "retailer": "JYSK",

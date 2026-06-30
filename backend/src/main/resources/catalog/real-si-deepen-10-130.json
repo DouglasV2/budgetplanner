@@ -560,34 +560,6 @@
   "dataQualityNotes": "Naziv + cijena (EUR) verificirani na jysk.si 2026-06-28 (catalog-deepen 10-130)."
  },
  {
-  "externalId": "jysk-si-vrtna-blazina-za-sedezni-del-lounge-stol-12",
-  "name": "Vrtna blazina za sedežni del lounge stola LODSHOLM tem.rjava",
-  "retailer": "JYSK",
-  "category": "sofa",
-  "price": 11.5,
-  "productUrl": "https://jysk.si/vrt/vrtne-blazine/vrtne-sedezne-blazine/vrtna-blazina-za-sedezni-del-lounge-stola-lodsholm-temrjava",
-  "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/274742",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "living-room"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK SI",
-  "sourceReference": "jysk-si-deepen-10-130",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (EUR) verificirani na jysk.si 2026-06-28 (catalog-deepen 10-130)."
- },
- {
   "externalId": "jysk-si-jedilniska-miza-lintrup-80x140-barva-div-159",
   "name": "Jedilniška miza LINTRUP 80x140 barva divj. naravnega hrasta",
   "retailer": "JYSK",
@@ -629,34 +601,6 @@
   "lastCheckedAt": "2026-06-28",
   "roomTags": [
    "bedroom"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK SI",
-  "sourceReference": "jysk-si-deepen-10-130",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (EUR) verificirani na jysk.si 2026-06-28 (catalog-deepen 10-130)."
- },
- {
-  "externalId": "jysk-si-vrtna-blazina-lounge-za-sedezni-del-stol-12",
-  "name": "Vrtna blazina lounge za sedežni del stola LODSHOLM peščena",
-  "retailer": "JYSK",
-  "category": "sofa",
-  "price": 11.5,
-  "productUrl": "https://jysk.si/vrt/vrtne-blazine/vrtne-sedezne-blazine/vrtna-blazina-lounge-za-sedezni-del-stola-lodsholm-pescena",
-  "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/231045",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "living-room"
   ],
   "styleTags": [
    "modern"
@@ -825,34 +769,6 @@
   "lastCheckedAt": "2026-06-28",
   "roomTags": [
    "dining-room"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK SI",
-  "sourceReference": "jysk-si-deepen-10-130",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (EUR) verificirani na jysk.si 2026-06-28 (catalog-deepen 10-130)."
- },
- {
-  "externalId": "jysk-si-vrtna-blazina-za-sedezni-del-stola-veste-14",
-  "name": "Vrtna blazina za sedežni del stola VESTERHEDE hitro sušeča",
-  "retailer": "JYSK",
-  "category": "sofa",
-  "price": 13.5,
-  "productUrl": "https://jysk.si/vrt/vrtne-blazine/vrtne-sedezne-blazine/vrtna-blazina-za-sedezni-del-stola-vesterhede-hitro-suseca",
-  "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/272807",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "living-room"
   ],
   "styleTags": [
    "modern"

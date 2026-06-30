@@ -784,62 +784,6 @@
   "dataQualityNotes": "Naziv + cijena EUR verificirani na jysk.fi 2026-06-28 (catalog-deepen 10-127)."
  },
  {
-  "externalId": "jysk-fi-sijauspatjat-89.99",
-  "name": "Sijauspatjat",
-  "retailer": "JYSK",
-  "category": "mattress",
-  "price": 89.99,
-  "productUrl": "https://jysk.fi/makuuhuone/patjat/sijauspatjat",
-  "imageUrl": "https://jysk.fi/JYSK.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "FI",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK FI",
-  "sourceReference": "jysk-fi-deepen-10-127",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena EUR verificirani na jysk.fi 2026-06-28 (catalog-deepen 10-127)."
- },
- {
-  "externalId": "jysk-fi-patjansuojukset-69.99",
-  "name": "Patjansuojukset",
-  "retailer": "JYSK",
-  "category": "mattress",
-  "price": 69.99,
-  "productUrl": "https://jysk.fi/makuuhuone/patjat/patjansuojukset",
-  "imageUrl": "https://jysk.fi/JYSK.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "FI",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK FI",
-  "sourceReference": "jysk-fi-deepen-10-127",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena EUR verificirani na jysk.fi 2026-06-28 (catalog-deepen 10-127)."
- },
- {
   "externalId": "jysk-fi-yopoyta-tapdrup-1-laatikko-valkoinen-30",
   "name": "Yöpöytä TAPDRUP 1 laatikko valkoinen",
   "retailer": "JYSK",
