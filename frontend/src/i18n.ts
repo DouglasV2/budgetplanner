@@ -637,7 +637,7 @@ const DICTIONARY: Record<string, Entry> = {
   'results.multiRoomCta': { hr: 'Prebaci na Cijeli stan', en: 'Switch to Whole apartment' },
   'results.scoreFit': { hr: 'Koliko prati želje', en: 'How well it matches your wishes' },
   'results.scoreStyle': { hr: 'Usklađen izgled', en: 'Style consistency' },
-  'results.scoreShopping': { hr: 'Kupnja', en: 'Shopping' },
+  'results.scoreShopping': { hr: 'Lakoća kupnje', en: 'Shopping effort' },
   'results.scoreItemCount': { hr: 'Broj proizvoda', en: 'Number of products' },
   'results.costPerStore': { hr: 'Trošak po trgovini', en: 'Cost per store' },
   'results.skippedForNow': { hr: 'Preskočeno za sada', en: 'Skipped for now' },
