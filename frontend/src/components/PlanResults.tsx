@@ -616,6 +616,12 @@ function ShoppingListCard({ plan, input }: { plan: FurnishingPlan; input: Planne
   );
 }
 
+// Sprint 10.153: the second-hand ("Rabljeno") block is HIDDEN. The eBay matching is title-derived (so it
+// mis-tags pieces, e.g. a TV-stand bracket as a "coffee table") and the cards can only show generic category
+// illustrations (eBay photos aren't verified), so the section confused more than it helped. Flip this to true to
+// bring it back once there's a better used-furniture source + real photos. (The component is kept intact.)
+const SHOW_SECOND_HAND = false;
+
 // Sprint 10.51: the separate "Rabljeno" (second-hand) block. Used marketplace listings (e.g. eBay) shown as
 // an optional, clearly-labelled alternative under the new-retail plan — NEVER counted into any plan total.
 // Honest by design: a "≈" asking price (negotiable), the seller's stated condition, the city, a buyer-beware
@@ -1343,7 +1349,7 @@ export function PlanResults({
             <UnderstandingSummary input={input} />
           </details>
 
-          <SecondHandSection products={secondHandSuggestions} planId={selectedPlan.id} onProductClick={onProductClick} />
+          {SHOW_SECOND_HAND && <SecondHandSection products={secondHandSuggestions} planId={selectedPlan.id} onProductClick={onProductClick} />}
 
           <SharePanel plan={selectedPlan} input={input} onSavePlan={onSavePlan} />
 
