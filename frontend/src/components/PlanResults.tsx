@@ -1237,9 +1237,12 @@ export function PlanResults({
               {plans.map((plan) => {
                 const active = plan.id === selectedPlan.id;
                 const planOverBudget = plan.total > input.budget;
+                // Sprint 10.153: localize the tier name here too (was the one ungated site → Croatian "Najbolji
+                // izbor" etc. leaked into the compare-versions grid for every non-HR / read-in-English user).
+                const planTier = TIER_LABEL_KEYS[plan.name] ? t(TIER_LABEL_KEYS[plan.name]) : plan.name;
                 return (
                   <button type="button" key={plan.id} className={active ? 'plan-choice-card active' : 'plan-choice-card'} onClick={() => setSelectedPlanId(plan.id)}>
-                    <span>{plan.name}</span>
+                    <span>{localize ? planTier : plan.name}</span>
                     <strong>{formatCurrency(plan.total)}</strong>
                     <small>{planOverBudget ? t('results.overBudgetAmount', { amount: formatCurrency(plan.total - input.budget) }) : t('results.remainsAmount', { amount: formatCurrency(input.budget - plan.total) })}</small>
                   </button>
