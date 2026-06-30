@@ -593,7 +593,11 @@ export function Planner() {
 
   // Sprint 10.115: honest out-of-scope banner — when the typed prompt clearly asks for things we don't sell
   // (electronics / appliances / building materials), say so plainly. Deterministic + localized (not AI text).
-  const outOfScope = plans.length > 0 ? detectOutOfScope(submittedPrompt) : null;
+  // Sprint 10.155: do NOT gate this on plans.length. A PURE out-of-scope request (e.g. "washing machine") now
+  // correctly yields an EMPTY plan, and the honest "we don't sell {what}" message is exactly what the user needs
+  // THEN — the old `plans.length > 0` gate suppressed the banner for the most important case (15-market sweep:
+  // appliance prompts returned 0 items in 12/15 markets, so the user saw a generic "no plan" empty state instead).
+  const outOfScope = detectOutOfScope(submittedPrompt);
   const dimensionConstraint = plans.length > 0 && detectDimensionConstraint(submittedPrompt);
   const outOfScopeWhatKey = outOfScope === 'electronics'
     ? 'results.outOfScopeElectronics'
