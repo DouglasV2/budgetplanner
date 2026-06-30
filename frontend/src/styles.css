@@ -190,6 +190,29 @@ a {
   gap: 12px;
 }
 
+/* Sprint 10.152: compact "read in English" toggle. */
+.lang-toggle {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  font-weight: 620;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.lang-toggle:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.lang-toggle.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
 .market-select {
   display: inline-flex;
   align-items: center;

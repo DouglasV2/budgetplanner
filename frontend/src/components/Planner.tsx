@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { generatePlan, generatePlanFast, getDesignSummary, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
-import type { DesignAssistant, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
+import { generatePlan, generatePlanFast, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
+import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
 import { detectOutOfScope } from '../utils/outOfScope';
 import { detectDimensionConstraint } from '../utils/dimensions';
@@ -205,7 +205,7 @@ function SavedPlansInbox({
 }
 
 export function Planner() {
-  const { market, config, setMarket, t } = useLocale();
+  const { market, config, setMarket, t, lang } = useLocale();
   // Sprint 10.63: real auth. When the signed-in user changes (sign-in/out), the saved-plans inbox refetches so
   // the now account-owned plans (migrated from the guest session on first sign-in) appear.
   const { user, openSignIn, billingEnabled, aiEnabled, betaMode } = useAuth();
@@ -243,7 +243,6 @@ export function Planner() {
   // non-Plus owner (i.e. their tier's AI allowance is spent). Dismissible for the session.
   const [aiNudgeDismissed, setAiNudgeDismissed] = useState(false);
   const [partialNotice, setPartialNotice] = useState<string | null>(null);
-  const [design, setDesign] = useState<DesignAssistant | null>(null);
   const [analysis, setAnalysis] = useState<PlannerIntentAnalysis | null>(null);
   // Sprint 10.74 (C): the prompt the user actually typed, captured at submit (response.input.prompt is cleared on
   // the AI path). Used to show a gentle "I wasn't sure — describe a room + budget" nudge on low-confidence input.
@@ -340,7 +339,7 @@ export function Planner() {
       const cfg = marketConfig(detected);
       setMarket(detected);
       setMarketNote(
-        cfg.lang === 'hr'
+        lang === 'hr'
           ? `Tržište postavljeno na ${cfg.label} (iz tvog opisa). Promijeni gore ako nije točno.`
           : `Market set to ${cfg.label} (from your description). Change it above if needed.`
       );
@@ -357,7 +356,6 @@ export function Planner() {
     setError(null);
     setNotice(null);
     setPartialNotice(null);
-    setDesign(null);
     setAnalysis(null);
     setSecondHand([]);
     setRefining(false);
@@ -412,10 +410,6 @@ export function Planner() {
     if (isFinal) {
       setSubmittedPrompt((effectiveInput.prompt ?? '').trim());
       setGenerationCount((count) => count + 1);
-      // Non-blocking AI design description: if it fails the plan still shows.
-      getDesignSummary(response)
-        .then((summary) => setDesign(summary))
-        .catch(() => setDesign(null));
     }
   }
 
@@ -533,7 +527,6 @@ export function Planner() {
     setSecondHand([]);
     if (savedPlan.spaceName) setActiveSpace(savedPlan.spaceName);
     setPartialNotice(null);
-    setDesign(null);
     setAnalysis(null);
     window.history.replaceState({}, '', `/plan/${savedPlan.id}`);
     setNotice(t('planner.noticeOpened'));
@@ -760,22 +753,10 @@ export function Planner() {
         </section>
       )}
 
-      {design && plans.length > 0 && (
-        <section className="design-assistant-card" aria-label={t('planner.designAria')}>
-          <div className="design-assistant-head">
-            <span>{t('planner.designTitle')}</span>
-            <small>{t('planner.designHint')}</small>
-          </div>
-          <p className="design-assistant-summary">{design.summary}</p>
-          {design.highlights.length > 0 && (
-            <ul className="design-assistant-highlights">
-              {design.highlights.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
+      {/* Sprint 10.152: removed the "Design assistant" card — it re-described the plan in a rule-based, backend-
+          HR-only summary (so it showed Croatian even on UK/other markets) and duplicated the plan + the "AI
+          understood" card above. Confusing + a localization leak; dropped. (A real AI design rationale can return
+          later as a proper localized feature.) */}
       </div>
 
       <div hidden={scope !== 'apartment'}>

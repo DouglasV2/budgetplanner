@@ -755,9 +755,11 @@ export function PlanResults({
   submittedPrompt = '',
   secondHandSuggestions = []
 }: PlanResultsProps) {
-  const { t, config } = useLocale();
+  const { t, config, lang } = useLocale();
   // Sprint 10.112: for any non-Croatian locale the backend's Croatian narrative is replaced by localized text.
-  const localize = config.lang !== 'hr';
+  // Sprint 10.152: keyed off the EFFECTIVE language so the "read in English" override also rebuilds the narrative
+  // (an HR user who switches to English gets English text, not the backend's Croatian).
+  const localize = lang !== 'hr';
   const [copiedPlanId, setCopiedPlanId] = useState<string | null>(null);
   const [savingPlanId, setSavingPlanId] = useState<string | null>(null);
   const [feedbackByPlan, setFeedbackByPlan] = useState<Record<string, PlanFeedback>>({});

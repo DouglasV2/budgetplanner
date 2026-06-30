@@ -36,6 +36,9 @@ const DICTIONARY: Record<string, Entry> = {
   'nav.planner': { hr: 'Planer', en: 'Planner' },
   'nav.cta': { hr: 'Složi prostor', en: 'Plan a room' },
   'header.market': { hr: 'Država', en: 'Country' },
+  'header.language': { hr: 'Jezik', en: 'Language' },
+  'header.readEnglish': { hr: 'Pročitaj na engleskom', en: 'Read in English' },
+  'header.readNative': { hr: 'Vrati na jezik države', en: 'Back to your country’s language' },
 
   'planner.eyebrow': { hr: 'Planer za kupnju', en: 'Shopping planner' },
   'planner.heading': { hr: 'Prvo napišeš želju. Desno dobiješ gotov plan.', en: 'Describe what you want. Get a ready plan.' },

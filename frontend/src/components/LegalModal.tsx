@@ -6,7 +6,7 @@ import { useLocale } from '../LocaleContext';
 import { legalDoc, type LegalKey } from '../legal';
 
 export function LegalModal({ docKey, onClose }: { docKey: LegalKey | null; onClose: () => void }) {
-  const { config, t } = useLocale();
+  const { lang, t } = useLocale();
 
   useEffect(() => {
     if (!docKey) return;
@@ -18,7 +18,7 @@ export function LegalModal({ docKey, onClose }: { docKey: LegalKey | null; onClo
   }, [docKey, onClose]);
 
   if (!docKey) return null;
-  const doc = legalDoc(config.lang, docKey);
+  const doc = legalDoc(lang, docKey);
 
   return (
     <div className="legal-overlay" role="dialog" aria-modal="true" aria-label={doc.title} onClick={onClose}>

@@ -11,7 +11,7 @@ import { SignOutDialog } from './SignOutDialog';
 // header: a full-width sticky bar with a subtle bottom hairline, contained content (.header-inner shell), and
 // plain-text nav links (no segmented pill).
 export function Header() {
-  const { market, setMarket, t } = useLocale();
+  const { market, setMarket, t, config, englishOverride, setEnglishOverride } = useLocale();
   const { user, loading, googleEnabled, openSignIn } = useAuth();
   // Sprint 10.150: a custom in-app confirm dialog for sign-out (replaces the native window.confirm).
   const [signingOut, setSigningOut] = useState(false);
@@ -50,6 +50,20 @@ export function Header() {
               ))}
             </select>
           </label>
+          {/* Sprint 10.152: read-in-English toggle for visitors on a non-English market. Shows "EN" to switch to
+              English, or the market's language code (e.g. "HR") to switch back. Currency/market are unaffected. */}
+          {config.lang !== 'en' && (
+            <button
+              type="button"
+              className={englishOverride ? 'lang-toggle active' : 'lang-toggle'}
+              aria-label={t('header.language')}
+              aria-pressed={englishOverride}
+              title={englishOverride ? t('header.readNative') : t('header.readEnglish')}
+              onClick={() => setEnglishOverride(!englishOverride)}
+            >
+              {englishOverride ? config.lang.toUpperCase() : 'EN'}
+            </button>
+          )}
           {user ? (
             <div className="header-user">
               {user.pictureUrl
