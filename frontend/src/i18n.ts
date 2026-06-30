@@ -522,6 +522,7 @@ const DICTIONARY: Record<string, Entry> = {
   'auth.guestNote': { hr: 'Možeš i bez prijave — tada se planovi spremaju samo u ovaj preglednik.', en: 'You can skip it — your plans are then saved only in this browser.' },
   'auth.signIn': { hr: 'Prijava', en: 'Sign in' },
   'auth.signOut': { hr: 'Odjava', en: 'Sign out' },
+  'auth.signOutConfirm': { hr: 'Želiš li se odjaviti?', en: 'Sign out?' },
   'auth.signedInAs': { hr: 'Prijavljen kao {name}', en: 'Signed in as {name}' },
   'auth.signInError': { hr: 'Prijava nije uspjela. Pokušaj ponovno.', en: 'Sign-in failed. Please try again.' },
 

@@ -1,6 +1,7 @@
 import { MARKETS } from '../markets';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
+import { googleStartUrl } from '../api/client';
 import { BrandMark } from './BrandMark';
 
 // Sprint 10.146: the header was a floating rounded "pill bar" (border-radius + shadow + float gap) with a
@@ -9,7 +10,23 @@ import { BrandMark } from './BrandMark';
 // plain-text nav links (no segmented pill).
 export function Header() {
   const { market, setMarket, t } = useLocale();
-  const { user, loading, signOut, openSignIn } = useAuth();
+  const { user, loading, googleEnabled, signOut, openSignIn } = useAuth();
+
+  // Sprint 10.150: sign out only after a confirm ("da/ne").
+  function confirmSignOut() {
+    if (window.confirm(t('auth.signOutConfirm'))) void signOut();
+  }
+
+  // Sprint 10.150: the header "Prijava" goes STRAIGHT to the Google redirect when sign-in is configured — no
+  // dependency on the gate's open/close state (which is what could get stuck after a sign-in/out cycle). Falls
+  // back to opening the gate (with its guest option / disabled placeholder) when Google isn't configured.
+  function startSignIn() {
+    if (googleEnabled) {
+      window.location.href = googleStartUrl();
+    } else {
+      openSignIn();
+    }
+  }
 
   return (
     <header className="header">
@@ -39,10 +56,10 @@ export function Header() {
                 ? <img className="header-avatar" src={user.pictureUrl} alt="" referrerPolicy="no-referrer" />
                 : <span className="header-avatar header-avatar-fallback" aria-hidden="true">{(user.name || user.email || '?').slice(0, 1).toUpperCase()}</span>}
               <span className="header-user-name">{user.name || user.email}</span>
-              <button type="button" className="header-signout" onClick={() => void signOut()}>{t('auth.signOut')}</button>
+              <button type="button" className="header-signout" onClick={confirmSignOut}>{t('auth.signOut')}</button>
             </div>
           ) : (
-            !loading && <button type="button" className="header-signin" onClick={openSignIn}>{t('auth.signIn')}</button>
+            !loading && <button type="button" className="header-signin" onClick={startSignIn}>{t('auth.signIn')}</button>
           )}
           <a className="nav-cta" href="#planner">{t('nav.cta')}</a>
         </div>
