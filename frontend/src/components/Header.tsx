@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { MARKETS } from '../markets';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
 import { googleStartUrl } from '../api/client';
 import { BrandMark } from './BrandMark';
+import { SignOutDialog } from './SignOutDialog';
 
 // Sprint 10.146: the header was a floating rounded "pill bar" (border-radius + shadow + float gap) with a
 // gray-pill nav — both classic AI/template tells (founder-flagged). Reworked into a clean full-bleed flush
@@ -10,12 +12,9 @@ import { BrandMark } from './BrandMark';
 // plain-text nav links (no segmented pill).
 export function Header() {
   const { market, setMarket, t } = useLocale();
-  const { user, loading, googleEnabled, signOut, openSignIn } = useAuth();
-
-  // Sprint 10.150: sign out only after a confirm ("da/ne").
-  function confirmSignOut() {
-    if (window.confirm(t('auth.signOutConfirm'))) void signOut();
-  }
+  const { user, loading, googleEnabled, openSignIn } = useAuth();
+  // Sprint 10.150: a custom in-app confirm dialog for sign-out (replaces the native window.confirm).
+  const [signingOut, setSigningOut] = useState(false);
 
   // Sprint 10.150: the header "Prijava" goes STRAIGHT to the Google redirect when sign-in is configured — no
   // dependency on the gate's open/close state (which is what could get stuck after a sign-in/out cycle). Falls
@@ -29,6 +28,7 @@ export function Header() {
   }
 
   return (
+    <>
     <header className="header">
       <div className="header-inner shell">
         <a className="brand" href="#top" aria-label="BudgetSpace">
@@ -56,7 +56,7 @@ export function Header() {
                 ? <img className="header-avatar" src={user.pictureUrl} alt="" referrerPolicy="no-referrer" />
                 : <span className="header-avatar header-avatar-fallback" aria-hidden="true">{(user.name || user.email || '?').slice(0, 1).toUpperCase()}</span>}
               <span className="header-user-name">{user.name || user.email}</span>
-              <button type="button" className="header-signout" onClick={confirmSignOut}>{t('auth.signOut')}</button>
+              <button type="button" className="header-signout" onClick={() => setSigningOut(true)}>{t('auth.signOut')}</button>
             </div>
           ) : (
             !loading && <button type="button" className="header-signin" onClick={startSignIn}>{t('auth.signIn')}</button>
@@ -65,5 +65,7 @@ export function Header() {
         </div>
       </div>
     </header>
+    {signingOut && <SignOutDialog onClose={() => setSigningOut(false)} />}
+    </>
   );
 }

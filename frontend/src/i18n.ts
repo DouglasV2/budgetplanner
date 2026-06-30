@@ -523,6 +523,7 @@ const DICTIONARY: Record<string, Entry> = {
   'auth.signIn': { hr: 'Prijava', en: 'Sign in' },
   'auth.signOut': { hr: 'Odjava', en: 'Sign out' },
   'auth.signOutConfirm': { hr: 'Želiš li se odjaviti?', en: 'Sign out?' },
+  'auth.signOutBody': { hr: 'Spremljeni planovi ostaju vezani uz tvoj račun — prijavi se ponovno kad god želiš.', en: 'Your saved plans stay linked to your account — sign back in whenever you like.' },
   'auth.signedInAs': { hr: 'Prijavljen kao {name}', en: 'Signed in as {name}' },
   'auth.signInError': { hr: 'Prijava nije uspjela. Pokušaj ponovno.', en: 'Sign-in failed. Please try again.' },
 

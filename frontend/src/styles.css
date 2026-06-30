@@ -4841,6 +4841,21 @@ a.google-signin-button.google-signin-link:hover {
   background: #b3261e;
   color: #fff;
 }
+/* Sprint 10.150: neutral primary confirm (sign-out isn't destructive — no red). Same shape as confirm-delete. */
+.confirm-primary {
+  border: 1px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 620;
+  cursor: pointer;
+  background: var(--ink);
+  color: #fff;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.confirm-primary:hover {
+  background: #000;
+  border-color: #000;
+}
 
 .confirm-delete:disabled,
 .confirm-cancel:disabled {
