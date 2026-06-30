@@ -78,4 +78,42 @@ class AuthControllerTest {
         String setCookie = response.getHeader(HttpHeaders.SET_COOKIE);
         assertThat(setCookie).contains("bs_auth=").contains("Max-Age=0");
     }
+
+    // --- OAuth redirect callback: CSRF state guard (Sprint 10.149). These rejection branches short-circuit
+    // BEFORE the server-side token exchange, so they never make a network call. They prove a callback with a
+    // bad/missing state can't mint a session — the constant-time state compare is the CSRF defence. ---
+
+    @Test
+    void oauthCallbackWithAProviderErrorRedirectsToErrorAndMintsNoSession() throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.googleCallback(null, null, "access_denied", null, response);
+
+        assertThat(response.getRedirectedUrl()).contains("login=error");
+        verify(authService, never()).login(any(), any());
+    }
+
+    @Test
+    void oauthCallbackWithoutACodeRedirectsToError() throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.googleCallback(null, "state-a", null, "state-a|guest-1", response);
+
+        assertThat(response.getRedirectedUrl()).contains("login=error");
+        verify(authService, never()).login(any(), any());
+    }
+
+    @Test
+    void oauthCallbackWithMismatchedStateIsRejectedAsCsrfAndMintsNoSession() throws Exception {
+        // The returned state ("state-a") does NOT match the one stored in the cookie ("state-b") → forged
+        // callback → rejected with no token exchange and no session.
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.googleCallback("auth-code-xyz", "state-a", null, "state-b|guest-1", response);
+
+        assertThat(response.getRedirectedUrl()).contains("login=error");
+        verify(authService, never()).login(any(), any());
+        // The one-time state cookie is cleared on every callback.
+        assertThat(response.getHeader(HttpHeaders.SET_COOKIE)).contains("bs_oauth=").contains("Max-Age=0");
+    }
 }
