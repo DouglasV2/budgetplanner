@@ -469,7 +469,12 @@ public class PlannerService {
             // step up from "Najjeftinije", not identical to it); the STRETCH tier only spends up when the
             // user signalled quality/focused (its own price bias still drives the balanced splurge tier).
             double perItemTarget = 0;
-            if (mode.equals("value") || (preferQuality && !mode.equals("budget"))) {
+            // Sprint 10.155: the STRETCH tier now ALSO uses a per-item spend target (not the old uncapped
+            // "most-expensive-wins" price bias). That bias picked the single priciest SKU per category and then
+            // repairBudget stripped every optional chasing the budget, leaving a degenerate 2-3 item plan at 2x
+            // budget (15-market sweep: NO 40796/20000, HR 3953/1800). A target makes stretch a NICER but COMPLETE
+            // room near/just-over budget. budget mode still floors to cheapest (no target).
+            if (mode.equals("value") || mode.equals("stretch") || (preferQuality && !mode.equals("budget"))) {
                 double totalWeight = 0;
                 for (int j = i; j < categories.size(); j++) totalWeight += categoryWeight(input.roomType(), categories.get(j));
                 perItemTarget = spendTarget(remaining, categoryWeight(input.roomType(), category), totalWeight, mode, preferQuality);
@@ -605,7 +610,10 @@ public class PlannerService {
         // hard-caps value at the stated budget (it down-tiers even core items if needed), so aiming higher can't
         // blow the budget. Reaching mid-tier also surfaces local retailers the cheapest-bias never picked.
         double factor = switch (mode) {
-            case "stretch" -> preferQuality ? 1.05 : 0.9;
+            // Sprint 10.155: stretch always aims ~5% over its weighted share (a "nicer, complete" splurge that
+            // leans just over budget), whether or not quality was signalled — repairBudget's 12% stretch headroom
+            // keeps the resulting room full instead of trimming it. (Was 0.9 for balanced + a separate price bias.)
+            case "stretch" -> 1.05;
             case "value" -> preferQuality ? 0.85 : 0.75;
             default -> 0.6;
         };
@@ -843,7 +851,11 @@ public class PlannerService {
     // categories are never dropped.
     private List<PlanItemDto> repairBudget(PlannerInputDto input, List<PlanItemDto> items, String mode) {
         List<PlanItemDto> working = new ArrayList<>(items);
-        double budget = input.budget();
+        // Sprint 10.155: the stretch ("splurge") tier may sit modestly over the stated budget for a NICER, COMPLETE
+        // room, so it tolerates up to 12% over before trimming optionals — otherwise it gets stripped to a few
+        // expensive core pieces. value/budget keep the hard budget ceiling. (overBudgetAmount, shown to the user, is
+        // still measured against the real input.budget() in calculatePlan — this only relaxes the internal trim.)
+        double budget = input.budget() * ("stretch".equals(mode) ? 1.12 : 1.0);
         if (sumPrice(working) <= budget) return working;
 
         Set<String> protectedCats = new LinkedHashSet<>(CORE_CATEGORIES_BY_ROOM.getOrDefault(input.roomType(), Set.of()));
