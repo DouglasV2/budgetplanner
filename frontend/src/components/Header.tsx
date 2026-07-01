@@ -40,42 +40,48 @@ export function Header() {
           <a href="#planner">{t('nav.planner')}</a>
         </nav>
         <div className="header-actions">
-          <label className="market-select" aria-label={t('header.market')}>
-            <span className="market-select-label">{t('header.market')}</span>
-            <select value={market} onChange={(event) => setMarket(event.target.value)}>
-              {MARKETS.map((option) => (
-                <option key={option.code} value={option.code}>
-                  {option.flag} {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          {/* Sprint 10.152: read-in-English toggle for visitors on a non-English market. Shows "EN" to switch to
-              English, or the market's language code (e.g. "HR") to switch back. Currency/market are unaffected. */}
-          {config.lang !== 'en' && (
-            <button
-              type="button"
-              className={englishOverride ? 'lang-toggle active' : 'lang-toggle'}
-              aria-label={t('header.language')}
-              aria-pressed={englishOverride}
-              title={englishOverride ? t('header.readNative') : t('header.readEnglish')}
-              onClick={() => setEnglishOverride(!englishOverride)}
-            >
-              {englishOverride ? config.lang.toUpperCase() : 'EN'}
-            </button>
-          )}
-          {user ? (
-            <div className="header-user">
-              {user.pictureUrl
-                ? <img className="header-avatar" src={user.pictureUrl} alt="" referrerPolicy="no-referrer" />
-                : <span className="header-avatar header-avatar-fallback" aria-hidden="true">{(user.name || user.email || '?').slice(0, 1).toUpperCase()}</span>}
-              <span className="header-user-name">{user.name || user.email}</span>
-              <button type="button" className="header-signout" onClick={() => setSigningOut(true)}>{t('auth.signOut')}</button>
-            </div>
-          ) : (
-            !loading && <button type="button" className="header-signin" onClick={startSignIn}>{t('auth.signIn')}</button>
-          )}
-          <a className="nav-cta" href="#planner">{t('nav.cta')}</a>
+          {/* Sprint 10.156: the header right side is now two clearly-grouped clusters split by a hairline —
+              a subtle UTILITY group (country + read-in-English) and a PRIMARY group (sign-in + the CTA) —
+              so it reads as an intentionally designed bar, not a row of mismatched controls. */}
+          <div className="header-utility">
+            <label className="market-select" aria-label={t('header.market')}>
+              <select value={market} onChange={(event) => setMarket(event.target.value)}>
+                {MARKETS.map((option) => (
+                  <option key={option.code} value={option.code}>
+                    {option.flag} {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {/* Read-in-English toggle for visitors on a non-English market. Shows "EN" to switch to English,
+                or the market's language code (e.g. "HR") to switch back. Currency/market are unaffected. */}
+            {config.lang !== 'en' && (
+              <button
+                type="button"
+                className={englishOverride ? 'lang-toggle active' : 'lang-toggle'}
+                aria-label={t('header.language')}
+                aria-pressed={englishOverride}
+                title={englishOverride ? t('header.readNative') : t('header.readEnglish')}
+                onClick={() => setEnglishOverride(!englishOverride)}
+              >
+                {englishOverride ? config.lang.toUpperCase() : 'EN'}
+              </button>
+            )}
+          </div>
+          <div className="header-primary">
+            {user ? (
+              <div className="header-user">
+                {user.pictureUrl
+                  ? <img className="header-avatar" src={user.pictureUrl} alt="" referrerPolicy="no-referrer" />
+                  : <span className="header-avatar header-avatar-fallback" aria-hidden="true">{(user.name || user.email || '?').slice(0, 1).toUpperCase()}</span>}
+                <span className="header-user-name">{user.name || user.email}</span>
+                <button type="button" className="header-signout" onClick={() => setSigningOut(true)}>{t('auth.signOut')}</button>
+              </div>
+            ) : (
+              !loading && <button type="button" className="header-signin" onClick={startSignIn}>{t('auth.signIn')}</button>
+            )}
+            <a className="nav-cta" href="#planner">{t('nav.cta')}</a>
+          </div>
         </div>
       </div>
     </header>

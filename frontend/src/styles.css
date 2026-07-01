@@ -158,8 +158,15 @@ a {
 }
 
 .nav-cta {
-  padding: 11px 18px;
+  height: 36px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 18px;
+  border-radius: 10px;
   background: linear-gradient(135deg, var(--ink), #4a3828);
+  /* Sprint 10.156: a subtle lift, not the big glowy drop shadow (which reads amateurish on a nav button). */
+  box-shadow: 0 6px 16px rgba(31, 29, 26, 0.15);
 }
 
 .primary-button,
@@ -183,26 +190,46 @@ a {
   transform: translateY(-2px);
 }
 
-/* Sprint 10.13 (#3): country/market selector in the header. */
+/* Sprint 10.156: header right side — two grouped clusters (utility | primary) split by a hairline, on ONE
+   consistent control system (36px height, 10px radius, --line border) so it reads designed, not vibe-coded. */
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+}
+.header-utility {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 16px;
+  border-right: 1px solid var(--hairline);
+}
+.header-primary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Sprint 10.152: compact "read in English" toggle. */
+/* The country select + the read-in-English toggle share ONE chip look (subtle "settings" weight). */
+.market-select {
+  display: inline-flex;
+}
+.market-select select,
 .lang-toggle {
+  height: 36px;
+  box-sizing: border-box;
   border: 1px solid var(--line);
-  background: transparent;
+  background: rgba(255, 255, 255, 0.55);
   color: var(--ink-soft);
-  font-weight: 620;
-  font-size: 0.8rem;
-  letter-spacing: 0.02em;
-  padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 640;
+  letter-spacing: 0.01em;
+  padding: 0 12px;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
+.market-select select:hover,
 .lang-toggle:hover {
   border-color: var(--ink);
   color: var(--ink);
@@ -213,31 +240,22 @@ a {
   color: #fff;
 }
 
-.market-select {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 0.82rem;
-}
-
-.market-select-label {
-  color: var(--muted, #6b6257);
-  font-weight: 700;
-}
-
+/* Custom chevron on the country select — kills the raw OS dropdown arrow (the biggest vibe-coded tell). */
 .market-select select {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  appearance: none;
+  -webkit-appearance: none;
   color: var(--ink);
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-weight: 760;
-  cursor: pointer;
+  font-weight: 680;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b463e' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
 }
 
-@media (max-width: 720px) {
-  .market-select-label {
-    display: none;
+@media (max-width: 760px) {
+  .header-utility {
+    padding-right: 12px;
+    gap: 6px;
   }
 }
 
@@ -3998,18 +4016,24 @@ a.google-signin-button.google-signin-link:hover {
 
 .header-signin,
 .header-signout {
+  height: 36px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
+  border-radius: 10px;
+  background: transparent;
   color: var(--ink);
-  font-weight: 620;
+  font-weight: 640;
   font-size: 0.85rem;
-  padding: 7px 14px;
+  padding: 0 14px;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .header-signin:hover,
 .header-signout:hover {
+  border-color: var(--ink);
   background: rgba(31, 29, 26, 0.04);
 }
 
