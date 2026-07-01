@@ -221,6 +221,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-ikea-kitchen-lighting-10-100.json",
             // Sprint 10.117: HR soft furnishings (curtains/cushions/throws), IKEA + JYSK, web-verified live.
             "/catalog/real-hr-textiles.json",
+            // Sprint 10.155: textiles for the 12 non-HR markets (were 0). 93 IKEA curtains/cushions/throws ported
+            // via the global article-number trick to each market's IKEA site, then EACH re-fetched live (localized
+            // name + per-market price/currency + verified og:image + real /p/ product URL); anything that 404'd or
+            // redirected to a category page was dropped (no fabrication). Fills the biggest catalog gap the
+            // 15-market sweep surfaced (non-HR comfort plans never got a textile).
+            "/catalog/real-eu-textiles-10-155.json",
             // Sprint 10.126: catalog DEEPENING for the 4 thinnest markets (FR/IT/FI/PT), skewed mid-to-upper
             // price so plans there can actually fill a bigger budget (premium 89 / standard 71 / budget 23).
             // Discovered by a web-search workflow, then EVERY product deterministically re-fetched: live JSON-LD
