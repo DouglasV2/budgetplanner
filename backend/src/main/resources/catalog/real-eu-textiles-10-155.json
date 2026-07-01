@@ -3249,5 +3249,1259 @@
   "sourceReference": "nonhr-textiles-10-155",
   "dataQuality": "complete",
   "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
+ },
+ {
+  "externalId": "ikea-gb-txt-50417812",
+  "name": "MAJGULL grey, Block-out curtains, 1 pair, 145x250 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 40.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/majgull-block-out-curtains-1-pair-grey-with-heading-tape-50417812/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/majgull-block-out-curtains-1-pair-grey-with-heading-tape__0597001_pe676987_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "grey"
+  ],
+  "priceTier": "standard",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-50586027",
+  "name": "MAJGULL block-out curtains, 1 pair, dark green/with heading tape, 145x250 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 40.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/majgull-block-out-curtains-1-pair-dark-green-with-heading-tape-50586027/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/majgull-block-out-curtains-1-pair-dark-green-with-heading-tape__1279699_pe931575_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "green"
+  ],
+  "priceTier": "standard",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-30346750",
+  "name": "MAJGULL light grey, Room darkening curtains, 1 pair, 145x250 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 40.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/majgull-room-darkening-curtains-1-pair-light-grey-with-heading-tape-30346750/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/majgull-room-darkening-curtains-1-pair-light-grey-with-heading-tape__0598870_pe677879_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "grey"
+  ],
+  "priceTier": "standard",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-40111987",
+  "name": "MERETE room darkening curtains, 1 pair, white/with eyelets, 145x250 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 29.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/merete-room-darkening-curtains-1-pair-white-with-eyelets-40111987/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/merete-room-darkening-curtains-1-pair-white-with-eyelets__74221_pe190980_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "standard",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-50598737",
+  "name": "GURLI cushion cover, dark grey, 50x50 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 3.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/gurli-cushion-cover-dark-grey-50598737/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/gurli-cushion-cover-dark-grey__1344343_pe949854_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "grey"
+  ],
+  "priceTier": "budget",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-20598748",
+  "name": "GURLI cushion cover, green, 50x50 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 3.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/gurli-cushion-cover-green-20598748/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/gurli-cushion-cover-green__1344351_pe949846_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "green"
+  ],
+  "priceTier": "budget",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-40598771",
+  "name": "GURLI cushion cover, red, 50x50 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 3.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/gurli-cushion-cover-red-40598771/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/gurli-cushion-cover-red__1413143_pe974186_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "pink"
+  ],
+  "priceTier": "budget",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-50590897",
+  "name": "SANELA cushion cover, light beige, 50x50 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 5.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/sanela-cushion-cover-light-beige-50590897/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/sanela-cushion-cover-light-beige__1284678_pe933086_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "beige"
+  ],
+  "priceTier": "budget",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-20542105",
+  "name": "DYTÅG throw, off-white, 130x170 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 35.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/dytag-throw-off-white-20542105/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/dytag-throw-off-white__1157585_pe887776_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "standard",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-80549547",
+  "name": "HUMLEMOTT throw, blue-grey, 130x170 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 19.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/humlemott-throw-blue-grey-80549547/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/humlemott-throw-blue-grey__1146916_pe883170_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "blue"
+  ],
+  "priceTier": "standard",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-gb-txt-70581057",
+  "name": "INDIRA bedspread, natural/unbleached cotton, 230x250 cm  - IKEA UK",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 19.0,
+  "productUrl": "https://www.ikea.com/gb/en/p/indira-bedspread-natural-unbleached-cotton-70581057/",
+  "imageUrl": "https://www.ikea.com/gb/en/images/products/indira-bedspread-natural-unbleached-cotton__1259115_pe926530_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "natural"
+  ],
+  "priceTier": "standard",
+  "market": "GB",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA GB",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + GBP price + image verified live on ikea.com/gb 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-20598748",
+  "name": "GURLI housse de coussin, vert, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 2.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/gurli-housse-de-coussin-vert-20598748/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/gurli-housse-de-coussin-vert__1344351_pe949846_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "green"
+  ],
+  "priceTier": "budget",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-90598759",
+  "name": "GURLI housse de coussin, jaune, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 2.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/gurli-housse-de-coussin-jaune-90598759/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/gurli-housse-de-coussin-jaune__1413144_pe974185_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "yellow"
+  ],
+  "priceTier": "budget",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-90111980",
+  "name": "LILL rideaux filet, 2 pièces, blanc/avec ourlet pour tringle, 280x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 3.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/lill-rideaux-filet-2-pieces-blanc-avec-ourlet-pour-tringle-90111980/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/lill-rideaux-filet-2-pieces-blanc-avec-ourlet-pour-tringle__0099863_pe242253_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "budget",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-70554129",
+  "name": "DYTÅG housse de coussin, gris vert, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 12.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/dytag-housse-de-coussin-gris-vert-70554129/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/dytag-housse-de-coussin-gris-vert__1157569_pe887764_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "green"
+  ],
+  "priceTier": "budget",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-30528482",
+  "name": "DYTÅG housse de coussin, beige foncé, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 12.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/dytag-housse-de-coussin-beige-fonce-30528482/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/dytag-housse-de-coussin-beige-fonce__1052104_pe845935_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "beige"
+  ],
+  "priceTier": "budget",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-40615049",
+  "name": "GULLSTRÅLE couvre-lit, beige clair, 230x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 29.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/gullstrale-couvre-lit-beige-clair-40615049/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/gullstrale-couvre-lit-beige-clair__1404905_pe970260_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "beige"
+  ],
+  "priceTier": "standard",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-10534747",
+  "name": "MAJGULL rideaux occultants, 2 pièces, gris/avec oeillets, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 39.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/majgull-rideaux-occultants-2-pieces-gris-avec-oeillets-10534747/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/majgull-rideaux-occultants-2-pieces-gris-avec-oeillets__0682452_pe720456_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "grey"
+  ],
+  "priceTier": "standard",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fr-txt-40111987",
+  "name": "MERETE rideaux assombrissants, 2 pièces, blanc/avec oeillets, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 39.99,
+  "productUrl": "https://www.ikea.com/fr/fr/p/merete-rideaux-assombrissants-2-pieces-blanc-avec-oeillets-40111987/",
+  "imageUrl": "https://www.ikea.com/fr/fr/images/products/merete-rideaux-assombrissants-2-pieces-blanc-avec-oeillets__74221_pe190980_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "standard",
+  "market": "FR",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FR",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fr 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-no-txt-80598731",
+  "name": "GURLI Putetrekk, ubleket, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 49.0,
+  "productUrl": "https://www.ikea.com/no/no/p/gurli-putetrekk-ubleket-80598731/",
+  "imageUrl": "https://www.ikea.com/no/no/images/products/gurli-putetrekk-ubleket__1409327_pe972205_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "natural"
+  ],
+  "priceTier": "budget",
+  "market": "NO",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA NO",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-no-txt-20602694",
+  "name": "DAGGKÅPOR Pledd, grønn, 130x170 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 59.0,
+  "productUrl": "https://www.ikea.com/no/no/p/daggkapor-pledd-gronn-20602694/",
+  "imageUrl": "https://www.ikea.com/no/no/images/products/daggkapor-pledd-gronn__1346593_pe951066_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "green"
+  ],
+  "priceTier": "budget",
+  "market": "NO",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA NO",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-no-txt-10515466",
+  "name": "GUNNEMOR Pledd, offwhite/gråbeige, 130x170 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 129.0,
+  "productUrl": "https://www.ikea.com/no/no/p/gunnemor-pledd-offwhite-grabeige-10515466/",
+  "imageUrl": "https://www.ikea.com/no/no/images/products/gunnemor-pledd-offwhite-grabeige__1033633_pe837370_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "beige"
+  ],
+  "priceTier": "budget",
+  "market": "NO",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA NO",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-no-txt-30582110",
+  "name": "SANDBRODD Pledd, mørk gul, 130x170 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 149.0,
+  "productUrl": "https://www.ikea.com/no/no/p/sandbrodd-pledd-mork-gul-30582110/",
+  "imageUrl": "https://www.ikea.com/no/no/images/products/sandbrodd-pledd-mork-gul__1259980_pe926867_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "yellow"
+  ],
+  "priceTier": "budget",
+  "market": "NO",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA NO",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-no-txt-90617593",
+  "name": "NÄTNÄVA Pledd, beige, 130x170 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 399.0,
+  "productUrl": "https://www.ikea.com/no/no/p/naetnaeva-pledd-beige-90617593/",
+  "imageUrl": "https://www.ikea.com/no/no/images/products/naetnaeva-pledd-beige__1433447_pe983256_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "beige"
+  ],
+  "priceTier": "standard",
+  "market": "NO",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA NO",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-no-txt-50396758",
+  "name": "TIBAST Gardiner, 1 par, hvit/med multibånd, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 499.0,
+  "productUrl": "https://www.ikea.com/no/no/p/tibast-gardiner-1-par-hvit-50396758/",
+  "imageUrl": "https://www.ikea.com/no/no/images/products/tibast-gardiner-1-par-hvit-med-multiband__0550099_pe658042_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "standard",
+  "market": "NO",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA NO",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-no-txt-10572206",
+  "name": "LAPPTÅG Pledd, offwhite, 130x170 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 499.0,
+  "productUrl": "https://www.ikea.com/no/no/p/lapptag-pledd-offwhite-10572206/",
+  "imageUrl": "https://www.ikea.com/no/no/images/products/lapptag-pledd-offwhite__1249622_pe923392_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "beige"
+  ],
+  "priceTier": "standard",
+  "market": "NO",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA NO",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fi-txt-10598763",
+  "name": "GURLI tyynynpäällinen, musta, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 3.19,
+  "productUrl": "https://www.ikea.com/fi/fi/p/gurli-tyynynpaeaellinen-musta-10598763/",
+  "imageUrl": "https://www.ikea.com/fi/fi/images/products/gurli-tyynynpaeaellinen-musta__1373598_pe960023_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "black"
+  ],
+  "priceTier": "budget",
+  "market": "FI",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FI",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fi 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fi-txt-90598759",
+  "name": "GURLI tyynynpäällinen, keltainen, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 3.19,
+  "productUrl": "https://www.ikea.com/fi/fi/p/gurli-tyynynpaeaellinen-keltainen-90598759/",
+  "imageUrl": "https://www.ikea.com/fi/fi/images/products/gurli-tyynynpaeaellinen-keltainen__1413144_pe974185_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "yellow"
+  ],
+  "priceTier": "budget",
+  "market": "FI",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FI",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fi 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fi-txt-30584623",
+  "name": "KLIPPOXEL huopa, sininen, 130x170 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 19.99,
+  "productUrl": "https://www.ikea.com/fi/fi/p/klippoxel-huopa-sininen-30584623/",
+  "imageUrl": "https://www.ikea.com/fi/fi/images/products/klippoxel-huopa-sininen__1284706_pe933111_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "blue"
+  ],
+  "priceTier": "standard",
+  "market": "FI",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FI",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fi 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fi-txt-80614934",
+  "name": "LENDA verhot+pidikkeet, 2 kpl, vaalea roosa/laskosnauha, 140x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 24.99,
+  "productUrl": "https://www.ikea.com/fi/fi/p/lenda-verhot-pidikkeet-2-kpl-vaalea-roosa-laskosnauha-80614934/",
+  "imageUrl": "https://www.ikea.com/fi/fi/images/products/lenda-verhot-pidikkeet-2-kpl-vaalea-roosa-laskosnauha__1405424_pe970479_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "pink"
+  ],
+  "priceTier": "standard",
+  "market": "FI",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FI",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fi 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fi-txt-30346750",
+  "name": "MAJGULL osittain pimentävät verhot, 2 kpl, vaaleanharmaa/laskosnauha, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 37.99,
+  "productUrl": "https://www.ikea.com/fi/fi/p/majgull-osittain-pimentaevaet-verhot-2-kpl-vaaleanharmaa-laskosnauha-30346750/",
+  "imageUrl": "https://www.ikea.com/fi/fi/images/products/majgull-osittain-pimentaevaet-verhot-2-kpl-vaaleanharmaa-laskosnauha__0598870_pe677879_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "grey"
+  ],
+  "priceTier": "standard",
+  "market": "FI",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FI",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fi 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-fi-txt-40111987",
+  "name": "MERETE osittain pimentävät verhot, 2 kpl, valkoinen/purjerenkailla, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 39.99,
+  "productUrl": "https://www.ikea.com/fi/fi/p/merete-osittain-pimentaevaet-verhot-2-kpl-valkoinen-purjerenkailla-40111987/",
+  "imageUrl": "https://www.ikea.com/fi/fi/images/products/merete-osittain-pimentaevaet-verhot-2-kpl-valkoinen-purjerenkailla__74221_pe190980_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "standard",
+  "market": "FI",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA FI",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/fi 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-se-txt-80598731",
+  "name": "GURLI Kuddfodral, oblekt, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 29.0,
+  "productUrl": "https://www.ikea.com/se/sv/p/gurli-kuddfodral-oblekt-80598731/",
+  "imageUrl": "https://www.ikea.com/se/sv/images/products/gurli-kuddfodral-oblekt__1409327_pe972205_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "natural"
+  ],
+  "priceTier": "budget",
+  "market": "SE",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA SE",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-se-txt-40590930",
+  "name": "SANELA Kuddfodral, blå, 50x50 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 79.0,
+  "productUrl": "https://www.ikea.com/se/sv/p/sanela-kuddfodral-bla-40590930/",
+  "imageUrl": "https://www.ikea.com/se/sv/images/products/sanela-kuddfodral-bla__1284654_pe933062_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "blue"
+  ],
+  "priceTier": "budget",
+  "market": "SE",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA SE",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-se-txt-70581057",
+  "name": "INDIRA Överkast, natur/oblekt bomull, 230x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 199.0,
+  "productUrl": "https://www.ikea.com/se/sv/p/indira-oeverkast-natur-oblekt-bomull-70581057/",
+  "imageUrl": "https://www.ikea.com/se/sv/images/products/indira-oeverkast-natur-oblekt-bomull__1259115_pe926530_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "natural"
+  ],
+  "priceTier": "standard",
+  "market": "SE",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA SE",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-se-txt-40111987",
+  "name": "MERETE Rumsförmörkande gardiner, 1 par, vit/med öljetter, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 399.0,
+  "productUrl": "https://www.ikea.com/se/sv/p/merete-rumsfoermoerkande-gardiner-1-par-vit-med-oeljetter-40111987/",
+  "imageUrl": "https://www.ikea.com/se/sv/images/products/merete-rumsfoermoerkande-gardiner-1-par-vit-med-oeljetter__74221_pe190980_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "standard",
+  "market": "SE",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA SE",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-se-txt-50586027",
+  "name": "MAJGULL Mörkläggningsgardiner, 1 par, mörkgrön/med veckband, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 399.0,
+  "productUrl": "https://www.ikea.com/se/sv/p/majgull-moerklaeggningsgardiner-1-par-moerkgroen-med-veckband-50586027/",
+  "imageUrl": "https://www.ikea.com/se/sv/images/products/majgull-moerklaeggningsgardiner-1-par-moerkgroen-med-veckband__1279699_pe931575_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "green"
+  ],
+  "priceTier": "standard",
+  "market": "SE",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA SE",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-07-01 (search discovery)."
+ },
+ {
+  "externalId": "ikea-se-txt-00466715",
+  "name": "DYTÅG Gardiner, 1 par, vit/med veckband, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 799.0,
+  "productUrl": "https://www.ikea.com/se/sv/p/dytag-gardiner-1-par-vit-00466715/",
+  "imageUrl": "https://www.ikea.com/se/sv/images/products/dytag-gardiner-1-par-vit-med-veckband__0803894_pe769366_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-07-01",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "premium",
+  "market": "SE",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA SE",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-07-01 (search discovery)."
  }
 ]
