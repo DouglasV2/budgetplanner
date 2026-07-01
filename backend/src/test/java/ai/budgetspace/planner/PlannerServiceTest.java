@@ -230,6 +230,26 @@ class PlannerServiceTest {
     }
 
     @Test
+    void focusedCrossRoomRequestReturnsEveryNamedItemNotJustTheInferredRoom() {
+        // Sprint 10.156: a user names items that SPAN rooms — a bed (bedroom) plus a sofa and a coffee table
+        // (living-room). In focused mode each named category is an explicit ask, so ALL must come back; the old
+        // code inferred a single room from the first item (bed -> bedroom) and dropped the sofa/table.
+        Product bed = product("bed-1", "Krevet", "IKEA", "bed", 300, 4.5);
+        bed.setRoomTags("bedroom");
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 400, 4.6);
+        sofa.setRoomTags("living-room");
+        Product table = product("table-1", "Stolić za kavu", "IKEA", "table", 90, 4.2);
+        table.setRoomTags("living-room");
+        PlannerService service = serviceWithProducts(List.of(bed, sofa, table));
+
+        PlannerInputDto focused = input("krevet, kauc i stolic za kavu")
+                .withCategories(List.of("bed", "sofa", "table"), List.of());
+        FurnishingPlanDto value = service.generateResolved(focused, true).plans().get(0);
+
+        assertThat(categories(value)).contains("bed", "sofa", "table");
+    }
+
+    @Test
     void plannerPrefersFresherCompleteProductOverStalePartialWhenSimilar() {
         Product fresh = product("sofa-fresh", "Kauč svjež", "IKEA", "sofa", 600, 4.5);
         fresh.setDataQuality("complete");

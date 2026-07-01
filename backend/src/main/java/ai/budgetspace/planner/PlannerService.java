@@ -485,12 +485,12 @@ public class PlannerService {
             int qty = quantityFor(input, category);
             double remainingPerUnit = qty > 1 ? remaining / qty : remaining;
             double perUnitTarget = qty > 1 ? perItemTarget / qty : perItemTarget;
-            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget);
+            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget, focused);
             // Sprint 10.122: the user explicitly asked for this category (focused or must-have) but nothing fits
             // the budget/cap — rather than an empty tier ("Najbolji izbor" with no items, which looks broken),
             // offer the cheapest real option. The budget status then honestly shows it's above the stated cap.
             if (product == null && (focused || input.mustHaveCategories().contains(category))) {
-                product = cheapestInCategory(category, input, picked, Double.MAX_VALUE);
+                product = cheapestInCategory(category, input, picked, Double.MAX_VALUE, focused);
             }
             if (product == null) continue;
 
@@ -522,7 +522,7 @@ public class PlannerService {
     }
 
     private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers,
-                            double perItemTarget) {
+                            double perItemTarget, boolean anyRoom) {
         List<String> allowedRetailers = selectedRetailers(input);
         boolean coreCategory = isCoreCategory(input.roomType(), category);
         double realisticLimit = coreCategory && !mode.equals("budget")
@@ -531,7 +531,10 @@ public class PlannerService {
 
         return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
-                .filter(product -> matchesRoom(product, input.roomType()))
+                // Sprint 10.156: in a FOCUSED plan every category is an item the user explicitly named, so a
+                // cross-room ask ("a bed AND a sofa") must not drop the sofa just because the plan's inferred room
+                // is the bedroom — match any room for those. Whole-room plans keep the strict room filter.
+                .filter(product -> anyRoom || matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
@@ -873,7 +876,7 @@ public class PlannerService {
             PlanItemDto item = working.get(pos);
             Set<String> usedIds = working.stream().map(other -> other.product().id()).collect(Collectors.toCollection(LinkedHashSet::new));
             usedIds.remove(id);
-            Product cheaper = cheapestInCategory(item.product().category(), input, usedIds, item.product().price().doubleValue());
+            Product cheaper = cheapestInCategory(item.product().category(), input, usedIds, item.product().price().doubleValue(), false);
             if (cheaper != null) {
                 working.set(pos, createPlanItem(cheaper, input, mode, "Povoljnija opcija da plan ostane bliže budžetu: "));
             }
@@ -910,7 +913,7 @@ public class PlannerService {
                 PlanItemDto item = working.get(pos);
                 Set<String> usedIds = working.stream().map(other -> other.product().id()).collect(Collectors.toCollection(LinkedHashSet::new));
                 usedIds.remove(id);
-                Product cheaper = cheapestInCategory(item.product().category(), input, usedIds, item.product().price().doubleValue());
+                Product cheaper = cheapestInCategory(item.product().category(), input, usedIds, item.product().price().doubleValue(), false);
                 if (cheaper != null) {
                     working.set(pos, createPlanItem(cheaper, input, mode, "Povoljnija opcija da plan stane u budžet: "));
                 }
@@ -931,11 +934,11 @@ public class PlannerService {
         return -1;
     }
 
-    private Product cheapestInCategory(String category, PlannerInputDto input, Set<String> excludeIds, double maxPriceExclusive) {
+    private Product cheapestInCategory(String category, PlannerInputDto input, Set<String> excludeIds, double maxPriceExclusive, boolean anyRoom) {
         List<String> allowed = selectedRetailers(input);
         return marketCatalog(input).stream()
                 .filter(product -> product.getCategory().equalsIgnoreCase(category))
-                .filter(product -> matchesRoom(product, input.roomType()))
+                .filter(product -> anyRoom || matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> allowed.contains(product.getRetailer()))
                 .filter(product -> !excludeIds.contains(product.getId()))
@@ -1000,7 +1003,7 @@ public class PlannerService {
     }
 
     private String swapSuggestion(PlannerInputDto input, PlanItemDto item) {
-        Product cheaper = cheapestInCategory(item.product().category(), input, Set.of(item.product().id()), item.product().price().doubleValue());
+        Product cheaper = cheapestInCategory(item.product().category(), input, Set.of(item.product().id()), item.product().price().doubleValue(), false);
         if (cheaper == null) return null;
         double diff = item.product().price().doubleValue() - cheaper.getPrice().doubleValue();
         if (diff < 1) return null;
@@ -1224,7 +1227,7 @@ public class PlannerService {
 
         for (String category : desired) {
             if (pickedCategories.contains(category) || input.alreadyHaveCategories().contains(category)) continue;
-            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, 0);
+            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, 0, false);
             if (option != null) {
                 tips.add("Za oko " + money(option.getPrice().doubleValue()) + " možeš dodati " + categoryLabel(category).toLowerCase(Locale.ROOT) + " i prostor će izgledati potpunije.");
             }
