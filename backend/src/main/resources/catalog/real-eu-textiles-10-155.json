@@ -3083,5 +3083,171 @@
   "sourceReference": "nonhr-textiles-10-155",
   "dataQuality": "complete",
   "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
+ },
+ {
+  "externalId": "ikea-dk-txt-hallebracka-00556848",
+  "name": "HÄLLEBRÄCKA tynde gardiner, 2 stk., lys beige/med rynkebånd, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 199.0,
+  "productUrl": "https://www.ikea.com/dk/da/p/haellebraecka-tynde-gardiner-2-stk-lys-beige-med-rynkeband-60559670/",
+  "imageUrl": "https://www.ikea.com/dk/da/images/products/haellebraecka-tynde-gardiner-2-stk-lys-beige-med-rynkeband__1196904_pe906599_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-06-30",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "beige"
+  ],
+  "priceTier": "standard",
+  "market": "DK",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA DK",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
+ },
+ {
+  "externalId": "ikea-dk-txt-ginstmott-60597167",
+  "name": "GINSTMOTT Gardiner, 2 stk., hvid/med rynkebånd, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 159.0,
+  "productUrl": "https://www.ikea.com/dk/da/p/ginstmott-gardiner-2-stk-hvid-med-rynkeband-50597167/",
+  "imageUrl": "https://www.ikea.com/dk/da/images/products/ginstmott-gardiner-2-stk-hvid-med-rynkeband__1308569_pe939889_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-06-30",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "standard",
+  "market": "DK",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA DK",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
+ },
+ {
+  "externalId": "ikea-dk-txt-dytag-20466719",
+  "name": "DYTÅG Gardiner, 2 stk., hvid/med rynkebånd, 145x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 600.0,
+  "productUrl": "https://www.ikea.com/dk/da/p/dytag-gardiner-2-stk-hvid-med-rynkeband-00607801/",
+  "imageUrl": "https://www.ikea.com/dk/da/images/products/dytag-gardiner-2-stk-hvid-med-rynkeband__0803894_pe769366_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-06-30",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "white"
+  ],
+  "priceTier": "premium",
+  "market": "DK",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA DK",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
+ },
+ {
+  "externalId": "ikea-dk-txt-vallkrassing-70570940",
+  "name": "VALLKRASSING plaid, grågrøn, 150x200 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 119.0,
+  "productUrl": "https://www.ikea.com/dk/da/p/vallkrassing-plaid-gragron-20570927/",
+  "imageUrl": "https://www.ikea.com/dk/da/images/products/vallkrassing-plaid-gragron__1207660_pe908117_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-06-30",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "grey"
+  ],
+  "priceTier": "standard",
+  "market": "DK",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA DK",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
+ },
+ {
+  "externalId": "ikea-dk-txt-indira-40582633",
+  "name": "INDIRA sengetæppe, grågrøn, 150x250 cm",
+  "retailer": "IKEA",
+  "category": "textiles",
+  "price": 95.0,
+  "productUrl": "https://www.ikea.com/dk/da/p/indira-sengetaeppe-gragron-00582625/",
+  "imageUrl": "https://www.ikea.com/dk/da/images/products/indira-sengetaeppe-gragron__1259112_pe926527_s5.jpg",
+  "imageVerified": true,
+  "availabilityStatus": "in-stock",
+  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
+  "lastCheckedAt": "2026-06-30",
+  "roomTags": [
+   "living-room",
+   "bedroom"
+  ],
+  "styleTags": [
+   "modern",
+   "minimal",
+   "cozy",
+   "classic"
+  ],
+  "colorTags": [
+   "grey",
+   "blue"
+  ],
+  "priceTier": "budget",
+  "market": "DK",
+  "sourceType": "public-product-page",
+  "sourceName": "IKEA DK",
+  "sourceReference": "nonhr-textiles-10-155",
+  "dataQuality": "complete",
+  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
  }
 ]
