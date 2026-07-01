@@ -610,7 +610,16 @@ export function Planner() {
       <div className="section-heading left planner-heading-row">
         <div>
           <span className="eyebrow">{t('planner.eyebrow')}</span>
-          <h2>{t('planner.heading')}</h2>
+          {/* Sprint 10.156: give the headline brand personality (less flat/generic) — the "payoff" second
+              sentence renders in the brand clay. Robust across locales: if there's no sentence break we just
+              show the plain heading. */}
+          <h2>{(() => {
+            const heading = t('planner.heading');
+            const at = heading.indexOf('. ');
+            return at < 0
+              ? heading
+              : <>{heading.slice(0, at + 1)} <span className="hero-accent">{heading.slice(at + 2)}</span></>;
+          })()}</h2>
           <p>{t('planner.subheading')}</p>
         </div>
       </div>

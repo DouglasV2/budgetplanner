@@ -516,6 +516,12 @@ label span,
   letter-spacing: -0.06em;
 }
 
+/* Sprint 10.156: the hero "payoff" phrase in brand clay — warmth + personality so the headline reads
+   crafted, not flat/generic. Colour only (no heavy effects) to stay editorial. */
+.hero-accent {
+  color: var(--clay);
+}
+
 .steps-grid,
 .monetization-grid {
   display: grid;
