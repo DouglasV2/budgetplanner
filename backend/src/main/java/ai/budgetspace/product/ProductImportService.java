@@ -176,15 +176,24 @@ public class ProductImportService {
     }
 
     private void apply(ImportProductDto dto, Product entity) {
+        // Sprint 10.156 — "newest check wins": if this row already exists and its stored lastCheckedAt is
+        // NEWER than the incoming snapshot's, the DB was re-verified more recently (by CatalogFreshnessService)
+        // than the seed JSON — so keep the DB's VOLATILE fields (price / sale / availability / lastCheckedAt)
+        // instead of reverting them to the stale JSON on the next boot. Inert until the freshness job runs
+        // (dates are then equal, so the JSON applies exactly as before). A JSON price fix still wins if its
+        // lastCheckedAt is bumped to a newer day. Non-volatile fields (name/tags/image/url) always apply.
+        boolean dbFresher = dbCheckIsNewer(entity.getLastCheckedAt(), dto.lastCheckedAt());
         entity.setExternalId(dto.externalId().trim());
         entity.setName(dto.name().trim());
         entity.setRetailer(ProductTaxonomy.normalizeRetailer(dto.retailer()).orElse(dto.retailer().trim()));
         entity.setCategory(ProductTaxonomy.normalizeCategory(dto.category()).orElse(dto.category().trim()));
-        entity.setPrice(dto.price());
-        if (dto.originalPrice() != null) entity.setOriginalPrice(dto.originalPrice());
-        // Sprint 10.33: verified promo window. Only stored when present; the planner/UI treats the row
-        // as "on sale" only when originalPrice > price, so a saleEndsAt without a real discount is inert.
-        if (hasText(dto.saleEndsAt())) entity.setSaleEndsAt(dto.saleEndsAt().trim());
+        if (!dbFresher) {
+            entity.setPrice(dto.price());
+            if (dto.originalPrice() != null) entity.setOriginalPrice(dto.originalPrice());
+            // Sprint 10.33: verified promo window. Only stored when present; the planner/UI treats the row
+            // as "on sale" only when originalPrice > price, so a saleEndsAt without a real discount is inert.
+            if (hasText(dto.saleEndsAt())) entity.setSaleEndsAt(dto.saleEndsAt().trim());
+        }
         entity.setStyleTags(joinCanonicalStyles(dto.styleTags()));
         entity.setRoomTags(joinCanonicalRooms(dto.roomTags()));
         if (hasText(dto.imageUrl())) {
@@ -197,18 +206,20 @@ public class ProductImportService {
             entity.setProductUrl(dto.productUrl().trim());
             entity.setUrl(dto.productUrl().trim());
         }
-        if (hasText(dto.availabilityStatus())) {
-            String availability = ProductTaxonomy.normalizeAvailability(dto.availabilityStatus());
-            entity.setAvailabilityStatus(availability);
-            entity.setInStock(!"unavailable".equals(availability));
-        } else if (!hasText(entity.getAvailabilityStatus())) {
-            entity.setAvailabilityStatus("in-stock");
-            entity.setInStock(true);
-        } else {
-            entity.setInStock(!"unavailable".equals(ProductTaxonomy.normalizeAvailability(entity.getAvailabilityStatus())));
+        if (!dbFresher) {
+            if (hasText(dto.availabilityStatus())) {
+                String availability = ProductTaxonomy.normalizeAvailability(dto.availabilityStatus());
+                entity.setAvailabilityStatus(availability);
+                entity.setInStock(!"unavailable".equals(availability));
+            } else if (!hasText(entity.getAvailabilityStatus())) {
+                entity.setAvailabilityStatus("in-stock");
+                entity.setInStock(true);
+            } else {
+                entity.setInStock(!"unavailable".equals(ProductTaxonomy.normalizeAvailability(entity.getAvailabilityStatus())));
+            }
         }
         if (hasText(dto.deliveryNote())) entity.setDeliveryNote(dto.deliveryNote().trim());
-        if (hasText(dto.lastCheckedAt())) {
+        if (!dbFresher && hasText(dto.lastCheckedAt())) {
             entity.setLastCheckedAt(dto.lastCheckedAt().trim());
         } else if (!hasText(entity.getLastCheckedAt())) {
             entity.setLastCheckedAt(LocalDate.now().toString());
@@ -570,6 +581,23 @@ public class ProductImportService {
 
     private ImportErrorDto error(int row, String externalId, String message) {
         return new ImportErrorDto(row, emptyToNull(externalId), message);
+    }
+
+    /** True iff both are parseable ISO days and the DB's check day is strictly AFTER the snapshot's (10.156). */
+    private static boolean dbCheckIsNewer(String dbLastChecked, String snapshotLastChecked) {
+        LocalDate db = parseDay(dbLastChecked);
+        LocalDate snap = parseDay(snapshotLastChecked);
+        return db != null && snap != null && db.isAfter(snap);
+    }
+
+    private static LocalDate parseDay(String value) {
+        String v = value == null ? "" : value.trim();
+        if (v.length() < 10) return null;
+        try {
+            return LocalDate.parse(v.substring(0, 10));
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     private ImportSummaryDto summary(int created, int updated, int skipped, int totalReceived, List<ProductDto> products, List<ImportErrorDto> errors) {

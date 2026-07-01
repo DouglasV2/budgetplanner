@@ -63,6 +63,44 @@ class ProductImportServiceTest {
     }
 
     @Test
+    void reSeedKeepsAFresherDbPriceButAnEqualOrNewerSnapshotStillApplies() {
+        // Sprint 10.156 "newest check wins": the DB row was re-verified 2026-07-05 (e.g. by the freshness job).
+        Product existing = new Product();
+        existing.setId("f-1");
+        existing.setExternalId("f-1");
+        existing.setName("Kauč");
+        existing.setRetailer("IKEA");
+        existing.setCategory("sofa");
+        existing.setPrice(BigDecimal.valueOf(120));
+        existing.setProductUrl("https://example.com/p");
+        existing.setUrl("https://example.com/p");
+        existing.setAvailabilityStatus("in-stock");
+        existing.setInStock(true);
+        existing.setLastCheckedAt("2026-07-05");
+
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findByExternalId("f-1")).thenReturn(Optional.of(existing));
+        when(repository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        ProductImportService service = new ProductImportService(repository);
+
+        // Re-seed from an OLDER snapshot (2026-06-10, price 999) — the DB was checked more recently, so KEEP 120.
+        service.importProducts(List.of(new ImportProductDto(
+                null, "f-1", "Kauč", "IKEA", "sofa", BigDecimal.valueOf(999), null,
+                List.of("modern"), List.of("living-room"), null, "https://example.com/p", "in-stock", null,
+                "2026-06-10", "standard", null, "manual", "IKEA", null, "partial", null)));
+        assertThat(existing.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(120));
+        assertThat(existing.getLastCheckedAt()).isEqualTo("2026-07-05");
+
+        // A NEWER snapshot (2026-07-10) DOES win — an explicit price fix takes effect once its date is bumped.
+        service.importProducts(List.of(new ImportProductDto(
+                null, "f-1", "Kauč", "IKEA", "sofa", BigDecimal.valueOf(140), null,
+                List.of("modern"), List.of("living-room"), null, "https://example.com/p", "in-stock", null,
+                "2026-07-10", "standard", null, "manual", "IKEA", null, "partial", null)));
+        assertThat(existing.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(140));
+        assertThat(existing.getLastCheckedAt()).isEqualTo("2026-07-10");
+    }
+
+    @Test
     void csvImportTrimsValuesAndSupportsPipeOrCommaTags() {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());

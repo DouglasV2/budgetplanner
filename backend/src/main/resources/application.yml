@@ -118,6 +118,15 @@ budgetspace:
   real-catalog:
     # Seed the real IKEA/JYSK living-room catalog on startup (env BUDGETSPACE_REAL_CATALOG_SEED_ENABLED).
     seed-enabled: ${BUDGETSPACE_REAL_CATALOG_SEED_ENABLED:true}
+  catalog:
+    # Sprint 10.156: rolling FRESHNESS re-check. In the background (off the request path) it re-verifies the
+    # stalest products' live prices with the deterministic probe, so stored prices stay honest over time. OFF
+    # by default (no surprise outbound requests before launch, like price-watch); flip on in prod when wanted.
+    freshness-enabled: ${BUDGETSPACE_CATALOG_FRESHNESS_ENABLED:false}
+    # Every 6h re-verify the N oldest-checked products (Spring 6-field cron). 60 x 4/day = 240/day => ~3000
+    # products under ~12 days, inside the 14-day UI freshness threshold. Tune batch to catalogSize/maxAgeDays.
+    freshness-cron: ${BUDGETSPACE_CATALOG_FRESHNESS_CRON:0 20 */6 * * *}
+    freshness-batch-size: ${BUDGETSPACE_CATALOG_FRESHNESS_BATCH_SIZE:60}
   feeds:
     # Sprint 10.14: official/partner feed slots for the feed-required retailers (Decathlon, Pevex,
     # Lesnina) whose sites return HTTP 403 and which we therefore never scrape. Blank = not configured
