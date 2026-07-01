@@ -219,7 +219,10 @@ export function Planner() {
     const draft = readPlannerDraft();
     return {
       ...initialInput,
-      prompt: draft?.prompt ? draft.prompt : exampleSeed,
+      // Sprint 10.156: ignore a stored draft that STARTS with a blank line — that's the signature of the old
+      // quick-action leak ("\n\n<suffix>"); a real typed prompt never begins with an empty line. This also
+      // cleans up any draft already poisoned before the fix. Falls back to the localised example.
+      prompt: draft?.prompt && !/^\s*\n/.test(draft.prompt) ? draft.prompt : exampleSeed,
       budget: draft?.budget && draft.budget > 0 ? draft.budget : initialInput.budget,
       market
     };
@@ -542,47 +545,36 @@ export function Planner() {
   }
 
   async function handleQuickAction(action: QuickPlanAction, plan?: FurnishingPlan) {
+    // The quick action changes the OPTIONS (goal/level/stores); the SUFFIX is a request-only nudge to the AI.
     let nextInput: PlannerInput = { ...input };
+    let suffix = '';
 
     if (action === 'cheaper') {
-      nextInput = {
-        ...nextInput,
-        optimizationGoal: 'lowest-price' as OptimizationGoal,
-        furnishingLevel: 'basic',
-        prompt: `${nextInput.prompt}\n\n${t('results.quickCheaperSuffix')}`
-      };
+      nextInput = { ...nextInput, optimizationGoal: 'lowest-price' as OptimizationGoal, furnishingLevel: 'basic' };
+      suffix = t('results.quickCheaperSuffix');
     }
-
     if (action === 'nicer') {
-      nextInput = {
-        ...nextInput,
-        optimizationGoal: 'style-match' as OptimizationGoal,
-        furnishingLevel: 'complete',
-        prompt: `${nextInput.prompt}\n\n${t('results.quickNicerSuffix')}`
-      };
+      nextInput = { ...nextInput, optimizationGoal: 'style-match' as OptimizationGoal, furnishingLevel: 'complete' };
+      suffix = t('results.quickNicerSuffix');
     }
-
     if (action === 'least-stores') {
-      nextInput = {
-        ...nextInput,
-        optimizationGoal: 'least-stores' as OptimizationGoal,
-        prompt: `${nextInput.prompt}\n\nSmanji broj trgovina i dostava.`
-      };
+      nextInput = { ...nextInput, optimizationGoal: 'least-stores' as OptimizationGoal };
+      suffix = 'Smanji broj trgovina i dostava.';
     }
-
     if (action === 'single-store') {
       const retailer = mostUsedRetailer(plan) ?? nextInput.selectedRetailers[0] ?? 'IKEA';
-      nextInput = {
-        ...nextInput,
-        retailerMode: 'single',
-        selectedRetailers: [retailer],
-        optimizationGoal: 'least-stores' as OptimizationGoal,
-        prompt: `${nextInput.prompt}\n\n${t('results.quickSingleStoreSuffix', { retailer })}`
-      };
+      nextInput = { ...nextInput, retailerMode: 'single', selectedRetailers: [retailer], optimizationGoal: 'least-stores' as OptimizationGoal };
+      suffix = t('results.quickSingleStoreSuffix', { retailer });
     }
 
+    // Sprint 10.156: the SUFFIX must NOT enter input.prompt (state). The AI response clears input.prompt after a
+    // generate, so appending the suffix there left the textarea holding just "\n\n<suffix>", which Sprint 10.138
+    // then PERSISTED as the user's draft — so "Složi ljepšu i skladniju verziju." reappeared in the box on the
+    // next load. Keep state's prompt untouched; append the suffix ONLY to the request, based on the originally
+    // typed prompt (submittedPrompt) so the regeneration keeps the room/budget context.
+    const base = (input.prompt && input.prompt.trim()) ? input.prompt.trim() : submittedPrompt;
     setInput(nextInput);
-    await runGeneration(nextInput);
+    await runGeneration({ ...nextInput, prompt: `${base}\n\n${suffix}`.trim() });
   }
 
   // Sprint 10.74 (C): the AI ran but wasn't sure what was asked (garbage / off-topic / very-vague typed prompt).
