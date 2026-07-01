@@ -485,12 +485,22 @@ public class PlannerService {
             int qty = quantityFor(input, category);
             double remainingPerUnit = qty > 1 ? remaining / qty : remaining;
             double perUnitTarget = qty > 1 ? perItemTarget / qty : perItemTarget;
-            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget, focused);
+            // Sprint 10.157: even in a focused plan, try the item in its OWN room FIRST (so a home-office "chair"
+            // resolves to an office chair, not the priciest lounge armchair the anyRoom pool offered), and fall
+            // back to any room only when the item genuinely isn't in the plan's room (so a cross-room "bed + sofa"
+            // ask still finds the sofa). Whole-room plans (focused=false) stay strictly room-scoped as before.
+            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget, false);
+            if (product == null && focused) {
+                product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget, true);
+            }
             // Sprint 10.122: the user explicitly asked for this category (focused or must-have) but nothing fits
             // the budget/cap — rather than an empty tier ("Najbolji izbor" with no items, which looks broken),
             // offer the cheapest real option. The budget status then honestly shows it's above the stated cap.
             if (product == null && (focused || input.mustHaveCategories().contains(category))) {
-                product = cheapestInCategory(category, input, picked, Double.MAX_VALUE, focused);
+                product = cheapestInCategory(category, input, picked, Double.MAX_VALUE, false);
+                if (product == null && focused) {
+                    product = cheapestInCategory(category, input, picked, Double.MAX_VALUE, true);
+                }
             }
             if (product == null) continue;
 
@@ -1049,10 +1059,11 @@ public class PlannerService {
     // clamped to a sane furniture maximum so a typo ("60 chairs") can't blow up a plan.
     private int quantityFor(PlannerInputDto input, String category) {
         java.util.Map<String, Integer> q = input.quantities();
-        if (q == null || q.isEmpty()) return 1;
-        Integer n = q.get(category);
-        if (n == null || n < 1) return 1;
-        return Math.min(n, 12);
+        Integer n = q == null ? null : q.get(category);
+        if (n != null && n >= 1) return Math.min(n, 12);
+        // Sprint 10.157: a dining set means SEATS — default dining chairs to a 4-person set when the user gave no
+        // count (a "table + 1 chair" plan looked broken to shoppers in the sweep). Everything else is a single unit.
+        return "dining-chair".equals(category) ? 4 : 1;
     }
 
     private PlanItemDto enrichExistingItem(PlanItemDto item, PlannerInputDto input) {
