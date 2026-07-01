@@ -71,6 +71,11 @@ public class GeminiLlmClient implements LlmClient {
     static String buildBody(LlmCompletionRequest request, int maxTokens) throws JsonProcessingException {
         Map<String, Object> generationConfig = new LinkedHashMap<>();
         generationConfig.put("maxOutputTokens", maxTokens);
+        // Sprint 10.156: temperature 0 → DETERMINISTIC extraction. We use the LLM to parse a prompt into a fixed
+        // structured shape (room / budget / named items), not to be creative; at the default (~1.0) Gemini returned
+        // slightly different extractions for the SAME prompt run-to-run (the 15-market sweep saw a plan vary across
+        // identical runs). 0 makes the same prompt map to the same intent — and the same plan.
+        generationConfig.put("temperature", 0);
         // Gemini 2.5 "thinks" by default, and those thinking tokens consume the output budget BEFORE the answer —
         // for a structured prompt extraction we don't need it, and leaving it on truncates the JSON (cut-off
         // array → parse error → rule-based fallback). Disable it (budget 0): faster, cheaper, full budget for the answer.

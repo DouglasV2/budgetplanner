@@ -882,15 +882,25 @@ public class PlannerService {
             }
         }
 
-        for (String priority : List.of("later", "add-comfort")) {
-            while (sumPrice(working) > budget) {
-                PlanItemDto target = working.stream()
-                        .filter(item -> !protectedCats.contains(item.product().category()))
-                        .filter(item -> priority.equals(priorityForCategory(input.roomType(), item.product().category())))
-                        .max(Comparator.comparing(item -> item.product().price()))
-                        .orElse(null);
-                if (target == null) break;
-                working.removeIf(item -> item.product().id().equals(target.product().id()));
+        // Sprint 10.156: at a budget so low the PROTECTED core already exceeds the (stretch) ceiling, dropping
+        // optionals can't bring the plan under it — it only leaves the STRETCH tier sparse AND still over budget
+        // (worse than value/budget; the sweep flagged this on ~400 EUR living rooms). So shed optionals only when
+        // that can actually achieve a fit; otherwise keep the fuller, nicer room and let it read as honestly over.
+        double protectedSubtotal = working.stream()
+                .filter(item -> protectedCats.contains(item.product().category()))
+                .mapToDouble(item -> item.product().price().doubleValue() * Math.max(1, item.quantity()))
+                .sum();
+        if (!"stretch".equals(mode) || protectedSubtotal <= budget) {
+            for (String priority : List.of("later", "add-comfort")) {
+                while (sumPrice(working) > budget) {
+                    PlanItemDto target = working.stream()
+                            .filter(item -> !protectedCats.contains(item.product().category()))
+                            .filter(item -> priority.equals(priorityForCategory(input.roomType(), item.product().category())))
+                            .max(Comparator.comparing(item -> item.product().price()))
+                            .orElse(null);
+                    if (target == null) break;
+                    working.removeIf(item -> item.product().id().equals(target.product().id()));
+                }
             }
         }
 
