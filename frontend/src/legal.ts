@@ -29,20 +29,20 @@ const HR: Record<LegalKey, LegalDoc> = {
         'Ako se prijaviš Googleom: ime, e-mail i profilnu sliku koje nam Google proslijedi.',
         'Planove i unose (soba, budžet, stil) koje sam spremiš.',
         'Približnu državu iz CDN zaglavlja — samo da odaberemo ispravno tržište i valutu.',
-        'Ako kupiš Plus: plaćanje obrađuje Stripe. Mi ne vidimo niti spremamo podatke o tvojoj kartici.',
+        'Ako platiš Design Session (planirana jednokratna kupnja — besplatno u beti): plaćanje obrađuje Stripe. Mi ne vidimo niti spremamo podatke o tvojoj kartici.',
         'Tekst koji upišeš AI asistentu šalje se davatelju AI usluge isključivo radi obrade tvog upita.',
       ] },
       { heading: 'Kolačići', body: [
         'Koristimo jedan nužni kolačić za prijavu (bs_auth) — bez njega prijava ne radi. Nemamo reklamne ni kolačiće za praćenje.',
       ] },
       { heading: 'S kim dijelimo podatke', body: [
-        'Google (prijava), Stripe (naplata Plusa), davatelj AI usluge (obrada upita), eBay (prikaz rabljenih oglasa) i Sentry (praćenje tehničkih grešaka). Tvoje podatke ne prodajemo.',
+        'Google (prijava), Stripe (naplata Design Sessiona, kad se uvede), davatelj AI usluge (obrada upita), eBay (prikaz rabljenih oglasa) i Sentry (praćenje tehničkih grešaka). Tvoje podatke ne prodajemo.',
       ] },
       { heading: 'Koliko dugo čuvamo', body: [
         'Dok ne obrišeš račun ili dok ti sesija ne istekne. Račun i sve povezane podatke možeš obrisati u aplikaciji ("Obriši račun").',
       ] },
       { heading: 'Tvoja prava (GDPR)', body: [
-        'Imaš pravo na pristup, ispravak, brisanje i prigovor. Brisanje računa dostupno je odmah u aplikaciji; za ostala prava nas kontaktiraj.',
+        'Imaš pravo na pristup, ispravak, brisanje, prenosivost i prigovor, te pravo na pritužbu nadzornom tijelu (u RH: AZOP). Brisanje računa dostupno je odmah u aplikaciji; za ostala prava nas kontaktiraj.',
       ] },
     ],
   },
@@ -98,20 +98,20 @@ const EN: Record<LegalKey, LegalDoc> = {
         'If you sign in with Google: the name, email and profile picture Google passes to us.',
         'The plans and inputs (room, budget, style) you choose to save.',
         'An approximate country from the CDN header — only to pick the right market and currency.',
-        'If you buy Plus: payment is handled by Stripe. We never see or store your card details.',
+        'If you pay for a Design Session (a planned one-time purchase — free during beta): payment is handled by Stripe. We never see or store your card details.',
         'Text you type to the AI assistant is sent to the AI provider solely to process your request.',
       ] },
       { heading: 'Cookies', body: [
         'We use a single strictly-necessary sign-in cookie (bs_auth) — sign-in does not work without it. We use no advertising or tracking cookies.',
       ] },
       { heading: 'Who we share with', body: [
-        'Google (sign-in), Stripe (Plus billing), the AI provider (processing prompts), eBay (showing second-hand listings) and Sentry (technical error monitoring). We do not sell your data.',
+        'Google (sign-in), Stripe (Design Session billing, once introduced), the AI provider (processing prompts), eBay (showing second-hand listings) and Sentry (technical error monitoring). We do not sell your data.',
       ] },
       { heading: 'How long we keep it', body: [
         'Until you delete your account or your session expires. You can delete your account and all related data in the app ("Delete account").',
       ] },
       { heading: 'Your rights (GDPR)', body: [
-        'You have the right to access, correct, delete and object. Account deletion is available immediately in the app; contact us for the other rights.',
+        'You have the right to access, rectify, delete, port and object, and to lodge a complaint with a data-protection supervisory authority (in the EU, your national DPA). Account deletion is available immediately in the app; contact us for the other rights.',
       ] },
     ],
   },
