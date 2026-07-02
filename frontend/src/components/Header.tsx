@@ -33,7 +33,9 @@ export function Header() {
       <div className="header-inner shell">
         <a className="brand" href="#top" aria-label="BudgetSpace">
           <BrandMark />
-          <span>BudgetSpace</span>
+          {/* Sprint 10.160: two-tone lowercase wordmark — "space" in clay echoes the brand mark's clay fill
+              ("budget filling a space"), so the logotype itself carries the product metaphor. */}
+          <span className="brand-word">budget<span className="brand-word-accent">space</span></span>
         </a>
         <nav className="nav" aria-label={t('aria.mainNav')}>
           <a href="#how">{t('nav.how')}</a>
@@ -80,7 +82,7 @@ export function Header() {
             ) : (
               !loading && <button type="button" className="header-signin" onClick={startSignIn}>{t('auth.signIn')}</button>
             )}
-            <a className="nav-cta" href="#planner">{t('nav.cta')}</a>
+            <a className="nav-cta" href="#planner">{t('nav.cta')}<span className="nav-cta-arrow" aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>
