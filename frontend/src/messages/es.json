@@ -519,6 +519,7 @@
   "moveIn.grandTotalLabel": "Total del apartamento",
   "moveIn.ofBudget": "de {budget}",
   "moveIn.withinBudget": "Dentro del presupuesto",
+  "moveIn.budgetLeft": "aún {amount} libres",
   "moveIn.overBudget": "Se pasa por {amount}",
   "moveIn.roomBudget": "Presupuesto de la habitación: {amount}",
   "moveIn.itemsCount": "{count} productos",

@@ -519,6 +519,7 @@
   "moveIn.grandTotalLabel": "Spolu za byt",
   "moveIn.ofBudget": "z {budget}",
   "moveIn.withinBudget": "Stane sa do rozpočtu",
+  "moveIn.budgetLeft": "ešte {amount} voľných",
   "moveIn.overBudget": "Nad rozpočet o {amount}",
   "moveIn.roomBudget": "Rozpočet miestnosti: {amount}",
   "moveIn.itemsCount": "{count} produktov",

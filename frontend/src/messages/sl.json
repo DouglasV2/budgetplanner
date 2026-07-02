@@ -519,6 +519,7 @@
   "moveIn.grandTotalLabel": "Skupaj za stanovanje",
   "moveIn.ofBudget": "od {budget}",
   "moveIn.withinBudget": "Znotraj proračuna",
+  "moveIn.budgetLeft": "še {amount} prosto",
   "moveIn.overBudget": "Čez za {amount}",
   "moveIn.roomBudget": "Proračun sobe: {amount}",
   "moveIn.itemsCount": "{count} izdelkov",

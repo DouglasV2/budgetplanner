@@ -519,6 +519,7 @@
   "moveIn.grandTotalLabel": "Totaal voor het appartement",
   "moveIn.ofBudget": "van {budget}",
   "moveIn.withinBudget": "Binnen budget",
+  "moveIn.budgetLeft": "nog {amount} vrij",
   "moveIn.overBudget": "{amount} te veel",
   "moveIn.roomBudget": "Kamerbudget: {amount}",
   "moveIn.itemsCount": "{count} producten",

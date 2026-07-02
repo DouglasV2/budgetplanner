@@ -5087,34 +5087,60 @@ a.google-signin-button.google-signin-link:hover {
   margin-top: 22px;
 }
 .move-in-total-card {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-  padding: 18px 20px;
+  padding: 18px 22px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--card);
   box-shadow: var(--shadow-sm);
 }
+.move-in-total-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 .move-in-total-label {
   color: var(--muted);
   font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.move-in-total-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-top: 4px;
 }
 .move-in-total-value {
   font-family: var(--font-display);
-  font-size: 1.7rem;
+  font-weight: 700;
+  font-size: 1.9rem;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 .move-in-total-budget {
   color: var(--muted);
+  font-weight: 500;
+}
+.move-in-total-statuscol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+.move-in-total-left {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
 }
 .move-in-status {
-  margin-left: auto;
   font-weight: 600;
-  font-size: 0.9rem;
-  padding: 4px 12px;
+  font-size: 0.85rem;
+  padding: 5px 12px;
   border-radius: 999px;
+  white-space: nowrap;
 }
 .move-in-status.within {
   color: var(--sage);
@@ -5123,6 +5149,30 @@ a.google-signin-button.google-signin-link:hover {
 .move-in-status.over {
   color: var(--orange-dark);
   background: rgba(207, 95, 42, 0.12);
+}
+
+/* Sprint 10.162: the "budget filling a space" bar — clay fill on a sand track. The header + brand mark share
+   this exact motif, so the whole app reads as one designed system, not a template. */
+.move-in-fillbar {
+  height: 6px;
+  border-radius: 6px;
+  background: var(--sand);
+  overflow: hidden;
+  margin-top: 9px;
+}
+.move-in-fillbar-lg {
+  height: 8px;
+  margin-top: 14px;
+}
+.move-in-fillbar > span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--clay);
+  transition: width 0.45s ease;
+}
+.move-in-fillbar > span.over {
+  background: var(--orange-dark);
 }
 
 .move-in-room-cards {
@@ -5135,69 +5185,165 @@ a.google-signin-button.google-signin-link:hover {
 .move-in-room-card {
   border: 1px solid var(--line);
   border-radius: var(--r-md);
-  background: var(--white);
-  padding: 14px 16px;
+  background: var(--card);
+  padding: 15px 16px 9px;
 }
 .move-in-room-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 8px;
+}
+.move-in-room-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.move-in-room-roomicon {
+  display: grid;
+  place-items: center;
+  color: var(--clay);
+  flex: none;
 }
 .move-in-room-head strong {
   font-family: var(--font-display);
+  font-weight: 700;
   font-size: 1.05rem;
 }
-.move-in-room-budget {
-  color: var(--muted);
-  font-size: 0.82rem;
+.move-in-room-count {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  padding: 2px 9px;
+  border-radius: 999px;
   white-space: nowrap;
+  flex: none;
 }
-.move-in-room-meta {
+.move-in-room-spend {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px 10px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-top: 10px;
 }
 .move-in-room-total {
   font-weight: 700;
+  font-size: 1rem;
   color: var(--ink);
 }
-.move-in-room-count,
-.move-in-room-stores {
+.move-in-room-budget {
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.move-in-room-stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+.move-in-store-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 .move-in-room-items {
   list-style: none;
-  margin: 0;
+  margin: 10px 0 0;
   padding: 0;
-  border-top: 1px solid var(--hairline);
 }
 .move-in-room-items li {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  font-size: 0.88rem;
-  border-bottom: 1px solid var(--hairline);
+  gap: 3px;
+  padding: 2px 0;
 }
 .move-in-item-row {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
+  align-items: center;
+  gap: 11px;
   flex: 1;
   min-width: 0;
   color: inherit;
   text-decoration: none;
+  padding: 6px 7px;
+  border-radius: 10px;
+  transition: background 0.14s ease;
 }
-/* Sprint 10.138: per-item swap / remove. Subtle by default, clearer on row hover/focus; always visible on touch. */
+.move-in-item-row:hover {
+  background: rgba(33, 30, 25, 0.04);
+}
+/* Sprint 10.162: real verified photo, or the crafted category glyph (clay on sand) when unverified. */
+.move-in-thumb {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 9px;
+  background: var(--sand);
+  border: 1px solid var(--hairline);
+  display: grid;
+  place-items: center;
+  color: var(--clay);
+  overflow: hidden;
+}
+.move-in-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+  padding: 3px;
+}
+.move-in-item-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink-soft);
+  font-size: 0.87rem;
+  font-weight: 500;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.move-in-item-price {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+/* Sprint 10.162: the external-link glyph appears on hover (the whole row is the store link). */
+.move-in-item-open {
+  color: var(--muted);
+  opacity: 0;
+  display: inline-flex;
+  transition: opacity 0.14s ease, color 0.14s ease;
+}
+a.move-in-item-link {
+  cursor: pointer;
+}
+a.move-in-item-link:hover .move-in-item-open,
+a.move-in-item-link:focus-visible .move-in-item-open {
+  opacity: 1;
+  color: var(--clay);
+}
+a.move-in-item-link:hover .move-in-item-name,
+a.move-in-item-link:hover .move-in-item-price {
+  color: var(--clay);
+}
+
 .move-in-item-actions {
   display: flex;
-  gap: 2px;
+  gap: 1px;
   flex-shrink: 0;
 }
 .move-in-item-act {
@@ -5205,59 +5351,28 @@ a.google-signin-button.google-signin-link:hover {
   background: none;
   cursor: pointer;
   color: var(--muted);
-  opacity: 0.5;
-  font-size: 0.95rem;
-  line-height: 1;
-  padding: 2px 5px;
-  border-radius: 6px;
+  opacity: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   transition: opacity 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
-.move-in-room-items li:hover .move-in-item-act,
+.move-in-item:hover .move-in-item-act,
 .move-in-item-act:focus-visible {
   opacity: 1;
 }
 .move-in-item-act:hover {
-  background: var(--surface-2, rgba(0, 0, 0, 0.05));
-  color: var(--accent);
+  background: rgba(33, 30, 25, 0.07);
+  color: var(--ink);
 }
 .move-in-item-act.move-in-item-remove:hover {
-  color: #c0392b;
+  color: var(--orange-dark);
 }
 .move-in-item-act:disabled {
   cursor: default;
   opacity: 0.4;
-}
-.move-in-item-name {
-  flex: 1;
-  min-width: 0;
-  color: var(--ink-soft);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* The price never wraps to a second line. */
-.move-in-item-price {
-  flex-shrink: 0;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-/* Sprint 10.137: items are clickable store links now — signal it (a persistent external-link arrow after the
-   price + an accent hover) so the whole-apartment plan is actually shoppable, like the single-room plan. */
-a.move-in-item-link {
-  cursor: pointer;
-}
-a.move-in-item-link .move-in-item-price::after {
-  content: ' ↗';
-  color: var(--muted);
-  font-size: 0.82em;
-}
-a.move-in-item-link:hover .move-in-item-name {
-  color: var(--accent);
-  text-decoration: underline;
-}
-a.move-in-item-link:hover .move-in-item-price,
-a.move-in-item-link:hover .move-in-item-price::after {
-  color: var(--accent);
 }
 .move-in-room-items li.move-in-more {
   justify-content: flex-start;

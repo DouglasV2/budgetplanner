@@ -519,6 +519,7 @@
   "moveIn.grandTotalLabel": "Totalt för lägenheten",
   "moveIn.ofBudget": "av {budget}",
   "moveIn.withinBudget": "Inom budget",
+  "moveIn.budgetLeft": "{amount} kvar",
   "moveIn.overBudget": "Över med {amount}",
   "moveIn.roomBudget": "Rumsbudget: {amount}",
   "moveIn.itemsCount": "{count} produkter",

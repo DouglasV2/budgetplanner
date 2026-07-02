@@ -3,13 +3,19 @@ import type { FurnishingPlan, PlannerInput, Product, RoomType, SavedPlanResponse
 import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
-import { RoomIcon } from './icons';
+import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon, ExternalLinkIcon } from './icons';
 
 // Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
 // plan that lists prices but can't be clicked through to the store isn't actually shoppable. Mirrors PlanResults.
 function storeUrl(product: Product): string {
   const url = product.productUrl || product.url || '';
   return url.startsWith('http') ? url : '';
+}
+
+// Sprint 10.162: the REAL retailer photo only when it was verified on the live product page (same honesty gate
+// as PlanResults). Otherwise null → the row shows the crafted category icon, never a misleading stock photo.
+function productPhoto(product: Product): string | null {
+  return product.imageVerified && product.imageUrl ? product.imageUrl : null;
 }
 
 const qtyOf = (item: { quantity?: number }) => (item.quantity && item.quantity > 1 ? item.quantity : 1);
@@ -325,12 +331,25 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             <p className="move-in-budget-low" role="status">{t('moveIn.budgetLow', { amount: formatCurrency(shortfall) })}</p>
           )}
           <div className="move-in-total-card">
-            <span className="move-in-total-label">{t('moveIn.grandTotalLabel')}</span>
-            <strong className="move-in-total-value">{formatCurrency(total)}</strong>
-            <span className="move-in-total-budget">{t('moveIn.ofBudget', { budget: formatCurrency(totalBudget) })}</span>
-            <span className={over > 0 ? 'move-in-status over' : 'move-in-status within'}>
-              {over > 0 ? t('moveIn.overBudget', { amount: formatCurrency(over) }) : t('moveIn.withinBudget')}
-            </span>
+            <div className="move-in-total-row">
+              <div className="move-in-total-headline">
+                <span className="move-in-total-label">{t('moveIn.grandTotalLabel')}</span>
+                <div className="move-in-total-figure">
+                  <strong className="move-in-total-value">{formatCurrency(total)}</strong>
+                  <span className="move-in-total-budget">{t('moveIn.ofBudget', { budget: formatCurrency(totalBudget) })}</span>
+                </div>
+              </div>
+              <div className="move-in-total-statuscol">
+                <span className={over > 0 ? 'move-in-status over' : 'move-in-status within'}>
+                  {over > 0 ? t('moveIn.overBudget', { amount: formatCurrency(over) }) : t('moveIn.withinBudget')}
+                </span>
+                {over < 0 && <span className="move-in-total-left">{t('moveIn.budgetLeft', { amount: formatCurrency(-over) })}</span>}
+              </div>
+            </div>
+            {/* Sprint 10.162: the "budget filling a space" motif, applied to the whole apartment. */}
+            <div className="move-in-fillbar move-in-fillbar-lg" aria-hidden="true">
+              <span className={over > 0 ? 'over' : ''} style={{ width: `${Math.min(100, Math.round((total / Math.max(1, totalBudget)) * 100))}%` }} />
+            </div>
           </div>
 
           {/* Sprint 10.138: take the list with you — copy as text (paste into Notes / a message) or print it. */}
@@ -343,27 +362,47 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             {results.map((result) => (
               <article className="move-in-room-card" key={result.roomType}>
                 <div className="move-in-room-head">
-                  <strong>{t(result.labelKey)}</strong>
-                  <span className="move-in-room-budget">{t('moveIn.roomBudget', { amount: formatCurrency(result.allocatedBudget) })}</span>
+                  <span className="move-in-room-title">
+                    <span className="move-in-room-roomicon" aria-hidden="true"><RoomIcon room={result.roomType} size={17} /></span>
+                    <strong>{t(result.labelKey)}</strong>
+                  </span>
+                  {result.hasItems && (
+                    <span className="move-in-room-count">{t('moveIn.itemsCount', { count: result.plan.items.length })}</span>
+                  )}
                 </div>
                 {result.hasItems ? (
                   <>
-                    <div className="move-in-room-meta">
+                    <div className="move-in-room-spend">
                       <span className="move-in-room-total">{formatCurrency(result.plan.total)}</span>
-                      <span className="move-in-room-count">{t('moveIn.itemsCount', { count: result.plan.items.length })}</span>
-                      {result.plan.retailersUsed.length > 0 && (
-                        <span className="move-in-room-stores">{result.plan.retailersUsed.join(' + ')}</span>
-                      )}
+                      <span className="move-in-room-budget">{t('moveIn.roomBudget', { amount: formatCurrency(result.allocatedBudget) })}</span>
                     </div>
-                    {/* Sprint 10.129: show the FULL per-room list. The old "first 4 + (+N)" hid most of the
-                        room behind an unclickable counter — useless when the user is deciding what to buy for
-                        each room. Whole-apartment plans are only a few rooms, so the complete list is scannable. */}
+                    {/* Per-room "budget filling a space" bar — how full this room is against its slice. */}
+                    <div className="move-in-fillbar" aria-hidden="true">
+                      <span style={{ width: `${Math.min(100, Math.round((Number(result.plan.total) / Math.max(1, result.allocatedBudget)) * 100))}%` }} />
+                    </div>
+                    {result.plan.retailersUsed.length > 0 && (
+                      <div className="move-in-room-stores">
+                        {result.plan.retailersUsed.map((retailer) => (
+                          <span key={retailer} className="move-in-store-chip">{retailer}</span>
+                        ))}
+                      </div>
+                    )}
+                    {/* Sprint 10.129: show the FULL per-room list. Sprint 10.162: each item now leads with a
+                        thumbnail — the real verified photo, or the crafted category icon when unverified. */}
                     <ul className="move-in-room-items">
                       {result.plan.items.map((item) => {
-                        const qty = item.quantity && item.quantity > 1 ? item.quantity : 1;
+                        const qty = qtyOf(item);
                         const name = qty > 1 ? `${qty} × ${item.product.name}` : item.product.name;
                         const lineTotal = item.product.price * qty;
                         const openUrl = storeUrl(item.product);
+                        const photo = productPhoto(item.product);
+                        const thumb = (
+                          <span className="move-in-thumb" aria-hidden="true">
+                            {photo
+                              ? <img src={photo} alt="" loading="lazy" referrerPolicy="no-referrer" />
+                              : <CategoryIcon category={item.product.category} size={24} />}
+                          </span>
+                        );
                         return (
                           <li key={item.product.id} className="move-in-item">
                             {openUrl ? (
@@ -375,11 +414,16 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                                 title={t('results.openInStore')}
                                 onClick={() => trackProductClick(result.plan.id, item.product)}
                               >
+                                {thumb}
                                 <span className="move-in-item-name">{name}</span>
-                                <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
+                                <span className="move-in-item-price">
+                                  {formatCurrency(lineTotal)}
+                                  <span className="move-in-item-open" aria-hidden="true"><ExternalLinkIcon size={14} /></span>
+                                </span>
                               </a>
                             ) : (
                               <div className="move-in-item-row">
+                                {thumb}
                                 <span className="move-in-item-name">{name}</span>
                                 <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
                               </div>
@@ -394,7 +438,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                                 disabled={swapping === item.product.id}
                                 onClick={() => void swapItem(result.roomType, item.product.id)}
                               >
-                                {swapping === item.product.id ? '…' : '⇄'}
+                                {swapping === item.product.id ? '…' : <SwapIcon />}
                               </button>
                               <button
                                 type="button"
@@ -403,7 +447,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                                 aria-label={t('moveIn.removeItem')}
                                 onClick={() => removeItem(result.roomType, item.product.id)}
                               >
-                                ×
+                                <CloseIcon />
                               </button>
                             </span>
                           </li>

@@ -215,6 +215,7 @@ const DICTIONARY: Record<string, Entry> = {
   'moveIn.grandTotalLabel': { hr: 'Ukupno za stan', en: 'Apartment total' },
   'moveIn.ofBudget': { hr: 'od {budget}', en: 'of {budget}' },
   'moveIn.withinBudget': { hr: 'Stane u budžet', en: 'Within budget' },
+  'moveIn.budgetLeft': { hr: 'još {amount} slobodno', en: '{amount} still free' },
   'moveIn.overBudget': { hr: 'Prelazi za {amount}', en: 'Over by {amount}' },
   'moveIn.roomBudget': { hr: 'Budžet sobe: {amount}', en: 'Room budget: {amount}' },
   'moveIn.itemsCount': { hr: '{count} komada', en: '{count} items' },

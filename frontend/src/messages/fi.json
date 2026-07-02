@@ -519,6 +519,7 @@
   "moveIn.grandTotalLabel": "Asunto yhteensä",
   "moveIn.ofBudget": "/ {budget}",
   "moveIn.withinBudget": "Pysyy budjetissa",
+  "moveIn.budgetLeft": "vielä {amount} vapaana",
   "moveIn.overBudget": "{amount} yli",
   "moveIn.roomBudget": "Huoneen budjetti: {amount}",
   "moveIn.itemsCount": "{count} tuotetta",

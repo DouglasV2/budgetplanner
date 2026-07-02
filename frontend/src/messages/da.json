@@ -519,6 +519,7 @@
   "moveIn.grandTotalLabel": "Lejligheden i alt",
   "moveIn.ofBudget": "af {budget}",
   "moveIn.withinBudget": "Inden for budgettet",
+  "moveIn.budgetLeft": "{amount} tilbage",
   "moveIn.overBudget": "Over med {amount}",
   "moveIn.roomBudget": "Rumbudget: {amount}",
   "moveIn.itemsCount": "{count} produkter",
