@@ -1,6 +1,9 @@
 package ai.budgetspace.planner;
 
 import ai.budgetspace.dto.FurnishingPlanDto;
+import ai.budgetspace.dto.MoveInRequestDto;
+import ai.budgetspace.dto.MoveInResponse;
+import ai.budgetspace.dto.MoveInRoomDto;
 import ai.budgetspace.dto.PlanGenerationResponse;
 import ai.budgetspace.dto.PlanItemDto;
 import ai.budgetspace.dto.PlannerInputDto;
@@ -388,6 +391,38 @@ class PlannerServiceTest {
 
         assertThat(plan.items()).extracting(item -> item.product().id()).contains("sofa-sourced");
         assertThat(plan.items()).extracting(item -> item.product().id()).doesNotContain("sofa-sample");
+    }
+
+    // Sprint 10.158 (Move-In fill): a room whose catalog can only absorb a fraction of its weighted share must
+    // not strand the rest — the allocator caps it at its catalog capacity and moves the excess to a room that
+    // can actually spend it. Here the kitchen sells ONE 90€ cart, so its naive ~1177€ share flows to the
+    // living room (whose own cap is its priciest sofa+tv, 1500€).
+    @Test
+    void moveInCapsAThinRoomAndMovesItsBudgetToARoomThatCanSpendIt() {
+        Product sofaCheap = product("sofa-s", "Kauč mali", "IKEA", "sofa", 200, 4.0);
+        Product sofaMid = product("sofa-m", "Kauč srednji", "IKEA", "sofa", 600, 4.2);
+        Product sofaBig = product("sofa-l", "Kauč veliki", "IKEA", "sofa", 1200, 4.5);
+        Product tv = product("tv-s", "TV klupa", "IKEA", "tv-unit", 100, 4.0);
+        Product tvMid = product("tv-m", "TV regal", "IKEA", "tv-unit", 300, 4.1);
+        Product cart = product("cart-1", "Kuhinjska kolica", "IKEA", "kitchen-cart", 90, 4.0);
+        cart.setRoomTags("kitchen");
+        PlannerService service = serviceWithProducts(List.of(sofaCheap, sofaMid, sofaBig, tv, tvMid, cart));
+
+        MoveInResponse response = service.generateMoveIn(
+                new MoveInRequestDto(null, List.of("living-room", "kitchen"), 3000));
+
+        MoveInRoomDto living = response.rooms().get(0);
+        MoveInRoomDto kitchen = response.rooms().get(1);
+        assertThat(kitchen.allocatedBudget())
+                .as("the kitchen is capped near its 90€ catalog capacity (+ tier headroom), not handed its ~1177€ weighted share")
+                .isLessThanOrEqualTo(150);
+        assertThat(living.allocatedBudget())
+                .as("the kitchen's excess moves to the living room, up to ITS catalog capacity")
+                .isGreaterThanOrEqualTo(1400);
+        assertThat(response.grandTotal().intValue()).isLessThanOrEqualTo(3000);
+        assertThat(kitchen.plans().get(0).items())
+                .extracting(item -> item.product().category())
+                .contains("kitchen-cart");
     }
 
     private PlannerService serviceWithProducts(List<Product> products) {

@@ -49,4 +49,61 @@ class MoveInAllocationTest {
         assertEquals(1, alloc.length);
         assertEquals(2500, alloc[0]);
     }
+
+    // Sprint 10.158: capacity caps — a thin room must not strand budget it can never spend. Each cap is
+    // ceil(max(capacity, floor) × 1.25): the headroom keeps the tiers (which plan with 0.82–0.98 of the
+    // allocation) able to afford the pieces the capacity was measured from.
+
+    @Test
+    void thinRoomExcessMovesToTheRoomWithHeadroom() {
+        List<String> rooms = List.of("living-room", "kitchen");
+        int[] alloc = {2000, 1600};
+        int[] out = PlannerService.capAllocationsToCapacity(alloc, rooms, new double[]{400, 100}, new double[]{10000, 300});
+
+        assertEquals(375, out[1], "the kitchen is capped at its 300 capacity + tier headroom");
+        assertEquals(3225, out[0], "the kitchen's stranded excess moves to the living room");
+        assertEquals(3600, out[0] + out[1], "nothing is lost while a room still has headroom");
+    }
+
+    @Test
+    void cappingCascadesWhenRedistributionOverflowsAnotherRoom() {
+        List<String> rooms = List.of("living-room", "bedroom", "kitchen");
+        int[] alloc = {1500, 1300, 1200};
+        // Kitchen caps at 250 (200×1.25) → its 950 excess flows to living+bedroom; that pushes bedroom over
+        // ITS 1500 cap (1200×1.25) → a second round moves bedroom's overflow to the living room too.
+        int[] out = PlannerService.capAllocationsToCapacity(alloc, rooms, new double[]{400, 300, 100}, new double[]{10000, 1200, 200});
+
+        assertEquals(250, out[2], "kitchen capped");
+        assertEquals(1500, out[1], "bedroom capped after the first redistribution round");
+        assertEquals(4000 - 250 - 1500, out[0], "the living room absorbs both overflows");
+        assertEquals(4000, out[0] + out[1] + out[2]);
+    }
+
+    @Test
+    void allRoomsCappedLeavesTheRestHonestlyUnallocated() {
+        List<String> rooms = List.of("kitchen", "bathroom");
+        int[] alloc = {2000, 1000};
+        int[] out = PlannerService.capAllocationsToCapacity(alloc, rooms, new double[]{100, 80}, new double[]{300, 150});
+
+        assertEquals(375, out[0]);
+        assertEquals(188, out[1]);
+        assertTrue(out[0] + out[1] < 3000, "when no room has headroom the leftover stays unallocated, not inflated");
+    }
+
+    @Test
+    void capNeverDropsBelowTheCoreFloor() {
+        // A capacity estimate below the core floor (odd catalog state) must not starve the room's essentials.
+        int[] out = PlannerService.capAllocationsToCapacity(new int[]{500}, List.of("hallway"), new double[]{250}, new double[]{120});
+        assertTrue(out[0] >= 250, "the core floor wins over a lower capacity estimate");
+        assertTrue(out[0] < 500, "but the room is still capped below its naive share");
+    }
+
+    @Test
+    void allocationsWithinCapacityAreUntouched() {
+        List<String> rooms = List.of("living-room", "bedroom");
+        int[] alloc = {2100, 1900};
+        int[] out = PlannerService.capAllocationsToCapacity(alloc, rooms, new double[]{400, 300}, new double[]{5000, 4000});
+        assertEquals(2100, out[0]);
+        assertEquals(1900, out[1]);
+    }
 }

@@ -180,26 +180,87 @@ public class PlannerService {
 
         int[] alloc = allocateMoveIn(total, rooms, floors, sumFloors, apartmentPartial);
 
+        // Sprint 10.158 (Move-In fill): the weight-only split parked money in rooms whose catalog can't absorb
+        // it (a DE kitchen was allocated 1658 and could spend ~110, stranding the difference), so cap every
+        // room at its catalog capacity and re-share the excess up front. Skipped in the infeasible case —
+        // there is no excess to move when even the core floors don't fit.
+        double[] capacities = new double[rooms.size()];
+        if (!apartmentPartial) {
+            for (int i = 0; i < rooms.size(); i++) {
+                capacities[i] = roomCapacity(moveInRoomInput(base, rooms.get(i), 1));
+            }
+            alloc = capAllocationsToCapacity(alloc, rooms, floors, capacities);
+        }
+
+        // Use the SAME path as /generate-fast (the rule-based extractor) — its enrichment is what fills the
+        // full category set, so a room gets a COMPLETE plan (buildResponse alone returns a sparse one). The
+        // roomType is explicit and the prompt is just the room label, so the room is never mis-parsed.
+        PlanGenerationResponse[] responses = new PlanGenerationResponse[rooms.size()];
+        double[] spent = new double[rooms.size()];
+        for (int i = 0; i < rooms.size(); i++) {
+            responses[i] = generate(moveInRoomInput(base, rooms.get(i), alloc[i]));
+            spent[i] = valueTierTotal(responses[i]);
+        }
+
+        // Sprint 10.158, second pass: the value tier deliberately spends below its budget, so after the first
+        // pass a slice of the total is still unspent. Re-share the REALIZED leftover among the rooms that
+        // proved they can absorb it (used most of their allocation and still have catalog headroom) and
+        // regenerate just those. Each boosted budget is the room's realized spend + its leftover share (the
+        // boost never spends the same euro twice), and a boosted plan is kept only if it spends more AND stays
+        // within its boosted budget — repairBudget's value cap has an honest-over escape hatch when even the
+        // cheapest essentials overrun, and accepting such a plan here could push the grand total past the
+        // user's total.
+        if (!apartmentPartial && total > 0) {
+            double leftover = total - Arrays.stream(spent).sum();
+            if (leftover >= Math.max(100, total * 0.05)) {
+                boolean[] absorber = new boolean[rooms.size()];
+                double sumWeights = 0;
+                for (int i = 0; i < rooms.size(); i++) {
+                    absorber[i] = spent[i] >= 0.6 * alloc[i] && capacities[i] > alloc[i] + 1;
+                    if (absorber[i]) sumWeights += MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0);
+                }
+                for (int i = 0; i < rooms.size() && sumWeights > 0; i++) {
+                    if (!absorber[i]) continue;
+                    double share = leftover * MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) / sumWeights;
+                    int boostedBudget = (int) Math.min(Math.floor(spent[i] + share), moveInCap(capacities[i], floors[i]));
+                    if (boostedBudget <= alloc[i]) continue;
+                    PlanGenerationResponse boosted = generate(moveInRoomInput(base, rooms.get(i), boostedBudget));
+                    double boostedTotal = valueTierTotal(boosted);
+                    if (boostedTotal > spent[i] && boostedTotal <= boostedBudget) {
+                        responses[i] = boosted;
+                        alloc[i] = boostedBudget;
+                        spent[i] = boostedTotal;
+                    }
+                }
+            }
+        }
+
         List<MoveInRoomDto> roomDtos = new ArrayList<>();
         BigDecimal grandTotal = BigDecimal.ZERO;
         for (int i = 0; i < rooms.size(); i++) {
-            String room = rooms.get(i);
-            PlannerInputDto roomInput = new PlannerInputDto(
-                    ROOM_LABELS.getOrDefault(room, room), Math.max(1, alloc[i]), room,
-                    base.style(), base.location(), base.size(), base.retailerMode(), base.selectedRetailers(),
-                    base.optimizationGoal(), base.furnishingLevel(), List.of(), List.of(), List.of(),
-                    base.preferredRetailers(), base.excludedRetailers(), base.maxStores(),
-                    base.colorPreferences(), base.materialPreferences(), base.market()
-            ).normalized();
-            // Use the SAME path as /generate-fast (the rule-based extractor) — its enrichment is what fills the
-            // full category set, so a room gets a COMPLETE plan (buildResponse alone returns a sparse one). The
-            // roomType is explicit and the prompt is just the room label, so the room is never mis-parsed.
-            PlanGenerationResponse resp = generate(roomInput);
+            PlanGenerationResponse resp = responses[i];
             FurnishingPlanDto best = resp.plans().isEmpty() ? null : resp.plans().get(0);
             grandTotal = grandTotal.add(best == null ? BigDecimal.ZERO : best.total());
-            roomDtos.add(new MoveInRoomDto(room, alloc[i], resp.plans(), resp.partialPlan()));
+            roomDtos.add(new MoveInRoomDto(rooms.get(i), alloc[i], resp.plans(), resp.partialPlan()));
         }
         return new MoveInResponse(roomDtos, grandTotal, total, apartmentPartial, BigDecimal.valueOf(Math.round(shortfall)));
+    }
+
+    // One room's planner input inside a Move-In request — the room label as the prompt, the room's slice of the
+    // budget, everything else inherited from the base request.
+    private PlannerInputDto moveInRoomInput(PlannerInputDto base, String room, int budget) {
+        return new PlannerInputDto(
+                ROOM_LABELS.getOrDefault(room, room), Math.max(1, budget), room,
+                base.style(), base.location(), base.size(), base.retailerMode(), base.selectedRetailers(),
+                base.optimizationGoal(), base.furnishingLevel(), List.of(), List.of(), List.of(),
+                base.preferredRetailers(), base.excludedRetailers(), base.maxStores(),
+                base.colorPreferences(), base.materialPreferences(), base.market()
+        ).normalized();
+    }
+
+    private double valueTierTotal(PlanGenerationResponse resp) {
+        FurnishingPlanDto best = resp.plans().isEmpty() ? null : resp.plans().get(0);
+        return best == null ? 0 : best.total().doubleValue();
     }
 
     // Cheapest available core pieces for a room+market — the minimum to give the room a complete core. A core
@@ -213,12 +274,89 @@ public class PlannerService {
                 .toList();
         double floor = 0;
         for (String category : core) {
+            // Sprint 10.158: × default quantity, so a dining room's floor counts the 4 chairs the plan will
+            // actually buy — otherwise apartmentPartial/shortfall are optimistic and the room can be allocated
+            // below its real minimum.
             floor += catalog.stream()
                     .filter(product -> category.equalsIgnoreCase(product.getCategory()))
                     .mapToDouble(product -> product.getPrice().doubleValue())
-                    .min().orElse(0);
+                    .min().orElse(0) * quantityFor(roomInput, category);
         }
         return floor;
+    }
+
+    // Sprint 10.158 (Move-In fill): the most a room's plan could PLAUSIBLY spend in this market — the priciest
+    // planner-eligible product per desired category (× default quantity). Mirrors desiredCategories/matchesRoom,
+    // i.e. exactly the set a room plan shops from, so it is a true upper bound on the room's value-tier spend.
+    // Used to stop the apartment allocator from parking budget in a room whose catalog can't absorb it.
+    private double roomCapacity(PlannerInputDto roomInput) {
+        // Same retailer allow-list pickBest enforces — otherwise a retailer-constrained request would get a
+        // capacity (and thus a cap) measured over stores its plan is not allowed to shop from.
+        List<String> allowedRetailers = selectedRetailers(roomInput);
+        List<Product> catalog = marketCatalog(roomInput).stream()
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> matchesRoom(product, roomInput.roomType()))
+                .filter(product -> allowedRetailers.contains(product.getRetailer()))
+                .toList();
+        double capacity = 0;
+        for (String category : desiredCategories(roomInput)) {
+            capacity += catalog.stream()
+                    .filter(product -> category.equalsIgnoreCase(product.getCategory()))
+                    .mapToDouble(product -> product.getPrice().doubleValue())
+                    .max().orElse(0) * quantityFor(roomInput, category);
+        }
+        return capacity;
+    }
+
+    // The tiers plan with a slice of the allocation (value 0.98, budget 0.82 of it), so a room capped EXACTLY
+    // at its capacity could no longer afford the very pieces the capacity was measured from (value tier of a
+    // 90€-capacity room gets 88€ → empty plan). 1.25 covers the deepest slice (1/0.82 ≈ 1.22) + repair slack.
+    private static final double MOVE_IN_CAPACITY_HEADROOM = 1.25;
+
+    // A room's allocation ceiling: its catalog capacity (never below the core floor) + tier headroom.
+    private static int moveInCap(double capacity, double floor) {
+        return (int) Math.ceil(Math.max(capacity, floor) * MOVE_IN_CAPACITY_HEADROOM);
+    }
+
+    // Sprint 10.158: cap each room's allocation at what its catalog can absorb; the excess is re-shared (by
+    // room weight) among the rooms that still have headroom, so a thin room (kitchen in a sparse market) no
+    // longer strands a big slice of the apartment budget it can never spend. A capped room never drops below
+    // its core floor, and if EVERY room is capped the leftover simply stays unallocated — the market genuinely
+    // can't absorb the budget, and honesty beats inflating picks. Pure math, package-private for
+    // MoveInAllocationTest.
+    static int[] capAllocationsToCapacity(int[] alloc, List<String> rooms, double[] floors, double[] capacities) {
+        int n = alloc.length;
+        int[] out = alloc.clone();
+        boolean[] capped = new boolean[n];
+        for (int round = 0; round < n; round++) {
+            long excess = 0;
+            for (int i = 0; i < n; i++) {
+                if (capped[i]) continue;
+                int cap = moveInCap(capacities[i], floors[i]);
+                if (out[i] > cap) {
+                    excess += out[i] - cap;
+                    out[i] = cap;
+                    capped[i] = true;
+                }
+            }
+            if (excess == 0) break;
+            double sumWeights = 0;
+            for (int i = 0; i < n; i++) {
+                if (!capped[i]) sumWeights += MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0);
+            }
+            if (sumWeights <= 0) break;
+            long distributed = 0;
+            int last = -1;
+            for (int i = 0; i < n; i++) {
+                if (capped[i]) continue;
+                int add = (int) Math.floor(excess * MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) / sumWeights);
+                out[i] += add;
+                distributed += add;
+                last = i;
+            }
+            if (last >= 0) out[last] += (int) (excess - distributed);
+        }
+        return out;
     }
 
     // Integer per-room budgets that sum EXACTLY to total. Feasible: floor + a weighted share of the remainder.
