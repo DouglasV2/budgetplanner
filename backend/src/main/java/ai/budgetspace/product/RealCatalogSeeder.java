@@ -265,7 +265,16 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Sprint 10.133: AT IKEA depth (152 products) via the same global-article port as GB — jysk.at is
             // JS-gated so AT is IKEA-only; the port fills all 17 categories (incl. premium beds/mattresses/sofas).
             // AT 107 -> ~259. Curl, no agents.
-            "/catalog/real-ikea-at-deepen-10-133.json"
+            "/catalog/real-ikea-at-deepen-10-133.json",
+            // Sprint 10.159: kitchen + bathroom TARGETED deepen. A depth measurement showed kitchen-cart /
+            // kitchen-storage / bathroom-storage cores are well covered, but kitchen LIGHTING was thin (PT had
+            // 0) and lacked tiering, and a few bathroom cells were sparse. Filled the real gaps by porting
+            // well-stocked IKEA kitchen/bathroom global articles (RANARP/SKURUP/NYMÅNE kitchen pendants,
+            // STENSTORP islands, FRIHULT bath lamp, ...) to the markets missing them — bare-article trick where
+            // it resolves + workflow-discovered canonical slugs where it redirects to /cat/. EVERY row
+            // deterministically re-fetched (live JSON-LD price+currency + product og:image + model-token guard),
+            // dropped on 404 / category redirect / currency mismatch. Curl, no trusted agent data.
+            "/catalog/real-eu-kb-deepen-10-159.json"
     );
 
     /**
