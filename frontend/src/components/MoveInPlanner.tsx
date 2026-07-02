@@ -3,7 +3,7 @@ import type { FurnishingPlan, PlannerInput, Product, RoomType, SavedPlanResponse
 import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
-import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon, ExternalLinkIcon } from './icons';
+import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon } from './icons';
 
 // Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
 // plan that lists prices but can't be clicked through to the store isn't actually shoppable. Mirrors PlanResults.
@@ -416,10 +416,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                               >
                                 {thumb}
                                 <span className="move-in-item-name">{name}</span>
-                                <span className="move-in-item-price">
-                                  {formatCurrency(lineTotal)}
-                                  <span className="move-in-item-open" aria-hidden="true"><ExternalLinkIcon size={14} /></span>
-                                </span>
+                                <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
                               </a>
                             ) : (
                               <div className="move-in-item-row">

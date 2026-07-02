@@ -5178,7 +5178,7 @@ a.google-signin-button.google-signin-link:hover {
 .move-in-room-cards {
   display: grid;
   /* auto-FIT (not auto-fill) so a couple of rooms stretch to fill the row instead of leaving empty tracks. */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 16px;
   margin-top: 16px;
 }
@@ -5281,8 +5281,8 @@ a.google-signin-button.google-signin-link:hover {
 }
 /* Sprint 10.162: real verified photo, or the crafted category glyph (clay on sand) when unverified. */
 .move-in-thumb {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   flex: none;
   border-radius: 9px;
   background: var(--sand);
@@ -5303,7 +5303,7 @@ a.google-signin-button.google-signin-link:hover {
   flex: 1;
   min-width: 0;
   color: var(--ink-soft);
-  font-size: 0.87rem;
+  font-size: 0.85rem;
   font-weight: 500;
   line-height: 1.3;
   display: -webkit-box;
@@ -5315,53 +5315,45 @@ a.google-signin-button.google-signin-link:hover {
   flex-shrink: 0;
   white-space: nowrap;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-variant-numeric: tabular-nums;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-/* Sprint 10.162: the external-link glyph appears on hover (the whole row is the store link). */
-.move-in-item-open {
-  color: var(--muted);
-  opacity: 0;
-  display: inline-flex;
-  transition: opacity 0.14s ease, color 0.14s ease;
 }
 a.move-in-item-link {
   cursor: pointer;
-}
-a.move-in-item-link:hover .move-in-item-open,
-a.move-in-item-link:focus-visible .move-in-item-open {
-  opacity: 1;
-  color: var(--clay);
 }
 a.move-in-item-link:hover .move-in-item-name,
 a.move-in-item-link:hover .move-in-item-price {
   color: var(--clay);
 }
 
+/* Sprint 10.162b: the swap/remove icons take NO horizontal space when idle (width 0), so the product name
+   gets the full row width and stops truncating; they expand on hover/focus. This was the "text doesn't fit". */
 .move-in-item-actions {
   display: flex;
   gap: 1px;
   flex-shrink: 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.move-in-item:hover .move-in-item-actions,
+.move-in-item:focus-within .move-in-item-actions {
+  width: auto;
+  opacity: 1;
 }
 .move-in-item-act {
   border: none;
   background: none;
   cursor: pointer;
   color: var(--muted);
-  opacity: 0;
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 8px;
-  transition: opacity 0.12s ease, color 0.12s ease, background 0.12s ease;
-}
-.move-in-item:hover .move-in-item-act,
-.move-in-item-act:focus-visible {
-  opacity: 1;
+  flex: none;
+  transition: color 0.12s ease, background 0.12s ease;
 }
 .move-in-item-act:hover {
   background: rgba(33, 30, 25, 0.07);
