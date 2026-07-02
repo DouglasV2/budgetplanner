@@ -425,6 +425,23 @@ class PlannerServiceTest {
                 .contains("kitchen-cart");
     }
 
+    // Sprint 10.161 (from the whole-apartment scenario sweep): a Move-In shopper who already owns a category
+    // must NOT be told to re-buy it. The move-in path used to drop base.alreadyHaveCategories (hardcoded empty),
+    // so an owned sofa/bed was re-recommended in every market — the sweep's top trust-killer.
+    @Test
+    void moveInHonorsAlreadyOwnedCategories() {
+        PlannerService service = serviceWithProducts(defaultProducts());
+        PlannerInputDto base = new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi", null,
+                "best-value", "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0)
+                .withCategories(List.of(), List.of("sofa"));
+
+        MoveInResponse response = service.generateMoveIn(new MoveInRequestDto(base, List.of("living-room"), 3000));
+
+        List<String> cats = categories(response.rooms().get(0).plans().get(0));
+        assertThat(cats).as("an already-owned sofa must not be re-recommended in Move-In").doesNotContain("sofa");
+        assertThat(cats).as("the rest of the room is still planned").contains("tv-unit");
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);

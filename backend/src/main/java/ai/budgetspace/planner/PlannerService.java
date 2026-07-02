@@ -247,12 +247,15 @@ public class PlannerService {
     }
 
     // One room's planner input inside a Move-In request — the room label as the prompt, the room's slice of the
-    // budget, everything else inherited from the base request.
+    // budget, everything else inherited from the base request. Sprint 10.161: propagate alreadyHaveCategories to
+    // every room (was hardcoded empty), so a whole-apartment shopper who already owns e.g. a bed/sofa is not
+    // told to re-buy it — the biggest trust-killer the scenario sweep found. mustHave/locked stay per-request
+    // empty: a single global must-have would wrongly force that piece into EVERY room (a sofa in the bedroom).
     private PlannerInputDto moveInRoomInput(PlannerInputDto base, String room, int budget) {
         return new PlannerInputDto(
                 ROOM_LABELS.getOrDefault(room, room), Math.max(1, budget), room,
                 base.style(), base.location(), base.size(), base.retailerMode(), base.selectedRetailers(),
-                base.optimizationGoal(), base.furnishingLevel(), List.of(), List.of(), List.of(),
+                base.optimizationGoal(), base.furnishingLevel(), List.of(), base.alreadyHaveCategories(), List.of(),
                 base.preferredRetailers(), base.excludedRetailers(), base.maxStores(),
                 base.colorPreferences(), base.materialPreferences(), base.market()
         ).normalized();
