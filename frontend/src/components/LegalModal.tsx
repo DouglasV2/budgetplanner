@@ -1,5 +1,5 @@
 // Sprint 10.72 — renders a legal document (privacy / terms / impressum) in a modal overlay. Content lives in
-// legal.ts (HR + EN, English fallback for other locales). The app has no router, so legal pages are modals
+// legal.ts (HR + EN + DE; English fallback for other locales). The app has no router, so legal pages are modals
 // opened from the footer.
 import { useEffect } from 'react';
 import { useLocale } from '../LocaleContext';

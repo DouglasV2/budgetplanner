@@ -29,6 +29,11 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+  # Sprint 10.163: behind the TLS-terminating proxy the app sees plain HTTP, so honor X-Forwarded-Proto to
+  # recover the real scheme. This makes request.isSecure() true over HTTPS — which drives both the session
+  # cookie's Secure fail-safe (AuthController) and HSTS (SecurityHeadersFilter). 'framework' uses Spring's
+  # ForwardedHeaderFilter (the trusted-proxy strategy; the proxy must strip client-supplied X-Forwarded-* ).
+  forward-headers-strategy: framework
 
 budgetspace:
   auth:

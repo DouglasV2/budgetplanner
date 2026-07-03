@@ -5,6 +5,7 @@ import ai.budgetspace.dto.AuthUserDto;
 import ai.budgetspace.dto.GoogleLoginRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -77,12 +78,13 @@ public class AuthController {
 
     /** Sign in with a Google ID token. Sets the session cookie and returns the signed-in profile. */
     @PostMapping("/api/auth/google")
-    public AuthUserDto google(@RequestBody GoogleLoginRequest request, HttpServletResponse response) {
+    public AuthUserDto google(@RequestBody GoogleLoginRequest body, HttpServletRequest request,
+                              HttpServletResponse response) {
         AuthService.LoginResult result = authService.login(
-                request == null ? null : request.credential(),
-                request == null ? null : request.guestSessionId());
+                body == null ? null : body.credential(),
+                body == null ? null : body.guestSessionId());
         response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie(result.session().getToken(),
-                Duration.ofDays(properties.sessionTtlDays())).toString());
+                Duration.ofDays(properties.sessionTtlDays()), request).toString());
         return toDto(result.user());
     }
 
@@ -95,14 +97,14 @@ public class AuthController {
      */
     @GetMapping("/api/auth/google/start")
     public void googleStart(@RequestParam(name = "guest", required = false) String guest,
-                            HttpServletResponse response) throws IOException {
+                            HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!properties.redirectLoginConfigured()) {
             response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), "Google prijava nije konfigurirana.");
             return;
         }
         String state = randomToken();
         response.addHeader(HttpHeaders.SET_COOKIE,
-                stateCookie(state + "|" + (guest == null ? "" : guest), Duration.ofMinutes(10)).toString());
+                stateCookie(state + "|" + (guest == null ? "" : guest), Duration.ofMinutes(10), request).toString());
         String url = GOOGLE_AUTH_URL
                 + "?client_id=" + enc(properties.googleClientId())
                 + "&redirect_uri=" + enc(properties.googleRedirectUri())
@@ -125,9 +127,10 @@ public class AuthController {
                                @RequestParam(name = "state", required = false) String state,
                                @RequestParam(name = "error", required = false) String error,
                                @CookieValue(name = STATE_COOKIE, required = false) String stateCookie,
+                               HttpServletRequest request,
                                HttpServletResponse response) throws IOException {
         // Always clear the one-time state cookie.
-        response.addHeader(HttpHeaders.SET_COOKIE, stateCookie("", Duration.ZERO).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, stateCookie("", Duration.ZERO, request).toString());
 
         if (error != null || code == null || code.isBlank() || state == null || stateCookie == null) {
             redirectToFrontend(response, true);
@@ -150,7 +153,7 @@ public class AuthController {
         try {
             AuthService.LoginResult result = authService.login(idToken, guest);
             response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie(result.session().getToken(),
-                    Duration.ofDays(properties.sessionTtlDays())).toString());
+                    Duration.ofDays(properties.sessionTtlDays()), request).toString());
         } catch (InvalidGoogleTokenException exception) {
             redirectToFrontend(response, true);
             return;
@@ -188,9 +191,11 @@ public class AuthController {
     }
 
     // The CSRF/state cookie. SameSite=Lax (NOT inherited — Strict would be dropped on Google's top-level redirect
-    // back to the callback, breaking the flow); Secure follows the session cookie's environment.
-    private ResponseCookie stateCookie(String value, Duration maxAge) {
-        boolean secure = properties.cookieSecure() || "None".equals(properties.cookieSameSite());
+    // back to the callback, breaking the flow); Secure follows the session cookie's environment. Fail-safe: also
+    // Secure whenever the request actually arrived over HTTPS, even if the env flag was forgotten (can only ADD
+    // Secure, never remove it — plain-http dev where request.isSecure()==false stays unaffected).
+    private ResponseCookie stateCookie(String value, Duration maxAge, HttpServletRequest request) {
+        boolean secure = properties.cookieSecure() || "None".equals(properties.cookieSameSite()) || request.isSecure();
         return ResponseCookie.from(STATE_COOKIE, value)
                 .httpOnly(true)
                 .secure(secure)
@@ -222,9 +227,10 @@ public class AuthController {
     /** Sign out: delete the server session and clear the cookie. */
     @PostMapping("/api/auth/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@CookieValue(name = COOKIE, required = false) String sessionToken, HttpServletResponse response) {
+    public void logout(@CookieValue(name = COOKIE, required = false) String sessionToken,
+                       HttpServletRequest request, HttpServletResponse response) {
         authService.logout(sessionToken);
-        response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("", Duration.ZERO).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("", Duration.ZERO, request).toString());
     }
 
     /**
@@ -234,21 +240,24 @@ public class AuthController {
     @DeleteMapping("/api/auth/account")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAccount(@CookieValue(name = COOKIE, required = false) String sessionToken,
-                              HttpServletResponse response) {
+                              HttpServletRequest request, HttpServletResponse response) {
         AppUser user = authService.authenticate(sessionToken)
                 .orElseThrow(() -> new NotAuthenticatedException("Niste prijavljeni."));
         // Sprint 10.73: cancel any live Stripe subscription first so a deleted account is never billed again
         // (best-effort — never blocks the erasure), then delete the account + all its data.
         billingService.cancelSubscriptionQuietly(user.getStripeSubscriptionId());
         authService.deleteAccount(user);
-        response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("", Duration.ZERO).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("", Duration.ZERO, request).toString());
     }
 
-    private ResponseCookie sessionCookie(String value, Duration maxAge) {
+    private ResponseCookie sessionCookie(String value, Duration maxAge, HttpServletRequest request) {
         String sameSite = properties.cookieSameSite();
         // Browsers reject a SameSite=None cookie that isn't also Secure, so force Secure on for a split-host
         // (None) deploy even if cookie-secure wasn't set — otherwise sign-in would silently break cross-site.
-        boolean secure = properties.cookieSecure() || "None".equals(sameSite);
+        // Fail-safe: also Secure whenever the request actually arrived over HTTPS (request.isSecure()), so the
+        // cookie is Secure in prod even if the env flag was forgotten. This can only ADD Secure, never remove it —
+        // plain-http local dev (request.isSecure()==false, cookie-secure=false, SameSite=Lax) is unaffected.
+        boolean secure = properties.cookieSecure() || "None".equals(sameSite) || request.isSecure();
         return ResponseCookie.from(COOKIE, value)
                 .httpOnly(true)
                 .secure(secure)

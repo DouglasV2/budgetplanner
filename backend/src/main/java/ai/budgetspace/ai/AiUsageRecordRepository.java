@@ -24,4 +24,14 @@ public interface AiUsageRecordRepository extends JpaRepository<AiUsageRecord, Lo
     @Transactional
     @Query("delete from AiUsageRecord r where r.createdAt < :cutoff")
     int deleteByCreatedAtBefore(@Param("cutoff") Instant cutoff);
+
+    /**
+     * GDPR Art. 17 erasure: drop every AI-usage ledger row owned by this account ({@code user:<id>}). Called when
+     * the account is deleted, so no ledger metadata (tier/model/tokens keyed by owner) outlives the account.
+     * Returns the number of rows removed (for the audit log).
+     */
+    @Modifying
+    @Transactional
+    @Query("delete from AiUsageRecord r where r.ownerKey = :ownerKey")
+    int deleteByOwnerKey(@Param("ownerKey") String ownerKey);
 }

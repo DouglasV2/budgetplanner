@@ -1,5 +1,7 @@
 package ai.budgetspace.auth;
 
+import ai.budgetspace.ai.AiUsageRecordRepository;
+import ai.budgetspace.ai.AiUsageTracker;
 import ai.budgetspace.auth.GoogleTokenVerifier.GoogleIdentity;
 import ai.budgetspace.pricewatch.PriceWatchRepository;
 import ai.budgetspace.saved.SavedPlanRepository;
@@ -34,6 +36,8 @@ class AuthServiceTest {
     private SavedPlanRepository savedPlanRepository;
     private PriceWatchRepository priceWatchRepository;
     private PlusInterestRepository plusInterestRepository;
+    private AiUsageRecordRepository aiUsageRecordRepository;
+    private AiUsageTracker aiUsageTracker;
     private AuthService service;
 
     @BeforeEach
@@ -44,10 +48,12 @@ class AuthServiceTest {
         savedPlanRepository = mock(SavedPlanRepository.class);
         priceWatchRepository = mock(PriceWatchRepository.class);
         plusInterestRepository = mock(PlusInterestRepository.class);
+        aiUsageRecordRepository = mock(AiUsageRecordRepository.class);
+        aiUsageTracker = mock(AiUsageTracker.class);
         when(userRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(sessionRepository.save(any(AuthSession.class))).thenAnswer(invocation -> invocation.getArgument(0));
         service = new AuthService(verifier, userRepository, sessionRepository, savedPlanRepository,
-                priceWatchRepository, plusInterestRepository,
+                priceWatchRepository, plusInterestRepository, aiUsageRecordRepository, aiUsageTracker,
                 new AuthProperties("client-123", "", "", "/", 30, 7, false, "Lax"));
     }
 
@@ -194,6 +200,9 @@ class AuthServiceTest {
         // GDPR erasure: the account's saved plans (owned under "user:<id>"), every session, then the account row.
         verify(savedPlanRepository).deleteByOwner("user:u9");
         verify(sessionRepository).deleteByUserId("u9");
+        // ...the AI-usage ledger rows (durable) + this owner's transient in-memory counters, keyed by owner key.
+        verify(aiUsageRecordRepository).deleteByOwnerKey("user:u9");
+        verify(aiUsageTracker).forgetOwner("user:u9");
         // ...and the email PII that lives outside the account row: price-drop watches + the Plus waitlist.
         verify(priceWatchRepository).deleteByEmailIgnoreCase("e@example.com");
         verify(plusInterestRepository).deleteByEmailIgnoreCase("e@example.com");
@@ -219,6 +228,8 @@ class AuthServiceTest {
 
         verify(savedPlanRepository, never()).deleteByOwner(any());
         verify(sessionRepository, never()).deleteByUserId(any());
+        verify(aiUsageRecordRepository, never()).deleteByOwnerKey(anyString());
+        verify(aiUsageTracker, never()).forgetOwner(anyString());
         verify(priceWatchRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(plusInterestRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(userRepository, never()).delete(any());

@@ -22,14 +22,15 @@ import java.util.regex.Pattern;
  * JSON-LD {@code offers.price} (the same authoritative field the catalog was sourced from; for JYSK this
  * is the live/promo price). No JS rendering, no crawling, no anti-bot bypass — exactly one URL, http(s)
  * only, bounded size/timeouts. If nothing parses cleanly it returns empty so the re-check never invents a
- * price. A browser User-Agent is used (as in the sourcing passes) because some sites omit the JSON-LD for
- * a default UA; this only reads a page served to everyone, it does not defeat any protection.
+ * price. Sends an honest, self-identifying User-Agent (matching {@code HttpProductPageFetcher}) — no browser
+ * impersonation — per docs/sourcing-policy.md §1/§6; this only reads a page served to everyone.
  */
 @Component
 public class HttpLivePriceProbe implements LivePriceProbe {
     private static final Logger log = LoggerFactory.getLogger(HttpLivePriceProbe.class);
-    private static final String USER_AGENT =
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+    // An honest, self-identifying User-Agent — NO browser impersonation (docs/sourcing-policy.md §1/§6), matching
+    // the sibling HttpProductPageFetcher. We read only pages served to everyone; we do not forge a browser UA.
+    static final String USER_AGENT = "BudgetSpaceCollector/0.1 (+https://budgetspace.ai; price re-check)";
     private static final int MAX_BYTES = 2_000_000;
     private static final Pattern LD_JSON = Pattern.compile(
             "<script[^>]*type=[\"']application/ld\\+json[\"'][^>]*>(.*?)</script>",

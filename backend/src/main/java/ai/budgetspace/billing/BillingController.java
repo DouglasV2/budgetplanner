@@ -3,6 +3,7 @@ package ai.budgetspace.billing;
 import ai.budgetspace.auth.AppUser;
 import ai.budgetspace.auth.AuthService;
 import ai.budgetspace.dto.BillingConfirmRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,16 +27,26 @@ public class BillingController {
 
     private final AuthService authService;
     private final BillingService billingService;
+    // Sprint 10.105: the free-beta switch (BUDGETSPACE_BETA_MODE, default true) that AuthController reports on
+    // /api/auth/me. A server-side fail-safe: while beta mode is on, no charge can ever be created even if Stripe
+    // keys are accidentally configured — otherwise a user could be billed while the UI still says "free beta".
+    private final boolean betaMode;
 
-    public BillingController(AuthService authService, BillingService billingService) {
+    public BillingController(AuthService authService, BillingService billingService,
+                            @Value("${budgetspace.beta-mode:true}") boolean betaMode) {
         this.authService = authService;
         this.billingService = billingService;
+        this.betaMode = betaMode;
     }
 
     /** Create a Plus subscription Checkout Session and return the hosted-checkout URL to redirect to. */
     @PostMapping("/api/billing/checkout")
     public Map<String, String> checkout(@CookieValue(name = AUTH_COOKIE, required = false) String token,
                                         @RequestHeader(name = "Origin", required = false) String origin) {
+        // Fail-safe: never start a checkout while the free beta is on, even if Stripe is configured (503).
+        if (betaMode) {
+            throw new BillingUnavailableException("Naplata je onemogućena u beta razdoblju.");
+        }
         AppUser user = requireUser(token);
         String base = baseUrl(origin);
         String url = billingService.createCheckoutUrl(user,
@@ -48,6 +59,10 @@ public class BillingController {
     @PostMapping("/api/billing/confirm")
     public Map<String, String> confirm(@CookieValue(name = AUTH_COOKIE, required = false) String token,
                                        @RequestBody(required = false) BillingConfirmRequest request) {
+        // Fail-safe: never confirm/upgrade a paid session while the free beta is on (503).
+        if (betaMode) {
+            throw new BillingUnavailableException("Naplata je onemogućena u beta razdoblju.");
+        }
         AppUser user = requireUser(token);
         String plan = billingService.confirmAndUpgrade(request == null ? null : request.sessionId(), user);
         return Map.of("plan", plan);
@@ -58,6 +73,11 @@ public class BillingController {
     @ResponseStatus(HttpStatus.OK)
     public void webhook(@RequestBody(required = false) String payload,
                         @RequestHeader(name = "Stripe-Signature", required = false) String signature) {
+        // Fail-safe: while the free beta is on, swallow any webhook (200 OK, no-op) — there can be no live
+        // subscription to react to, and we must never mutate a plan/upgrade on a Stripe event during beta.
+        if (betaMode) {
+            return;
+        }
         billingService.handleWebhook(payload, signature);
     }
 

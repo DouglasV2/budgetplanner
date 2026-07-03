@@ -271,6 +271,8 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             onChange={(event) => onChange({ ...input, prompt: event.target.value })}
           />
         </label>
+        {/* Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the typed text. */}
+        <small className="field-help ai-interaction-notice">{t('planner.aiInteractionNotice')}</small>
         <button className="generate-button" type="submit" disabled={isLoading}>
           {isLoading ? t('planner.generating') : t('planner.generate')}
           <span>{t('form.generateHint')}</span>

@@ -190,6 +190,20 @@ public class AiUsageTracker {
         }
     }
 
+    /**
+     * GDPR Art. 17 (best-effort): drop this owner's in-memory usage events + any live reservation, so no per-owner
+     * usage metadata for a deleted account lingers in this instance's memory. Holds the same monitor as every other
+     * mutation, so it's safe against concurrent tryAcquire/complete. The durable ledger is erased separately (that
+     * is the authoritative deletion); this just keeps the transient counters consistent until the next restart.
+     */
+    public synchronized void forgetOwner(String ownerKey) {
+        if (ownerKey == null || ownerKey.isBlank()) {
+            return;
+        }
+        events.removeIf(e -> ownerKey.equals(e.ownerKey()));
+        inFlight.remove(ownerKey);
+    }
+
     /** The per-user daily AI allowance for a subscription tier. Unknown/guest tiers get the smallest. */
     int dailyLimitForTier(String tier) {
         if (tier == null) return guestDailyLimit;

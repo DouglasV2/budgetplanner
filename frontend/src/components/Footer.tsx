@@ -19,6 +19,8 @@ export function Footer() {
       <div>
         <strong>BudgetSpace</strong>
         <p>{t('footer.tagline')}</p>
+        {/* Sprint 10.163 (trademark / non-affiliation): a small muted echo that we are independent of the retailers. */}
+        <small className="field-help footer-independence">{t('footer.independence')}</small>
       </div>
       <nav className="footer-legal" aria-label={t('footer.legalNav')}>
         <button type="button" onClick={() => setLegal('privacy')}>{t('legal.privacy')}</button>

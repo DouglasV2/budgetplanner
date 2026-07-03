@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.time.Instant;
@@ -54,7 +55,7 @@ class AuthControllerTest {
         when(authService.authenticate(any())).thenReturn(Optional.empty());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        assertThatThrownBy(() -> controller.deleteAccount(null, response))
+        assertThatThrownBy(() -> controller.deleteAccount(null, new MockHttpServletRequest(), response))
                 .isInstanceOf(NotAuthenticatedException.class);
 
         // The unauthenticated path must not touch billing or erase any data.
@@ -69,7 +70,7 @@ class AuthControllerTest {
         when(authService.authenticate("tok")).thenReturn(Optional.of(user));
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        controller.deleteAccount("tok", response);
+        controller.deleteAccount("tok", new MockHttpServletRequest(), response);
 
         // Cancel the live subscription first (best-effort), then erase the account + all its data.
         verify(billingService).cancelSubscriptionQuietly("sub_live_123");
@@ -77,6 +78,33 @@ class AuthControllerTest {
         // The session cookie is cleared (expired) so the browser is logged out immediately after erasure.
         String setCookie = response.getHeader(HttpHeaders.SET_COOKIE);
         assertThat(setCookie).contains("bs_auth=").contains("Max-Age=0");
+    }
+
+    @Test
+    void cookieIsSecureOverHttpsEvenWhenCookieSecureFlagIsOff() {
+        // Fail-safe: cookieSecure=false in AuthProperties (the setUp default) but the request arrived over HTTPS
+        // → the session cookie MUST still carry Secure, so a forgotten prod env flag can't ship a non-Secure cookie.
+        AppUser user = new AppUser("u1", "sub-1", "ana@example.com", "Ana", "pic", Instant.now(), Instant.now());
+        when(authService.authenticate("tok")).thenReturn(Optional.of(user));
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setSecure(true);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.logout("tok", request, response);
+
+        assertThat(response.getHeader(HttpHeaders.SET_COOKIE)).contains("bs_auth=").contains("Secure");
+    }
+
+    @Test
+    void cookieIsNotSecureOverPlainHttpInDev() {
+        // The other side of the fail-safe: plain-http dev (request.isSecure()==false, cookieSecure=false,
+        // SameSite=Lax) must NOT get a Secure cookie, or the browser would drop it on http://localhost.
+        MockHttpServletRequest request = new MockHttpServletRequest(); // isSecure() defaults to false
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.logout(null, request, response);
+
+        assertThat(response.getHeader(HttpHeaders.SET_COOKIE)).contains("bs_auth=").doesNotContain("Secure");
     }
 
     // --- OAuth redirect callback: CSRF state guard (Sprint 10.149). These rejection branches short-circuit
@@ -87,7 +115,7 @@ class AuthControllerTest {
     void oauthCallbackWithAProviderErrorRedirectsToErrorAndMintsNoSession() throws Exception {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        controller.googleCallback(null, null, "access_denied", null, response);
+        controller.googleCallback(null, null, "access_denied", null, new MockHttpServletRequest(), response);
 
         assertThat(response.getRedirectedUrl()).contains("login=error");
         verify(authService, never()).login(any(), any());
@@ -97,7 +125,7 @@ class AuthControllerTest {
     void oauthCallbackWithoutACodeRedirectsToError() throws Exception {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        controller.googleCallback(null, "state-a", null, "state-a|guest-1", response);
+        controller.googleCallback(null, "state-a", null, "state-a|guest-1", new MockHttpServletRequest(), response);
 
         assertThat(response.getRedirectedUrl()).contains("login=error");
         verify(authService, never()).login(any(), any());
@@ -109,7 +137,7 @@ class AuthControllerTest {
         // callback → rejected with no token exchange and no session.
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        controller.googleCallback("auth-code-xyz", "state-a", null, "state-b|guest-1", response);
+        controller.googleCallback("auth-code-xyz", "state-a", null, "state-b|guest-1", new MockHttpServletRequest(), response);
 
         assertThat(response.getRedirectedUrl()).contains("login=error");
         verify(authService, never()).login(any(), any());

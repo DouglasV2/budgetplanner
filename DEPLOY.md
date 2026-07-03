@@ -90,6 +90,11 @@ with `ddl-auto=validate` checking it. So in prod:
 ## Gate 1 — Stripe go-live + ops
 
 ### 5. Stripe: switch to LIVE
+- **First flip `BUDGETSPACE_BETA_MODE=false`.** While beta-mode is true the billing endpoints are refused
+  server-side (`BillingController` → 503 / webhook no-op), so setting Stripe keys alone does NOT enable
+  charging — this is the fail-safe that prevents a charge firing while the UI still says "free beta".
+  Do NOT go live on billing until the Terms/checkout model is reconciled (one-time vs subscription) and the
+  pre-charge items in [legal-launch-checklist.md](docs/legal-launch-checklist.md) §C are done.
 - In Stripe, toggle to **Live mode**; create the live €5.99 product/price; set `STRIPE_SECRET_KEY` (live),
   `STRIPE_PUBLISHABLE_KEY` (live), `STRIPE_PLUS_PRICE_ID` (live).
 - Confirm the live checkout `success_url`/`cancel_url` resolve to the prod domain (built from the request Origin —

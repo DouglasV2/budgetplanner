@@ -188,3 +188,10 @@ budgetspace:
     notify-cooldown-days: ${BUDGETSPACE_PRICE_WATCH_COOLDOWN_DAYS:7}
     # Cron for the daily re-check (Spring 6-field cron). Only fires when recheck-enabled=true.
     recheck-cron: ${BUDGETSPACE_PRICE_WATCH_CRON:0 0 7 * * *}
+  retention:
+    # Sprint 10.163: GDPR Art. 5(1)(e) storage limitation. Daily sweep that prunes the pseudonymous analytics
+    # (product_clicks, plan_feedback) and the Plus waitlist (plus_interest — carries an optional email) older than
+    # the window below. ON by default (bounded storage is the safe default); disable via env to keep everything.
+    cleanup-enabled: ${BUDGETSPACE_RETENTION_CLEANUP_ENABLED:true}
+    months: ${BUDGETSPACE_RETENTION_MONTHS:18}                        # delete analytics/waitlist rows older than this
+    cleanup-cron: ${BUDGETSPACE_RETENTION_CLEANUP_CRON:0 45 3 * * *}  # daily, staggered after the session sweep

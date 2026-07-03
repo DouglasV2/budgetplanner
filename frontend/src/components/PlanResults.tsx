@@ -953,6 +953,9 @@ export function PlanResults({
           from useAuth() and, when it's false, render a PREVIEW here (recommended style + budget-by-category +
           "N matching products found") instead of the full output, gating the exact products / store links /
           alternatives / downloadable list behind a purchased session. No premium feature is gated during beta. */}
+      {/* Sprint 10.163 (UCPD timeliness): an always-visible caveat that prices/availability/reviews are estimates
+          and BudgetSpace is not the seller — the buried Terms-modal statement is not enough at the point of display. */}
+      <p className="field-help price-estimate-note" role="note">{t('results.priceEstimateNote')}</p>
       {partialNotice && (
         <div className="partial-plan-note" role="status">
           <strong>{t('results.partialPlan')}</strong>
@@ -1102,7 +1105,10 @@ export function PlanResults({
                           <span className={`priority-chip ${priority}`}>{shoppingPriorityLabels[priority]}</span>
                           <span>{availabilityLabel(t, product)}</span>
                           {hasReviews(t, product) && (
-                            <span className="review-chip" title={t('results.reviewChipTitle')}>
+                            // Sprint 10.163 (Omnibus review rules): the softened default tooltip no longer claims
+                            // "(verified)"; when the product is stale we can't re-verify the rating, so the tooltip
+                            // becomes explicitly time-qualified. The click-through to the store's reviews is kept below.
+                            <span className="review-chip" title={isStaleProduct(product) ? t('results.reviewChipTitleStale') : t('results.reviewChipTitle')}>
                               {reviewSummary(t, product)}
                             </span>
                           )}

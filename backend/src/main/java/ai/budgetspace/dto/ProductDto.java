@@ -83,9 +83,15 @@ public record ProductDto(
                 splitTags(product.getColorTags()),
                 splitTags(product.getMaterialTags()),
                 firstNonBlank(product.getOriginalProductUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),
-                product.getAffiliateUrl(),
-                product.isSponsored(),
-                product.getSponsorLabel(),
+                // GUARD (Sprint 10.163): neutralize the sponsored/affiliate fields at the API boundary so the client
+                // can NEVER receive a paid flag or affiliate redirect while there is no disclosure UI + ranking
+                // guardrail. The Terms promise sponsored links are "clearly labelled"; until a visible "Sponsored"
+                // badge AND a rank guard (a sponsored row must never displace the best organic pick) both ship, no
+                // paid placement is shown — true by construction. The entity fields stay intact; this only stops
+                // them leaking. REMOVE this guard together with that disclosure UI + ranking guard, not before.
+                null,   // affiliateUrl — was product.getAffiliateUrl()
+                false,  // sponsored   — was product.isSponsored()
+                null,   // sponsorLabel — was product.getSponsorLabel()
                 product.getReviewCount(),
                 product.getReviewRating(),
                 firstNonBlank(product.getReviewsUrl(), firstNonBlank(product.getProductUrl(), product.getUrl())),

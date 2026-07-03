@@ -280,7 +280,9 @@ export function authLogout() {
 // Sprint 10.72: GDPR "right to be forgotten" — permanently delete the signed-in account and all its data
 // (saved plans + sessions). The backend clears the cookie; the caller then drops the local user.
 export function deleteAccount() {
-  return request<void>('/api/auth/account', { method: 'DELETE' });
+  // Sprint 10.163 (CSRF defense-in-depth): send the session header on this state-changing write, mirroring
+  // savePlan/generatePlan. Harmless today; sets up future backend enforcement.
+  return request<void>('/api/auth/account', { method: 'DELETE', headers: { 'X-BudgetSpace-Session': sessionId() } });
 }
 
 // Sprint 10.68: an early willingness-to-pay signal — "I want Plus", optionally with an email for the launch
@@ -298,12 +300,16 @@ export function recordPlusInterest(email?: string, source?: string) {
 // Sprint 10.69: Stripe checkout. The backend creates a hosted Checkout Session and returns its URL; the frontend
 // redirects there. On return (?plus=success&session_id=…) confirmCheckout verifies payment + upgrades the account.
 export function startCheckout() {
-  return request<{ url: string }>('/api/billing/checkout', { method: 'POST' });
+  // Sprint 10.163 (CSRF defense-in-depth): send the session header on this state-changing write.
+  return request<{ url: string }>('/api/billing/checkout', { method: 'POST', headers: { 'X-BudgetSpace-Session': sessionId() } });
 }
 
 export function confirmCheckout(sessionId: string) {
   return request<{ plan: string }>('/api/billing/confirm', {
     method: 'POST',
+    // Sprint 10.163 (CSRF defense-in-depth): the param `sessionId` shadows the module `sessionId()` here, so use
+    // the exported getGuestSessionId() for the browser session header (the param is the Stripe checkout session id).
+    headers: { 'X-BudgetSpace-Session': getGuestSessionId() },
     body: JSON.stringify({ sessionId })
   });
 }

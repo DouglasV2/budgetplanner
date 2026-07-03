@@ -755,6 +755,8 @@ export function Planner() {
             // (preferredRetailers, qualityPreference, …) to the user.
             <p className="ai-insight-unsure">{t('planner.unsure')}</p>
           )}
+          {/* Sprint 10.163 (reliance / UCPD): only when AI actually produced this — the estimates aren't advice. */}
+          {analysis.aiUsed && <p className="field-help ai-not-advice-note">{t('planner.aiNotAdvice')}</p>}
         </section>
       )}
 

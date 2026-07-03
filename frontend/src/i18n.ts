@@ -96,6 +96,8 @@ const DICTIONARY: Record<string, Entry> = {
   'stats.shareable': { hr: 'plan se može podijeliti', en: 'the plan can be shared' },
 
   'footer.tagline': { hr: 'Planer koji iz budžeta i želja slaže konkretan popis za kupnju.', en: 'A planner that turns your budget and wishes into a concrete shopping list.' },
+  // Sprint 10.163 (trademark / non-affiliation): a small muted echo near the tagline that we are independent.
+  'footer.independence': { hr: 'Nismo povezani s IKEA-om, JYSK-om, eBayem ni bilo kojim trgovcem. Zaštitni znakovi pripadaju vlasnicima.', en: 'Not affiliated with IKEA, JYSK, eBay or any retailer. Trademarks belong to their owners.' },
   'footer.backToTop': { hr: 'Natrag gore ↑', en: 'Back to top ↑' },
   // Sprint 10.72: legal + GDPR account deletion.
   'footer.legalNav': { hr: 'Pravno', en: 'Legal' },
@@ -199,6 +201,10 @@ const DICTIONARY: Record<string, Entry> = {
   'planner.aiUnderstood': { hr: 'AI je razumio tvoju želju', en: 'The AI understood your wish' },
   'planner.weUnderstood': { hr: 'Što smo razumjeli iz opisa', en: 'What we understood from your description' },
   'planner.unsure': { hr: 'Za precizniji plan možeš dodati npr. stil, boje ili materijale — ili podesi polja lijevo.', en: 'For a sharper plan you can add e.g. style, colours or materials — or tweak the fields on the left.' },
+  // Sprint 10.163 (reliance / UCPD): a muted caveat under the AI insight card, shown only when AI was actually used.
+  'planner.aiNotAdvice': { hr: 'AI prijedlog — cijene i pristajanje su procjene, nisu stručni savjet. Provjeri kod trgovca prije kupnje.', en: 'AI-generated suggestion — prices and fit are estimates, not professional advice. Check with the retailer before buying.' },
+  // Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the free-text prompt.
+  'planner.aiInteractionNotice': { hr: 'Pokreće AI — tvoj tekst obrađuje AI asistent kako bi razumio tvoj zahtjev.', en: 'Powered by AI — your text is processed by an AI assistant to understand your request.' },
   // Sprint 10.109: Move-In ("Cijeli stan") — multi-room mode. Same engine, one total budget split across rooms.
   'moveIn.scopeSingle': { hr: 'Jedna soba', en: 'One room' },
   'moveIn.scopeApartment': { hr: 'Cijeli stan', en: 'Whole apartment' },
@@ -488,7 +494,14 @@ const DICTIONARY: Record<string, Entry> = {
   'results.imageIllustrationAlt': { hr: '{name} — ilustracija (nije stvarna fotografija proizvoda)', en: '{name} — illustration (not an actual product photo)' },
   'results.marketCatalogTitle': { hr: 'Tržište / katalog: {market}', en: 'Market / catalog: {market}' },
   'results.marketLabel': { hr: 'Tržište: {market}', en: 'Market: {market}' },
-  'results.reviewChipTitle': { hr: 'Prosječna ocjena i broj recenzija u trgovini (provjereno)', en: 'Average rating and number of reviews in store (verified)' },
+  // Sprint 10.163 (Omnibus review rules): the star rating is the retailer's own aggregate as recorded when we last
+  // checked — we no longer assert "(verified)"/"(provjereno)" for a number we can't currently re-verify, and a
+  // stale product gets an explicitly time-qualified tooltip. The click-through to the store's reviews is kept.
+  'results.reviewChipTitle': { hr: 'Ocjena sa stranice trgovca u trenutku zadnje provjere. Provjeri aktualne recenzije u trgovini.', en: 'Rating from the retailer\'s page when last checked. Check current reviews in store.' },
+  'results.reviewChipTitleStale': { hr: 'Ocjena je zabilježena prije nekog vremena i možda više nije aktualna — provjeri recenzije u trgovini.', en: 'This rating was recorded a while ago and may be out of date — check the reviews in store.' },
+  // Sprint 10.163 (UCPD timeliness): an always-visible point-of-display caveat that prices/availability/reviews are
+  // estimates gathered from retailers and BudgetSpace is not the seller. Renders subtly (muted) at the top of the plan.
+  'results.priceEstimateNote': { hr: 'Cijene i dostupnost su procjene prikupljene od trgovaca i mogu biti zastarjele — provjeri na stranici trgovca prije kupnje. BudgetSpace nije prodavatelj.', en: 'Prices and availability are estimates gathered from retailers and may be out of date — always check on the retailer\'s page before buying. BudgetSpace is not the seller.' },
   'results.illustrationTitle': { hr: 'Nemamo stvarnu fotografiju ovog proizvoda — prikazana je ilustracija kategorije.', en: 'We don\'t have an actual photo of this product — a category illustration is shown.' },
   'results.illustrationChip': { hr: 'ilustracija', en: 'illustration' },
   'results.onSale': { hr: 'Akcija', en: 'On sale' },
