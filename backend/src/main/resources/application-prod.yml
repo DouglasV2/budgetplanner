@@ -46,6 +46,11 @@ budgetspace:
     enabled: ${BUDGETSPACE_ADMIN_ENDPOINTS_ENABLED:false}
   real-catalog:
     seed-enabled: ${BUDGETSPACE_REAL_CATALOG_SEED_ENABLED:true}
+  catalog:
+    # Sprint 10.166: production turns ON the rolling freshness re-check + weekly health audit (base default is OFF
+    # so dev/test/CI never fire outbound requests). Env still overrides — set the flag to false to pause either.
+    freshness-enabled: ${BUDGETSPACE_CATALOG_FRESHNESS_ENABLED:true}
+    audit-enabled: ${BUDGETSPACE_CATALOG_AUDIT_ENABLED:true}
 
 app:
   cors:

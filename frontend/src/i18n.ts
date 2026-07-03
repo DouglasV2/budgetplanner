@@ -205,6 +205,9 @@ const DICTIONARY: Record<string, Entry> = {
   'planner.aiNotAdvice': { hr: 'AI prijedlog — cijene i pristajanje su procjene, nisu stručni savjet. Provjeri kod trgovca prije kupnje.', en: 'AI-generated suggestion — prices and fit are estimates, not professional advice. Check with the retailer before buying.' },
   // Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the free-text prompt.
   'planner.aiInteractionNotice': { hr: 'Tvoj tekst obrađuje AI asistent.', en: 'Your text is processed by an AI assistant.' },
+  // Sprint 10.166: freshness note shown when an older SAVED plan is opened — its prices are a snapshot from save time.
+  'results.savedPlanFreshnessNote': { hr: 'Cijene su zabilježene {date} (prije {days} d.). Provjeri ih u trgovini ili osvježi plan.', en: 'Prices were captured on {date} ({days}d ago). Check in-store or refresh the plan.' },
+  'results.savedPlanRefresh': { hr: 'Osvježi cijene', en: 'Refresh prices' },
   // Sprint 10.109: Move-In ("Cijeli stan") — multi-room mode. Same engine, one total budget split across rooms.
   'moveIn.scopeSingle': { hr: 'Jedna soba', en: 'One room' },
   'moveIn.scopeApartment': { hr: 'Cijeli stan', en: 'Whole apartment' },

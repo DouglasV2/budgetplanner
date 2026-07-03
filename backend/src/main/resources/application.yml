@@ -127,6 +127,12 @@ budgetspace:
     # products under ~12 days, inside the 14-day UI freshness threshold. Tune batch to catalogSize/maxAgeDays.
     freshness-cron: ${BUDGETSPACE_CATALOG_FRESHNESS_CRON:0 20 */6 * * *}
     freshness-batch-size: ${BUDGETSPACE_CATALOG_FRESHNESS_BATCH_SIZE:60}
+    # Sprint 10.166: weekly catalog HEALTH AUDIT. Reads DB state only (no outbound fetch), logs a summary, and
+    # escalates to WARN (→ Sentry) when the stale share crosses the threshold — the "N products outdated" alert.
+    # OFF by default; the prod profile turns it on (application-prod.yml).
+    audit-enabled: ${BUDGETSPACE_CATALOG_AUDIT_ENABLED:false}
+    audit-cron: ${BUDGETSPACE_CATALOG_AUDIT_CRON:0 0 4 * * 1}                   # weekly, Monday 04:00
+    audit-stale-threshold: ${BUDGETSPACE_CATALOG_AUDIT_STALE_THRESHOLD:0.2}     # warn when >20% of the catalog is stale
   feeds:
     # Sprint 10.14: official/partner feed slots for the feed-required retailers (Decathlon, Pevex,
     # Lesnina) whose sites return HTTP 403 and which we therefore never scrape. Blank = not configured

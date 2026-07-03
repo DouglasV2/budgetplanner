@@ -29,15 +29,17 @@ public class ProductController {
     private final RetailerSnapshotImportService retailerSnapshotImportService;
     private final RetailerCollectorService retailerCollectorService;
     private final CatalogHealthService catalogHealthService;
+    private final CatalogAuditService catalogAuditService;
     private final CollectorRunStore collectorRunStore;
     private final CategoryDiscoveryService categoryDiscoveryService;
 
-    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService, RetailerCollectorService retailerCollectorService, CatalogHealthService catalogHealthService, CollectorRunStore collectorRunStore, CategoryDiscoveryService categoryDiscoveryService) {
+    public ProductController(ProductRepository productRepository, ProductImportService productImportService, RetailerSnapshotImportService retailerSnapshotImportService, RetailerCollectorService retailerCollectorService, CatalogHealthService catalogHealthService, CatalogAuditService catalogAuditService, CollectorRunStore collectorRunStore, CategoryDiscoveryService categoryDiscoveryService) {
         this.productRepository = productRepository;
         this.productImportService = productImportService;
         this.retailerSnapshotImportService = retailerSnapshotImportService;
         this.retailerCollectorService = retailerCollectorService;
         this.catalogHealthService = catalogHealthService;
+        this.catalogAuditService = catalogAuditService;
         this.collectorRunStore = collectorRunStore;
         this.categoryDiscoveryService = categoryDiscoveryService;
     }
@@ -90,6 +92,12 @@ public class ProductController {
     @GetMapping("/api/products/catalog-health")
     public CatalogHealthDto catalogHealth() {
         return catalogHealthService.compute();
+    }
+
+    // Dev-only: run the catalog-health audit on demand (also runs weekly on a schedule). No UI.
+    @GetMapping("/api/products/catalog-audit")
+    public CatalogAuditService.AuditReport catalogAudit() {
+        return catalogAuditService.runAudit();
     }
 
     // Dev-only: read past collector runs. No UI.

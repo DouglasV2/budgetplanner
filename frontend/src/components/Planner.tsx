@@ -80,6 +80,13 @@ function formatSavedDate(value: string) {
   }).format(date);
 }
 
+// Sprint 10.166: whole days since an ISO timestamp — for the "prices captured N days ago" note on an opened plan.
+function daysSince(iso: string) {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return 0;
+  return Math.max(0, Math.floor((Date.now() - then) / 86_400_000));
+}
+
 // Sprint 10.61: Saved Spaces — group a session's saved room-plans by "space" (e.g. "Moj dom"), let the user
 // switch/create the active space, and "keep designing" a space (= start another room for the same home).
 function SavedPlansInbox({
@@ -263,6 +270,9 @@ export function Planner() {
   const [scope, setScope] = useState<'single' | 'apartment'>('single');
   // Sprint 10.116: when a free-text prompt names several rooms, this seeds the Move-In mode the nudge switches to.
   const [moveInSeed, setMoveInSeed] = useState<{ rooms: RoomType[]; budget: number } | null>(null);
+  // Sprint 10.166: when the shown plan is an OPENED SAVED plan, remember when it was saved so we can surface a
+  // "prices captured N days ago — refresh" note. Null for a freshly generated plan (its prices are current).
+  const [openedSavedAt, setOpenedSavedAt] = useState<string | null>(null);
 
   async function refreshSavedPlans() {
     try {
@@ -327,6 +337,7 @@ export function Planner() {
         setInput(savedPlan.input);
         setPlans([savedPlan.plan]);
         setSecondHand([]);
+        setOpenedSavedAt(savedPlan.createdAt);
         setNotice(t('planner.noticeLoaded'));
       })
       .catch(() => setError(t('planner.errorNotFound')))
@@ -362,6 +373,7 @@ export function Planner() {
     setAnalysis(null);
     setSecondHand([]);
     setRefining(false);
+    setOpenedSavedAt(null); // a fresh generation prices against the current catalog → drop the "saved plan" note
 
     // Sprint 10.78: two-phase generate. Paint an INSTANT deterministic draft (~50ms) so the user isn't staring
     // at a ~2s spinner, then refine it with the AI result (which we kick off immediately, in parallel).
@@ -528,6 +540,7 @@ export function Planner() {
     setInput(savedPlan.input);
     setPlans([savedPlan.plan]);
     setSecondHand([]);
+    setOpenedSavedAt(savedPlan.createdAt);
     if (savedPlan.spaceName) setActiveSpace(savedPlan.spaceName);
     setPartialNotice(null);
     setAnalysis(null);
@@ -711,6 +724,14 @@ export function Planner() {
             }}
           >
             {t('results.multiRoomCta')}
+          </button>
+        </div>
+      )}
+      {openedSavedAt && plans.length > 0 && (
+        <div className="planner-notice saved-freshness-note" role="note">
+          <span>{t('results.savedPlanFreshnessNote', { date: formatSavedDate(openedSavedAt), days: daysSince(openedSavedAt) })}</span>
+          <button type="button" className="saved-freshness-refresh" onClick={handleGenerate} disabled={isLoading}>
+            {t('results.savedPlanRefresh')}
           </button>
         </div>
       )}

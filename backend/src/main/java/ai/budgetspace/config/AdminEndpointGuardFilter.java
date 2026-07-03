@@ -32,7 +32,8 @@ public class AdminEndpointGuardFilter extends OncePerRequestFilter {
     private static final List<String> GUARDED_PREFIXES = List.of(
             "/api/products/import",
             "/api/products/collect",
-            "/api/products/catalog-health"
+            "/api/products/catalog-health",
+            "/api/products/catalog-audit"
     );
 
     private final boolean adminEnabled;

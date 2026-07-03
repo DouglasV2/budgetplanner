@@ -93,6 +93,8 @@
   "planner.unsure": "Für einen genaueren Plan kannst du z. B. Stil, Farben oder Materialien ergänzen — oder pass die Felder links an.",
   "planner.aiNotAdvice": "KI-Vorschlag — Preise und Passform sind Schätzungen, keine fachliche Beratung. Vor dem Kauf beim Händler prüfen.",
   "planner.aiInteractionNotice": "Dein Text wird von einem KI-Assistenten verarbeitet.",
+  "results.savedPlanFreshnessNote": "Preise erfasst am {date} (vor {days} T.). Im Geschäft prüfen oder Plan aktualisieren.",
+  "results.savedPlanRefresh": "Preise aktualisieren",
   "form.roomLivingRoomLabel": "Wohnzimmer",
   "results.dimensionNotice": "Wir können noch nicht nach exakten Maßen filtern (z. B. Breite). Prüfe die Maße auf der Produktseite vor dem Kauf.",
   "form.roomStudioLabel": "Einzimmerwohnung",
