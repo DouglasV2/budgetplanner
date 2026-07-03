@@ -204,7 +204,7 @@ const DICTIONARY: Record<string, Entry> = {
   // Sprint 10.163 (reliance / UCPD): a muted caveat under the AI insight card, shown only when AI was actually used.
   'planner.aiNotAdvice': { hr: 'AI prijedlog — cijene i pristajanje su procjene, nisu stručni savjet. Provjeri kod trgovca prije kupnje.', en: 'AI-generated suggestion — prices and fit are estimates, not professional advice. Check with the retailer before buying.' },
   // Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the free-text prompt.
-  'planner.aiInteractionNotice': { hr: 'Pokreće AI — tvoj tekst obrađuje AI asistent kako bi razumio tvoj zahtjev.', en: 'Powered by AI — your text is processed by an AI assistant to understand your request.' },
+  'planner.aiInteractionNotice': { hr: 'Tvoj tekst obrađuje AI asistent.', en: 'Your text is processed by an AI assistant.' },
   // Sprint 10.109: Move-In ("Cijeli stan") — multi-room mode. Same engine, one total budget split across rooms.
   'moveIn.scopeSingle': { hr: 'Jedna soba', en: 'One room' },
   'moveIn.scopeApartment': { hr: 'Cijeli stan', en: 'Whole apartment' },

@@ -102,14 +102,15 @@ a {
   flex: none;
 }
 
-/* Two-tone lowercase logotype: "budget" ink + "space" clay (echoes the mark's clay fill). */
+/* Two-tone uppercase logotype: "BUDGET" ink + "SPACE" clay (echoes the mark's clay fill). */
 .brand-word {
   font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: -0.035em;
-  font-size: 1.32rem;
+  letter-spacing: -0.01em;
+  font-size: 1.24rem;
   color: var(--ink);
   line-height: 1;
+  text-transform: uppercase;
 }
 .brand-word-accent {
   color: var(--clay);
