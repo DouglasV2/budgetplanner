@@ -35,7 +35,7 @@ current when a processing purpose, subprocessor or retention period changes.
 | Processor | Purpose | Country | Transfer safeguard | Status |
 |-----------|---------|---------|--------------------|--------|
 | Google (Identity) | Google Sign-In | US | Google DPA + EU-US DPF / SCCs | Live |
-| Google (Gemini API) | AI prompt processing | US | **Paid-tier Gemini API — no training on prompts + Google Data Processing Addendum** | Live when AI is on — **confirm the project is on the PAID tier** (a free-tier key trains on inputs) |
+| Google (Gemini API) | AI prompt processing | US | **Paid-tier Gemini API — no training on prompts + Google Data Processing Addendum** | Live when AI is on — **paid tier confirmed** (billing account linked, prepay, "Paid 2"). Ensure the app's key is from a project under that billing account. |
 | Stripe | Payment processing | US/EU | Stripe DPA + SCCs | Dormant |
 | Sentry | Error monitoring | US | Sentry DPA + SCCs | Live (DSN blank ⇒ off) |
 | eBay | Public used-listings **source** | — | **Not a recipient** — we send eBay no personal data | Dormant (feature hidden) |
