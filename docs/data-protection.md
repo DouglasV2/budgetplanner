@@ -11,7 +11,7 @@ current when a processing purpose, subprocessor or retention period changes.
 
 ## 1. Controller
 
-- **Controller:** Bruno (add surname before broad promotion) — see `frontend/src/legal.ts` → `OPERATOR`.
+- **Controller:** Bruno Pušić — see `frontend/src/legal.ts` → `OPERATOR`.
 - **Contact:** budgetspace.ai@gmail.com
 - **Supervisory authority:** Croatia — AZOP (Agencija za zaštitu osobnih podataka). For DE/AT users, the
   competent authority is their national/Land DPA.
@@ -35,14 +35,16 @@ current when a processing purpose, subprocessor or retention period changes.
 | Processor | Purpose | Country | Transfer safeguard | Status |
 |-----------|---------|---------|--------------------|--------|
 | Google (Identity) | Google Sign-In | US | Google DPA + EU-US DPF / SCCs | Live |
-| Google (Gemini API) | AI prompt processing | US | **Use Vertex/paid API under the Google Cloud DPA (no training)** | Dormant — precondition before enabling |
+| Google (Gemini API) | AI prompt processing | US | **Paid-tier Gemini API — no training on prompts + Google Data Processing Addendum** | Live when AI is on — **confirm the project is on the PAID tier** (a free-tier key trains on inputs) |
 | Stripe | Payment processing | US/EU | Stripe DPA + SCCs | Dormant |
 | Sentry | Error monitoring | US | Sentry DPA + SCCs | Live (DSN blank ⇒ off) |
 | eBay | Public used-listings **source** | — | **Not a recipient** — we send eBay no personal data | Dormant (feature hidden) |
 
-**Action before charging / before enabling AI:** accept and store each processor's published DPA, and
-confirm the transfer basis. For Gemini specifically, route through Vertex AI or the paid Gemini API whose
-terms exclude training/human-review — do **not** use a consumer Gemini account. See the checklist.
+**Gemini note:** the paid tier of the Gemini API (billing linked / prepaid) excludes training on your
+prompts and processes them under Google's Data Processing Addendum (Google as processor) — this is the
+GDPR transfer/processor basis. A **free-tier** key does the opposite (prompts used to improve models +
+human review), so the only action is to confirm the project behind the key is on the **paid tier**, not to
+switch products. Keep a note that you rely on Google's DPA + paid-tier data-use terms. See the checklist.
 
 ## 4. International transfers
 

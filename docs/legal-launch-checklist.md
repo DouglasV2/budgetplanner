@@ -34,10 +34,11 @@ Legend: ✅ done in code · ⚠️ needs owner action · ⏳ pre-charge / pre-fe
   the webhook while `BUDGETSPACE_BETA_MODE=true`, so keys-set-but-still-beta cannot charge.
 - ✅ **EU AI Act Art. 50 notice** ("powered by AI…") at the prompt input + an "AI suggestions are estimates,
   not professional advice" disclaimer on the AI insight card.
-- ⚠️/⏳ **AI provider DPA + transfer basis (before setting `GEMINI_API_KEY` on a public deploy).** Route
-  Gemini through **Vertex AI or the paid Gemini API** under the Google Cloud DPA (which excludes training
-  on inputs) — never a consumer Gemini account. Record the SCC/DPF transfer basis in `data-protection.md`.
-  The app keeps AI **off by default**, so this is a precondition, not a live gap.
+- ⚠️ **AI provider — confirm the paid tier (before the AI is on for real users).** The **paid tier** of the
+  Gemini API (billing linked) excludes training on your prompts and processes them under Google's Data
+  Processing Addendum — that IS the transfer/processor basis. A **free-tier** key does the opposite (prompts
+  used to improve Google's models + human review). So the only action is: verify the Google Cloud project
+  behind `GEMINI_API_KEY` is on the **paid tier**, and note the reliance on Google's DPA. Never a consumer key.
 - ✅ **Honest User-Agent** on the live price probe (no more spoofed Chrome UA — matches the sourcing policy).
 - ⏳ **Product images / IKEA-JYSK data → official/affiliate feeds.** Still hotlinked from retailer CDNs and
   fetched from public pages. Defensible for a free beta (takedown-on-notice), but migrate to official /
