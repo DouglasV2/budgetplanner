@@ -11,7 +11,7 @@ current when a processing purpose, subprocessor or retention period changes.
 
 ## 1. Controller
 
-- **Controller:** `[POPUNITI: ime i prezime / registrirani subjekt]` (see `frontend/src/legal.ts` → `OPERATOR`).
+- **Controller:** Bruno (add surname before broad promotion) — see `frontend/src/legal.ts` → `OPERATOR`.
 - **Contact:** budgetspace.ai@gmail.com
 - **Supervisory authority:** Croatia — AZOP (Agencija za zaštitu osobnih podataka). For DE/AT users, the
   competent authority is their national/Land DPA.

@@ -32,7 +32,8 @@ export interface LegalDoc {
 // "controller" line in every language, so it is filled in exactly once.
 const OPERATOR = {
   // REQUIRED before public launch — a real full name (natural person) or registered entity.
-  name: '[POPUNITI: ime i prezime operatera / registrirani subjekt]',
+  // NOTE: a first name alone does not satisfy the identification duty — add a surname before broad promotion.
+  name: 'Bruno',
   // Optional now; REQUIRED before charging: registered trader (obrt/d.o.o.) + OIB/VAT.
   entity: '',
   // Optional now; REQUIRED before charging / business-like DE-AT launch: geographic (postal) address.
