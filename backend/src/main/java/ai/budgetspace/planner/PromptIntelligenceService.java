@@ -11,6 +11,7 @@ import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.PlannerIntentAnalysisDto;
 import ai.budgetspace.product.Markets;
 import ai.budgetspace.product.ProductTaxonomy;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,14 @@ import java.util.Set;
 @Service
 public class PromptIntelligenceService {
     private static final Logger log = LoggerFactory.getLogger(PromptIntelligenceService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    // Sprint 10.167: the LLM sometimes returns a scalar where the schema wants an array (e.g. a prompt saying
+    // "topli tonovi" came back as "colorPreferences":"topli tonovi" instead of ["warm"]), which previously threw
+    // MismatchedInputException and silently dropped the whole request to the rule-based path. Accept a single
+    // value as a 1-element array, and ignore any extra keys the model volunteers, so a well-formed-but-loose LLM
+    // answer is still used instead of wasted.
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final String USE_CASE = "intent-extraction";
 
     private static final Set<String> KNOWN_STYLES = Set.of(
@@ -228,7 +236,9 @@ public class PromptIntelligenceService {
         String quality = a.qualityPreference() != null && QUALITY_PREFERENCES.contains(a.qualityPreference().toLowerCase(Locale.ROOT))
                 ? a.qualityPreference().toLowerCase(Locale.ROOT) : null;
         return new PlannerIntentAnalysisDto(
-                roomType, budget, a.currency(), size, style,
+                // Currency is decided by the market, never by the model — the LLM sometimes echoes a symbol
+                // ("€") or the wrong code, so always use the authoritative market currency passed in here.
+                roomType, budget, currency, size, style,
                 validRetailers(a.preferredRetailers()), validCategories(a.mustHaveCategories()),
                 validCategories(a.alreadyHaveCategories()), validCategories(a.avoidCategories()),
                 lowerAll(a.colorPreferences()), lowerAll(a.materialPreferences()),

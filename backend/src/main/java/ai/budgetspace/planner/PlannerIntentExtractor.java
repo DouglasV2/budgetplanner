@@ -117,7 +117,10 @@ public class PlannerIntentExtractor {
         if (matches(text, "kuhinj|kitchen|kuche|cucina|cuisine|keuken|kuchyn|cocina|cozinha|keitti|kjokken|kokken")) input = input.withRoomType("kitchen");
         if (matches(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|comedor|sala de jantar|ruokailu|spisestue|matsal")) input = input.withRoomType("dining-room");
         if (matches(text, "hodnik|predsoblje|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b")) input = input.withRoomType("hallway");
-        if (matches(text, "kupaon|kupatil|bathroom|badezimmer|\\bbad\\b|bagno|salle de bain|badkamer|kupelna|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum")) input = input.withRoomType("bathroom");
+        // German "Bad" = bathroom, but a bare \bbad\b also matched the English adjective "bad" (e.g. "my sofa is
+        // bad, help with the living room" was reclassified to bathroom). Require a German determiner/verb context
+        // so the noun still resolves without hijacking English prompts; "badezimmer" still catches the full word.
+        if (matches(text, "kupaon|kupatil|bathroom|badezimmer|(?:\\b(?:das|mein|meine|unser|unsere|euer|im|ins|ein)\\s+bad\\b|\\bbad\\s+(?:einricht|renovier|umbau|gestalt))|bagno|salle de bain|badkamer|kupelna|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum")) input = input.withRoomType("bathroom");
         // Studio / one-room apartment is the COMBINED-room container (bed + seating + dining in one space); checked
         // last so it wins over any single-room word it co-occurs with. Bare "studio" leans studio-flat here (the
         // common furnishing sense); a rare IT/ES "studio/estudio"=home-office is left to the (primary) AI path.
@@ -330,12 +333,32 @@ public class PlannerIntentExtractor {
         Integer bestValue = null;
         for (Pattern pattern : patterns) {
             Matcher matcher = pattern.matcher(text);
+            // Only accept a match whose number parses into a sane budget. A pathological grouped number
+            // like "111.111.111.111" would otherwise overflow Integer.parseInt and 500 the (unauthenticated)
+            // rule-based endpoint; parseBudget skips it so a later pattern — or the default — takes over.
             if (matcher.find() && matcher.start() < bestIndex) {
-                bestIndex = matcher.start();
-                bestValue = Integer.parseInt(matcher.group(1).replaceAll("[.\\s]", ""));
+                Integer parsed = parseBudget(matcher.group(1));
+                if (parsed != null) {
+                    bestIndex = matcher.start();
+                    bestValue = parsed;
+                }
             }
         }
         return Optional.ofNullable(bestValue);
+    }
+
+    /**
+     * Parse a (possibly dot/space-grouped) budget number into a sane amount, or {@code null} if it does not
+     * parse or falls outside {@code 1..100_000_000} (covers every real budget incl. high-denomination NOK/SEK
+     * while rejecting nonsense). Never throws — a hostile huge number must not crash the rule-based path.
+     */
+    private Integer parseBudget(String grouped) {
+        try {
+            long value = Long.parseLong(grouped.replaceAll("[.\\s]", ""));
+            return (value >= 1 && value <= 100_000_000L) ? (int) value : null;
+        } catch (NumberFormatException overflowOrGarbage) {
+            return null;
+        }
     }
 
     private Optional<Integer> firstNumber(String text, Pattern pattern) {

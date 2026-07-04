@@ -156,6 +156,26 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Living room for £1800.").budget()).isEqualTo(1800); // GBP symbol
     }
 
+    @Test
+    void absurdlyLargeGroupedBudgetDoesNotThrowAndIsIgnored() {
+        // A pathological grouped number must not overflow Integer.parseInt and 500 the (unauthenticated)
+        // rule-based endpoint. It is rejected as a budget, so the request keeps its default 1500 (not a crash).
+        assertThat(parse("Dnevni boravak do 111.111.111.111 €, treba mi kauč.").budget()).isEqualTo(1500);
+        assertThat(parse("Kuhinja, budget 999.999.999.999.").budget()).isEqualTo(1500);
+        // A normal grouped budget still parses correctly (regression guard for the sane path).
+        assertThat(parse("Dnevni boravak do 2.500 €.").budget()).isEqualTo(2500);
+    }
+
+    @Test
+    void englishWordBadIsNotMisreadAsBathroom() {
+        // German "Bad" = bathroom, but the bare token used to also match the English adjective "bad".
+        assertThat(parse("My old sofa is really bad, help me furnish the living room.").roomType())
+                .isEqualTo("living-room");
+        // German bathroom intent still resolves in the rule-based fallback.
+        assertThat(parse("Ich möchte mein Bad einrichten.").roomType()).isEqualTo("bathroom"); // determiner
+        assertThat(parse("Bad renovieren, Budget 1500 €.").roomType()).isEqualTo("bathroom"); // verb
+    }
+
     private PlannerInputDto parse(String prompt) {
         return extractor.enrich(base(prompt));
     }
