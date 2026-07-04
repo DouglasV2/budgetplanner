@@ -62,6 +62,19 @@ class HttpLivePriceProbeTest {
     }
 
     @Test
+    void ssrfGuardBlocksPrivateAndLoopbackHostsButAllowsPublicLiterals() {
+        // SSRF guard: the probe must refuse loopback / link-local (incl. cloud metadata) / private RFC-1918 hosts.
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://127.0.0.1/x"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://localhost/x"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://169.254.169.254/latest/meta-data/"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://10.0.0.5/x"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://192.168.1.10/x"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://172.16.0.1/x"))).isTrue();
+        // A public literal IP is allowed (no DNS needed; 8.8.8.8 is a public address).
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://8.8.8.8/x"))).isFalse();
+    }
+
+    @Test
     void reSlugKeepingTheProductIdIsLiveButADifferentIdIsDead() {
         // Same trailing product id (4320261) across a slug change = same product = LIVE.
         assertThat(classify("https://www.kwantum.nl/eettafel-ferrara-walnoot-4320261",

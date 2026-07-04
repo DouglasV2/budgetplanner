@@ -20,6 +20,9 @@
     <options>
       <!-- dsn omitted on purpose -> read from SENTRY_DSN env; empty => Sentry disabled. -->
       <debug>${sentryDebug}</debug>
+      <!-- GDPR: pin PII collection OFF explicitly so no IP/headers/cookies are ever attached to an event, even if
+           a future env flips the SDK default. Error events carry only the stack trace (no prompt/email/body). -->
+      <sendDefaultPii>false</sendDefaultPii>
     </options>
     <!-- Only ERROR and above become Sentry events (the real failures); INFO+ ride along as breadcrumbs for context.
          Expected client situations are logged at WARN/DEBUG (see GlobalExceptionHandler), so 4xx never alert. -->

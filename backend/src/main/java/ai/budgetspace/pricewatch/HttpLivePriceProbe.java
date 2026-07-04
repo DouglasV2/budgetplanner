@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -62,6 +63,7 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         if (scheme == null || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https")) || uri.getHost() == null) {
             return Liveness.UNKNOWN;
         }
+        if (isBlockedHost(uri)) return Liveness.UNKNOWN; // SSRF guard: never probe a private/loopback/link-local target
         try {
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(15))
@@ -131,6 +133,28 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         return last;
     }
 
+    /**
+     * SSRF guard: true if the URL's host resolves to a non-public address (loopback, link-local incl. the
+     * 169.254.169.254 cloud-metadata IP, private RFC-1918 ranges, wildcard or multicast). The probe only ever
+     * fetches curated catalog URLs, but this makes the "public retailer pages only" invariant hold in code even
+     * if a bad URL ever reaches the DB. Unresolvable host → blocked (fail closed). Package-private for testing.
+     */
+    static boolean isBlockedHost(URI uri) {
+        String host = uri.getHost();
+        if (host == null || host.isBlank()) return true;
+        try {
+            for (InetAddress addr : InetAddress.getAllByName(host)) {
+                if (addr.isLoopbackAddress() || addr.isLinkLocalAddress() || addr.isSiteLocalAddress()
+                        || addr.isAnyLocalAddress() || addr.isMulticastAddress()) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception unresolvable) {
+            return true;
+        }
+    }
+
     private String fetch(String url) {
         if (url == null || url.isBlank()) return null;
         final URI uri;
@@ -143,6 +167,7 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         if (scheme == null || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https")) || uri.getHost() == null) {
             return null;
         }
+        if (isBlockedHost(uri)) return null; // SSRF guard: never fetch a private/loopback/link-local target
         try {
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(15))
