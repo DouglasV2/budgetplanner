@@ -49,6 +49,88 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         return jsonLdPrice(html);
     }
 
+    @Override
+    public Liveness liveness(String productUrl, String retailer) {
+        if (productUrl == null || productUrl.isBlank()) return Liveness.UNKNOWN;
+        final URI uri;
+        try {
+            uri = URI.create(productUrl.trim());
+        } catch (RuntimeException e) {
+            return Liveness.UNKNOWN;
+        }
+        String scheme = uri.getScheme();
+        if (scheme == null || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https")) || uri.getHost() == null) {
+            return Liveness.UNKNOWN;
+        }
+        try {
+            HttpRequest request = HttpRequest.newBuilder(uri)
+                    .timeout(Duration.ofSeconds(15))
+                    .header("User-Agent", USER_AGENT)
+                    .header("Accept", "text/html,application/xhtml+xml")
+                    .header("Accept-Language", "hr,en;q=0.8")
+                    .GET()
+                    .build();
+            // We only need status + the final URL after redirects — discard the body (cheap, no 2MB buffer).
+            HttpResponse<Void> response = httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+            int code = response.statusCode();
+            if (code == 404 || code == 410) return Liveness.DEAD;
+            if (code == 403 || code == 429 || code >= 500) return Liveness.UNKNOWN; // blocked/transient — can't tell
+            if (code == 200) return classifyLanding(uri, response.uri(), retailer);
+            return Liveness.UNKNOWN;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Liveness.UNKNOWN;
+        } catch (Exception e) {
+            log.debug("Liveness probe failed for {}: {}", productUrl, e.getMessage());
+            return Liveness.UNKNOWN;
+        }
+    }
+
+    /**
+     * Classify a 200 response by WHERE it landed after redirects (deterministic, conservative). Same page =
+     * LIVE. IKEA keeps products under {@code /p/}; a bounce to {@code /cat/} (or anything without {@code /p/})
+     * is a discontinued product = DEAD. For other retailers a preserved trailing product-id means a mere
+     * re-slug (LIVE); a redirect up to a strict parent path or the site root is a category bounce = DEAD;
+     * anything else is treated as LIVE (never retire on a guess). Package-private for direct unit testing.
+     */
+    static Liveness classifyLanding(URI requested, URI landed, String retailer) {
+        if (landed == null) return Liveness.UNKNOWN;
+        String reqHost = host(requested), finHost = host(landed);
+        String reqPath = normPath(requested.getPath()), finPath = normPath(landed.getPath());
+        if (reqHost.equals(finHost) && reqPath.equals(finPath)) return Liveness.LIVE;
+        boolean ikea = (retailer != null && retailer.equalsIgnoreCase("IKEA")) || finHost.contains("ikea") || reqHost.contains("ikea");
+        if (ikea) return finPath.contains("/p/") ? Liveness.LIVE : Liveness.DEAD;
+        String reqId = trailingId(reqPath), finId = trailingId(finPath);
+        if (reqId != null && reqId.equals(finId)) return Liveness.LIVE; // same product, re-slugged
+        if (!finPath.isEmpty() && reqPath.startsWith(finPath) && finPath.length() < reqPath.length()) return Liveness.DEAD; // parent/category
+        if (segments(finPath) <= 1) return Liveness.DEAD; // bounced to home / shallow landing
+        return Liveness.LIVE;
+    }
+
+    private static String host(URI u) {
+        String h = u.getHost() == null ? "" : u.getHost().toLowerCase();
+        return h.startsWith("www.") ? h.substring(4) : h;
+    }
+
+    private static String normPath(String p) {
+        if (p == null || p.isEmpty()) return "";
+        String s = p.toLowerCase();
+        return s.length() > 1 && s.endsWith("/") ? s.substring(0, s.length() - 1) : s;
+    }
+
+    private static int segments(String path) {
+        return (int) path.chars().filter(c -> c == '/').count();
+    }
+
+    private static final Pattern PRODUCT_ID = Pattern.compile("\\d{4,}");
+
+    private static String trailingId(String path) {
+        Matcher m = PRODUCT_ID.matcher(path);
+        String last = null;
+        while (m.find()) last = m.group();
+        return last;
+    }
+
     private String fetch(String url) {
         if (url == null || url.isBlank()) return null;
         final URI uri;

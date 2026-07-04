@@ -50,11 +50,14 @@ class ExpandedRealCatalogRuntimeTest {
         ImportSummaryDto summary = new RetailerSnapshotImportService(
                 new ProductImportService(repository), new RetailerCatalogAdapter()).importSnapshot(snapshot);
 
-        assertThat(summary.created()).isGreaterThanOrEqualTo(76);
+        // Sprint 10.167: the live dead-link sweep removed 16 verified-dead HR living-room rows (discontinued
+        // IKEA/JYSK products that 404 or bounce to a category), so these floors dropped from 76/41/35 to the
+        // post-removal reality (60/29/31). They stay a regression floor; a sourcing backfill only raises them.
+        assertThat(summary.created()).isGreaterThanOrEqualTo(58);
         long ikea = saved.stream().filter(product -> "IKEA".equals(product.getRetailer())).count();
         long jysk = saved.stream().filter(product -> "JYSK".equals(product.getRetailer())).count();
-        assertThat(ikea).as("verified IKEA products").isGreaterThanOrEqualTo(41);
-        assertThat(jysk).as("verified JYSK products").isGreaterThanOrEqualTo(35);
+        assertThat(ikea).as("verified IKEA products").isGreaterThanOrEqualTo(28);
+        assertThat(jysk).as("verified JYSK products").isGreaterThanOrEqualTo(30);
 
         for (Product product : saved) {
             assertThat(product.getName()).as("name").isNotBlank();

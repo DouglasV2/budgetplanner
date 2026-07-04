@@ -73,7 +73,7 @@ public class CatalogFreshnessService {
     public RefreshSummary runRefresh(Instant now) {
         List<Product> batch = productRepository.findByOrderByLastCheckedAtAsc(PageRequest.of(0, batchSize));
         String today = LocalDate.ofInstant(now, ZoneOffset.UTC).toString();
-        int checked = 0, changed = 0, confirmed = 0, unverifiable = 0;
+        int checked = 0, changed = 0, confirmed = 0, unverifiable = 0, retired = 0;
 
         for (Product product : batch) {
             checked++;
@@ -92,9 +92,17 @@ public class CatalogFreshnessService {
                 }
                 product.setAvailabilityStatus("in-stock"); // a live price means it is purchasable now
                 product.setInStock(true);
+            } else if (probe.liveness(product.getProductUrl(), product.getRetailer()) == LivePriceProbe.Liveness.DEAD) {
+                // Sprint 10.167: the page is unreadable AND the URL is unambiguously gone (404/410 or a bounce to
+                // a category page). Auto-RETIRE it — "unavailable" + out-of-stock drop it from the planner via
+                // ProductTaxonomy.canEnterPlanner — instead of leaving a dead link hedged as check-store forever.
+                product.setAvailabilityStatus("unavailable");
+                product.setInStock(false);
+                retired++;
             } else {
-                // Couldn't confidently read (403/anti-bot, dead link, transient) — do NOT fabricate a price.
-                // Flag check-store so the UI hedges honestly; still advance lastCheckedAt so the queue moves on.
+                // Couldn't confidently read (403/anti-bot, transient, or a moved-but-live slug) — do NOT fabricate
+                // a price and do NOT retire on a guess. Flag check-store so the UI hedges honestly; still advance
+                // lastCheckedAt so the queue moves on.
                 product.setAvailabilityStatus("check-store");
                 product.setInStock(true);
                 unverifiable++;
@@ -102,10 +110,10 @@ public class CatalogFreshnessService {
             product.setLastCheckedAt(today);
             productRepository.save(product);
         }
-        return new RefreshSummary(checked, changed, confirmed, unverifiable);
+        return new RefreshSummary(checked, changed, confirmed, unverifiable, retired);
     }
 
     /** A run summary (also handy for a manual/admin trigger and tests). */
-    public record RefreshSummary(int checked, int changed, int confirmed, int unverifiable) {
+    public record RefreshSummary(int checked, int changed, int confirmed, int unverifiable, int retired) {
     }
 }

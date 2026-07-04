@@ -1,39 +1,5 @@
 [
  {
-  "externalId": "ikea-it-soederhamn-divano-angolare-a-3-posti-ton-780",
-  "name": "SÖDERHAMN divano angolare a 3 posti, Tonerud grigio",
-  "retailer": "IKEA",
-  "category": "sofa",
-  "price": 780,
-  "productUrl": "https://www.ikea.com/it/it/p/soederhamn-divano-angolare-a-3-posti-tonerud-grigio-s19452068/",
-  "imageUrl": "https://www.ikea.com/it/it/images/products/soederhamn-divano-angolare-a-3-posti-tonerud-grigio__1057821_pe849003_s5.jpg?f=xl",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "living-room"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy"
-  ],
-  "colorTags": [
-   "grey"
-  ],
-  "materialTags": [
-   "fabric"
-  ],
-  "priceTier": "premium",
-  "market": "IT",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA IT",
-  "sourceReference": "ikea-it-deepen-10-126",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena EUR verificirani na www.ikea.com 2026-06-28 (catalog-deepen 10-126)."
- },
- {
   "externalId": "ikea-it-landskrona-divano-a-3-posti-grann-bomsta-899",
   "name": "LANDSKRONA divano a 3 posti, Grann/Bomstad nero/metallo",
   "retailer": "IKEA",

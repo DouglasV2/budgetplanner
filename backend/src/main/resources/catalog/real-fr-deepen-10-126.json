@@ -276,42 +276,6 @@
   "dataQualityNotes": "Naziv + cijena EUR verificirani na jysk.fr 2026-06-28 (catalog-deepen 10-126)."
  },
  {
-  "externalId": "jysk-fr-cadre-de-lit-agerfeld-180x200-tissu-gris-250",
-  "name": "Cadre de lit AGERFELD 180x200 tissu gris foncé",
-  "retailer": "JYSK",
-  "category": "bed",
-  "price": 250,
-  "productUrl": "https://jysk.fr/chambre-et-literie/lits/sommiers-et-cadres-de-lit/cadres-de-lit/cadre-de-lit-agerfeld-180x200-tissu-gris-fonce",
-  "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/258392",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy"
-  ],
-  "colorTags": [
-   "grey"
-  ],
-  "materialTags": [
-   "fabric",
-   "wood",
-   "metal"
-  ],
-  "priceTier": "standard",
-  "market": "FR",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK FR",
-  "sourceReference": "jysk-fr-deepen-10-126",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena EUR verificirani na jysk.fr 2026-06-28 (catalog-deepen 10-126)."
- },
- {
   "externalId": "jysk-fr-table-korskro-100x200-326-ch-ne-naturel-700",
   "name": "Table KORSKRO 100x200/326 chêne naturel",
   "retailer": "JYSK",

@@ -56,34 +56,6 @@
   "dataQualityNotes": "Naziv + cijena (SEK) verificirani na jysk.se 2026-06-28 (catalog-deepen 10-130)."
  },
  {
-  "externalId": "jysk-se-tv-bank-halmstad-2-skjutdorrar-varm-ekfa-1350",
-  "name": "TV-bänk HALMSTAD 2 skjutdörrar varm ekfärgad/konstrotting",
-  "retailer": "JYSK",
-  "category": "tv-unit",
-  "price": 1350,
-  "productUrl": "https://jysk.se/vardagsrum/tv-bankar/tv-bank-halmstad-2-skjutdorrar-varm-ekfargad-konstrotting",
-  "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/258692",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "living-room"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "SE",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK SE",
-  "sourceReference": "jysk-se-deepen-10-130",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (SEK) verificirani na jysk.se 2026-06-28 (catalog-deepen 10-130)."
- },
- {
   "externalId": "jysk-se-garderob-billund-119x193-4-dorrar-2-lado-2100",
   "name": "Garderob BILLUND 119x193 4 dörrar 2 lådor travertin/beige",
   "retailer": "JYSK",

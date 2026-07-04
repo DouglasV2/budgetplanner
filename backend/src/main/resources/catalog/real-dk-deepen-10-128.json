@@ -420,34 +420,6 @@
   "dataQualityNotes": "Naziv + cijena (DKK) verificirani na jysk.dk 2026-06-28 (catalog-deepen 10-128)."
  },
  {
-  "externalId": "jysk-dk-laenestol-simested-stribet-sort-beige-st-650",
-  "name": "Lænestol SIMESTED stribet sort/beige stof",
-  "retailer": "JYSK",
-  "category": "chair",
-  "price": 650,
-  "productUrl": "https://jysk.dk/stue/laenestole/laenestol-simested-stribet-sort-beige-stof",
-  "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/256452",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "home-office"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK DK",
-  "sourceReference": "jysk-dk-deepen-10-128",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (DKK) verificirani na jysk.dk 2026-06-28 (catalog-deepen 10-128)."
- },
- {
   "externalId": "jysk-dk-laenestol-vadehavet-naturfarvet-stof-eg-850",
   "name": "Lænestol VADEHAVET naturfarvet stof/eg",
   "retailer": "JYSK",
@@ -707,34 +679,6 @@
   "price": 599,
   "productUrl": "https://jysk.dk/stue/tv-borde/tv-bord-dokkedal-1-hylde-betonfarve-sort",
   "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/258683",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "living-room"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK DK",
-  "sourceReference": "jysk-dk-deepen-10-128",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (DKK) verificirani na jysk.dk 2026-06-28 (catalog-deepen 10-128)."
- },
- {
-  "externalId": "jysk-dk-tv-bord-krondal-2-laager-sort-marmorfarv-650",
-  "name": "TV-bord KRONDAL 2 låger sort marmorfarve/sort",
-  "retailer": "JYSK",
-  "category": "tv-unit",
-  "price": 650,
-  "productUrl": "https://jysk.dk/stue/tv-borde/tv-bord-krondal-2-laager-sort-marmorfarve-sort",
-  "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/237604",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
   "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
@@ -1056,34 +1000,6 @@
   "colorTags": [],
   "materialTags": [],
   "priceTier": "standard",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "JYSK DK",
-  "sourceReference": "jysk-dk-deepen-10-128",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena (DKK) verificirani na jysk.dk 2026-06-28 (catalog-deepen 10-128)."
- },
- {
-  "externalId": "jysk-dk-spisebord-hansted-oe100-varm-graa-550",
-  "name": "Spisebord HANSTED Ø100 varm grå",
-  "retailer": "JYSK",
-  "category": "dining-table",
-  "price": 550,
-  "productUrl": "https://jysk.dk/spisestue/spiseborde/spisebord-hansted-oe100-varm-graa",
-  "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/259704",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "dining-room"
-  ],
-  "styleTags": [
-   "modern"
-  ],
-  "colorTags": [],
-  "materialTags": [],
-  "priceTier": "budget",
   "market": "DK",
   "sourceType": "public-product-page",
   "sourceName": "JYSK DK",

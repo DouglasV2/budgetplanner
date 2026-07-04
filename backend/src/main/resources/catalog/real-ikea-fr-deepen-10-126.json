@@ -1341,39 +1341,5 @@
   "sourceReference": "ikea-fr-deepen-10-126",
   "dataQuality": "complete",
   "dataQualityNotes": "Naziv + cijena EUR verificirani na www.ikea.com 2026-06-28 (catalog-deepen 10-126)."
- },
- {
-  "externalId": "ikea-fr-malm-commode-4-tiroirs-plaque-chene-blan-70403574",
-  "name": "MALM Commode 4 tiroirs, plaqué chêne blanchi, 80x100 cm",
-  "retailer": "IKEA",
-  "category": "dresser",
-  "price": 129,
-  "productUrl": "https://www.ikea.com/fr/fr/p/malm-commode-4-tiroirs-plaque-chene-blanchi-70403574/",
-  "imageUrl": "https://www.ikea.com/fr/fr/images/products/malm-commode-4-tiroirs-plaque-chene-blanchi__1154347_pe886002_s5.jpg?f=xl",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal"
-  ],
-  "colorTags": [
-   "natural",
-   "white"
-  ],
-  "materialTags": [
-   "wood"
-  ],
-  "priceTier": "standard",
-  "market": "FR",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA FR",
-  "sourceReference": "ikea-fr-deepen-10-126",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena EUR verificirani na www.ikea.com 2026-06-28 (catalog-deepen 10-126)."
  }
 ]

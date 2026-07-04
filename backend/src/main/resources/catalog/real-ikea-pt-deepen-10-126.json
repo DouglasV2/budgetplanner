@@ -574,39 +574,6 @@
   "dataQualityNotes": "Naziv + cijena EUR verificirani na www.ikea.com 2026-06-28 (catalog-deepen 10-126)."
  },
  {
-  "externalId": "ikea-pt-hektar-candeeiro-suspenso-cinz-esc-40296108",
-  "name": "HEKTAR Candeeiro suspenso, cinz esc, 38 cm",
-  "retailer": "IKEA",
-  "category": "lighting",
-  "price": 59.99,
-  "productUrl": "https://www.ikea.com/pt/pt/p/hektar-candeeiro-suspenso-cinz-esc-40296108/",
-  "imageUrl": "https://www.ikea.com/pt/pt/images/products/hektar-candeeiro-suspenso-cinz-esc__0607413_pe682963_s5.jpg?f=xl",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-28",
-  "roomTags": [
-   "living-room"
-  ],
-  "styleTags": [
-   "industrial",
-   "modern"
-  ],
-  "colorTags": [
-   "grey"
-  ],
-  "materialTags": [
-   "metal"
-  ],
-  "priceTier": "budget",
-  "market": "PT",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA PT",
-  "sourceReference": "ikea-pt-deepen-10-126",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Naziv + cijena EUR verificirani na www.ikea.com 2026-06-28 (catalog-deepen 10-126)."
- },
- {
   "externalId": "ikea-pt-flyghoejd-candeeiro-de-pe-latao-bege-50574473",
   "name": "FLYGHÖJD Candeeiro de pé, latão/bege",
   "retailer": "IKEA",

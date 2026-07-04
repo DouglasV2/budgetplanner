@@ -352,31 +352,6 @@
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
-    "externalId": "ikea-hr-besta-tv-klupa-bijela",
-    "name": "BESTÅ TV klupa, bijela",
-    "retailer": "IKEA",
-    "category": "tv-unit",
-    "price": 75.0,
-    "productUrl": "https://www.ikea.com/hr/hr/p/besta-tv-klupa-bijela-80299874/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "minimal",
-      "modern"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
     "externalId": "ikea-hr-lack-stolic-bijela-90",
     "reviewRating": 4.5,
     "reviewCount": 4076,
@@ -515,132 +490,6 @@
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
-    "externalId": "ikea-hr-guttane-stolic-hrast",
-    "name": "GUTTANE stolić, hrast",
-    "retailer": "IKEA",
-    "category": "table",
-    "price": 149.0,
-    "productUrl": "https://www.ikea.com/hr/hr/p/guttane-stolic-hrast-10587712/",
-    "imageUrl": "https://www.ikea.com/hr/hr/images/products/guttane-stolic-hrast__1369155_pe958055_s5.jpg?f=xl",
-    "imageVerified": true,
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-17",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "cozy",
-      "classic"
-    ],
-    "priceTier": "standard",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
-  },
-  {
-    "externalId": "ikea-hr-morum-tepih-bez-160x230",
-    "name": "MORUM tepih, ravno tkanje, bež",
-    "retailer": "IKEA",
-    "category": "rug",
-    "price": 44.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/morum-tepih-ravno-tkanje-za-unut-van-bez-30203575/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "minimal",
-      "boho"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
-    "externalId": "ikea-hr-stoense-tepih-blijedoroza-170x240",
-    "name": "STOENSE tepih, niski flor, blijedoroza",
-    "retailer": "IKEA",
-    "category": "rug",
-    "price": 99.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/stoense-tepih-niski-flor-blijedoroza-20510203/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "cozy",
-      "modern"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
-    "externalId": "ikea-hr-tiphede-tepih-prirodna-crna",
-    "name": "TIPHEDE tepih, ravno tkanje, prirodna boja/crna",
-    "retailer": "IKEA",
-    "category": "rug",
-    "price": 9.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/tiphede-tepih-ravno-tkanje-prirodna-boja-crna-60470039/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "boho",
-      "minimal"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
-    "externalId": "ikea-hr-arende-tepih-visoki-flor-krem",
-    "name": "ÄRENDE tepih, visoki flor, krem",
-    "retailer": "IKEA",
-    "category": "rug",
-    "price": 79.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/aerende-tepih-visoki-flor-krem-00587622/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "cozy",
-      "minimal"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
     "externalId": "ikea-hr-stoense-tepih-krem-50426802",
     "name": "STOENSE tepih, niski flor, krem",
     "retailer": "IKEA",
@@ -667,31 +516,6 @@
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
-    "externalId": "ikea-hr-ringsta-skaftet-podna-lampa-bijela-mjed",
-    "name": "RINGSTA / SKAFTET podna lampa, bijela/mjed",
-    "retailer": "IKEA",
-    "category": "lighting",
-    "price": 39.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/ringsta-skaftet-podna-lampa-bijela-mjed-s99416162/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "classic",
-      "minimal"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
     "externalId": "ikea-hr-arstid-podna-lampa-mjed-bijela",
     "name": "ÅRSTID podna lampa, mjed/bijela",
     "retailer": "IKEA",
@@ -708,31 +532,6 @@
     "styleTags": [
       "classic",
       "cozy"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
-    "externalId": "ikea-hr-strandad-podna-lampa-bijela-crna",
-    "name": "STRANDAD podna lampa, bijela/crna",
-    "retailer": "IKEA",
-    "category": "lighting",
-    "price": 9.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/strandad-podna-lampa-bijela-crna-90562220/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "minimal",
-      "modern"
     ],
     "priceTier": "budget",
     "sourceType": "retailer-snapshot",
@@ -766,56 +565,6 @@
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
-  },
-  {
-    "externalId": "ikea-hr-nymane-podna-lampa-antracit",
-    "name": "NYMÅNE podna lampa, 3 reflektora, antracit",
-    "retailer": "IKEA",
-    "category": "lighting",
-    "price": 39.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/nymane-podna-lampa-3-reflektora-antracit-70477754/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "industrial",
-      "modern"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
-    "externalId": "ikea-hr-barlast-podna-lampa-crna-bijela",
-    "name": "BARLAST podna lampa, crna/bijela",
-    "retailer": "IKEA",
-    "category": "lighting",
-    "price": 7.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/barlast-podna-lampa-crna-bijela-70437819/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "minimal",
-      "modern"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "ikea-hr-kallax-regal-bijela-77x147",
@@ -870,56 +619,6 @@
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
-    "externalId": "ikea-hr-vittsjoe-komb-odlaganje-crno-smeda",
-    "name": "VITTSJÖ komb/odlaganje, crno-smeđa/staklo",
-    "retailer": "IKEA",
-    "category": "storage",
-    "price": 119.98,
-    "productUrl": "https://www.ikea.com/hr/hr/p/vittsjoe-komb-odlaganje-crno-smeda-staklo-s39294554/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "industrial",
-      "modern"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
-    "externalId": "ikea-hr-vanderots-jastucnica-bijela",
-    "name": "VÄNDEROT jastučnica, bijela",
-    "retailer": "IKEA",
-    "category": "decor",
-    "price": 9.99,
-    "productUrl": "https://www.ikea.com/hr/hr/p/vaenderot-jastucnica-bijela-00575882/",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "cozy",
-      "minimal"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "IKEA HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
     "externalId": "ikea-hr-roedeby-pladanj-bambus",
     "name": "RÖDEBY pladanj za naslon za ruke, bambus",
     "retailer": "IKEA",
@@ -944,59 +643,6 @@
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL osvjezen na kanonski + slika web-provjerena 2026-06-17 (cijenu re-provjeriti)."
-  },
-  {
-    "externalId": "jysk-hr-trosjed-andrup-ovalni-bez",
-    "name": "Trosjed ANDRUP ovalni bež tkanina",
-    "retailer": "JYSK",
-    "category": "sofa",
-    "price": 315,
-    "originalPrice": 399,
-    "saleEndsAt": "2026-06-21",
-    "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-andrup-ovalni-bez-tkanina",
-    "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264033",
-    "imageVerified": true,
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-17",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "modern",
-      "cozy"
-    ],
-    "priceTier": "standard",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "JYSK HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "complete",
-    "dataQualityNotes": "Akcija −21% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 399 €, JSON-LD price=akcijska 315 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
-  },
-  {
-    "externalId": "jysk-hr-trosjed-vejlby-tamnosiva",
-    "name": "Trosjed s produžetkom VEJLBY tamnosiva tkanina",
-    "retailer": "JYSK",
-    "category": "sofa",
-    "price": 399.0,
-    "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-s-produzetkom-vejlby-tamnosiva-tkanina",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "modern",
-      "cozy"
-    ],
-    "priceTier": "standard",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "JYSK HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
   },
   {
     "externalId": "jysk-hr-fotelja-udsbjerg-siva",
@@ -1293,31 +939,6 @@
     "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
-    "externalId": "jysk-hr-stolic-trosterud-mramor-crna",
-    "name": "Stolić TROSTERUD 50x100 boja mramora/crna",
-    "retailer": "JYSK",
-    "category": "table",
-    "price": 35.0,
-    "productUrl": "https://jysk.hr/dnevni-boravak/stolici-za-kavu-i-pomocni-stolici/stolic-trosterud-50x100-boja-mramora-crna",
-    "imageUrl": "",
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-14",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "modern",
-      "industrial"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "JYSK HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "needs-review",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu. URL vise ne vodi na proizvod (301 -> kategorija), provjereno 2026-06-17; ponovno pronaci ili ukloniti."
-  },
-  {
     "externalId": "jysk-hr-stolic-nielshave-travertin",
     "name": "Stolić NIELSHAVE Ø55 boja travertin",
     "retailer": "JYSK",
@@ -1344,32 +965,6 @@
     "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
     "dataQuality": "complete",
     "dataQualityNotes": "Akcija −38% web-provjerena 2026-06-17 (jysk.hr priceAmount=redovna 64.99 €, JSON-LD price=akcijska 40 €, vrijedi do 2026-06-21). Re-check nakon isteka akcije."
-  },
-  {
-    "externalId": "jysk-hr-stolic-lunde-bijela-kava",
-    "name": "Stolić LUNDE Ø33 boja bijele kave",
-    "retailer": "JYSK",
-    "category": "table",
-    "price": 27.5,
-    "productUrl": "https://jysk.hr/dnevni-boravak/stolici-za-kavu-i-pomocni-stolici/nsf-stolic-lunde-o33-boja-bijele-kave",
-    "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/249316",
-    "imageVerified": true,
-    "availabilityStatus": "in-stock",
-    "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-06-17",
-    "roomTags": [
-      "living-room"
-    ],
-    "styleTags": [
-      "cozy",
-      "boho"
-    ],
-    "priceTier": "budget",
-    "sourceType": "retailer-snapshot",
-    "sourceName": "JYSK HR production pilot",
-    "sourceReference": "ikea-jysk-hr-living-room-production-pilot-10-3",
-    "dataQuality": "complete",
-    "dataQualityNotes": "Ručni production-pilot snapshot sa stvarnim product URL-ovima; prije finalne produkcije ponovno provuci collector ili službeni feed za aktualnu cijenu, sliku i zalihu."
   },
   {
     "externalId": "jysk-hr-tepih-lingon-natur",

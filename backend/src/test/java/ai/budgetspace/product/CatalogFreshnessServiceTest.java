@@ -87,6 +87,41 @@ class CatalogFreshnessServiceTest {
     }
 
     @Test
+    void unreadableButDeadUrlIsAutoRetiredNotJustHedged() {
+        // Sprint 10.167: the page won't price AND the URL is unambiguously gone (probe.liveness == DEAD) — retire
+        // it (unavailable + out-of-stock) so canEnterPlanner drops it, instead of leaving a dead link forever.
+        Product p = product("p4", "https://ikea/p4-gone", "IKEA", "120.00", "2026-06-02");
+        when(repository.findByOrderByLastCheckedAtAsc(any(Pageable.class))).thenReturn(List.of(p));
+        when(probe.currentPrice("https://ikea/p4-gone", "IKEA")).thenReturn(Optional.empty());
+        when(probe.liveness("https://ikea/p4-gone", "IKEA")).thenReturn(LivePriceProbe.Liveness.DEAD);
+
+        CatalogFreshnessService.RefreshSummary summary = service.runRefresh(NOW);
+
+        assertThat(p.getAvailabilityStatus()).isEqualTo("unavailable");
+        assertThat(p.isInStock()).isFalse();
+        assertThat(p.getPrice()).as("never fabricate; keep the last known price on the retired row").isEqualByComparingTo("120.00");
+        assertThat(p.getLastCheckedAt()).isEqualTo("2026-07-01");
+        assertThat(summary.retired()).isEqualTo(1);
+        assertThat(summary.unverifiable()).isZero();
+    }
+
+    @Test
+    void unreadableAndUnknownLivenessStaysCheckStore() {
+        // Blocked/anti-bot/transient (liveness UNKNOWN) must NOT be retired on a guess — only hedged check-store.
+        Product p = product("p5", "https://blocked/p5", "SomeChain", "80.00", "2026-06-03");
+        when(repository.findByOrderByLastCheckedAtAsc(any(Pageable.class))).thenReturn(List.of(p));
+        when(probe.currentPrice("https://blocked/p5", "SomeChain")).thenReturn(Optional.empty());
+        when(probe.liveness("https://blocked/p5", "SomeChain")).thenReturn(LivePriceProbe.Liveness.UNKNOWN);
+
+        CatalogFreshnessService.RefreshSummary summary = service.runRefresh(NOW);
+
+        assertThat(p.getAvailabilityStatus()).isEqualTo("check-store");
+        assertThat(p.isInStock()).isTrue();
+        assertThat(summary.retired()).isZero();
+        assertThat(summary.unverifiable()).isEqualTo(1);
+    }
+
+    @Test
     void unchangedPriceIsConfirmedAndReStamped() {
         Product p = product("p3", "https://jysk/p3", "JYSK", "99.99", "2026-06-05");
         when(repository.findByOrderByLastCheckedAtAsc(any(Pageable.class))).thenReturn(List.of(p));

@@ -33,72 +33,6 @@
   "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
  },
  {
-  "externalId": "ikea-si-txt-dytag-80607820",
-  "name": "DYTÅG zavese, 1 par, bež/z nabornim trakom, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 99.99,
-  "productUrl": "https://www.ikea.com/si/sl/p/dytag-zavese-1-par-bez-z-nabornim-trakom-20466720/",
-  "imageUrl": "https://www.ikea.com/si/sl/images/products/dytag-zavese-1-par-bez-z-nabornim-trakom__1379956_pe961586_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "beige"
-  ],
-  "priceTier": "premium",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SI",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-si-txt-dytag-20466719",
-  "name": "DYTÅG Zavese, 1 par, bela/z nabornim trakom, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 99.99,
-  "productUrl": "https://www.ikea.com/si/sl/p/dytag-zavese-1-par-bela-z-nabornim-trakom-80607819/",
-  "imageUrl": "https://www.ikea.com/si/sl/images/products/dytag-zavese-1-par-bela-z-nabornim-trakom__0803894_pe769366_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "premium",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SI",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
- },
- {
   "externalId": "ikea-si-txt-lill-10070262",
   "name": "LILL mrežaste zavese, 1 par, bela/z odprtino za drog, 280x300 cm",
   "retailer": "IKEA",
@@ -139,72 +73,6 @@
   "price": 24.99,
   "productUrl": "https://www.ikea.com/si/sl/p/ginstmott-zavese-1-par-bela-z-nabornim-trakom-60597167/",
   "imageUrl": "https://www.ikea.com/si/sl/images/products/ginstmott-zavese-1-par-bela-z-nabornim-trakom__1308569_pe939889_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SI",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-si-txt-stenfro-50562125",
-  "name": "STENFRÖ prosojna zavesa, 1 par, bela/z nabornim trakom, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 19.99,
-  "productUrl": "https://www.ikea.com/si/sl/p/stenfroe-prosojna-zavesa-1-par-bela-z-nabornim-trakom-00594892/",
-  "imageUrl": "https://www.ikea.com/si/sl/images/products/stenfroe-prosojna-zavesa-1-par-bela-z-nabornim-trakom__1303702_pe938466_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SI",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-si-txt-silverlonn-20491040",
-  "name": "SILVERLÖNN prosojna zavesa, 1 par, bela/z nabornim trakom, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 24.99,
-  "productUrl": "https://www.ikea.com/si/sl/p/silverloenn-prosojna-zavesa-1-par-bela-z-nabornim-trakom-10493976/",
-  "imageUrl": "https://www.ikea.com/si/sl/images/products/silverloenn-prosojna-zavesa-1-par-bela-z-nabornim-trakom__0913763_pe783726_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
   "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
@@ -287,108 +155,6 @@
   ],
   "colorTags": [
    "beige"
-  ],
-  "priceTier": "budget",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SI",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-si-txt-pelartuja-60600396",
-  "name": "PELARTUJA posteljno pregrinjalo, zeleno siva/bela, 150x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 27.95,
-  "productUrl": "https://www.ikea.com/si/sl/p/pelartuja-posteljno-pregrinjalo-zeleno-siva-bela-50600386/",
-  "imageUrl": "https://www.ikea.com/si/sl/images/products/pelartuja-posteljno-pregrinjalo-zeleno-siva-bela__1385928_pe963548_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white",
-   "grey",
-   "green"
-  ],
-  "priceTier": "standard",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SI",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-si-txt-vallkrassing-70570940",
-  "name": "VALLKRASSING pregrinjalo, svetla sivo rjava, 150x200 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 17.99,
-  "productUrl": "https://www.ikea.com/si/sl/p/vallkrassing-pregrinjalo-svetla-sivo-rjava-20570930/",
-  "imageUrl": "https://www.ikea.com/si/sl/images/products/vallkrassing-pregrinjalo-svetla-sivo-rjava__1207657_pe908120_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "grey"
-  ],
-  "priceTier": "standard",
-  "market": "SI",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SI",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/si 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-si-txt-indira-40582633",
-  "name": "INDIRA posteljno pregrinjalo, temna sivo modra, 150x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 14.99,
-  "productUrl": "https://www.ikea.com/si/sl/p/indira-posteljno-pregrinjalo-temna-sivo-modra-20582633/",
-  "imageUrl": "https://www.ikea.com/si/sl/images/products/indira-posteljno-pregrinjalo-temna-sivo-modra__1259109_pe926524_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "grey",
-   "blue"
   ],
   "priceTier": "budget",
   "market": "SI",
@@ -498,39 +264,6 @@
   "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/de 2026-06-30 (article-number port)."
  },
  {
-  "externalId": "ikea-de-txt-silverlonn-20491040",
-  "name": "SILVERLÖNN Gardinenstore-Paar, weiß, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 24.99,
-  "productUrl": "https://www.ikea.com/de/de/p/silverloenn-gardinenstore-paar-weiss-mit-gardinenband-60491040/",
-  "imageUrl": "https://www.ikea.com/de/de/images/products/silverloenn-gardinenstore-paar-weiss-mit-gardinenband__0913763_pe783726_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "DE",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DE",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/de 2026-06-30 (article-number port)."
- },
- {
   "externalId": "ikea-de-txt-skogsduva-80576786",
   "name": "SKOGSDUVA Kissen, blumenförmig/weiß, 47x8 cm",
   "retailer": "IKEA",
@@ -589,41 +322,6 @@
    "beige"
   ],
   "priceTier": "budget",
-  "market": "DE",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DE",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/de 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-de-txt-pelartuja-60600396",
-  "name": "PELARTUJA Tagesdecke, grüngrau/weiß, 150x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 29.99,
-  "productUrl": "https://www.ikea.com/de/de/p/pelartuja-tagesdecke-gruengrau-weiss-10600396/",
-  "imageUrl": "https://www.ikea.com/de/de/images/products/pelartuja-tagesdecke-gruengrau-weiss__1385928_pe963548_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white",
-   "grey",
-   "green"
-  ],
-  "priceTier": "standard",
   "market": "DE",
   "sourceType": "public-product-page",
   "sourceName": "IKEA DE",
@@ -967,7 +665,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 99.0,
-  "productUrl": "https://www.ikea.com/fi/fi/p/-20466719/",
+  "productUrl": "https://www.ikea.com/fi/fi/p/dytag-verhot-2-kpl-valkoinen-laskosnauha-20466719/",
   "imageUrl": "https://www.ikea.com/fi/fi/images/products/dytag-verhot-2-kpl-valkoinen-laskosnauha__0803894_pe769366_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1000,7 +698,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 24.99,
-  "productUrl": "https://www.ikea.com/fi/fi/p/-50562125/",
+  "productUrl": "https://www.ikea.com/fi/fi/p/stenfroe-verhot-2-kpl-valkoinen-laskosnauha-50562125/",
   "imageUrl": "https://www.ikea.com/fi/fi/images/products/stenfroe-verhot-2-kpl-valkoinen-laskosnauha__1303702_pe938466_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1033,7 +731,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 29.99,
-  "productUrl": "https://www.ikea.com/fi/fi/p/-20491040/",
+  "productUrl": "https://www.ikea.com/fi/fi/p/silverloenn-verhot-2-kpl-valkoinen-laskosnauha-20491040/",
   "imageUrl": "https://www.ikea.com/fi/fi/images/products/silverloenn-verhot-2-kpl-valkoinen-laskosnauha__0913763_pe783726_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1066,7 +764,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 12.99,
-  "productUrl": "https://www.ikea.com/fi/fi/p/-80576786/",
+  "productUrl": "https://www.ikea.com/fi/fi/p/skogsduva-tyyny-kukanmuotoinen-valkoinen-80576786/",
   "imageUrl": "https://www.ikea.com/fi/fi/images/products/skogsduva-tyyny-kukanmuotoinen-valkoinen__1294173_pe935317_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1099,7 +797,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 9.99,
-  "productUrl": "https://www.ikea.com/fi/fi/p/-20560203/",
+  "productUrl": "https://www.ikea.com/fi/fi/p/akervindefly-istuintyyny-beige-20560203/",
   "imageUrl": "https://www.ikea.com/fi/fi/images/products/akervindefly-istuintyyny-beige__1159544_pe888540_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1132,7 +830,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 15.99,
-  "productUrl": "https://www.ikea.com/fi/fi/p/-70570940/",
+  "productUrl": "https://www.ikea.com/fi/fi/p/vallkrassing-huopa-vaalea-harmaanruskea-70570940/",
   "imageUrl": "https://www.ikea.com/fi/fi/images/products/vallkrassing-huopa-vaalea-harmaanruskea__1207657_pe908120_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1165,7 +863,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 9.99,
-  "productUrl": "https://www.ikea.com/fr/fr/p/-80576786/",
+  "productUrl": "https://www.ikea.com/fr/fr/p/skogsduva-coussin-forme-de-fleur-blanc-80576786/",
   "imageUrl": "https://www.ikea.com/fr/fr/images/products/skogsduva-coussin-forme-de-fleur-blanc__1294173_pe935317_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1198,7 +896,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 14.99,
-  "productUrl": "https://www.ikea.com/fr/fr/p/-20560203/",
+  "productUrl": "https://www.ikea.com/fr/fr/p/akervindefly-coussin-de-chaise-beige-20560203/",
   "imageUrl": "https://www.ikea.com/fr/fr/images/products/akervindefly-coussin-de-chaise-beige__1159544_pe888540_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1231,7 +929,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 19.99,
-  "productUrl": "https://www.ikea.com/fr/fr/p/-70570940/",
+  "productUrl": "https://www.ikea.com/fr/fr/p/vallkrassing-plaid-gris-brun-clair-70570940/",
   "imageUrl": "https://www.ikea.com/fr/fr/images/products/vallkrassing-plaid-gris-brun-clair__1207657_pe908120_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1264,7 +962,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 17.99,
-  "productUrl": "https://www.ikea.com/fr/fr/p/-40582633/",
+  "productUrl": "https://www.ikea.com/fr/fr/p/indira-couvre-lit-bleu-gris-fonce-40582633/",
   "imageUrl": "https://www.ikea.com/fr/fr/images/products/indira-couvre-lit-bleu-gris-fonce__1259109_pe926524_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -1690,39 +1388,6 @@
   "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
  },
  {
-  "externalId": "ikea-sk-txt-dytag-20466719",
-  "name": "DYTÅG závesy, 1 pár, biela/s riasiacou stuhou, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 79.9,
-  "productUrl": "https://www.ikea.com/sk/sk/p/dytag-zavesy-1-par-biela-s-riasiacou-stuhou-80607819/",
-  "imageUrl": "https://www.ikea.com/sk/sk/images/products/dytag-zavesy-1-par-biela-s-riasiacou-stuhou__0803894_pe769366_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "premium",
-  "market": "SK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
- },
- {
   "externalId": "ikea-sk-txt-lill-10070262",
   "name": "LILL sieťkované záclony, 1 pár, biela/s otvorom na tyč, 280x300 cm",
   "retailer": "IKEA",
@@ -1756,105 +1421,6 @@
   "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
  },
  {
-  "externalId": "ikea-sk-txt-ginstmott-60597167",
-  "name": "GINSTMOTT závesy, 1 pár, biela/s riasiacou stuhou, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 24.99,
-  "productUrl": "https://www.ikea.com/sk/sk/p/ginstmott-zavesy-1-par-biela-s-riasiacou-stuhou-40597180/",
-  "imageUrl": "https://www.ikea.com/sk/sk/images/products/ginstmott-zavesy-1-par-biela-s-riasiacou-stuhou__1308569_pe939889_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "SK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-sk-txt-stenfro-50562125",
-  "name": "STENFRÖ záclony, 1 pár, biela/s riasiacou stuhou, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 14.99,
-  "productUrl": "https://www.ikea.com/sk/sk/p/stenfroe-zaclony-1-par-biela-s-riasiacou-stuhou-00594887/",
-  "imageUrl": "https://www.ikea.com/sk/sk/images/products/stenfroe-zaclony-1-par-biela-s-riasiacou-stuhou__1303702_pe938466_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "SK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-sk-txt-silverlonn-20491040",
-  "name": "SILVERLÖNN záclony, 1 pár, biela/s riasiacou stuhou, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 24.99,
-  "productUrl": "https://www.ikea.com/sk/sk/p/silverloenn-zaclony-1-par-biela-s-riasiacou-stuhou-10493977/",
-  "imageUrl": "https://www.ikea.com/sk/sk/images/products/silverloenn-zaclony-1-par-biela-s-riasiacou-stuhou__0913763_pe783726_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "SK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
- },
- {
   "externalId": "ikea-sk-txt-skogsduva-80576786",
   "name": "SKOGSDUVA vankúš, v tvare kvetu/biela, 47x8 cm",
   "retailer": "IKEA",
@@ -1878,73 +1444,6 @@
   ],
   "colorTags": [
    "white"
-  ],
-  "priceTier": "budget",
-  "market": "SK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-sk-txt-akervindefly-20560203",
-  "name": "ÅKERVINDEFLY Podložka na stoličku, béžová, 39/35x37x5 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 10.99,
-  "productUrl": "https://www.ikea.com/sk/sk/p/akervindefly-podlozka-na-stolicku-bezova-40554361/",
-  "imageUrl": "https://www.ikea.com/sk/sk/images/products/akervindefly-podlozka-na-stolicku-bezova__1159544_pe888540_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "beige"
-  ],
-  "priceTier": "budget",
-  "market": "SK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/sk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-sk-txt-indira-40582633",
-  "name": "INDIRA posteľná prikrývka, tmavá sivomodrá, 150x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 12.99,
-  "productUrl": "https://www.ikea.com/sk/sk/p/indira-postelna-prikryvka-tmava-sivomodra-20582633/",
-  "imageUrl": "https://www.ikea.com/sk/sk/images/products/indira-postelna-prikryvka-tmava-sivomodra__1259109_pe926524_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "grey",
-   "blue"
   ],
   "priceTier": "budget",
   "market": "SK",
@@ -1993,7 +1492,7 @@
   "retailer": "IKEA",
   "category": "textiles",
   "price": 79.99,
-  "productUrl": "https://www.ikea.com/es/es/p/-80607820/",
+  "productUrl": "https://www.ikea.com/es/es/p/dytag-cortinas-pack-2-unidades-beige-con-cinta-fruncir-80607820/",
   "imageUrl": "https://www.ikea.com/es/es/images/products/dytag-cortinas-pack-2-unidades-beige-con-cinta-fruncir__1379956_pe961586_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
@@ -2021,145 +1520,13 @@
   "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
  },
  {
-  "externalId": "ikea-es-txt-dytag-20466719",
-  "name": "DYTÅG Cortinas, pack de 2 unidades, blanco/con cinta de fruncir, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 79.99,
-  "productUrl": "https://www.ikea.com/es/es/p/dytag-cortinas-pack-2-unidades-blanco-con-cinta-fruncir-10700216/",
-  "imageUrl": "https://www.ikea.com/es/es/images/products/dytag-cortinas-pack-2-unidades-blanco-con-cinta-fruncir__0803894_pe769366_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "premium",
-  "market": "ES",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA ES",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-es-txt-lill-10070262",
-  "name": "LILL Cortinas de red, pack de 2 unidades, blanco/con bolsillo para barra, 280x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 6.99,
-  "productUrl": "https://www.ikea.com/es/es/p/lill-cortinas-red-pack-2-unidades-blanco-con-bolsillo-barra-10700155/",
-  "imageUrl": "https://www.ikea.com/es/es/images/products/lill-cortinas-red-pack-2-unidades-blanco-con-bolsillo-barra__0598717_pe677784_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "budget",
-  "market": "ES",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA ES",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
- },
- {
   "externalId": "ikea-es-txt-ginstmott-60597167",
   "name": "GINSTMOTT Cortinas, pack de 2 unidades, blanco/con cinta de fruncir, 145x300 cm",
   "retailer": "IKEA",
   "category": "textiles",
   "price": 24.99,
-  "productUrl": "https://www.ikea.com/es/es/p/-60597167/",
+  "productUrl": "https://www.ikea.com/es/es/p/ginstmott-cortinas-pack-2-unidades-blanco-con-cinta-fruncir-60597167/",
   "imageUrl": "https://www.ikea.com/es/es/images/products/ginstmott-cortinas-pack-2-unidades-blanco-con-cinta-fruncir__1308569_pe939889_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "ES",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA ES",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-es-txt-stenfro-50562125",
-  "name": "STENFRÖ Visillo, pack de 2 unidades, blanco/con cinta de fruncir, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 17.99,
-  "productUrl": "https://www.ikea.com/es/es/p/stenfro-visillo-pack-2-unidades-blanco-con-cinta-fruncir-70594882/",
-  "imageUrl": "https://www.ikea.com/es/es/images/products/stenfro-visillo-pack-2-unidades-blanco-con-cinta-fruncir__1303702_pe938466_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "ES",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA ES",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-es-txt-silverlonn-20491040",
-  "name": "SILVERLÖNN Visillo, pack de 2 unidades, blanco/con cinta de fruncir, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 19.95,
-  "productUrl": "https://www.ikea.com/es/es/p/silverlonn-visillo-pack-2-unidades-blanco-con-cinta-fruncir-70572884/",
-  "imageUrl": "https://www.ikea.com/es/es/images/products/silverlonn-visillo-pack-2-unidades-blanco-con-cinta-fruncir__0913763_pe783726_s5.jpg",
   "imageVerified": true,
   "availabilityStatus": "in-stock",
   "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
@@ -2209,108 +1576,6 @@
   ],
   "colorTags": [
    "white"
-  ],
-  "priceTier": "budget",
-  "market": "ES",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA ES",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-es-txt-pelartuja-60600396",
-  "name": "PELARTUJA Colcha, gris verdoso/blanco, 150x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 29.95,
-  "productUrl": "https://www.ikea.com/es/es/p/pelartuja-colcha-gris-verdoso-blanco-50600375/",
-  "imageUrl": "https://www.ikea.com/es/es/images/products/pelartuja-colcha-gris-verdoso-blanco__1385928_pe963548_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white",
-   "grey",
-   "green"
-  ],
-  "priceTier": "standard",
-  "market": "ES",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA ES",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-es-txt-vallkrassing-70570940",
-  "name": "VALLKRASSING Manta, marrón grisáceo claro, 150x200 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 17.99,
-  "productUrl": "https://www.ikea.com/es/es/p/vallkrassing-manta-marron-grisaceo-claro-30570941/",
-  "imageUrl": "https://www.ikea.com/es/es/images/products/vallkrassing-manta-marron-grisaceo-claro__1207657_pe908120_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "grey"
-  ],
-  "priceTier": "standard",
-  "market": "ES",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA ES",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/es 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-es-txt-indira-40582633",
-  "name": "INDIRA colcha, azul grisáceo oscuro, 150x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 12.99,
-  "productUrl": "https://www.ikea.com/es/es/p/indira-colcha-azul-grisaceo-oscuro-20582633/",
-  "imageUrl": "https://www.ikea.com/es/es/images/products/indira-colcha-azul-grisaceo-oscuro__1259109_pe926524_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "grey",
-   "blue"
   ],
   "priceTier": "budget",
   "market": "ES",
@@ -2654,171 +1919,6 @@
   "dataQualityNotes": "Name + EUR price + image verified live on ikea.com/pt 2026-06-30 (article-number port)."
  },
  {
-  "externalId": "ikea-no-txt-dytag-20466719",
-  "name": "DYTÅG Gardiner, 1 par, hvit, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 995.0,
-  "productUrl": "https://www.ikea.com/no/no/p/dytag-gardiner-1-par-hvit-med-multiband-00466716/",
-  "imageUrl": "https://www.ikea.com/no/no/images/products/dytag-gardiner-1-par-hvit-med-multiband__0803894_pe769366_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "premium",
-  "market": "NO",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA NO",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-no-txt-stenfro-50562125",
-  "name": "STENFRÖ Florlette gardiner, 1 par, hvit/med multibånd, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 299.0,
-  "productUrl": "https://www.ikea.com/no/no/p/stenfroe-florlette-gardiner-1-par-hvit-med-multiband-90594897/",
-  "imageUrl": "https://www.ikea.com/no/no/images/products/stenfroe-florlette-gardiner-1-par-hvit-med-multiband__1303702_pe938466_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "NO",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA NO",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-no-txt-silverlonn-20491040",
-  "name": "SILVERLÖNN florlette gardiner, 1 par, hvit/med multibånd, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 349.0,
-  "productUrl": "https://www.ikea.com/no/no/p/silverloenn-florlette-gardiner-1-par-hvit-med-multiband-60491022/",
-  "imageUrl": "https://www.ikea.com/no/no/images/products/silverloenn-florlette-gardiner-1-par-hvit-med-multiband__0913763_pe783726_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "NO",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA NO",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-no-txt-skogsduva-80576786",
-  "name": "SKOGSDUVA pute, blomsterformet/hvit, 47x8 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 149.0,
-  "productUrl": "https://www.ikea.com/no/no/p/skogsduva-pute-blomsterformet-hvit-30420814/",
-  "imageUrl": "https://www.ikea.com/no/no/images/products/skogsduva-pute-blomsterformet-hvit__1294173_pe935317_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "budget",
-  "market": "NO",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA NO",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-no-txt-akervindefly-20560203",
-  "name": "ÅKERVINDEFLY Stolpute, beige, 39/35x37x5 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 169.0,
-  "productUrl": "https://www.ikea.com/no/no/p/akervindefly-stolpute-beige-40554361/",
-  "imageUrl": "https://www.ikea.com/no/no/images/products/akervindefly-stolpute-beige__1159544_pe888540_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "beige"
-  ],
-  "priceTier": "budget",
-  "market": "NO",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA NO",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + NOK price + image verified live on ikea.com/no 2026-06-30 (article-number port)."
- },
- {
   "externalId": "ikea-se-txt-dytag-20466719",
   "name": "DYTÅG Gardiner, 1 par, 100% linne, vit, 145x300 cm",
   "retailer": "IKEA",
@@ -2844,72 +1944,6 @@
    "white"
   ],
   "priceTier": "premium",
-  "market": "SE",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SE",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-se-txt-stenfro-50562125",
-  "name": "STENFRÖ Skira gardiner, 1 par, vit/med veckband, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 249.0,
-  "productUrl": "https://www.ikea.com/se/sv/p/stenfroe-skira-gardiner-1-par-vit-med-veckband-10594898/",
-  "imageUrl": "https://www.ikea.com/se/sv/images/products/stenfroe-skira-gardiner-1-par-vit-med-veckband__1303702_pe938466_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "SE",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SE",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-se-txt-silverlonn-20491040",
-  "name": "SILVERLÖNN skira gardiner, 1 par, vit/med veckband, 145x300 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 299.0,
-  "productUrl": "https://www.ikea.com/se/sv/p/silverloenn-skira-gardiner-1-par-vit-med-veckband-60491030/",
-  "imageUrl": "https://www.ikea.com/se/sv/images/products/silverloenn-skira-gardiner-1-par-vit-med-veckband__0913763_pe783726_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
   "market": "SE",
   "sourceType": "public-product-page",
   "sourceName": "IKEA SE",
@@ -2949,272 +1983,6 @@
   "sourceReference": "nonhr-textiles-10-155",
   "dataQuality": "complete",
   "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-se-txt-akervindefly-20560203",
-  "name": "ÅKERVINDEFLY stoldyna, beige, 39/35x37x5 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 149.0,
-  "productUrl": "https://www.ikea.com/se/sv/p/akervindefly-stoldyna-beige-40554361/",
-  "imageUrl": "https://www.ikea.com/se/sv/images/products/akervindefly-stoldyna-beige__1159544_pe888540_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "beige"
-  ],
-  "priceTier": "budget",
-  "market": "SE",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SE",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-se-txt-vallkrassing-70570940",
-  "name": "VALLKRASSING Pläd, ljus gråbrun, 150x200 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 199.0,
-  "productUrl": "https://www.ikea.com/se/sv/p/vallkrassing-plaed-ljus-grabrun-20570925/",
-  "imageUrl": "https://www.ikea.com/se/sv/images/products/vallkrassing-plaed-ljus-grabrun__1207657_pe908120_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "grey"
-  ],
-  "priceTier": "standard",
-  "market": "SE",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA SE",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + SEK price + image verified live on ikea.com/se 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-dk-txt-akervindefly-20560203",
-  "name": "ÅKERVINDEFLY Stolehynde, beige, 39/35x37x5 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 99.0,
-  "productUrl": "https://www.ikea.com/dk/da/p/akervindefly-stolehynde-beige-40554361/",
-  "imageUrl": "https://www.ikea.com/dk/da/images/products/akervindefly-stolehynde-beige__1159544_pe888540_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "beige"
-  ],
-  "priceTier": "budget",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-dk-txt-pelartuja-60600396",
-  "name": "PELARTUJA sengetæppe, grågrøn/hvid, 150x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 200.0,
-  "productUrl": "https://www.ikea.com/dk/da/p/pelartuja-sengetaeppe-gragron-hvid-50600386/",
-  "imageUrl": "https://www.ikea.com/dk/da/images/products/pelartuja-sengetaeppe-gragron-hvid__1385928_pe963548_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white",
-   "grey",
-   "green"
-  ],
-  "priceTier": "standard",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-dk-txt-hallebracka-00556848",
-  "name": "HÄLLEBRÄCKA tynde gardiner, 2 stk., lys beige/med rynkebånd, 145x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 199.0,
-  "productUrl": "https://www.ikea.com/dk/da/p/haellebraecka-tynde-gardiner-2-stk-lys-beige-med-rynkeband-60559670/",
-  "imageUrl": "https://www.ikea.com/dk/da/images/products/haellebraecka-tynde-gardiner-2-stk-lys-beige-med-rynkeband__1196904_pe906599_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "beige"
-  ],
-  "priceTier": "standard",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-dk-txt-ginstmott-60597167",
-  "name": "GINSTMOTT Gardiner, 2 stk., hvid/med rynkebånd, 145x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 159.0,
-  "productUrl": "https://www.ikea.com/dk/da/p/ginstmott-gardiner-2-stk-hvid-med-rynkeband-50597167/",
-  "imageUrl": "https://www.ikea.com/dk/da/images/products/ginstmott-gardiner-2-stk-hvid-med-rynkeband__1308569_pe939889_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "standard",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-dk-txt-dytag-20466719",
-  "name": "DYTÅG Gardiner, 2 stk., hvid/med rynkebånd, 145x250 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 600.0,
-  "productUrl": "https://www.ikea.com/dk/da/p/dytag-gardiner-2-stk-hvid-med-rynkeband-00607801/",
-  "imageUrl": "https://www.ikea.com/dk/da/images/products/dytag-gardiner-2-stk-hvid-med-rynkeband__0803894_pe769366_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "white"
-  ],
-  "priceTier": "premium",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
- },
- {
-  "externalId": "ikea-dk-txt-vallkrassing-70570940",
-  "name": "VALLKRASSING plaid, grågrøn, 150x200 cm",
-  "retailer": "IKEA",
-  "category": "textiles",
-  "price": 119.0,
-  "productUrl": "https://www.ikea.com/dk/da/p/vallkrassing-plaid-gragron-20570927/",
-  "imageUrl": "https://www.ikea.com/dk/da/images/products/vallkrassing-plaid-gragron__1207660_pe908117_s5.jpg",
-  "imageVerified": true,
-  "availabilityStatus": "in-stock",
-  "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-  "lastCheckedAt": "2026-06-30",
-  "roomTags": [
-   "living-room",
-   "bedroom"
-  ],
-  "styleTags": [
-   "modern",
-   "minimal",
-   "cozy",
-   "classic"
-  ],
-  "colorTags": [
-   "grey"
-  ],
-  "priceTier": "standard",
-  "market": "DK",
-  "sourceType": "public-product-page",
-  "sourceName": "IKEA DK",
-  "sourceReference": "nonhr-textiles-10-155",
-  "dataQuality": "complete",
-  "dataQualityNotes": "Name + DKK price + image verified live on ikea.com/dk 2026-06-30 (article-number port)."
  },
  {
   "externalId": "ikea-dk-txt-indira-40582633",
