@@ -280,7 +280,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // resolved to a real product page there survived, and each row's price + priceCurrency + og:image was
             // re-read LIVE off ikea.com/<cc> (currency-matched to the market; agent-free, curl only). Fills the
             // 15-market grid where an article is sold but was previously catalogued only elsewhere. No fabrication.
-            "/catalog/real-ikea-cross-market-port-10-167.json"
+            "/catalog/real-ikea-cross-market-port-10-167.json",
+            // Sprint 10.167: 141 non-IKEA products (Interio AT, JYSK AT/DK, Camif FR, Lovely Meubles FR, Poco DE,
+            // Harvey Norman HR) discovered by a workflow that returned only product URLs; every price + currency +
+            // og:image was then read LIVE off each page by a deterministic curl pass (agents supplied no prices),
+            // currency-matched to the market. Rows without a readable JSON-LD price/image were dropped, not guessed.
+            "/catalog/real-discovery-retailers-10-167.json"
     );
 
     /**
