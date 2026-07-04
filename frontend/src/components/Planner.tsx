@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePlan, generatePlanFast, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
 import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
-import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
+import { formatCurrency, retailersForMarket, roomLabels, styleLabels, setFormattingMarket } from '../utils/planner';
 import { detectOutOfScope } from '../utils/outOfScope';
 import { detectDimensionConstraint } from '../utils/dimensions';
 import { detectMultiRoom } from '../utils/multiRoom';
@@ -187,7 +187,7 @@ function SavedPlansInbox({
                   <div>
                     <span>{savedPlan.favorite ? t('saved.favorite') : t('saved.saved')} · {formatSavedDate(savedPlan.createdAt)}</span>
                     <strong>{roomLabels[savedPlan.input.roomType]}</strong>
-                    <small>{t('saved.metaLine', { price: formatCurrency(savedPlan.plan.total), count: savedPlan.plan.items.length, stores })}</small>
+                    <small>{t('saved.metaLine', { price: formatCurrency(savedPlan.plan.total, savedPlan.input.market), count: savedPlan.plan.items.length, stores })}</small>
                   </div>
                   <div className="saved-plan-actions">
                     <button
@@ -338,6 +338,9 @@ export function Planner() {
         setPlans([savedPlan.plan]);
         setSecondHand([]);
         setOpenedSavedAt(savedPlan.createdAt);
+        // Sprint 10.167: render a shared plan in ITS market's currency, not the viewer's selected one (a UK
+        // plan must show £, not the viewer's €). formatCurrency reads this when no explicit market is passed.
+        setFormattingMarket(savedPlan.input.market);
         setNotice(t('planner.noticeLoaded'));
       })
       .catch(() => setError(t('planner.errorNotFound')))
@@ -374,6 +377,9 @@ export function Planner() {
     setSecondHand([]);
     setRefining(false);
     setOpenedSavedAt(null); // a fresh generation prices against the current catalog → drop the "saved plan" note
+    // Sprint 10.167: format THIS plan in its own market's currency, resetting any market left over from viewing a
+    // saved/shared plan from a different market (formatCurrency reads this module-level market when none is passed).
+    setFormattingMarket(effectiveInput.market);
 
     // Sprint 10.78: two-phase generate. Paint an INSTANT deterministic draft (~50ms) so the user isn't staring
     // at a ~2s spinner, then refine it with the AI result (which we kick off immediately, in parallel).
@@ -541,6 +547,8 @@ export function Planner() {
     setPlans([savedPlan.plan]);
     setSecondHand([]);
     setOpenedSavedAt(savedPlan.createdAt);
+    // Sprint 10.167: a saved plan opened from another market renders in ITS currency, not the viewer's selection.
+    setFormattingMarket(savedPlan.input.market);
     if (savedPlan.spaceName) setActiveSpace(savedPlan.spaceName);
     setPartialNotice(null);
     setAnalysis(null);
