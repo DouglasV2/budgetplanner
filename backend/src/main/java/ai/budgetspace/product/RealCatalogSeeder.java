@@ -274,7 +274,13 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // it resolves + workflow-discovered canonical slugs where it redirects to /cat/. EVERY row
             // deterministically re-fetched (live JSON-LD price+currency + product og:image + model-token guard),
             // dropped on 404 / category redirect / currency mismatch. Curl, no trusted agent data.
-            "/catalog/real-eu-kb-deepen-10-159.json"
+            "/catalog/real-eu-kb-deepen-10-159.json",
+            // Sprint 10.167: cross-market IKEA port — 2955 products. Every known IKEA article present in some
+            // market was ported to each OTHER market via the bare-article URL (/p/-{article}/); only rows that
+            // resolved to a real product page there survived, and each row's price + priceCurrency + og:image was
+            // re-read LIVE off ikea.com/<cc> (currency-matched to the market; agent-free, curl only). Fills the
+            // 15-market grid where an article is sold but was previously catalogued only elsewhere. No fabrication.
+            "/catalog/real-ikea-cross-market-port-10-167.json"
     );
 
     /**
