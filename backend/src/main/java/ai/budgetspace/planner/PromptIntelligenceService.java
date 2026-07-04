@@ -112,7 +112,9 @@ public class PromptIntelligenceService {
         // knows but can't read intent it has no rule for.
         boolean hadPrompt = prompt != null && !prompt.isBlank();
         PlannerIntentAnalysisDto analysis = new PlannerIntentAnalysisDto(
-                enriched.roomType(), enriched.budget(), "EUR", enriched.size(), enriched.style(),
+                // Currency follows the market, not a hardcoded "EUR" — otherwise a rule-based FALLBACK in a
+                // non-EUR market (GB/NO/SE/DK), which happens on any LLM hiccup or cap, mislabels the currency.
+                enriched.roomType(), enriched.budget(), Markets.currencyFor(input.market()), enriched.size(), enriched.style(),
                 enriched.preferredRetailers(), enriched.mustHaveCategories(), enriched.alreadyHaveCategories(),
                 List.of(), enriched.colorPreferences(), enriched.materialPreferences(),
                 qualityFromGoal(enriched.optimizationGoal(), enriched.furnishingLevel()), null,
@@ -235,15 +237,20 @@ public class PromptIntelligenceService {
         Integer size = a.roomSize() == null ? null : clamp(a.roomSize(), 8, 60);
         String quality = a.qualityPreference() != null && QUALITY_PREFERENCES.contains(a.qualityPreference().toLowerCase(Locale.ROOT))
                 ? a.qualityPreference().toLowerCase(Locale.ROOT) : null;
+        List<String> validMustHave = validCategories(a.mustHaveCategories());
+        // "Specific items only" restricts the plan to the requested categories — but if NONE of them mapped to a
+        // category we stock (e.g. "a hammock, a disco ball and a bean bag"), that would build an EMPTY plan. Drop
+        // the restriction in that case so the user still gets a normal room instead of nothing.
+        boolean specificItemsOnly = a.specificItemsOnly() && !validMustHave.isEmpty();
         return new PlannerIntentAnalysisDto(
                 // Currency is decided by the market, never by the model — the LLM sometimes echoes a symbol
                 // ("€") or the wrong code, so always use the authoritative market currency passed in here.
                 roomType, budget, currency, size, style,
-                validRetailers(a.preferredRetailers()), validCategories(a.mustHaveCategories()),
+                validRetailers(a.preferredRetailers()), validMustHave,
                 validCategories(a.alreadyHaveCategories()), validCategories(a.avoidCategories()),
                 lowerAll(a.colorPreferences()), lowerAll(a.materialPreferences()),
                 quality, a.urgency(), a.confidence(), a.missingImportantInfo(), a.userGoalSummary(),
-                a.normalizedPrompt(), a.warnings(), a.aiUsed(), a.source(), a.specificItemsOnly(), validQuantities(a.quantities()));
+                a.normalizedPrompt(), a.warnings(), a.aiUsed(), a.source(), specificItemsOnly, validQuantities(a.quantities()));
     }
 
     private List<String> validCategories(List<String> values) {

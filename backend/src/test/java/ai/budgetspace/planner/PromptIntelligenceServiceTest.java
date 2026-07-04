@@ -179,6 +179,57 @@ class PromptIntelligenceServiceTest {
         assertThat(analysis.mustHaveCategories()).contains("kitchen-cart");
     }
 
+    @Test
+    void specificItemsOnlyDroppedWhenNoRequestedCategoryIsStocked() {
+        // Sprint 10.167: "a hammock, a disco ball and a bean bag" — the model flags specificItemsOnly but none
+        // map to a category we stock; keeping the flag would build an EMPTY plan, so it must be dropped.
+        String json = "{\"roomType\":\"living-room\",\"budget\":800,\"specificItemsOnly\":true,"
+                + "\"mustHaveCategories\":[\"hammock\",\"disco-ball\",\"bean-bag\"]}";
+        PromptIntelligenceService service = service(enabledOpenAi("key"), defaultTracker(), fixedClient(json));
+
+        PlannerIntentAnalysisDto a = service.analyze(input("I need a hammock and a disco ball"), "s1", "FREE");
+
+        assertThat(a.aiUsed()).isTrue();
+        assertThat(a.mustHaveCategories()).isEmpty();
+        assertThat(a.specificItemsOnly()).as("no stocked item → drop the restriction so the room still fills").isFalse();
+    }
+
+    @Test
+    void specificItemsOnlyKeptWhenAtLeastOneCategoryIsStocked() {
+        String json = "{\"roomType\":\"living-room\",\"budget\":800,\"specificItemsOnly\":true,"
+                + "\"mustHaveCategories\":[\"sofa\",\"disco-ball\"]}";
+        PromptIntelligenceService service = service(enabledOpenAi("key"), defaultTracker(), fixedClient(json));
+
+        PlannerIntentAnalysisDto a = service.analyze(input("just a sofa please"), "s1", "FREE");
+
+        assertThat(a.specificItemsOnly()).isTrue();
+        assertThat(a.mustHaveCategories()).containsExactly("sofa");
+    }
+
+    @Test
+    void ruleBasedFallbackCurrencyFollowsMarketNotHardcodedEur() {
+        // Sprint 10.167: a fallback in a non-EUR market must carry that market's currency, not a hardcoded "EUR".
+        PromptIntelligenceService service = service(disabled(), defaultTracker());
+
+        PlannerIntentAnalysisDto gb = service.analyze(input("living room, sofa").withMarket("GB"), "s1", "FREE");
+
+        assertThat(gb.aiUsed()).isFalse();
+        assertThat(gb.currency()).isEqualTo("GBP");
+    }
+
+    @Test
+    void llmScalarForArrayFieldIsAcceptedNotDroppedToFallback() {
+        // Sprint 10.167: the model sometimes returns a scalar where a list is expected ("colorPreferences":"warm").
+        // It must be accepted as a 1-element list, not throw and silently drop the whole request to rule-based.
+        String json = "{\"roomType\":\"living-room\",\"budget\":1000,\"colorPreferences\":\"warm\"}";
+        PromptIntelligenceService service = service(enabledOpenAi("key"), defaultTracker(), fixedClient(json));
+
+        PlannerIntentAnalysisDto a = service.analyze(input("warm living room"), "s1", "FREE");
+
+        assertThat(a.aiUsed()).as("scalar-for-array must not force a fallback").isTrue();
+        assertThat(a.colorPreferences()).contains("warm");
+    }
+
     // --- helpers ---
 
     private PromptIntelligenceService service(LlmProperties props, AiUsageTracker tracker, LlmClient... clients) {
