@@ -916,6 +916,12 @@ input[type='range'] {
     position: static;
   }
 
+  /* Sprint 10.167: once the layout is single-column, stop bottom-pinning the Generate bar — otherwise
+     it shares the viewport-bottom strip with the fixed share dock and the dock covers the CTA. */
+  .sticky-generate-bar {
+    position: static;
+  }
+
   .stats,
   .steps-grid,
   .monetization-grid {
@@ -1683,6 +1689,47 @@ textarea:focus {
 .share-btn.whatsapp { border-color: rgba(37, 211, 102, 0.5); color: #128C4B; }
 .share-btn.reddit { border-color: rgba(255, 69, 0, 0.45); color: #D93A00; }
 .share-btn.x { border-color: rgba(31, 29, 26, 0.5); color: #1F1D1A; }
+
+/* Sprint 10.167: slim sticky share dock (mockup) — an always-reachable share bar pinned to the
+   viewport bottom. Portaled to <body>, so no backdrop-filter/transform ancestor can trap it.
+   Reuses the .share-btn pills; the full share card (with its preview text) stays in flow above it.
+   z-index 30 sits above page content but below the auth-gate (50) and legal overlay (1000) modals. */
+.share-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 34px rgba(31, 29, 26, 0.16);
+}
+
+@media (max-width: 680px) {
+  /* Full-width bar hugging the bottom edge on phones, buttons sharing the row. */
+  .share-dock {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    transform: none;
+    max-width: none;
+    border-radius: 20px;
+    justify-content: space-between;
+  }
+
+  .share-dock .share-btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 9px 10px;
+  }
+}
 
 /* Sprint 10.61: Saved Spaces — active-space chips + grouped saved plans + "keep designing". */
 .spaces-control {
@@ -3275,6 +3322,9 @@ textarea {
 /* Sprint 6.6: 10-second decision result */
 .decision-results-column {
   gap: 14px;
+  /* Sprint 10.167: clearance so the last results content isn't hidden behind the fixed share dock
+     (sized for the wrapped two-row dock case, not just a single row). */
+  padding-bottom: 120px;
 }
 
 .decision-plan-card {
