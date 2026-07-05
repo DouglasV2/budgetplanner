@@ -402,9 +402,11 @@ export function Planner() {
       aiLanded = true;
       applyResponse(ai, effectiveInput, true);
       shown = true;
-    } catch (apiError) {
+    } catch {
       if (!shown) {
-        setError(apiError instanceof Error ? apiError.message : t('planner.errorUnavailable'));
+        // Sprint 10.167: always show the localised, friendly error — never a raw thrown/backend string (which
+        // was hardcoded Croatian and leaked the word "Backend" to users, incl. in English).
+        setError(t('planner.errorUnavailable'));
       }
       // else: AI failed but the deterministic draft is already shown — keep it (graceful).
     } finally {
@@ -443,8 +445,9 @@ export function Planner() {
     try {
       const updatedPlan = await replaceProduct(plan, input, productId, changeType);
       setPlans((currentPlans) => currentPlans.map((currentPlan) => (currentPlan.id === planId ? updatedPlan : currentPlan)));
-    } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : t('planner.errorReplace'));
+    } catch {
+      // Localised error only — never surface a raw thrown/backend string to the user.
+      setError(t('planner.errorReplace'));
     }
   }
 

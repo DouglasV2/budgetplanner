@@ -63,8 +63,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
       }
     });
   } catch {
-    // Network/CORS failure: the backend is unreachable rather than returning an error status.
-    throw new Error('Backend trenutno nije dostupan. Provjeri je li server pokrenut i pokušaj ponovno.');
+    // Network/CORS failure: the app can't reach the service. Callers show a LOCALISED, friendly error to the
+    // user — this thrown text is a fallback only and must stay non-technical (no "Backend"/"server" jargon).
+    throw new Error('Trenutno se ne možemo spojiti. Pokušaj ponovno za koju minutu.');
   }
 
   if (!response.ok) {
