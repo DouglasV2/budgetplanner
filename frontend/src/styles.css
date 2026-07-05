@@ -1654,7 +1654,7 @@ textarea:focus {
 
 .share-btn {
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 999px;
   background: var(--white, #fff);
   color: var(--ink);
   padding: 8px 15px;
