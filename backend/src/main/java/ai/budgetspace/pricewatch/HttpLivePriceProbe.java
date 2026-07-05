@@ -104,8 +104,14 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         if (ikea) return finPath.contains("/p/") ? Liveness.LIVE : Liveness.DEAD;
         String reqId = trailingId(reqPath), finId = trailingId(finPath);
         if (reqId != null && reqId.equals(finId)) return Liveness.LIVE; // same product, re-slugged
+        // Both URLs carry a product id but they DIFFER -> the requested product is gone and the site bounced us to a
+        // DIFFERENT product (e.g. Kwantum salontafel-4323413 -> eettafel-4320261) -> dead.
+        if (reqId != null && finId != null) return Liveness.DEAD;
         if (!finPath.isEmpty() && reqPath.startsWith(finPath) && finPath.length() < reqPath.length()) return Liveness.DEAD; // parent/category
-        if (segments(finPath) <= 1) return Liveness.DEAD; // bounced to home / shallow landing
+        // Only a true bounce to the site ROOT/home is dead. A same-depth single-segment RE-SLUG (e.g. a retailer
+        // like Harvey Norman whose products live at /slug and one re-slugs /trosjed-filip -> /trosjed-filip-v2) must
+        // NOT be retired — the old "<=1 segment" rule wrongly killed those live products. (Sprint 10.167 fix.)
+        if (finPath.isEmpty() || finPath.equals("/")) return Liveness.DEAD; // bounced to home
         return Liveness.LIVE;
     }
 
@@ -120,9 +126,6 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         return s.length() > 1 && s.endsWith("/") ? s.substring(0, s.length() - 1) : s;
     }
 
-    private static int segments(String path) {
-        return (int) path.chars().filter(c -> c == '/').count();
-    }
 
     private static final Pattern PRODUCT_ID = Pattern.compile("\\d{4,}");
 
@@ -148,6 +151,11 @@ public class HttpLivePriceProbe implements LivePriceProbe {
                         || addr.isAnyLocalAddress() || addr.isMulticastAddress()) {
                     return true;
                 }
+                byte[] b = addr.getAddress();
+                // CGNAT / RFC 6598 100.64.0.0/10 (internal load balancers, cloud NAT) — not flagged by isSiteLocal.
+                if (b.length == 4 && (b[0] & 0xFF) == 100 && (b[1] & 0xFF) >= 64 && (b[1] & 0xFF) <= 127) return true;
+                // IPv6 Unique-Local fc00::/7 (fc../fd.. — internal service mesh / IPv6 metadata).
+                if (b.length == 16 && (b[0] & 0xFE) == 0xFC) return true;
             }
             return false;
         } catch (Exception unresolvable) {

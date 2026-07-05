@@ -70,8 +70,27 @@ class HttpLivePriceProbeTest {
         assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://10.0.0.5/x"))).isTrue();
         assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://192.168.1.10/x"))).isTrue();
         assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://172.16.0.1/x"))).isTrue();
-        // A public literal IP is allowed (no DNS needed; 8.8.8.8 is a public address).
+        // Sprint 10.167 sweep: also block CGNAT (100.64.0.0/10) and IPv6 Unique-Local (fc00::/7).
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://100.64.0.1/x"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://100.127.255.254/x"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://[fd00:ec2::254]/x"))).isTrue();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://[fc00::1]/x"))).isTrue();
+        // Public literals still allowed (100.63.x is NOT CGNAT; 8.8.8.8 public).
         assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://8.8.8.8/x"))).isFalse();
+        assertThat(HttpLivePriceProbe.isBlockedHost(URI.create("http://100.63.0.1/x"))).isFalse();
+    }
+
+    @Test
+    void singleSegmentReSlugIsLiveOnlyARootBounceIsDead() {
+        // Sprint 10.167 sweep: a flat-URL retailer (e.g. Harvey Norman) re-slugging /trosjed-filip -> /trosjed-filip-v2
+        // must stay LIVE (was wrongly retired by the old "<=1 segment => DEAD" rule). Only a bounce to root is DEAD.
+        assertThat(classify("https://www.harveynorman.hr/trosjed-filip",
+                "https://www.harveynorman.hr/trosjed-filip-v2", "Harvey Norman")).isEqualTo(Liveness.LIVE);
+        assertThat(classify("https://www.harveynorman.hr/tv-element-rivero-189",
+                "https://www.harveynorman.hr/tv-element-rivero-190", "Harvey Norman")).isEqualTo(Liveness.LIVE);
+        // A genuine bounce to the site root is still DEAD.
+        assertThat(classify("https://www.harveynorman.hr/trosjed-filip",
+                "https://www.harveynorman.hr/", "Harvey Norman")).isEqualTo(Liveness.DEAD);
     }
 
     @Test

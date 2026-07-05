@@ -1691,34 +1691,55 @@ public class PlannerService {
     // those ~N full-table loads into a single query — the cost stops growing with the catalog (now 1200+
     // rows). The small TTL means a dev admin-import is still reflected within a couple of seconds.
     private static final long CATALOG_SNAPSHOT_TTL_MS = 2_000;
-    private volatile List<Product> catalogSnapshot;
+    // Sprint 10.167 (perf): cache the planner-eligible catalog BUCKETED BY MARKET, rebuilt at most once per TTL.
+    // marketCatalog() is called ~10x per plan request and used to re-stream + re-filter the WHOLE products table
+    // each time — an O(catalog) pass whose cost doubled when the catalog grew past 6000 rows and capped hot-path
+    // throughput (a plan request only ever needs its own market's ~few-hundred rows). Bucketing makes each call an
+    // O(1) map lookup, so per-request cost stops scaling with total catalog size. Eligibility + second-hand
+    // filtering is applied ONCE at build time (was the single chokepoint in the old stream). Products with no
+    // market are "global" (eligible in every market) and appended at lookup — matching the old equalsIgnoreCase
+    // semantics. The benign rebuild race (two threads may both refresh) is harmless: same result, last wins.
+    private volatile Map<String, List<Product>> catalogByMarket;
+    private volatile List<Product> globalCatalog = List.of();
     private volatile long catalogSnapshotAt;
 
-    private List<Product> allProducts() {
-        List<Product> snapshot = catalogSnapshot;
-        if (snapshot != null && System.currentTimeMillis() - catalogSnapshotAt < CATALOG_SNAPSHOT_TTL_MS) {
-            return snapshot;
+    private void refreshCatalogIfStale() {
+        Map<String, List<Product>> current = catalogByMarket;
+        if (current != null && System.currentTimeMillis() - catalogSnapshotAt < CATALOG_SNAPSHOT_TTL_MS) {
+            return;
         }
-        snapshot = List.copyOf(productRepository.findAll());
-        catalogSnapshot = snapshot;
-        catalogSnapshotAt = System.currentTimeMillis();
-        return snapshot;
+        Map<String, List<Product>> buckets = new HashMap<>();
+        List<Product> global = new ArrayList<>();
+        for (Product product : productRepository.findAll()) {
+            // Sprint 10.51: a second-hand marketplace listing is never a plan pick (different trust/freshness model);
+            // it is surfaced only in the separate "Rabljeno" block and must never enter a plan or the budget total.
+            if (!CatalogSourcePolicy.isPlannerEligible(product) || product.isSecondHand()) {
+                continue;
+            }
+            String market = product.getMarket();
+            if (market == null || market.isBlank()) {
+                global.add(product);
+            } else {
+                buckets.computeIfAbsent(market.toUpperCase(Locale.ROOT), key -> new ArrayList<>()).add(product);
+            }
+        }
+        this.catalogByMarket = buckets;
+        this.globalCatalog = List.copyOf(global);
+        this.catalogSnapshotAt = System.currentTimeMillis();
     }
 
     private List<Product> marketCatalog(PlannerInputDto input) {
+        refreshCatalogIfStale();
         String market = Markets.normalize(input == null ? null : input.market());
-        List<Product> all = allProducts();
-        return all.stream()
-                .filter(CatalogSourcePolicy::isPlannerEligible)
-                // Sprint 10.51: a second-hand marketplace listing is never a plan pick — different trust/freshness
-                // model (single-unit, ephemeral, "used"). It is surfaced only in the separate "Rabljeno" block via
-                // secondHandSuggestions and must never enter a plan or the budget total. This is the single
-                // chokepoint every pick path streams from (pickBest / pickReplacement / cheapest / coverage /
-                // missingImportant), so one guard here covers them all. See docs/marketplace-sourcing.md §5.
-                .filter(product -> !product.isSecondHand())
-                .filter(product -> product.getMarket() == null || product.getMarket().isBlank()
-                        || product.getMarket().equalsIgnoreCase(market))
-                .toList();
+        List<Product> forMarket = catalogByMarket.getOrDefault(market, List.of());
+        List<Product> global = globalCatalog;
+        if (global.isEmpty()) {
+            return forMarket;
+        }
+        List<Product> combined = new ArrayList<>(forMarket.size() + global.size());
+        combined.addAll(forMarket);
+        combined.addAll(global);
+        return combined;
     }
 
     private boolean hasTag(String csv, String tag) {
