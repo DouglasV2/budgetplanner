@@ -982,7 +982,7 @@ public class PlannerService {
         } else if (storeCount == 1) {
             base = "Sve na jednom mjestu, u " + mainRetailer + " — jedan odlazak i gotovo.";
         } else {
-            base = "Težište je u " + mainRetailer + "; ostatak pokupiš u još " + (storeCount - 1) + " " + storesWord(storeCount - 1) + ".";
+            base = "Najviše je u " + mainRetailer + ", a ostatak pokupiš u još " + (storeCount - 1) + " " + storesWordLocative(storeCount - 1) + ".";
         }
         if (checkInStoreCount > 0) {
             base += checkInStoreCount == 1
@@ -995,6 +995,15 @@ public class PlannerService {
     private String storesWord(int count) {
         int mod100 = count % 100;
         int mod10 = count % 10;
+        if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "trgovine";
+        return "trgovina";
+    }
+
+    // Locative case for "u još N ___" (e.g. "u još 1 trgovini", "u još 2 trgovine", "u još 5 trgovina").
+    private String storesWordLocative(int count) {
+        int mod100 = count % 100;
+        int mod10 = count % 10;
+        if (mod10 == 1 && mod100 != 11) return "trgovini";
         if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "trgovine";
         return "trgovina";
     }
