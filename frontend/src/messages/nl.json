@@ -557,5 +557,17 @@
   "moveIn.byStore": "Waar kopen — per winkel",
   "moveIn.printList": "Lijst afdrukken",
   "moveIn.removeItem": "Dit stuk verwijderen",
-  "moveIn.swapItem": "Vervang door een vergelijkbaar stuk"
+  "moveIn.swapItem": "Vervang door een vergelijkbaar stuk",
+  "header.language": "Taal",
+  "header.readEnglish": "Lees in het Engels",
+  "header.readNative": "Terug naar de taal van je land",
+  "footer.independence": "Niet verbonden aan IKEA, JYSK, eBay of enige retailer. Handelsmerken zijn eigendom van hun eigenaren.",
+  "planner.aiNotAdvice": "Door AI gegenereerd voorstel — prijzen en pasvorm zijn schattingen, geen professioneel advies. Controleer bij de retailer voordat je koopt.",
+  "planner.aiInteractionNotice": "Je tekst wordt verwerkt door een AI-assistent.",
+  "results.savedPlanFreshnessNote": "Prijzen vastgelegd op {date} ({days} d geleden). Controleer in de winkel of vernieuw het plan.",
+  "results.savedPlanRefresh": "Prijzen vernieuwen",
+  "results.reviewChipTitleStale": "Deze beoordeling is een tijd geleden vastgelegd en kan verouderd zijn — bekijk de reviews in de winkel.",
+  "results.priceEstimateNote": "Prijzen en beschikbaarheid zijn schattingen verzameld bij retailers en kunnen verouderd zijn — controleer altijd op de pagina van de retailer voordat je koopt. BudgetSpace is niet de verkoper.",
+  "auth.signOutConfirm": "Uitloggen?",
+  "auth.signOutBody": "Je opgeslagen plannen blijven aan je account gekoppeld — log weer in wanneer je wilt."
 }

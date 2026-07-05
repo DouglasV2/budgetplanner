@@ -564,5 +564,10 @@
   "moveIn.byStore": "Wo kaufen — nach Geschäft",
   "moveIn.printList": "Liste drucken",
   "moveIn.removeItem": "Dieses Teil entfernen",
-  "moveIn.swapItem": "Gegen ein ähnliches Teil tauschen"
+  "moveIn.swapItem": "Gegen ein ähnliches Teil tauschen",
+  "header.language": "Sprache",
+  "header.readEnglish": "Auf Englisch lesen",
+  "header.readNative": "Zurück zur Sprache deines Landes",
+  "auth.signOutConfirm": "Abmelden?",
+  "auth.signOutBody": "Deine gespeicherten Pläne bleiben mit deinem Konto verknüpft — melde dich an, wann immer du willst."
 }

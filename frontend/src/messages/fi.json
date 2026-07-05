@@ -557,5 +557,17 @@
   "moveIn.byStore": "Mistä ostaa — myymälöittäin",
   "moveIn.printList": "Tulosta lista",
   "moveIn.removeItem": "Poista tämä kappale",
-  "moveIn.swapItem": "Vaihda samankaltaiseen kappaleeseen"
+  "moveIn.swapItem": "Vaihda samankaltaiseen kappaleeseen",
+  "header.language": "Kieli",
+  "header.readEnglish": "Lue englanniksi",
+  "header.readNative": "Takaisin maasi kielelle",
+  "footer.independence": "Ei yhteydessä IKEAan, JYSKiin, eBayhin tai mihinkään jälleenmyyjään. Tavaramerkit kuuluvat omistajilleen.",
+  "planner.aiNotAdvice": "Tekoälyn ehdotus — hinnat ja sopivuus ovat arvioita, eivät ammattineuvontaa. Tarkista jälleenmyyjältä ennen ostoa.",
+  "planner.aiInteractionNotice": "Tekstisi käsittelee tekoälyavustaja.",
+  "results.savedPlanFreshnessNote": "Hinnat tallennettu {date} ({days} pv sitten). Tarkista myymälässä tai päivitä suunnitelma.",
+  "results.savedPlanRefresh": "Päivitä hinnat",
+  "results.reviewChipTitleStale": "Tämä arvio tallennettiin jokin aika sitten ja voi olla vanhentunut — tarkista arvostelut myymälässä.",
+  "results.priceEstimateNote": "Hinnat ja saatavuus ovat jälleenmyyjiltä koottuja arvioita ja voivat olla vanhentuneita — tarkista aina jälleenmyyjän sivulta ennen ostoa. BudgetSpace ei ole myyjä.",
+  "auth.signOutConfirm": "Kirjaudutaanko ulos?",
+  "auth.signOutBody": "Tallennetut suunnitelmasi pysyvät tilisi yhteydessä — kirjaudu takaisin milloin haluat."
 }

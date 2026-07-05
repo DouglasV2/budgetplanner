@@ -557,5 +557,17 @@
   "moveIn.byStore": "Kde kúpiť — podľa obchodu",
   "moveIn.printList": "Vytlačiť zoznam",
   "moveIn.removeItem": "Odstrániť tento kus",
-  "moveIn.swapItem": "Vymeniť za podobný kus"
+  "moveIn.swapItem": "Vymeniť za podobný kus",
+  "header.language": "Jazyk",
+  "header.readEnglish": "Čítať v angličtine",
+  "header.readNative": "Späť na jazyk tvojej krajiny",
+  "footer.independence": "Bez prepojenia s IKEA, JYSK, eBay či akýmkoľvek predajcom. Ochranné známky patria ich vlastníkom.",
+  "planner.aiNotAdvice": "Návrh vygenerovaný AI — ceny a vhodnosť sú odhady, nie odborné poradenstvo. Pred kúpou over u predajcu.",
+  "planner.aiInteractionNotice": "Tvoj text spracúva AI asistent.",
+  "results.savedPlanFreshnessNote": "Ceny zaznamenané {date} (pred {days} d). Over v predajni alebo obnov plán.",
+  "results.savedPlanRefresh": "Obnoviť ceny",
+  "results.reviewChipTitleStale": "Toto hodnotenie bolo zaznamenané pred časom a môže byť neaktuálne — pozri recenzie v predajni.",
+  "results.priceEstimateNote": "Ceny a dostupnosť sú odhady získané od predajcov a môžu byť neaktuálne — pred kúpou vždy over na stránke predajcu. BudgetSpace nie je predajca.",
+  "auth.signOutConfirm": "Odhlásiť sa?",
+  "auth.signOutBody": "Tvoje uložené plány zostávajú prepojené s tvojím účtom — prihlás sa znova, kedykoľvek chceš."
 }

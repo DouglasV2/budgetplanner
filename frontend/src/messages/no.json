@@ -557,5 +557,17 @@
   "moveIn.byStore": "Hvor du kjøper — per butikk",
   "moveIn.printList": "Skriv ut listen",
   "moveIn.removeItem": "Fjern denne delen",
-  "moveIn.swapItem": "Bytt til en lignende del"
+  "moveIn.swapItem": "Bytt til en lignende del",
+  "header.language": "Språk",
+  "header.readEnglish": "Les på engelsk",
+  "header.readNative": "Tilbake til landets språk",
+  "footer.independence": "Ikke tilknyttet IKEA, JYSK, eBay eller noen forhandler. Varemerker tilhører sine eiere.",
+  "planner.aiNotAdvice": "AI-generert forslag — priser og passform er anslag, ikke profesjonelle råd. Sjekk med forhandleren før du kjøper.",
+  "planner.aiInteractionNotice": "Teksten din behandles av en AI-assistent.",
+  "results.savedPlanFreshnessNote": "Priser registrert {date} (for {days} d siden). Sjekk i butikk eller oppdater planen.",
+  "results.savedPlanRefresh": "Oppdater priser",
+  "results.reviewChipTitleStale": "Denne vurderingen ble registrert for en stund siden og kan være utdatert — sjekk anmeldelsene i butikken.",
+  "results.priceEstimateNote": "Priser og tilgjengelighet er anslag samlet inn fra forhandlere og kan være utdaterte — sjekk alltid på forhandlerens side før du kjøper. BudgetSpace er ikke selgeren.",
+  "auth.signOutConfirm": "Logge ut?",
+  "auth.signOutBody": "De lagrede planene dine forblir knyttet til kontoen din — logg inn igjen når du vil."
 }

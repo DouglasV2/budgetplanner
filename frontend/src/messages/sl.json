@@ -557,5 +557,17 @@
   "moveIn.byStore": "Kje kupiti — po trgovini",
   "moveIn.printList": "Natisni seznam",
   "moveIn.removeItem": "Odstrani ta kos",
-  "moveIn.swapItem": "Zamenjaj s podobnim kosom"
+  "moveIn.swapItem": "Zamenjaj s podobnim kosom",
+  "header.language": "Jezik",
+  "header.readEnglish": "Beri v angleščini",
+  "header.readNative": "Nazaj na jezik tvoje države",
+  "footer.independence": "Brez povezave z IKEA, JYSK, eBay ali katerim koli trgovcem. Blagovne znamke pripadajo svojim lastnikom.",
+  "planner.aiNotAdvice": "Predlog, ustvarjen z UI — cene in ustreznost so ocene, ne strokovni nasvet. Pred nakupom preveri pri trgovcu.",
+  "planner.aiInteractionNotice": "Tvoje besedilo obdela pomočnik z UI.",
+  "results.savedPlanFreshnessNote": "Cene zabeležene {date} (pred {days} d). Preveri v trgovini ali osveži načrt.",
+  "results.savedPlanRefresh": "Osveži cene",
+  "results.reviewChipTitleStale": "Ta ocena je bila zabeležena pred časom in je morda zastarela — preveri mnenja v trgovini.",
+  "results.priceEstimateNote": "Cene in razpoložljivost so ocene, zbrane od trgovcev, in so morda zastarele — pred nakupom vedno preveri na strani trgovca. BudgetSpace ni prodajalec.",
+  "auth.signOutConfirm": "Se želiš odjaviti?",
+  "auth.signOutBody": "Tvoji shranjeni načrti ostanejo povezani s tvojim računom — znova se prijavi, kadar koli želiš."
 }

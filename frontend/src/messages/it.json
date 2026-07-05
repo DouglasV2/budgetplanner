@@ -557,5 +557,17 @@
   "moveIn.byStore": "Dove comprare — per negozio",
   "moveIn.printList": "Stampa la lista",
   "moveIn.removeItem": "Rimuovi questo pezzo",
-  "moveIn.swapItem": "Sostituisci con un pezzo simile"
+  "moveIn.swapItem": "Sostituisci con un pezzo simile",
+  "header.language": "Lingua",
+  "header.readEnglish": "Leggi in inglese",
+  "header.readNative": "Torna alla lingua del tuo paese",
+  "footer.independence": "Nessuna affiliazione con IKEA, JYSK, eBay o altri rivenditori. I marchi appartengono ai rispettivi proprietari.",
+  "planner.aiNotAdvice": "Suggerimento generato dall'IA — prezzi e compatibilità sono stime, non consulenza professionale. Verifica dal rivenditore prima di acquistare.",
+  "planner.aiInteractionNotice": "Il tuo testo è elaborato da un assistente IA.",
+  "results.savedPlanFreshnessNote": "Prezzi registrati il {date} ({days} g fa). Controlla in negozio o aggiorna il piano.",
+  "results.savedPlanRefresh": "Aggiorna i prezzi",
+  "results.reviewChipTitleStale": "Questa valutazione è stata registrata tempo fa e potrebbe non essere aggiornata — controlla le recensioni in negozio.",
+  "results.priceEstimateNote": "Prezzi e disponibilità sono stime raccolte dai rivenditori e potrebbero non essere aggiornati — verifica sempre sulla pagina del rivenditore prima di acquistare. BudgetSpace non è il venditore.",
+  "auth.signOutConfirm": "Disconnettersi?",
+  "auth.signOutBody": "I tuoi piani salvati restano collegati al tuo account — accedi di nuovo quando vuoi."
 }
