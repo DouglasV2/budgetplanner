@@ -261,6 +261,10 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
   return (
     <form
       className="planner-form friendly-form"
+      // Sprint 10.168: noValidate — a number input with an out-of-range/step-mismatched value that sits
+      // inside a collapsed <details> can't be focused, so the browser silently BLOCKS submit ("An invalid
+      // form control … is not focusable") and the plan never generates. We validate/clamp in JS + backend.
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
         onGenerate();
@@ -361,8 +365,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             <input
               aria-label={t('form.budgetAriaLabel')}
               type="number"
-              min="100"
-              step="50"
+              inputMode="numeric"
               value={input.budget || ''}
               onChange={(event) => onChange({ ...input, budget: Number(event.target.value || 0) })}
             />
