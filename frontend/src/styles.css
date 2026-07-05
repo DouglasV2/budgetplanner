@@ -143,11 +143,6 @@ a {
   position: relative;
   padding: 6px 1px;
   color: var(--ink-soft);
-  /* Sprint 10.167: uppercase, letter-spaced nav to match the mockup's header. */
-  text-transform: uppercase;
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
   transition: color 0.18s ease;
 }
 
@@ -916,12 +911,6 @@ input[type='range'] {
     position: static;
   }
 
-  /* Sprint 10.167: once the layout is single-column, stop bottom-pinning the Generate bar — otherwise
-     it shares the viewport-bottom strip with the fixed share dock and the dock covers the CTA. */
-  .sticky-generate-bar {
-    position: static;
-  }
-
   .stats,
   .steps-grid,
   .monetization-grid {
@@ -996,11 +985,6 @@ input[type='range'] {
   .product-row img {
     width: 100%;
     height: 180px;
-  }
-
-  /* Sprint 10.167: let the larger price (+ struck original) wrap instead of overflowing a narrow card. */
-  .decision-product-row .product-title-line > span {
-    white-space: normal;
   }
 }
 
@@ -1415,23 +1399,21 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.42);
 }
 
-/* Sprint 10.167: mockup-style vibe cards — a large "image" block on top + name below, 3 across. */
 .vibe-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
   margin-top: 4px;
 }
 
 .vibe-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  gap: 7px;
   align-content: start;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--card);
-  padding: 8px 8px 11px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 13px 14px;
   text-align: left;
   cursor: pointer;
   transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
@@ -1454,23 +1436,17 @@ textarea:focus {
 }
 
 .vibe-card small {
-  /* Sprint 10.167: compact mockup-style card = image + name only. The description stays in the DOM (kept for
-     screen readers / not deleted), just visually collapsed so the cards match the mockup's clean look. */
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 .vibe-swatch {
-  display: flex;
-  border-radius: 12px;
+  display: inline-flex;
+  border-radius: 999px;
   overflow: hidden;
-  width: 100%;
-  height: 74px;
+  width: 54px;
+  height: 18px;
   border: 1px solid var(--hairline);
 }
 
@@ -1660,7 +1636,7 @@ textarea:focus {
 
 .share-btn {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 12px;
   background: var(--white, #fff);
   color: var(--ink);
   padding: 8px 15px;
@@ -1689,47 +1665,6 @@ textarea:focus {
 .share-btn.whatsapp { border-color: rgba(37, 211, 102, 0.5); color: #128C4B; }
 .share-btn.reddit { border-color: rgba(255, 69, 0, 0.45); color: #D93A00; }
 .share-btn.x { border-color: rgba(31, 29, 26, 0.5); color: #1F1D1A; }
-
-/* Sprint 10.167: slim sticky share dock (mockup) — an always-reachable share bar pinned to the
-   viewport bottom. Portaled to <body>, so no backdrop-filter/transform ancestor can trap it.
-   Reuses the .share-btn pills; the full share card (with its preview text) stays in flow above it.
-   z-index 30 sits above page content but below the auth-gate (50) and legal overlay (1000) modals. */
-.share-dock {
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  z-index: 30;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  max-width: calc(100vw - 24px);
-  padding: 8px;
-  border-radius: 999px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: 0 10px 34px rgba(31, 29, 26, 0.16);
-}
-
-@media (max-width: 680px) {
-  /* Full-width bar hugging the bottom edge on phones, buttons sharing the row. */
-  .share-dock {
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    transform: none;
-    max-width: none;
-    border-radius: 20px;
-    justify-content: space-between;
-  }
-
-  .share-dock .share-btn {
-    flex: 1 1 auto;
-    text-align: center;
-    padding: 9px 10px;
-  }
-}
 
 /* Sprint 10.61: Saved Spaces — active-space chips + grouped saved plans + "keep designing". */
 .spaces-control {
@@ -3322,9 +3257,6 @@ textarea {
 /* Sprint 6.6: 10-second decision result */
 .decision-results-column {
   gap: 14px;
-  /* Sprint 10.167: clearance so the last results content isn't hidden behind the fixed share dock
-     (sized for the wrapped two-row dock case, not just a single row). */
-  padding-bottom: 120px;
 }
 
 .decision-plan-card {
@@ -3479,9 +3411,10 @@ textarea {
 
 .step-product-section-title {
   display: flex;
-  gap: 8px;
-  align-items: baseline;
-  padding: 2px 4px 6px;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 2px 4px;
 }
 
 .step-product-section-title span {
@@ -3489,36 +3422,13 @@ textarea {
   margin: 0;
 }
 
-/* Sprint 10.167: numbered clay section header (01  OSNOVA PROSTORA …) matching the mockup. */
-.step-product-section-title .section-number {
-  color: var(--clay);
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-}
-.step-product-section-title .section-name {
-  text-transform: uppercase;
-  color: var(--clay);
-  font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.07em;
-}
-
 .step-product-section-title strong {
-  margin-left: auto;
   color: var(--orange-dark);
 }
 
 .decision-product-row {
-  /* Sprint 10.167: product cards toward the launch mockup — a solid cream card with a soft
-     hairline + micro-shadow instead of the translucent wash, and a touch more breathing room.
-     Scoped to decision rows so the second-hand row and other product lists keep their look. */
   margin: 0;
-  background: var(--card);
-  border-color: rgba(31, 29, 26, 0.10);
-  padding: 16px;
-  border-radius: 22px;
-  box-shadow: 0 2px 8px rgba(31, 29, 26, 0.06);
+  background: rgba(255, 255, 255, 0.74);
 }
 
 .compact-reason-box {
@@ -3725,42 +3635,6 @@ textarea {
 .decision-product-actions .more-options-toggle {
   background: transparent;
   color: var(--muted);
-}
-
-/* Sprint 10.167: match the mockup's product card — calmer image corners, a price that reads as
-   the strong number on the card, and pill-shaped primary/secondary actions. Scoped to decision
-   rows; no text/markup changes. */
-.decision-product-row > img {
-  border-radius: 16px;
-}
-
-.decision-product-row .product-title-line strong {
-  font-size: 1.02rem;
-}
-
-/* Price is the strong number on the card — clearly larger than the name (mockup), tight numerals. */
-.decision-product-row .product-title-line > span {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-}
-
-/* Pin the struck-through original price (it is 0.85em, so it would otherwise scale up with the bigger price). */
-.decision-product-row .original-price {
-  font-size: 0.85rem;
-}
-
-/* Pill actions incl. the disabled no-link fallback, so a product without a store URL matches its neighbours. */
-.decision-product-actions .open-store-link,
-.decision-product-actions .more-options-toggle,
-.decision-product-actions button {
-  border-radius: 999px;
-  padding: 10px 16px;
-}
-
-.decision-product-actions .more-options-toggle {
-  border-color: rgba(31, 29, 26, 0.14);
 }
 
 .compact-plan-header {

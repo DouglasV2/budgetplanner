@@ -316,30 +316,6 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </button>
       </div>
 
-      {/* Sprint 10.167: budget surfaced out of the advanced collapsible — a prominent step in the main flow, matching
-          the mockup (describe -> style -> budget -> build). Same control (input + presets), just no longer buried. */}
-      <div className="form-step budget-panel">
-        <span className="friendly-label">{t('form.budgetLabel')}</span>
-        <label className="budget-input-wrap">
-          <input
-            aria-label={t('form.budgetAriaLabel')}
-            type="number"
-            min="100"
-            step="50"
-            value={input.budget}
-            onChange={(event) => onChange({ ...input, budget: Number(event.target.value || 0) })}
-          />
-          <span>€</span>
-        </label>
-        <div className="budget-presets" aria-label={t('form.budgetPresetsAriaLabel')}>
-          {budgetPresets.map((budget) => (
-            <button type="button" key={budget} className={input.budget === budget ? 'preset active' : 'preset'} onClick={() => onChange({ ...input, budget })}>
-              {formatCurrency(budget)}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="form-step starter-template-panel">
         <div className="step-kicker">{t('form.quickStartKicker')}</div>
         <h3>{t('form.quickStartHeading')}</h3>
@@ -364,6 +340,28 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         <div className="step-kicker">{t('form.adjustKicker')}</div>
         <h3>{t('form.basicsHeading')}</h3>
         <p>{t('form.basicsIntro')}</p>
+
+        <div className="control-block budget-block">
+          <span className="friendly-label">{t('form.budgetLabel')}</span>
+          <label className="budget-input-wrap">
+            <input
+              aria-label={t('form.budgetAriaLabel')}
+              type="number"
+              min="100"
+              step="50"
+              value={input.budget}
+              onChange={(event) => onChange({ ...input, budget: Number(event.target.value || 0) })}
+            />
+            <span>€</span>
+          </label>
+          <div className="budget-presets" aria-label={t('form.budgetPresetsAriaLabel')}>
+            {budgetPresets.map((budget) => (
+              <button type="button" key={budget} className={input.budget === budget ? 'preset active' : 'preset'} onClick={() => onChange({ ...input, budget })}>
+                {formatCurrency(budget)}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="control-block">
           <span className="friendly-label">{t('form.whatFurnishLabel')}</span>

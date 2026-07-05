@@ -1,5 +1,4 @@
 import { useEffect, useState, type ReactNode, type SyntheticEvent } from 'react';
-import { createPortal } from 'react-dom';
 import type {
   FurnishingPlan,
   PlanFeedback,
@@ -498,21 +497,6 @@ function SharePanel({ plan, input, onSavePlan }: {
   const [url, setUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
-  // Sprint 10.167: hide the sticky dock before the footer (with the legally-required Impressum /
-  // Privacy / delete-account links) reaches the viewport, so the fixed bar never covers them. An
-  // IntersectionObserver is precise regardless of footer height; the 140px bottom margin pre-clears
-  // the dock (max ~128px tall) just before the footer scrolls in.
-  const [dockHidden, setDockHidden] = useState(false);
-  useEffect(() => {
-    const footer = document.querySelector('footer');
-    if (!footer || typeof IntersectionObserver === 'undefined') return;
-    const observer = new IntersectionObserver(
-      (entries) => setDockHidden(entries[0]?.isIntersecting ?? false),
-      { rootMargin: '0px 0px 140px 0px' },
-    );
-    observer.observe(footer);
-    return () => observer.disconnect();
-  }, []);
   const summary = buildShareText(t, plan, input, !paid);
   const canNativeShare = typeof navigator !== 'undefined' && typeof (navigator as Navigator & { share?: unknown }).share === 'function';
 
@@ -565,39 +549,23 @@ function SharePanel({ plan, input, onSavePlan }: {
     window.setTimeout(() => setCopied(false), 1800);
   }
 
-  // Sprint 10.167: one source of truth for the share buttons — reused in the in-flow card AND the
-  // slim sticky dock below, so their labels/handlers can never drift apart.
-  const shareButtons = (
-    <>
-      {canNativeShare && (
-        <button type="button" className="share-btn primary" onClick={nativeShare} disabled={busy}>{t('results.shareNative')}</button>
-      )}
-      <button type="button" className="share-btn whatsapp" onClick={() => shareTo('whatsapp')} disabled={busy}>WhatsApp</button>
-      <button type="button" className="share-btn reddit" onClick={() => shareTo('reddit')} disabled={busy}>Reddit</button>
-      <button type="button" className="share-btn x" onClick={() => shareTo('x')} disabled={busy}>X</button>
-      <button type="button" className="share-btn" onClick={copyShare} disabled={busy}>{copied ? t('results.shareCopied') : t('results.shareCopy')}</button>
-    </>
-  );
-
   return (
-    <>
-      <section className="share-card" aria-label={t('results.shareTitle')}>
-        <div className="share-head">
-          <span>{t('results.shareTitle')}</span>
-          <small>{t('results.shareHint')}</small>
-        </div>
-        <p className="share-preview">{summary}</p>
-        <div className="share-actions">{shareButtons}</div>
-      </section>
-      {/* Sprint 10.167: slim sticky share dock (mockup). Portaled to <body> so no backdrop-filter/
-          transform ancestor traps the fixed positioning; the full card with its preview stays above. */}
-      {!dockHidden && typeof document !== 'undefined' && createPortal(
-        <div className="share-dock" role="group" aria-label={t('results.shareTitle')}>
-          {shareButtons}
-        </div>,
-        document.body,
-      )}
-    </>
+    <section className="share-card" aria-label={t('results.shareTitle')}>
+      <div className="share-head">
+        <span>{t('results.shareTitle')}</span>
+        <small>{t('results.shareHint')}</small>
+      </div>
+      <p className="share-preview">{summary}</p>
+      <div className="share-actions">
+        {canNativeShare && (
+          <button type="button" className="share-btn primary" onClick={nativeShare} disabled={busy}>{t('results.shareNative')}</button>
+        )}
+        <button type="button" className="share-btn whatsapp" onClick={() => shareTo('whatsapp')} disabled={busy}>WhatsApp</button>
+        <button type="button" className="share-btn reddit" onClick={() => shareTo('reddit')} disabled={busy}>Reddit</button>
+        <button type="button" className="share-btn x" onClick={() => shareTo('x')} disabled={busy}>X</button>
+        <button type="button" className="share-btn" onClick={copyShare} disabled={busy}>{copied ? t('results.shareCopied') : t('results.shareCopy')}</button>
+      </div>
+    </section>
   );
 }
 
@@ -1088,12 +1056,10 @@ export function PlanResults({
               <span>{t('results.productsInPlan')}</span>
               <p>{t('results.productsInPlanHint')}</p>
             </div>
-            {steps.map((step, stepIndex) => (
+            {steps.map((step) => (
               <section className="step-product-section" key={step.priority}>
                 <div className="step-product-section-title">
-                  {/* Sprint 10.167: numbered clay sections (01, 02…) matching the mockup. */}
-                  <span className="section-number" aria-hidden="true">{String(stepIndex + 1).padStart(2, '0')}</span>
-                  <span className="section-name">{t(step.titleKey)}</span>
+                  <span>{t(step.titleKey)}</span>
                   <strong>{formatCurrency(step.subtotal)}</strong>
                 </div>
                 {step.items.map((item) => {
