@@ -1058,18 +1058,30 @@ textarea:focus {
   /* Sprint 10.142: 22px read a touch bubbly; 15px is crisper/more editorial without going sharp-cornered. */
   border-radius: 15px;
   padding: 16px 18px;
-  background: linear-gradient(135deg, var(--ink), #47392c);
-  color: white;
+  /* Sprint 10.168: primary action in the app's orange (was dark ink), white text, orange-tinted lift. */
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  color: #fff;
   font-weight: 620;
   display: flex;
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-  box-shadow: 0 18px 38px rgba(31, 29, 26, 0.2);
+  box-shadow: 0 16px 34px rgba(207, 95, 42, 0.28);
 }
 
-.generate-button span {
-  color: rgba(255,255,255,0.72);
+/* Icon + label travel together on the left; the hint stays on the right. */
+.generate-button-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.generate-button-icon {
+  flex-shrink: 0;
+}
+
+.generate-button .generate-button-hint {
+  color: rgba(255,255,255,0.82);
   font-size: 0.82rem;
   font-weight: 700;
 }

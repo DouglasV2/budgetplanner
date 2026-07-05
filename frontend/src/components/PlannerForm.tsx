@@ -234,6 +234,20 @@ function categoriesFromText(value: string): ProductCategory[] {
   return matches.filter(([, pattern]) => pattern.test(text)).map(([category]) => category);
 }
 
+// Sprint 10.168: a simple, non-branded checklist glyph for the primary "Složi plan" button.
+function PlanIcon() {
+  return (
+    <svg className="generate-button-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 6.4l1.4 1.4L8 5.4" />
+      <path d="M11 7h9" />
+      <path d="M4 12.5h.01" />
+      <path d="M11 12.5h9" />
+      <path d="M4 18.5h.01" />
+      <path d="M11 18.5h9" />
+    </svg>
+  );
+}
+
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
   const { t, market, setMarket } = useLocale();
   const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
@@ -274,8 +288,8 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         {/* Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the typed text. */}
         <small className="field-help ai-interaction-notice">{t('planner.aiInteractionNotice')}</small>
         <button className="generate-button" type="submit" disabled={isLoading}>
-          {isLoading ? t('planner.generating') : t('planner.generate')}
-          <span>{t('form.generateHint')}</span>
+          <span className="generate-button-label"><PlanIcon />{isLoading ? t('planner.generating') : t('planner.generate')}</span>
+          <span className="generate-button-hint">{t('form.generateHint')}</span>
         </button>
       </div>
 
@@ -349,7 +363,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
               type="number"
               min="100"
               step="50"
-              value={input.budget}
+              value={input.budget || ''}
               onChange={(event) => onChange({ ...input, budget: Number(event.target.value || 0) })}
             />
             <span>€</span>
@@ -404,7 +418,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 type="number"
                 min="8"
                 max="80"
-                value={input.size}
+                value={input.size || ''}
                 onChange={(event) => onChange({ ...input, size: Number(event.target.value || 0) })}
               />
               <span className="input-unit" aria-hidden="true">m²</span>
@@ -614,8 +628,8 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
 
       <div className="sticky-generate-bar">
         <button className="generate-button" type="submit" disabled={isLoading}>
-          {isLoading ? t('planner.generating') : t('planner.generate')}
-          <span>{t('form.budgetBarHint', { amount: formatCurrency(input.budget) })}</span>
+          <span className="generate-button-label"><PlanIcon />{isLoading ? t('planner.generating') : t('planner.generate')}</span>
+          <span className="generate-button-hint">{t('form.budgetBarHint', { amount: formatCurrency(input.budget) })}</span>
         </button>
       </div>
     </form>
