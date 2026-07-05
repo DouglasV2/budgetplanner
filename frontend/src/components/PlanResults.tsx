@@ -1056,10 +1056,12 @@ export function PlanResults({
               <span>{t('results.productsInPlan')}</span>
               <p>{t('results.productsInPlanHint')}</p>
             </div>
-            {steps.map((step) => (
+            {steps.map((step, stepIndex) => (
               <section className="step-product-section" key={step.priority}>
                 <div className="step-product-section-title">
-                  <span>{t(step.titleKey)}</span>
+                  {/* Sprint 10.167: numbered clay sections (01, 02…) matching the mockup. */}
+                  <span className="section-number" aria-hidden="true">{String(stepIndex + 1).padStart(2, '0')}</span>
+                  <span className="section-name">{t(step.titleKey)}</span>
                   <strong>{formatCurrency(step.subtotal)}</strong>
                 </div>
                 {step.items.map((item) => {

@@ -3424,10 +3424,9 @@ textarea {
 
 .step-product-section-title {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-  padding: 2px 4px;
+  gap: 8px;
+  align-items: baseline;
+  padding: 2px 4px 6px;
 }
 
 .step-product-section-title span {
@@ -3435,7 +3434,23 @@ textarea {
   margin: 0;
 }
 
+/* Sprint 10.167: numbered clay section header (01  OSNOVA PROSTORA …) matching the mockup. */
+.step-product-section-title .section-number {
+  color: var(--clay);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+.step-product-section-title .section-name {
+  text-transform: uppercase;
+  color: var(--clay);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+}
+
 .step-product-section-title strong {
+  margin-left: auto;
   color: var(--orange-dark);
 }
 
