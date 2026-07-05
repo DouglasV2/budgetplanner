@@ -991,6 +991,11 @@ input[type='range'] {
     width: 100%;
     height: 180px;
   }
+
+  /* Sprint 10.167: let the larger price (+ struck original) wrap instead of overflowing a narrow card. */
+  .decision-product-row .product-title-line > span {
+    white-space: normal;
+  }
 }
 
 /* Prompt-first planner additions */
@@ -3455,8 +3460,15 @@ textarea {
 }
 
 .decision-product-row {
+  /* Sprint 10.167: product cards toward the launch mockup — a solid cream card with a soft
+     hairline + micro-shadow instead of the translucent wash, and a touch more breathing room.
+     Scoped to decision rows so the second-hand row and other product lists keep their look. */
   margin: 0;
-  background: rgba(255, 255, 255, 0.74);
+  background: var(--card);
+  border-color: rgba(31, 29, 26, 0.10);
+  padding: 16px;
+  border-radius: 22px;
+  box-shadow: 0 2px 8px rgba(31, 29, 26, 0.06);
 }
 
 .compact-reason-box {
@@ -3663,6 +3675,42 @@ textarea {
 .decision-product-actions .more-options-toggle {
   background: transparent;
   color: var(--muted);
+}
+
+/* Sprint 10.167: match the mockup's product card — calmer image corners, a price that reads as
+   the strong number on the card, and pill-shaped primary/secondary actions. Scoped to decision
+   rows; no text/markup changes. */
+.decision-product-row > img {
+  border-radius: 16px;
+}
+
+.decision-product-row .product-title-line strong {
+  font-size: 1.02rem;
+}
+
+/* Price is the strong number on the card — clearly larger than the name (mockup), tight numerals. */
+.decision-product-row .product-title-line > span {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+/* Pin the struck-through original price (it is 0.85em, so it would otherwise scale up with the bigger price). */
+.decision-product-row .original-price {
+  font-size: 0.85rem;
+}
+
+/* Pill actions incl. the disabled no-link fallback, so a product without a store URL matches its neighbours. */
+.decision-product-actions .open-store-link,
+.decision-product-actions .more-options-toggle,
+.decision-product-actions button {
+  border-radius: 999px;
+  padding: 10px 16px;
+}
+
+.decision-product-actions .more-options-toggle {
+  border-color: rgba(31, 29, 26, 0.14);
 }
 
 .compact-plan-header {
