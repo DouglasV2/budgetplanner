@@ -370,7 +370,9 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
               type="number"
               inputMode="numeric"
               value={input.budget || ''}
-              onChange={(event) => onChange({ ...input, budget: Number(event.target.value || 0) })}
+              // Sprint 10.168: clamp to a sane integer range. Without this a 10+ digit / e-notation entry
+              // overflows the backend's int budget field → 400 → the plan silently never generates.
+              onChange={(event) => onChange({ ...input, budget: Math.min(10_000_000, Math.max(0, Math.floor(Number(event.target.value) || 0))) })}
             />
             <span>€</span>
           </label>
@@ -425,7 +427,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 min="8"
                 max="80"
                 value={input.size || ''}
-                onChange={(event) => onChange({ ...input, size: Number(event.target.value || 0) })}
+                onChange={(event) => onChange({ ...input, size: Math.min(1000, Math.max(0, Math.floor(Number(event.target.value) || 0))) })}
               />
               <span className="input-unit" aria-hidden="true">m²</span>
             </span>
