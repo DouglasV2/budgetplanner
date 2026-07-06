@@ -3319,6 +3319,66 @@ textarea {
   color: var(--ink);
 }
 
+/* Sprint 10.168: the result header now lives at the top of the plan card (replacing the "Isplativo i sigurno" /
+   "Najbolji izbor" row and the separate REZULTAT title-bar). Kicker + title on the left, a "?" that reveals the
+   price/availability caveat on the right. */
+.decision-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.decision-result-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.decision-card .decision-result-title h3 {
+  margin: 4px 0 0;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+.result-info {
+  position: relative;
+  flex-shrink: 0;
+}
+.result-info-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--orange);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.result-info-btn:hover {
+  background: var(--orange-dark);
+}
+.result-info-tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(320px, 78vw);
+  z-index: 6;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 12px 30px rgba(31, 29, 26, 0.16);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
 .decision-card p {
   margin: 0;
   color: var(--muted);

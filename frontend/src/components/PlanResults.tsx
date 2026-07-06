@@ -269,13 +269,6 @@ function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   return plans.find((plan) => plan.id === preferredId)?.id ?? plans.find((plan) => plan.id === 'value')?.id ?? plans[0].id;
 }
 
-function decisionLabel(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
-  const difference = input.budget - plan.total;
-  if (difference < 0) return t('results.decisionNotIdeal');
-  if (difference >= input.budget * 0.12) return t('results.decisionWorthSafe');
-  return t('results.decisionWorthClose');
-}
-
 function shortBudgetText(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
   const difference = input.budget - plan.total;
   if (difference >= 0) return t('results.budgetRemains', { amount: formatCurrency(difference) });
@@ -735,16 +728,10 @@ function UnderstandingSummary({ input }: { input: PlannerInput }) {
 }
 
 function ResultShell({ children }: { children: ReactNode }) {
-  const { t } = useLocale();
+  // Sprint 10.168: the separate REZULTAT title-bar was removed — the header now lives inside the plan card's
+  // topline (with a "?" for the price caveat), so the card sits higher and there's no redundant mini-card.
   return (
     <div className="results-shell">
-      <div className="results-title-bar">
-        <div>
-          <span className="step-kicker">{t('results.resultKicker')}</span>
-          <h3>{t('results.resultHeading')}</h3>
-        </div>
-        <small>{t('results.resultSubtitle')}</small>
-      </div>
       {children}
     </div>
   );
@@ -773,6 +760,8 @@ export function PlanResults({
   const localize = lang !== 'hr';
   const [copiedPlanId, setCopiedPlanId] = useState<string | null>(null);
   const [savingPlanId, setSavingPlanId] = useState<string | null>(null);
+  // Sprint 10.168: the price/availability caveat now lives behind the "?" next to the result title.
+  const [showPriceInfo, setShowPriceInfo] = useState(false);
   const [feedbackByPlan, setFeedbackByPlan] = useState<Record<string, PlanFeedback>>({});
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
@@ -1001,9 +990,6 @@ export function PlanResults({
           from useAuth() and, when it's false, render a PREVIEW here (recommended style + budget-by-category +
           "N matching products found") instead of the full output, gating the exact products / store links /
           alternatives / downloadable list behind a purchased session. No premium feature is gated during beta. */}
-      {/* Sprint 10.163 (UCPD timeliness): an always-visible caveat that prices/availability/reviews are estimates
-          and BudgetSpace is not the seller — the buried Terms-modal statement is not enough at the point of display. */}
-      <p className="field-help price-estimate-note" role="note">{t('results.priceEstimateNote')}</p>
       {partialNotice && (
         <div className="partial-plan-note" role="status">
           <strong>{t('results.partialPlan')}</strong>
@@ -1030,9 +1016,25 @@ export function PlanResults({
       <div className="plans-column decision-results-column">
         <article className="plan-card focused-plan-card decision-plan-card" key={selectedPlan.id}>
           <div className="decision-card">
-            <div className="decision-topline">
-              <span>{decisionLabel(t, selectedPlan, input)}</span>
-              <strong>{localize ? tier : selectedPlan.name}</strong>
+            <div className="decision-result-header">
+              <div className="decision-result-title">
+                <span className="step-kicker">{t('results.resultKicker')}</span>
+                <h3>{t('results.resultHeading')}</h3>
+              </div>
+              <span className="result-info">
+                <button
+                  type="button"
+                  className="result-info-btn"
+                  aria-label={t('results.priceEstimateNote')}
+                  aria-expanded={showPriceInfo}
+                  onClick={() => setShowPriceInfo((value) => !value)}
+                >
+                  ?
+                </button>
+                {showPriceInfo && (
+                  <span className="result-info-tip" role="tooltip">{t('results.priceEstimateNote')}</span>
+                )}
+              </span>
             </div>
             {!localize && summaryBullets.length > 0 ? (
               <ul className="purchase-summary">
