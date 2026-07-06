@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Toto hodnotenie bolo zaznamenané pred časom a môže byť neaktuálne — pozri recenzie v predajni.",
   "results.priceEstimateNote": "Ceny a dostupnosť sú odhady získané od predajcov a môžu byť neaktuálne — pred kúpou vždy over na stránke predajcu. BudgetSpace nie je predajca.",
   "auth.signOutConfirm": "Odhlásiť sa?",
-  "auth.signOutBody": "Tvoje uložené plány zostávajú prepojené s tvojím účtom — prihlás sa znova, kedykoľvek chceš."
+  "auth.signOutBody": "Tvoje uložené plány zostávajú prepojené s tvojím účtom — prihlás sa znova, kedykoľvek chceš.",
+  "print.downloadPdf": "Stiahnuť PDF",
+  "print.shoppingList": "Nákupný zoznam",
+  "print.budget": "Rozpočet",
+  "print.total": "Spolu",
+  "print.remaining": "Zostáva",
+  "print.over": "Nad rozpočet",
+  "print.byStore": "Podľa obchodov",
+  "print.disclaimer": "Ceny sú odhady získané od predajcov a môžu byť neaktuálne — pred nákupom si ich over v obchode.",
+  "print.madeWith": "Vytvorené v budgetspace",
+  "results.noResultsBadge": "Žiadne výsledky",
+  "results.noResultsHeading": "Pre túto požiadavku nie sú žiadne produkty.",
+  "saved.delete": "Vymazať",
+  "saved.deleteTitle": "Vymazať plán?",
+  "saved.deleteConfirm": "Naozaj chceš vymazať tento uložený plán? Táto akcia sa nedá vrátiť späť.",
+  "saved.deleting": "Vymazávam…",
+  "saved.deleted": "Plán bol vymazaný."
 }

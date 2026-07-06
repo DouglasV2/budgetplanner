@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Esta valoración se registró hace tiempo y puede estar desactualizada — comprueba las reseñas en la tienda.",
   "results.priceEstimateNote": "Los precios y la disponibilidad son estimaciones obtenidas de los comercios y pueden estar desactualizados — comprueba siempre en la página del comercio antes de comprar. BudgetSpace no es el vendedor.",
   "auth.signOutConfirm": "¿Cerrar sesión?",
-  "auth.signOutBody": "Tus planes guardados siguen vinculados a tu cuenta — vuelve a iniciar sesión cuando quieras."
+  "auth.signOutBody": "Tus planes guardados siguen vinculados a tu cuenta — vuelve a iniciar sesión cuando quieras.",
+  "print.downloadPdf": "Descargar PDF",
+  "print.shoppingList": "Lista de la compra",
+  "print.budget": "Presupuesto",
+  "print.total": "Total",
+  "print.remaining": "Restante",
+  "print.over": "Excedido",
+  "print.byStore": "Por tienda",
+  "print.disclaimer": "Los precios son estimaciones recopiladas de las tiendas y pueden estar desactualizados — compruébalos en la tienda antes de comprar.",
+  "print.madeWith": "Hecho con budgetspace",
+  "results.noResultsBadge": "Sin resultados",
+  "results.noResultsHeading": "No hay productos para esta búsqueda.",
+  "saved.delete": "Eliminar",
+  "saved.deleteTitle": "¿Eliminar plan?",
+  "saved.deleteConfirm": "¿Seguro que quieres eliminar este plan guardado? Esta acción no se puede deshacer.",
+  "saved.deleting": "Eliminando…",
+  "saved.deleted": "Plan eliminado."
 }

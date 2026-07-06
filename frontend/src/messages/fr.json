@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Cette note a été enregistrée il y a un moment et peut être obsolète — vérifie les avis en magasin.",
   "results.priceEstimateNote": "Les prix et la disponibilité sont des estimations recueillies auprès des commerçants et peuvent être obsolètes — vérifie toujours sur la page du commerçant avant d'acheter. BudgetSpace n'est pas le vendeur.",
   "auth.signOutConfirm": "Se déconnecter ?",
-  "auth.signOutBody": "Tes plans enregistrés restent liés à ton compte — reconnecte-toi quand tu veux."
+  "auth.signOutBody": "Tes plans enregistrés restent liés à ton compte — reconnecte-toi quand tu veux.",
+  "print.downloadPdf": "Télécharger le PDF",
+  "print.shoppingList": "Liste de courses",
+  "print.budget": "Budget",
+  "print.total": "Total",
+  "print.remaining": "Reste",
+  "print.over": "Dépassement",
+  "print.byStore": "Par magasin",
+  "print.disclaimer": "Les prix sont des estimations recueillies auprès des commerçants et peuvent être obsolètes — vérifie en magasin avant d'acheter.",
+  "print.madeWith": "Créé avec budgetspace",
+  "results.noResultsBadge": "Aucun résultat",
+  "results.noResultsHeading": "Aucun produit pour cette demande.",
+  "saved.delete": "Supprimer",
+  "saved.deleteTitle": "Supprimer le plan ?",
+  "saved.deleteConfirm": "Tu veux vraiment supprimer ce plan enregistré ? Cette action est irréversible.",
+  "saved.deleting": "Suppression…",
+  "saved.deleted": "Plan supprimé."
 }

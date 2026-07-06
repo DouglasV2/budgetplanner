@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Tämä arvio tallennettiin jokin aika sitten ja voi olla vanhentunut — tarkista arvostelut myymälässä.",
   "results.priceEstimateNote": "Hinnat ja saatavuus ovat jälleenmyyjiltä koottuja arvioita ja voivat olla vanhentuneita — tarkista aina jälleenmyyjän sivulta ennen ostoa. BudgetSpace ei ole myyjä.",
   "auth.signOutConfirm": "Kirjaudutaanko ulos?",
-  "auth.signOutBody": "Tallennetut suunnitelmasi pysyvät tilisi yhteydessä — kirjaudu takaisin milloin haluat."
+  "auth.signOutBody": "Tallennetut suunnitelmasi pysyvät tilisi yhteydessä — kirjaudu takaisin milloin haluat.",
+  "print.downloadPdf": "Lataa PDF",
+  "print.shoppingList": "Ostoslista",
+  "print.budget": "Budjetti",
+  "print.total": "Yhteensä",
+  "print.remaining": "Jäljellä",
+  "print.over": "Yli budjetin",
+  "print.byStore": "Kaupoittain",
+  "print.disclaimer": "Hinnat ovat jälleenmyyjiltä koottuja arvioita ja voivat olla vanhentuneita — tarkista myymälässä ennen ostoa.",
+  "print.madeWith": "Tehty budgetspacella",
+  "results.noResultsBadge": "Ei tuloksia",
+  "results.noResultsHeading": "Ei tuotteita tähän pyyntöön.",
+  "saved.delete": "Poista",
+  "saved.deleteTitle": "Poistetaanko suunnitelma?",
+  "saved.deleteConfirm": "Haluatko varmasti poistaa tämän tallennetun suunnitelman? Toimintoa ei voi peruuttaa.",
+  "saved.deleting": "Poistetaan…",
+  "saved.deleted": "Suunnitelma poistettu."
 }

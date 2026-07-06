@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Ta ocena je bila zabeležena pred časom in je morda zastarela — preveri mnenja v trgovini.",
   "results.priceEstimateNote": "Cene in razpoložljivost so ocene, zbrane od trgovcev, in so morda zastarele — pred nakupom vedno preveri na strani trgovca. BudgetSpace ni prodajalec.",
   "auth.signOutConfirm": "Se želiš odjaviti?",
-  "auth.signOutBody": "Tvoji shranjeni načrti ostanejo povezani s tvojim računom — znova se prijavi, kadar koli želiš."
+  "auth.signOutBody": "Tvoji shranjeni načrti ostanejo povezani s tvojim računom — znova se prijavi, kadar koli želiš.",
+  "print.downloadPdf": "Prenesi PDF",
+  "print.shoppingList": "Nakupovalni seznam",
+  "print.budget": "Proračun",
+  "print.total": "Skupaj",
+  "print.remaining": "Ostane",
+  "print.over": "Čez proračun",
+  "print.byStore": "Po trgovinah",
+  "print.disclaimer": "Cene so ocene, zbrane pri trgovcih, in so lahko zastarele — pred nakupom preveri v trgovini.",
+  "print.madeWith": "Sestavljeno z budgetspace",
+  "results.noResultsBadge": "Ni rezultatov",
+  "results.noResultsHeading": "Ni izdelkov za to zahtevo.",
+  "saved.delete": "Izbriši",
+  "saved.deleteTitle": "Izbrišem načrt?",
+  "saved.deleteConfirm": "Res želiš izbrisati ta shranjeni načrt? Tega ni mogoče razveljaviti.",
+  "saved.deleting": "Brišem…",
+  "saved.deleted": "Načrt je izbrisan."
 }

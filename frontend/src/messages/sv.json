@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Det här betyget registrerades för ett tag sedan och kan vara inaktuellt — kolla recensionerna i butiken.",
   "results.priceEstimateNote": "Priser och tillgänglighet är uppskattningar insamlade från återförsäljare och kan vara inaktuella — kontrollera alltid på återförsäljarens sida innan du köper. BudgetSpace är inte säljaren.",
   "auth.signOutConfirm": "Logga ut?",
-  "auth.signOutBody": "Dina sparade planer förblir kopplade till ditt konto — logga in igen när du vill."
+  "auth.signOutBody": "Dina sparade planer förblir kopplade till ditt konto — logga in igen när du vill.",
+  "print.downloadPdf": "Ladda ner PDF",
+  "print.shoppingList": "Inköpslista",
+  "print.budget": "Budget",
+  "print.total": "Totalt",
+  "print.remaining": "Kvar",
+  "print.over": "Över budget",
+  "print.byStore": "Per butik",
+  "print.disclaimer": "Priserna är uppskattningar insamlade från återförsäljare och kan vara inaktuella — kolla i butiken innan du köper.",
+  "print.madeWith": "Skapad med budgetspace",
+  "results.noResultsBadge": "Inga resultat",
+  "results.noResultsHeading": "Inga produkter för den här förfrågan.",
+  "saved.delete": "Ta bort",
+  "saved.deleteTitle": "Ta bort planen?",
+  "saved.deleteConfirm": "Är du säker på att du vill ta bort den här sparade planen? Det går inte att ångra.",
+  "saved.deleting": "Tar bort…",
+  "saved.deleted": "Planen borttagen."
 }

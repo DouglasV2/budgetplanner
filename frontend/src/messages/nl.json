@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Deze beoordeling is een tijd geleden vastgelegd en kan verouderd zijn — bekijk de reviews in de winkel.",
   "results.priceEstimateNote": "Prijzen en beschikbaarheid zijn schattingen verzameld bij retailers en kunnen verouderd zijn — controleer altijd op de pagina van de retailer voordat je koopt. BudgetSpace is niet de verkoper.",
   "auth.signOutConfirm": "Uitloggen?",
-  "auth.signOutBody": "Je opgeslagen plannen blijven aan je account gekoppeld — log weer in wanneer je wilt."
+  "auth.signOutBody": "Je opgeslagen plannen blijven aan je account gekoppeld — log weer in wanneer je wilt.",
+  "print.downloadPdf": "PDF downloaden",
+  "print.shoppingList": "Boodschappenlijst",
+  "print.budget": "Budget",
+  "print.total": "Totaal",
+  "print.remaining": "Over",
+  "print.over": "Boven budget",
+  "print.byStore": "Per winkel",
+  "print.disclaimer": "Prijzen zijn schattingen verzameld bij retailers en kunnen verouderd zijn — controleer in de winkel voor je koopt.",
+  "print.madeWith": "Gemaakt met budgetspace",
+  "results.noResultsBadge": "Geen resultaten",
+  "results.noResultsHeading": "Geen producten voor deze aanvraag.",
+  "saved.delete": "Verwijderen",
+  "saved.deleteTitle": "Plan verwijderen?",
+  "saved.deleteConfirm": "Weet je zeker dat je dit opgeslagen plan wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+  "saved.deleting": "Verwijderen…",
+  "saved.deleted": "Plan verwijderd."
 }

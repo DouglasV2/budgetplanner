@@ -569,5 +569,21 @@
   "header.readEnglish": "Auf Englisch lesen",
   "header.readNative": "Zurück zur Sprache deines Landes",
   "auth.signOutConfirm": "Abmelden?",
-  "auth.signOutBody": "Deine gespeicherten Pläne bleiben mit deinem Konto verknüpft — melde dich an, wann immer du willst."
+  "auth.signOutBody": "Deine gespeicherten Pläne bleiben mit deinem Konto verknüpft — melde dich an, wann immer du willst.",
+  "print.downloadPdf": "PDF herunterladen",
+  "print.shoppingList": "Einkaufsliste",
+  "print.budget": "Budget",
+  "print.total": "Gesamt",
+  "print.remaining": "Übrig",
+  "print.over": "Über Budget",
+  "print.byStore": "Nach Geschäft",
+  "print.disclaimer": "Preise sind Schätzungen von den Geschäften und können veraltet sein — prüf sie vor dem Kauf im Geschäft.",
+  "print.madeWith": "Erstellt mit budgetspace",
+  "results.noResultsBadge": "Keine Ergebnisse",
+  "results.noResultsHeading": "Keine Produkte für diese Anfrage.",
+  "saved.delete": "Löschen",
+  "saved.deleteTitle": "Plan löschen?",
+  "saved.deleteConfirm": "Willst du diesen gespeicherten Plan wirklich löschen? Das lässt sich nicht rückgängig machen.",
+  "saved.deleting": "Wird gelöscht…",
+  "saved.deleted": "Plan gelöscht."
 }

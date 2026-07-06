@@ -569,5 +569,21 @@
   "results.reviewChipTitleStale": "Denne vurderingen ble registrert for en stund siden og kan være utdatert — sjekk anmeldelsene i butikken.",
   "results.priceEstimateNote": "Priser og tilgjengelighet er anslag samlet inn fra forhandlere og kan være utdaterte — sjekk alltid på forhandlerens side før du kjøper. BudgetSpace er ikke selgeren.",
   "auth.signOutConfirm": "Logge ut?",
-  "auth.signOutBody": "De lagrede planene dine forblir knyttet til kontoen din — logg inn igjen når du vil."
+  "auth.signOutBody": "De lagrede planene dine forblir knyttet til kontoen din — logg inn igjen når du vil.",
+  "print.downloadPdf": "Last ned PDF",
+  "print.shoppingList": "Handleliste",
+  "print.budget": "Budsjett",
+  "print.total": "Totalt",
+  "print.remaining": "Igjen",
+  "print.over": "Over budsjett",
+  "print.byStore": "Etter butikk",
+  "print.disclaimer": "Prisene er anslag hentet fra butikkene og kan være utdaterte — sjekk i butikken før du kjøper.",
+  "print.madeWith": "Laget med budgetspace",
+  "results.noResultsBadge": "Ingen treff",
+  "results.noResultsHeading": "Ingen produkter for dette søket.",
+  "saved.delete": "Slett",
+  "saved.deleteTitle": "Slette planen?",
+  "saved.deleteConfirm": "Er du sikker på at du vil slette denne lagrede planen? Dette kan ikke angres.",
+  "saved.deleting": "Sletter…",
+  "saved.deleted": "Planen er slettet."
 }
