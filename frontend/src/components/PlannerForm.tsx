@@ -278,9 +278,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         <div className="prompt-topline">
           <div>
             <h3>{t('form.describeHeading')}</h3>
-            <p>{t('form.describeIntro')}</p>
           </div>
-          <span className="ai-chip">{t('form.easiestChip')}</span>
         </div>
         <label>
           <span>{t('form.promptLabel')}</span>
