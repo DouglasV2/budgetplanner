@@ -316,11 +316,6 @@ function hasReviews(t: Translate, product: Product) {
   return reviewSummary(t, product) !== '';
 }
 
-function reviewsUrl(product: Product) {
-  const url = product.reviewsUrl || product.productUrl || product.url || '';
-  return url.startsWith('http') ? url : '';
-}
-
 interface SaleInfo {
   percent: number;
   amount: number;
@@ -1125,7 +1120,6 @@ export function PlanResults({
                   const expanded = expandedProductId === product.id;
                   const actionsOpen = actionsProductId === product.id;
                   const openUrl = productUrl(product);
-                  const reviewsHref = reviewsUrl(product);
                   const market = marketBadge(product);
                   const illustration = usesFallbackImage(product);
                   const sale = saleInfo(product);
@@ -1211,11 +1205,6 @@ export function PlanResults({
                         </div>
                         {actionsOpen && (
                           <div className="product-actions product-secondary-actions">
-                            {hasReviews(t, product) && reviewsHref && (
-                              <a className="reviews-link" href={reviewsHref} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
-                                {t('product.reviews')} ↗
-                              </a>
-                            )}
                             <button type="button" aria-expanded={expanded} onClick={() => setExpandedProductId(expanded ? null : product.id)} disabled={locked}>
                               {expanded ? t('results.hideReplacements') : t('results.change')}
                             </button>
