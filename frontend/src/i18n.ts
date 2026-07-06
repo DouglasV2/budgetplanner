@@ -470,6 +470,8 @@ const DICTIONARY: Record<string, Entry> = {
   'results.emptyBadge': { hr: 'Spremno', en: 'Ready' },
   'results.emptyHeading': { hr: 'Ovdje ćeš odmah vidjeti što se isplati.', en: 'Here you\'ll instantly see what\'s worth it.' },
   'results.emptyText': { hr: 'Ovdje će se pojaviti tvoj plan za kupnju: proizvodi, cijene i popis po trgovinama.', en: 'Your shopping plan will appear here: products, prices and a list by store.' },
+  'results.noResultsBadge': { hr: 'Bez rezultata', en: 'No results' },
+  'results.noResultsHeading': { hr: 'Nema proizvoda za ovaj zahtjev.', en: 'No products for this request.' },
   'results.emptyGetLabel': { hr: 'Dobit ćeš:', en: 'You\'ll get:' },
   'results.emptyGetItems': { hr: 'konkretne proizvode · ukupnu cijenu · popis za kupnju', en: 'concrete products · total price · shopping list' },
   'results.partialPlan': { hr: 'Plan je djelomičan', en: 'The plan is partial' },

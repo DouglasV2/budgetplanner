@@ -1008,6 +1008,15 @@ public class PlannerService {
         return "trgovina";
     }
 
+    // Accusative case for "koristi N ___" (e.g. "koristi 1 trgovinu", "koristi 2 trgovine", "koristi 5 trgovina").
+    private String storesWordAccusative(int count) {
+        int mod100 = count % 100;
+        int mod10 = count % 10;
+        if (mod10 == 1 && mod100 != 11) return "trgovinu";
+        if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "trgovine";
+        return "trgovina";
+    }
+
     // Budget repair v1. Only runs while building a fresh plan (not on manual replace).
     // Order: keep the most important pieces, make optional pieces cheaper, then move the
     // least important optional pieces out of the main buy. Core and explicitly requested
@@ -1121,7 +1130,7 @@ public class PlannerService {
         List<String> summary = new ArrayList<>();
         int storeCount = storeTrip == null ? 0 : storeTrip.storeCount();
         if (total <= input.budget()) {
-            summary.add("Ova kombinacija drži budžet i koristi " + storeCount + " " + storesWord(storeCount) + ".");
+            summary.add("Ova kombinacija drži budžet i koristi " + storeCount + " " + storesWordAccusative(storeCount) + ".");
         } else {
             summary.add("Plan je " + money(total - input.budget()) + " iznad budžeta — pogledaj kako ga spustiti.");
         }
@@ -1185,7 +1194,7 @@ public class PlannerService {
         if (cap <= 0) return null;
         int used = retailersUsed.size();
         if (used <= cap) return null;
-        return "Za bolju cijenu plan koristi " + used + " " + storesWord(used) + ". Ako želiš manje obilazaka, preskoči stvari iz „Može kasnije”.";
+        return "Za bolju cijenu plan koristi " + used + " " + storesWordAccusative(used) + ". Ako želiš manje obilazaka, preskoči stvari iz „Može kasnije”.";
     }
 
     private String capitalize(String value) {
@@ -1294,7 +1303,7 @@ public class PlannerService {
         String budgetText = total <= input.budget()
                 ? "ostaje unutar budžeta"
                 : "prelazi budžet za " + money(total - input.budget());
-        String stores = retailersUsed.size() <= 1 ? "iz jedne trgovine" : "iz " + retailersUsed.size() + " trgovine";
+        String stores = retailersUsed.size() <= 1 ? "iz jedne trgovine" : "iz " + retailersUsed.size() + " " + storesWord(retailersUsed.size());
         return switch (mode) {
             case "stretch" -> "Za dovršen dojam odmah, bez kompromisa na glavnim komadima. Pokriva " + categories + ", " + budgetText + ", " + stores + ".";
             case "value" -> "Novac ide tamo gdje se najviše osjeti u " + room + "u. Pokriva " + categories + ", " + budgetText + ", " + stores + ".";
@@ -1651,7 +1660,7 @@ public class PlannerService {
             return "Najviše stvari su iz " + mainRetailer + ", a ostatak je dodan samo gdje bolje čuva budžet.";
         }
 
-        return "Plan koristi " + retailersUsed.size() + " trgovine da ne moraš tražiti svaku stvar posebno.";
+        return "Plan koristi " + retailersUsed.size() + " " + storesWordAccusative(retailersUsed.size()) + " da ne moraš tražiti svaku stvar posebno.";
     }
 
     private boolean styleMatches(Product product, String requestedStyle) {

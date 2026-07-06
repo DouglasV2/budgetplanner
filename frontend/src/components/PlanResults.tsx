@@ -938,6 +938,23 @@ export function PlanResults({
     );
   }
 
+  // Sprint 10.168: the backend always returns 3 tiers, so plans.length is never 0 after a generation — an
+  // empty result is 3 tiers each with 0 items. Show a clear "no products" state instead of a total=0 plan
+  // that misleadingly reports "comfortably fits the budget".
+  if (plans.every((plan) => plan.items.length === 0)) {
+    return (
+      <ResultShell>
+        <div className="plans-column state-panel">
+          <div className="empty-state friendly-empty-state decision-empty-state">
+            <span>{t('results.noResultsBadge')}</span>
+            <h3>{t('results.noResultsHeading')}</h3>
+            <p>{t('planner.partialNone')}</p>
+          </div>
+        </div>
+      </ResultShell>
+    );
+  }
+
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans.find((plan) => plan.id === 'value') ?? plans[0];
   const overBudget = selectedPlan.total > input.budget;
   const breakdown = getRetailerBreakdown(selectedPlan);

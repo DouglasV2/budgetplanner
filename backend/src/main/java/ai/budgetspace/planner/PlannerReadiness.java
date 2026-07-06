@@ -23,7 +23,10 @@ public final class PlannerReadiness {
             Map.entry("kitchen", List.of("kitchen-cart")),
             Map.entry("dining-room", List.of("dining-table", "dining-chair")),
             Map.entry("hallway", List.of("storage")),
-            Map.entry("bathroom", List.of("storage"))
+            Map.entry("bathroom", List.of("storage")),
+            // Sprint 10.168: a studio (garsonijera) is a combined living+sleeping room — a plan with no bed is
+            // partial. Only "bed" is required (lowest false-positive risk); the rest are recommended below.
+            Map.entry("studio", List.of("bed"))
     );
 
     public static final Map<String, List<String>> RECOMMENDED_BY_ROOM = Map.ofEntries(
@@ -35,7 +38,8 @@ public final class PlannerReadiness {
             Map.entry("kitchen", List.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", List.of("lighting", "rug", "storage")),
             Map.entry("hallway", List.of("lighting", "decor", "rug")),
-            Map.entry("bathroom", List.of("lighting", "decor"))
+            Map.entry("bathroom", List.of("lighting", "decor")),
+            Map.entry("studio", List.of("mattress", "sofa", "table", "storage", "lighting"))
     );
 
     public static final List<String> ROOMS = List.of(
