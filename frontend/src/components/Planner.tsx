@@ -766,7 +766,6 @@ export function Planner() {
           )}
         </div>
         <PlanResults
-          active={scope === 'single'}
           plans={plans}
           input={input}
           submittedPrompt={submittedPrompt}
@@ -812,7 +811,6 @@ export function Planner() {
 
       <div hidden={scope !== 'apartment'}>
         <MoveInPlanner
-          active={scope === 'apartment'}
           baseInput={input}
           activeSpace={activeSpace}
           onSavedPlan={(saved) => setSavedPlans((current) => [saved, ...current.filter((plan) => plan.id !== saved.id)])}

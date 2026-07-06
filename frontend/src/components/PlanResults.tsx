@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode, type SyntheticEvent } from 'react';
-import { PrintablePlan } from './PrintablePlan';
+import { openPlanPdf } from '../utils/planPdf';
 import type {
   FurnishingPlan,
   PlanFeedback,
@@ -53,9 +53,6 @@ function ikeaMarketUrl(market?: string): string {
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
 
 interface PlanResultsProps {
-  // Sprint 10.168: true only when the single-room pane is visible. Both panes stay mounted, so this gates the
-  // portaled print sheet — otherwise the single-room and apartment PDFs would both print.
-  active: boolean;
   plans: FurnishingPlan[];
   input: PlannerInput;
   onReplace: (planId: string, productId: string, changeType?: ReplacementChoice) => void;
@@ -754,7 +751,6 @@ function ResultShell({ children }: { children: ReactNode }) {
 }
 
 export function PlanResults({
-  active,
   plans,
   input,
   onReplace,
@@ -1100,21 +1096,24 @@ export function PlanResults({
               <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, true)} disabled={savingPlanId === selectedPlan.id}>
                 {t('results.copyLink')}
               </button>
-              <button className="share-button soft" type="button" onClick={() => window.print()}>
+              <button className="share-button soft" type="button" onClick={() => void openPlanPdf({
+                title: roomLabels[input.roomType],
+                subtitle: styleLabels[input.style],
+                budget: input.budget,
+                total: selectedPlan.total,
+                sections: printSections,
+                stores: printStores,
+                money: (value) => formatCurrency(value, input.market),
+                labels: {
+                  shoppingList: t('print.shoppingList'), budget: t('print.budget'), total: t('print.total'),
+                  remaining: t('print.remaining'), over: t('print.over'), byStore: t('print.byStore'),
+                  disclaimer: t('print.disclaimer'), madeWith: t('print.madeWith'),
+                  itemsCount: (count) => t('moveIn.itemsCount', { count }),
+                },
+              })}>
                 {t('print.downloadPdf')}
               </button>
             </div>
-            {active && (
-              <PrintablePlan
-                title={roomLabels[input.roomType]}
-                subtitle={styleLabels[input.style]}
-                budget={input.budget}
-                total={selectedPlan.total}
-                sections={printSections}
-                stores={printStores}
-                market={input.market}
-              />
-            )}
           </div>
 
           <div className="items-list step-items-list">
