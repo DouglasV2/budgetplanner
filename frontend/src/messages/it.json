@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Eliminare il piano?",
   "saved.deleteConfirm": "Vuoi davvero eliminare questo piano salvato? L'operazione non può essere annullata.",
   "saved.deleting": "Elimino…",
-  "saved.deleted": "Piano eliminato."
+  "saved.deleted": "Piano eliminato.",
+  "results.priceEstimateShort": "I prezzi sono stime — verifica in negozio."
 }

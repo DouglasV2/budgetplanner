@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Eliminar plano?",
   "saved.deleteConfirm": "Tens a certeza de que queres eliminar este plano guardado? Esta ação é irreversível.",
   "saved.deleting": "A eliminar…",
-  "saved.deleted": "Plano eliminado."
+  "saved.deleted": "Plano eliminado.",
+  "results.priceEstimateShort": "Os preços são estimativas — verifica na loja."
 }

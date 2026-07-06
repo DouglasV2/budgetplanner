@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Plan verwijderen?",
   "saved.deleteConfirm": "Weet je zeker dat je dit opgeslagen plan wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
   "saved.deleting": "Verwijderen…",
-  "saved.deleted": "Plan verwijderd."
+  "saved.deleted": "Plan verwijderd.",
+  "results.priceEstimateShort": "Prijzen zijn schattingen — check in de winkel."
 }

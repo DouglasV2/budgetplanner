@@ -3340,6 +3340,13 @@ textarea {
   line-height: 1.1;
   letter-spacing: -0.04em;
 }
+/* Sprint 10.168: short always-visible price caveat (the UCPD note stays on screen; the "?" holds the full text). */
+.result-price-caveat {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
 .result-info {
   position: relative;
   flex-shrink: 0;

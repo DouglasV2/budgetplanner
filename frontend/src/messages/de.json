@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Plan löschen?",
   "saved.deleteConfirm": "Willst du diesen gespeicherten Plan wirklich löschen? Das lässt sich nicht rückgängig machen.",
   "saved.deleting": "Wird gelöscht…",
-  "saved.deleted": "Plan gelöscht."
+  "saved.deleted": "Plan gelöscht.",
+  "results.priceEstimateShort": "Preise sind Schätzungen — im Geschäft prüfen."
 }

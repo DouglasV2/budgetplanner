@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Supprimer le plan ?",
   "saved.deleteConfirm": "Tu veux vraiment supprimer ce plan enregistré ? Cette action est irréversible.",
   "saved.deleting": "Suppression…",
-  "saved.deleted": "Plan supprimé."
+  "saved.deleted": "Plan supprimé.",
+  "results.priceEstimateShort": "Les prix sont des estimations — vérifie en magasin."
 }

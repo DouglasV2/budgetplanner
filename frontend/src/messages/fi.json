@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Poistetaanko suunnitelma?",
   "saved.deleteConfirm": "Haluatko varmasti poistaa tämän tallennetun suunnitelman? Toimintoa ei voi peruuttaa.",
   "saved.deleting": "Poistetaan…",
-  "saved.deleted": "Suunnitelma poistettu."
+  "saved.deleted": "Suunnitelma poistettu.",
+  "results.priceEstimateShort": "Hinnat ovat arvioita — tarkista myymälässä."
 }

@@ -523,6 +523,8 @@ const DICTIONARY: Record<string, Entry> = {
   // Sprint 10.163 (UCPD timeliness): an always-visible point-of-display caveat that prices/availability/reviews are
   // estimates gathered from retailers and BudgetSpace is not the seller. Renders subtly (muted) at the top of the plan.
   'results.priceEstimateNote': { hr: 'Cijene i dostupnost su procjene prikupljene od trgovaca i mogu biti zastarjele — provjeri na stranici trgovca prije kupnje. BudgetSpace nije prodavatelj.', en: 'Prices and availability are estimates gathered from retailers and may be out of date — always check on the retailer\'s page before buying. BudgetSpace is not the seller.' },
+  // Sprint 10.168: a short ALWAYS-VISIBLE version of the UCPD caveat (the full text stays behind the "?").
+  'results.priceEstimateShort': { hr: 'Cijene su procjene — provjeri u trgovini.', en: 'Prices are estimates — check in-store.' },
   'results.illustrationTitle': { hr: 'Nemamo stvarnu fotografiju ovog proizvoda — prikazana je ilustracija kategorije.', en: 'We don\'t have an actual photo of this product — a category illustration is shown.' },
   'results.illustrationChip': { hr: 'ilustracija', en: 'illustration' },
   'results.onSale': { hr: 'Akcija', en: 'On sale' },

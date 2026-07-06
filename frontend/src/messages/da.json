@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Slette plan?",
   "saved.deleteConfirm": "Er du sikker på, at du vil slette denne gemte plan? Det kan ikke fortrydes.",
   "saved.deleting": "Sletter…",
-  "saved.deleted": "Planen er slettet."
+  "saved.deleted": "Planen er slettet.",
+  "results.priceEstimateShort": "Priserne er skøn — tjek i butikken."
 }

@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Ta bort planen?",
   "saved.deleteConfirm": "Är du säker på att du vill ta bort den här sparade planen? Det går inte att ångra.",
   "saved.deleting": "Tar bort…",
-  "saved.deleted": "Planen borttagen."
+  "saved.deleted": "Planen borttagen.",
+  "results.priceEstimateShort": "Priserna är uppskattningar — kolla i butiken."
 }

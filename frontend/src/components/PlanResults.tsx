@@ -1020,6 +1020,7 @@ export function PlanResults({
               <div className="decision-result-title">
                 <span className="step-kicker">{t('results.resultKicker')}</span>
                 <h3>{t('results.resultHeading')}</h3>
+                <small className="result-price-caveat" role="note">{t('results.priceEstimateShort')}</small>
               </div>
               <span className="result-info">
                 <button

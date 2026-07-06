@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Vymazať plán?",
   "saved.deleteConfirm": "Naozaj chceš vymazať tento uložený plán? Táto akcia sa nedá vrátiť späť.",
   "saved.deleting": "Vymazávam…",
-  "saved.deleted": "Plán bol vymazaný."
+  "saved.deleted": "Plán bol vymazaný.",
+  "results.priceEstimateShort": "Ceny sú odhady — over v obchode."
 }

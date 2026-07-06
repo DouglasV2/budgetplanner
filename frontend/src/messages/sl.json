@@ -585,5 +585,6 @@
   "saved.deleteTitle": "Izbrišem načrt?",
   "saved.deleteConfirm": "Res želiš izbrisati ta shranjeni načrt? Tega ni mogoče razveljaviti.",
   "saved.deleting": "Brišem…",
-  "saved.deleted": "Načrt je izbrisan."
+  "saved.deleted": "Načrt je izbrisan.",
+  "results.priceEstimateShort": "Cene so ocene — preveri v trgovini."
 }
