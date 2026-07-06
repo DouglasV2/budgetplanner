@@ -247,18 +247,6 @@ function localStoreAdvice(t: Translate, plan: FurnishingPlan) {
     : t('results.storeAdviceMany', { count: plan.retailersUsed.length });
 }
 
-function localRole(t: Translate, priority: ShoppingPriority) {
-  if (priority === 'buy-first') return t('results.roleBuyFirst');
-  if (priority === 'add-comfort') return t('results.roleComfort');
-  return t('results.roleLater');
-}
-
-function localReason(t: Translate, priority: ShoppingPriority) {
-  if (priority === 'buy-first') return t('results.reasonBuyFirst');
-  if (priority === 'add-comfort') return t('results.reasonComfort');
-  return t('results.reasonLater');
-}
-
 function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   if (!plans.length) return null;
   const preferredId = input.optimizationGoal === 'lowest-price' || input.furnishingLevel === 'basic'
@@ -1131,7 +1119,7 @@ export function PlanResults({
                   <strong>{formatCurrency(step.subtotal)}</strong>
                 </div>
                 {step.items.map((item) => {
-                  const { product, reason } = item;
+                  const { product } = item;
                   const locked = lockedProductIds.includes(product.id);
                   const priority = priorityForItem(item, input.roomType);
                   const expanded = expandedProductId === product.id;
@@ -1203,11 +1191,10 @@ export function PlanResults({
                           {locked && <span>{t('results.kept')}</span>}
                         </div>
                         <small className="product-shop-note">{priceTierLabel(t, product)} · {productCheckLabel(t, product)}</small>
-                        {product.deliveryNote && <small className="product-delivery-note">{localize ? t('results.deliveryNoteGeneric') : product.deliveryNote}</small>}
-                        <div className="product-reason-box compact-reason-box">
-                          <span>{localize ? localRole(t, priority) : (item.shoppingRole || t('results.whyThis'))}</span>
-                          <p>{localize ? localReason(t, priority) : reason}</p>
-                        </div>
+                        {/* The delivery note is a generic "check delivery/pickup in store" caveat, so always show the
+                            localized UI string — never the per-product deliveryNote, which is stored in English for many
+                            catalog rows (IKEA cross-market port, AT/DE/SI) and would leak English into a non-EN UI. */}
+                        {product.deliveryNote && <small className="product-delivery-note">{t('results.deliveryNoteGeneric')}</small>}
                         <div className="product-actions decision-product-actions">
                           {openUrl ? (
                             <a className="open-store-link" href={openUrl} target="_blank" rel="noopener noreferrer" onClick={() => onProductClick(selectedPlan.id, product)}>
