@@ -4,6 +4,7 @@ import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from 
 import { formatCurrency } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
 import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon } from './icons';
+import { PrintablePlan } from './PrintablePlan';
 
 // Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
 // plan that lists prices but can't be clicked through to the store isn't actually shoppable. Mirrors PlanResults.
@@ -47,6 +48,9 @@ function aggregateByStore(results: RoomPlanResult[]): Array<{ retailer: string; 
 // honest "budget too low" signal fires when the total can't cover every room's core.
 
 interface MoveInPlannerProps {
+  // Sprint 10.168: true only when the apartment scope is the visible pane. Both panes stay mounted (Planner
+  // toggles visibility), so this gates the portaled print sheet — otherwise both panes' PDFs would print.
+  active: boolean;
   // The current single-room form input — we inherit its shared settings (style, stores, market, location, size).
   baseInput: PlannerInput;
   // The active "space" (home) that saved rooms group under, e.g. "Moj dom".
@@ -86,7 +90,7 @@ function pickBestPlan(plans: FurnishingPlan[]): FurnishingPlan | null {
   return plans.find((plan) => plan.id === 'value') ?? plans[Math.min(1, plans.length - 1)] ?? plans[0];
 }
 
-export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, seed }: MoveInPlannerProps) {
+export function MoveInPlanner({ active, baseInput, activeSpace, onSavedPlan, onNotice, seed }: MoveInPlannerProps) {
   const { t } = useLocale();
   // Sprint 10.138: hydrate the room picks + budget from the last session (localStorage draft) so a reload or a
   // return visit doesn't reset the form. Falls back to sensible defaults.
@@ -275,6 +279,19 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   const total = results ? results.reduce((sum, result) => sum + result.plan.total, 0) : 0;
   const over = total - totalBudget;
   const storeRollup = results ? aggregateByStore(results) : [];
+  // Sprint 10.168: a clean whole-apartment shopping-list PDF — grouped by room, matching the single-room PDF.
+  const printSections = (results ?? []).filter((result) => result.hasItems).map((result) => ({
+    title: t(result.labelKey),
+    subtotal: result.plan.total,
+    items: result.plan.items.map((item) => {
+      const qty = qtyOf(item);
+      return {
+        name: qty > 1 ? `${qty} × ${item.product.name}` : item.product.name,
+        meta: item.product.retailer,
+        lineTotal: item.product.price * qty,
+      };
+    }),
+  }));
 
   return (
     <div className="move-in">
@@ -355,8 +372,19 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
           {/* Sprint 10.138: take the list with you — copy as text (paste into Notes / a message) or print it. */}
           <div className="move-in-actions no-print">
             <button type="button" className="move-in-action-btn" onClick={() => void copyList()}>{t('results.copyShoppingList')}</button>
-            <button type="button" className="move-in-action-btn" onClick={() => window.print()}>{t('moveIn.printList')}</button>
+            <button type="button" className="move-in-action-btn" onClick={() => window.print()}>{t('print.downloadPdf')}</button>
           </div>
+          {active && (
+            <PrintablePlan
+              title={t('moveIn.heading')}
+              subtitle={t('moveIn.roomsSelected', { count: results.length })}
+              budget={totalBudget}
+              total={total}
+              sections={printSections}
+              stores={storeRollup}
+              market={baseInput.market}
+            />
+          )}
 
           <div className="move-in-room-cards">
             {results.map((result) => (

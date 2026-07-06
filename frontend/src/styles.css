@@ -5489,15 +5489,42 @@ a.move-in-item-link:hover .move-in-item-price {
   color: var(--ink-soft);
   font-variant-numeric: tabular-nums;
 }
-/* Sprint 10.138: print-friendly shopping list — Ctrl+P (or the Print button) drops all the app chrome and the
-   per-item action buttons, leaving just the plan. Same trick works for any results panel marked to keep. */
+/* Sprint 10.168: PDF export (Print → "Save as PDF"). The clean shopping list is a print-only .printable-plan
+   portaled to <body>; the print stylesheet drops the whole app (and any chrome) and shows only it, so the
+   single-room and whole-apartment PDFs come out identical. Replaces the 10.138 .move-in-results print trick. */
+.printable-plan { display: none; }
 @media print {
-  body * { visibility: hidden; }
-  .move-in-results, .move-in-results * { visibility: visible; }
-  .move-in-results { position: absolute; left: 0; top: 0; width: 100%; }
-  .no-print, .move-in-item-actions { display: none !important; }
-  .move-in-item-link .move-in-item-name { color: #000 !important; text-decoration: none !important; }
-  a.move-in-item-link .move-in-item-price::after { content: ''; }
+  @page { margin: 14mm; }
+  body > *:not(.printable-plan) { display: none !important; }
+  .no-print { display: none !important; }
+  .printable-plan {
+    display: block !important;
+    color: #000;
+    font: 11pt/1.5 'Inter', system-ui, sans-serif;
+  }
+  .print-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid #000; padding-bottom: 6px;
+  }
+  .print-brand { font-weight: 800; letter-spacing: -0.01em; font-size: 13pt; }
+  .print-kicker { text-transform: uppercase; letter-spacing: 0.08em; font-size: 8.5pt; color: #444; }
+  .print-title { font-size: 20pt; margin: 14px 0 2px; }
+  .print-subtitle { color: #555; margin: 0 0 4px; }
+  .print-summary { display: flex; gap: 20px; flex-wrap: wrap; margin: 10px 0 18px; font-size: 10.5pt; }
+  .print-section { margin: 0 0 12px; break-inside: avoid; }
+  .print-section-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid #bbb; padding: 3px 0; margin-bottom: 4px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 9.5pt;
+  }
+  .print-table { width: 100%; border-collapse: collapse; }
+  .print-table td { padding: 2.5px 0; vertical-align: top; }
+  .print-table tr { break-inside: avoid; }
+  .print-item-name { padding-right: 10px; }
+  .print-item-meta { color: #666; font-size: 9pt; white-space: nowrap; padding: 0 12px; }
+  .print-item-price { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .print-stores .print-item-name { font-weight: 600; }
+  .print-foot { margin-top: 18px; border-top: 1px solid #bbb; padding-top: 6px; font-size: 8pt; color: #666; }
 }
 .move-in-save {
   margin-top: 18px;

@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode, type SyntheticEvent } from 'react';
+import { PrintablePlan } from './PrintablePlan';
 import type {
   FurnishingPlan,
   PlanFeedback,
@@ -52,6 +53,9 @@ function ikeaMarketUrl(market?: string): string {
 export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stores';
 
 interface PlanResultsProps {
+  // Sprint 10.168: true only when the single-room pane is visible. Both panes stay mounted, so this gates the
+  // portaled print sheet — otherwise the single-room and apartment PDFs would both print.
+  active: boolean;
   plans: FurnishingPlan[];
   input: PlannerInput;
   onReplace: (planId: string, productId: string, changeType?: ReplacementChoice) => void;
@@ -750,6 +754,7 @@ function ResultShell({ children }: { children: ReactNode }) {
 }
 
 export function PlanResults({
+  active,
   plans,
   input,
   onReplace,
@@ -965,6 +970,28 @@ export function PlanResults({
   const showBudgetBlock = repairTips.length > 0 || budgetTight;
   const missing = missingForRoom(selectedPlan, input);
   const steps = purchaseSteps(selectedPlan, input.roomType);
+  // Sprint 10.168: a clean shopping-list PDF (Print → "Save as PDF"). Build print sections from the same
+  // purchase steps, and roll the items up by store for the "by store" summary.
+  const printSections = steps.map((step) => ({
+    title: t(step.titleKey),
+    subtotal: step.subtotal,
+    items: step.items.map((item) => {
+      const qty = item.quantity && item.quantity > 1 ? item.quantity : 1;
+      return {
+        name: qty > 1 ? `${qty} × ${item.product.name}` : item.product.name,
+        meta: `${item.product.retailer} · ${categoryLabels[item.product.category]}`,
+        lineTotal: item.product.price * qty,
+      };
+    }),
+  }));
+  const printStores = Object.values(selectedPlan.items.reduce((acc, item) => {
+    const qty = item.quantity && item.quantity > 1 ? item.quantity : 1;
+    const retailer = item.product.retailer;
+    acc[retailer] = acc[retailer] ?? { retailer, count: 0, total: 0 };
+    acc[retailer].count += qty;
+    acc[retailer].total += item.product.price * qty;
+    return acc;
+  }, {} as Record<string, { retailer: string; count: number; total: number }>)).sort((a, b) => b.total - a.total);
   const tier = TIER_LABEL_KEYS[selectedPlan.id]
     ? t(TIER_LABEL_KEYS[selectedPlan.id])
     : furnishingLevelLabels[input.furnishingLevel ?? 'comfort'];
@@ -1073,7 +1100,21 @@ export function PlanResults({
               <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, true)} disabled={savingPlanId === selectedPlan.id}>
                 {t('results.copyLink')}
               </button>
+              <button className="share-button soft" type="button" onClick={() => window.print()}>
+                {t('print.downloadPdf')}
+              </button>
             </div>
+            {active && (
+              <PrintablePlan
+                title={roomLabels[input.roomType]}
+                subtitle={styleLabels[input.style]}
+                budget={input.budget}
+                total={selectedPlan.total}
+                sections={printSections}
+                stores={printStores}
+                market={input.market}
+              />
+            )}
           </div>
 
           <div className="items-list step-items-list">
