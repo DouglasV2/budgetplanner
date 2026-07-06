@@ -791,22 +791,30 @@ export function PlanResults({
   // "More options" row a user is editing survives an iterative replace instead of snapping shut under them.
   const planIdsKey = plans.map((plan) => plan.id).join('|');
 
-  // Runs on every plans change: keep the selected version in sync, and clear stale feedback (Sprint 10.54: a
-  // fresh plan set means old feedback no longer applies, so a stale "make it cheaper?" CTA never lingers).
+  // Sprint 10.168: keep the user's MANUAL version choice across an in-place replace (which returns a new plans
+  // array with the same ids). Only re-derive the preferred plan when the plan SET actually changes — otherwise
+  // every "find cheaper/nicer/remove" snapped the view back to the deterministic preferred plan.
   useEffect(() => {
-    setSelectedPlanId(preferredPlanId(plans, input));
-    setFeedbackByPlan({});
+    setSelectedPlanId((prev) => (plans.some((plan) => plan.id === prev) ? prev : preferredPlanId(plans, input)));
   }, [plans, input.optimizationGoal, input.furnishingLevel]);
 
-  // Runs only on a genuinely new plan set (new ids) or a goal/level switch — NOT on an in-place replace — so a
-  // row the user has open for editing stays open while they try cheaper/nicer swaps on the same item.
+  // Clear stale feedback only on a genuinely new plan set (Sprint 10.54) — NOT on an in-place replace or a
+  // version switch, so a just-given "thanks" / actionable CTA isn't wiped the instant the user tweaks a product.
+  useEffect(() => {
+    setFeedbackByPlan({});
+  }, [planIdsKey, input.optimizationGoal, input.furnishingLevel]);
+
+  // Reset per-row disclosure state on a new plan set OR when switching between compared versions (Sprint 10.168:
+  // selectedPlanId added) — these panels are keyed by product.id only, so without this an open More-options /
+  // watch / replace panel leaks onto a different plan's row that happens to share the same product id. An
+  // in-place replace keeps planIdsKey + selectedPlanId, so the row a user is editing still survives the swap.
   useEffect(() => {
     setExpandedProductId(null);
     setDislikeProductId(null);
     setActionsProductId(null);
     setWatchProductId(null);
     setWatchStatus(null);
-  }, [planIdsKey, input.optimizationGoal, input.furnishingLevel]);
+  }, [planIdsKey, selectedPlanId, input.optimizationGoal, input.furnishingLevel]);
 
   function openWatchForm(productId: string) {
     setWatchProductId(watchProductId === productId ? null : productId);
