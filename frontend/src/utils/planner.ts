@@ -1,16 +1,23 @@
 import type { FurnishingLevel, FurnishingPlan, PlanItem, PlannerInput, Product, ProductCategory, Retailer, RoomType, ShoppingPriority, StoreTotal, StoreTrip, StyleType } from '../types';
-import { marketConfig } from '../markets';
+import { marketConfig, type Lang } from '../markets';
 import { translate } from '../i18n';
 
 // Sprint 10.13/10.47: the active market drives BOTH currency formatting and domain-label translation
 // app-wide (LocaleProvider sets it on country switch). Domain labels read the market's language so
 // category/room/style/level/priority names are localised instead of hardcoded Croatian.
 let activeMarket = 'HR';
+let activeLang: Lang | undefined;
 export function setFormattingMarket(market: string | undefined) {
   activeMarket = market ?? 'HR';
 }
+// Sprint 10.168: the EFFECTIVE UI language (honours the "Read in English" override), so domain labels
+// (category/room/style/level/priority/store-trip/share) follow the override instead of always using the
+// market's language. Falls back to the market language when unset.
+export function setFormattingLang(lang: Lang | undefined) {
+  activeLang = lang;
+}
 function labelLang() {
-  return marketConfig(activeMarket).lang;
+  return activeLang ?? marketConfig(activeMarket).lang;
 }
 function tLabel(key: string, params?: Record<string, string | number>) {
   return translate(key, labelLang(), params);

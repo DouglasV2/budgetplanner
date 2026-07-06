@@ -7,7 +7,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { marketConfig, marketFromBrowser, regionToMarket, type MarketConfig } from './markets';
 import { ensureLangLoaded, translate } from './i18n';
 import { fetchGeoCountry } from './api/client';
-import { setFormattingMarket } from './utils/planner';
+import { setFormattingMarket, setFormattingLang } from './utils/planner';
 
 const STORAGE_KEY = 'budgetspace.market';
 const LANG_OVERRIDE_KEY = 'budgetspace.lang';
@@ -65,6 +65,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setFormattingMarket(config.code);
+    // Sprint 10.168: also drive domain-label language off the EFFECTIVE lang so "Read in English"
+    // translates category/room/style/priority/store-trip labels, not just the UI strings.
+    setFormattingLang(lang);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(STORAGE_KEY, config.code);
       window.document.documentElement.lang = lang;
