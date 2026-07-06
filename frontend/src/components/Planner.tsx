@@ -244,6 +244,9 @@ export function Planner() {
   const [savedSearch, setSavedSearch] = useState('');
   const [generationCount, setGenerationCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  // Sprint 10.168: monotonic token so a slow AI result from an OLDER generation can't clobber a newer one
+  // (the "plan reset to the previous list" race). Only the latest runGeneration is allowed to apply results.
+  const genRef = useRef(0);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   // Sprint 10.88: the actionable Plus upsell card, shown when a save hits the Free 3-plan cap (402).
@@ -349,6 +352,7 @@ export function Planner() {
   }, []);
 
   async function runGeneration(nextInput: PlannerInput) {
+    const myGen = ++genRef.current; // this generation's token; another runGeneration supersedes it
     // Sprint 10.13 (#3): if the prompt names a country/city we support, auto-switch the market for
     // this plan and show a reversible note. The selector stays the source of truth (user can revert).
     let effectiveInput = nextInput;
@@ -387,7 +391,7 @@ export function Planner() {
 
     try {
       const draft = await generatePlanFast(effectiveInput);
-      if (!aiLanded) {
+      if (myGen === genRef.current && !aiLanded) {
         applyResponse(draft, effectiveInput, false);
         shown = true;
         setRefining(true);    // plan is visible; AI is sharpening it
@@ -399,26 +403,33 @@ export function Planner() {
 
     try {
       const ai = await aiPromise;
+      if (myGen !== genRef.current) return; // a newer generation started → drop this stale result
       aiLanded = true;
       applyResponse(ai, effectiveInput, true);
       shown = true;
     } catch {
-      if (!shown) {
+      if (myGen === genRef.current && !shown) {
         // Sprint 10.167: always show the localised, friendly error — never a raw thrown/backend string (which
         // was hardcoded Croatian and leaked the word "Backend" to users, incl. in English).
         setError(t('planner.errorUnavailable'));
       }
       // else: AI failed but the deterministic draft is already shown — keep it (graceful).
     } finally {
-      setRefining(false);
-      setIsLoading(false);
+      // Only the latest generation owns the loading/refining state; a superseded one must not clear it.
+      if (myGen === genRef.current) {
+        setRefining(false);
+        setIsLoading(false);
+      }
     }
   }
 
   // Sprint 10.78: render a plan response. isFinal=true only for the AI (authoritative) result — only then do we
   // count the generation, fetch the AI design summary, and capture the typed prompt for the low-confidence nudge.
   function applyResponse(response: PlanGenerationResponse, effectiveInput: PlannerInput, isFinal: boolean) {
-    setInput({ ...response.input, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
+    // Sprint 10.168: keep the user's typed prompt in the textarea. The AI response returns input.prompt=''
+    // (the server analysis is authoritative), but blanking the box loses what the user wrote and they can't
+    // review/tweak/re-run their own request. submittedPrompt is captured separately, so nothing depends on this.
+    setInput({ ...response.input, prompt: effectiveInput.prompt, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
     setPlans(response.plans);
     setAnalysis(response.intentAnalysis ?? null);
     setSecondHand(response.secondHandSuggestions ?? []);

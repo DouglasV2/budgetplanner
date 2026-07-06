@@ -187,12 +187,15 @@ function applyTemplate(input: PlannerInput, template: Partial<PlannerInput>, pro
 // Sprint 10.57: apply a vibe as a style overlay — keeps the room/budget/size/stores, sets the style +
 // colour/material preferences, and a style-pure prompt the extractor maps to this exact style.
 function applyVibe(input: PlannerInput, vibe: Vibe, prompt: string): PlannerInput {
+  // Sprint 10.168: a vibe is a STYLE overlay — set style/colours/materials, but don't wipe a brief the user
+  // already typed (their room/budget/items). Only seed the style-pure prompt when the textarea is empty.
+  const hasUserPrompt = input.prompt.trim().length > 0;
   return {
     ...input,
     style: vibe.style,
     colorPreferences: vibe.colors,
     materialPreferences: vibe.materials,
-    prompt,
+    prompt: hasUserPrompt ? input.prompt : prompt,
     lockedProductIds: []
   };
 }
