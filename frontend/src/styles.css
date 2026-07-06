@@ -3839,6 +3839,16 @@ textarea {
   font-weight: 620;
 }
 
+/* Sprint 10.168: delete is the quiet, clearly-destructive action — muted by default, red on hover. */
+.saved-plan-delete {
+  color: var(--muted);
+}
+.saved-plan-delete:hover {
+  border-color: rgba(179, 64, 42, 0.4);
+  background: rgba(179, 64, 42, 0.08);
+  color: #b3402a;
+}
+
 .shopping-list-card {
   border: 1px solid var(--line);
   border-radius: 24px;

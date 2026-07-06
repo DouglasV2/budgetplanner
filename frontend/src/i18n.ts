@@ -182,6 +182,10 @@ const DICTIONARY: Record<string, Entry> = {
   'saved.favoriteStar': { hr: '★ Favorit', en: '★ Favorite' },
   'saved.markStar': { hr: '☆ Označi', en: '☆ Mark' },
   'saved.open': { hr: 'Otvori', en: 'Open' },
+  // Sprint 10.168: delete a saved plan (owner-only).
+  'saved.delete': { hr: 'Obriši', en: 'Delete' },
+  'saved.deleteConfirm': { hr: 'Sigurno želiš obrisati ovaj spremljeni plan?', en: 'Delete this saved plan?' },
+  'saved.deleted': { hr: 'Plan je obrisan.', en: 'Plan deleted.' },
   'saved.emptySearch': { hr: 'Nema spremljenog plana za taj pojam.', en: 'No saved plan for that term.' },
 
   'planner.examplePrompt': { hr: 'Imam 1500 € za dnevni boravak od 20 m² u Zagrebu. Želim svijetli i prozračni stil, kombiniraj IKEA i JYSK ako ima smisla. Trebam kauč, TV komodu, klub stolić, tepih i lampu.', en: 'I have €1500 for a 20 m² living room. I want a bright, airy style, combine IKEA and JYSK if it makes sense. I need a sofa, TV unit, coffee table, rug and a lamp.' },

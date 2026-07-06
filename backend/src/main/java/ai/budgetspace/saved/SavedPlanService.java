@@ -89,6 +89,18 @@ public class SavedPlanService {
         return toResponse(savedPlanRepository.save(savedPlan));
     }
 
+    // Sprint 10.168: owner-only delete from the "Moji planovi" inbox. Same scoping as setFavorite — a non-owner
+    // (incl. a shared-link viewer) is treated as if the plan does not exist, so ownership is never revealed.
+    public void delete(String id, String sessionId) {
+        SavedPlan savedPlan = savedPlanRepository.findById(id)
+                .orElseThrow(() -> new SavedPlanNotFoundException("Saved plan not found"));
+        String owner = blankToNull(sessionId);
+        if (savedPlan.getSessionId() == null || !savedPlan.getSessionId().equals(owner)) {
+            throw new SavedPlanNotFoundException("Saved plan not found");
+        }
+        savedPlanRepository.delete(savedPlan);
+    }
+
     private SavedPlanResponse toResponse(SavedPlan savedPlan) {
         try {
             return new SavedPlanResponse(

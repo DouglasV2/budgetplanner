@@ -6,6 +6,7 @@ import ai.budgetspace.dto.SavedPlanRequest;
 import ai.budgetspace.dto.SavedPlanResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,5 +62,14 @@ public class SavedPlanController {
                                          @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
                                          @CookieValue(name = AUTH_COOKIE, required = false) String authToken) {
         return savedPlanService.setFavorite(id, request.favorite(), authService.resolveOwnerKey(authToken, sessionId));
+    }
+
+    // Sprint 10.168: delete a saved plan from the caller's "Moji planovi" inbox (owner-only, scoped like favorite).
+    @DeleteMapping("/api/saved-plans/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String id,
+                       @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
+                       @CookieValue(name = AUTH_COOKIE, required = false) String authToken) {
+        savedPlanService.delete(id, authService.resolveOwnerKey(authToken, sessionId));
     }
 }

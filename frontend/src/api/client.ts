@@ -207,6 +207,14 @@ export function setSavedPlanFavorite(id: string, favorite: boolean) {
   });
 }
 
+// Sprint 10.168: delete a saved plan (owner-only; the backend scopes it to the caller's session). 204 → no body.
+export function deleteSavedPlan(id: string) {
+  return request<void>(`/api/saved-plans/${id}`, {
+    method: 'DELETE',
+    headers: { 'X-BudgetSpace-Session': sessionId() }
+  });
+}
+
 export function trackProductClick(planId: string, product: Product) {
   fireAndForget('/api/events/product-click', {
     planId,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { generatePlan, generatePlanFast, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
+import { deleteSavedPlan, generatePlan, generatePlanFast, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
 import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
 import { detectOutOfScope } from '../utils/outOfScope';
@@ -95,6 +95,7 @@ function SavedPlansInbox({
   onSearchChange,
   onOpen,
   onFavorite,
+  onDelete,
   activeSpace,
   onActiveSpaceChange,
   onContinueSpace,
@@ -105,6 +106,7 @@ function SavedPlansInbox({
   onSearchChange: (value: string) => void;
   onOpen: (plan: SavedPlanResponse) => void;
   onFavorite: (plan: SavedPlanResponse) => void;
+  onDelete: (plan: SavedPlanResponse) => void;
   activeSpace: string;
   onActiveSpaceChange: (name: string) => void;
   onContinueSpace: (name: string) => void;
@@ -199,6 +201,15 @@ function SavedPlansInbox({
                       {savedPlan.favorite ? t('saved.favoriteStar') : t('saved.markStar')}
                     </button>
                     <button type="button" onClick={() => onOpen(savedPlan)}>{t('saved.open')}</button>
+                    <button
+                      type="button"
+                      className="saved-plan-delete"
+                      onClick={() => onDelete(savedPlan)}
+                      aria-label={t('saved.delete')}
+                      title={t('saved.delete')}
+                    >
+                      {t('saved.delete')}
+                    </button>
                   </div>
                 </article>
               );
@@ -579,6 +590,19 @@ export function Planner() {
     }
   }
 
+  // Sprint 10.168: delete a saved plan from "Moji planovi" (owner-only on the backend). Confirm first, then
+  // drop it from the list optimistically after the 204.
+  async function handleDeleteSaved(savedPlan: SavedPlanResponse) {
+    if (typeof window !== 'undefined' && !window.confirm(t('saved.deleteConfirm'))) return;
+    try {
+      await deleteSavedPlan(savedPlan.id);
+      setSavedPlans((currentPlans) => currentPlans.filter((plan) => plan.id !== savedPlan.id));
+      setNotice(t('saved.deleted'));
+    } catch {
+      setNotice(t('planner.errorUnavailable'));
+    }
+  }
+
   async function handleQuickAction(action: QuickPlanAction, plan?: FurnishingPlan) {
     // The quick action changes the OPTIONS (goal/level/stores); the SUFFIX is a request-only nudge to the AI.
     let nextInput: PlannerInput = { ...input };
@@ -704,6 +728,7 @@ export function Planner() {
         onSearchChange={setSavedSearch}
         onOpen={openSavedPlan}
         onFavorite={toggleSavedFavorite}
+        onDelete={handleDeleteSaved}
         activeSpace={activeSpace}
         onActiveSpaceChange={setActiveSpace}
         onContinueSpace={handleContinueSpace}
