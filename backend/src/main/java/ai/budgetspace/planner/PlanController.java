@@ -3,12 +3,15 @@ package ai.budgetspace.planner;
 import ai.budgetspace.dto.DesignAssistantResponse;
 import ai.budgetspace.dto.FurnishingPlanDto;
 import ai.budgetspace.auth.AuthService;
+import ai.budgetspace.config.ClientIp;
 import ai.budgetspace.dto.MoveInRequestDto;
 import ai.budgetspace.dto.MoveInResponse;
 import ai.budgetspace.dto.PlanGenerationResponse;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.PlannerIntentAnalysisDto;
 import ai.budgetspace.dto.ReplaceProductRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,21 +27,26 @@ public class PlanController {
     private final DesignAssistantService designAssistantService;
     private final PromptIntelligenceService promptIntelligenceService;
     private final AuthService authService;
+    // Sprint 10.168: trusted reverse-proxy hop count for resolving the real client IP (Railway/most PaaS = 1).
+    private final int trustedProxyCount;
 
     public PlanController(PlannerService plannerService, DesignAssistantService designAssistantService,
-                         PromptIntelligenceService promptIntelligenceService, AuthService authService) {
+                         PromptIntelligenceService promptIntelligenceService, AuthService authService,
+                         @Value("${budgetspace.trusted-proxy-count:1}") int trustedProxyCount) {
         this.plannerService = plannerService;
         this.designAssistantService = designAssistantService;
         this.promptIntelligenceService = promptIntelligenceService;
         this.authService = authService;
+        this.trustedProxyCount = Math.max(0, trustedProxyCount);
     }
 
     @PostMapping("/api/plans/generate")
     public PlanGenerationResponse generate(@RequestBody PlannerInputDto input,
                                            @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
-                                           @CookieValue(name = AUTH_COOKIE, required = false) String authToken) {
+                                           @CookieValue(name = AUTH_COOKIE, required = false) String authToken,
+                                           HttpServletRequest request) {
         // Understand the prompt first (AI when enabled + within the tier's allowance, else rule-based), then plan.
-        Caller caller = resolveCaller(authToken, sessionId);
+        Caller caller = resolveCaller(authToken, sessionId, request);
         PlannerIntentAnalysisDto analysis = promptIntelligenceService.analyze(input, caller.countingKey(), caller.tier());
         PlanGenerationResponse response = analysis.aiUsed()
                 ? plannerService.generateResolved(promptIntelligenceService.toPlannerInput(analysis, input), analysis.specificItemsOnly())
@@ -73,19 +81,24 @@ public class PlanController {
     @PostMapping("/api/plans/design")
     public DesignAssistantResponse design(@RequestBody PlanGenerationResponse plan,
                                           @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
-                                          @CookieValue(name = AUTH_COOKIE, required = false) String authToken) {
-        Caller caller = resolveCaller(authToken, sessionId);
+                                          @CookieValue(name = AUTH_COOKIE, required = false) String authToken,
+                                          HttpServletRequest request) {
+        Caller caller = resolveCaller(authToken, sessionId, request);
         return designAssistantService.describe(plan, caller.countingKey(), caller.tier());
     }
 
-    // Sprint 10.70/10.71: who is asking, for AI usage gating. The owner key ("user:<id>" signed-in, else
-    // "guest:<browserId>") is the counting identity; the tier (FREE/PLUS/PRO, else GUEST) sets the per-day cap.
-    // A blank/forged session falls back to a per-browser guest bucket so counting always has a non-blank key.
-    private Caller resolveCaller(String authToken, String sessionId) {
+    // Sprint 10.70/10.71: who is asking, for AI usage gating. The tier (FREE/PLUS/PRO, else GUEST) sets the
+    // per-day cap. Sprint 10.168: a GUEST's allowance is counted PER CLIENT IP, not per browser session — so
+    // clearing localStorage / a fresh incognito window (a new session id) can't reset the daily cap. Signed-in
+    // callers stay keyed by their account. Tradeoff: guests behind one NAT/office IP share the guest/day
+    // allowance (they can sign in for a per-account one; tune budgetspace.ai.daily-per-user.guest). The IP is
+    // resolved spoof-resistantly (ClientIp) so a rotated X-Forwarded-For can't mint fresh guest buckets.
+    private Caller resolveCaller(String authToken, String sessionId, HttpServletRequest request) {
         String ownerKey = authService.resolveOwnerKey(authToken, sessionId);
         String tier = authService.aiTierFor(ownerKey);
-        String countingKey = ownerKey != null ? ownerKey
-                : "guest:" + (sessionId == null || sessionId.isBlank() ? "anon" : sessionId.trim());
+        String countingKey = (ownerKey != null && !"GUEST".equalsIgnoreCase(tier))
+                ? ownerKey
+                : "guest-ip:" + ClientIp.resolve(request, trustedProxyCount);
         return new Caller(countingKey, tier);
     }
 

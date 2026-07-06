@@ -41,6 +41,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final boolean enabled;
     private final int maxRequests;
     private final long windowMs;
+    // Sprint 10.168: number of trusted reverse-proxy hops between the app and the public internet (Railway/most
+    // PaaS = 1). Used to pick the real client from X-Forwarded-For without trusting client-supplied entries.
+    private final int trustedProxyCount;
     private final Set<String> allowedOrigins;
     private final ConcurrentHashMap<String, Window> buckets = new ConcurrentHashMap<>();
 
@@ -48,10 +51,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
             @Value("${budgetspace.rate-limit.enabled:true}") boolean enabled,
             @Value("${budgetspace.rate-limit.requests-per-window:60}") int maxRequests,
             @Value("${budgetspace.rate-limit.window-seconds:10}") long windowSeconds,
+            @Value("${budgetspace.trusted-proxy-count:1}") int trustedProxyCount,
             @Value("${app.cors.allowed-origins:http://localhost:5180}") String allowedOrigins) {
         this.enabled = enabled;
         this.maxRequests = Math.max(1, maxRequests);
         this.windowMs = Math.max(1, windowSeconds) * 1000L;
+        this.trustedProxyCount = Math.max(0, trustedProxyCount);
         this.allowedOrigins = Arrays.stream(allowedOrigins.split(",")).map(String::trim)
                 .filter(s -> !s.isBlank()).collect(Collectors.toUnmodifiableSet());
     }
@@ -96,15 +101,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return window.count <= maxRequests;
     }
 
-    // Behind a CDN/proxy the real client is the first X-Forwarded-For hop; fall back to the socket address.
-    private static String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            int comma = forwarded.indexOf(',');
-            return (comma > 0 ? forwarded.substring(0, comma) : forwarded).trim();
-        }
-        String remote = request.getRemoteAddr();
-        return remote == null ? "unknown" : remote;
+    // Sprint 10.168: the real client, resilient to client-supplied X-Forwarded-For spoofing (see ClientIp).
+    private String clientIp(HttpServletRequest request) {
+        return ClientIp.resolve(request, trustedProxyCount);
     }
 
     // Echo the CORS allow-origin onto the 429 so the browser surfaces the real status, not an opaque network error.
