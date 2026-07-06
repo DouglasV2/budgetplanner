@@ -285,7 +285,13 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // Harvey Norman HR) discovered by a workflow that returned only product URLs; every price + currency +
             // og:image was then read LIVE off each page by a deterministic curl pass (agents supplied no prices),
             // currency-matched to the market. Rows without a readable JSON-LD price/image were dropped, not guessed.
-            "/catalog/real-discovery-retailers-10-167.json"
+            "/catalog/real-discovery-retailers-10-167.json",
+            // Sprint 10.168: JYSK HR sofa refresh — the full current jysk.hr/dnevni-boravak/kauci range
+            // (60 web-verified couches: name + JSON-LD ItemList price + og:image, read LIVE 2026-07-06 via
+            // curl, agent-free), deduped vs the existing catalog. Closes the "plan shows a sofa JYSK no longer
+            // sells" trust gap: a discontinued product URL 200-bounces to the category listing, so the shopper
+            // saw "all couches" instead of the one in the plan. This gives the planner today's real options.
+            "/catalog/real-jysk-hr-sofa-refresh-10-168.json"
     );
 
     /**
