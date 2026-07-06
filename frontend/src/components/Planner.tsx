@@ -258,6 +258,9 @@ export function Planner() {
   // Sprint 10.168: monotonic token so a slow AI result from an OLDER generation can't clobber a newer one
   // (the "plan reset to the previous list" race). Only the latest runGeneration is allowed to apply results.
   const genRef = useRef(0);
+  // Sprint 10.168: the saved plan pending an in-app delete confirmation (null = the confirm modal is closed).
+  const [deleteTarget, setDeleteTarget] = useState<SavedPlanResponse | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   // Sprint 10.88: the actionable Plus upsell card, shown when a save hits the Free 3-plan cap (402).
@@ -590,16 +593,24 @@ export function Planner() {
     }
   }
 
-  // Sprint 10.168: delete a saved plan from "Moji planovi" (owner-only on the backend). Confirm first, then
-  // drop it from the list optimistically after the 204.
-  async function handleDeleteSaved(savedPlan: SavedPlanResponse) {
-    if (typeof window !== 'undefined' && !window.confirm(t('saved.deleteConfirm'))) return;
+  // Sprint 10.168: delete a saved plan from "Moji planovi" (owner-only on the backend). Open the in-app confirm
+  // modal first (not the browser's window.confirm), then delete on confirm and drop it from the list on the 204.
+  function handleDeleteSaved(savedPlan: SavedPlanResponse) {
+    setDeleteTarget(savedPlan);
+  }
+
+  async function confirmDeleteSaved() {
+    if (!deleteTarget) return;
+    setDeleteBusy(true);
     try {
-      await deleteSavedPlan(savedPlan.id);
-      setSavedPlans((currentPlans) => currentPlans.filter((plan) => plan.id !== savedPlan.id));
+      await deleteSavedPlan(deleteTarget.id);
+      setSavedPlans((currentPlans) => currentPlans.filter((plan) => plan.id !== deleteTarget.id));
       setNotice(t('saved.deleted'));
+      setDeleteTarget(null);
     } catch {
       setNotice(t('planner.errorUnavailable'));
+    } finally {
+      setDeleteBusy(false);
     }
   }
 
@@ -843,6 +854,22 @@ export function Planner() {
           seed={moveInSeed}
         />
       </div>
+
+      {/* Sprint 10.168: in-app confirm modal for deleting a saved plan (reuses the legal/confirm modal styling). */}
+      {deleteTarget && (
+        <div className="legal-overlay" role="dialog" aria-modal="true" aria-label={t('saved.deleteTitle')} onClick={() => setDeleteTarget(null)}>
+          <div className="legal-modal confirm-modal" onClick={(event) => event.stopPropagation()}>
+            <h2>{t('saved.deleteTitle')}</h2>
+            <p>{t('saved.deleteConfirm')}</p>
+            <div className="confirm-actions">
+              <button type="button" className="confirm-cancel" onClick={() => setDeleteTarget(null)} disabled={deleteBusy}>{t('account.cancel')}</button>
+              <button type="button" className="confirm-delete" onClick={() => void confirmDeleteSaved()} disabled={deleteBusy}>
+                {deleteBusy ? t('saved.deleting') : t('saved.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

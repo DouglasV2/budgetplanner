@@ -182,9 +182,11 @@ const DICTIONARY: Record<string, Entry> = {
   'saved.favoriteStar': { hr: '★ Favorit', en: '★ Favorite' },
   'saved.markStar': { hr: '☆ Označi', en: '☆ Mark' },
   'saved.open': { hr: 'Otvori', en: 'Open' },
-  // Sprint 10.168: delete a saved plan (owner-only).
+  // Sprint 10.168: delete a saved plan (owner-only) via an in-app confirm modal.
   'saved.delete': { hr: 'Obriši', en: 'Delete' },
-  'saved.deleteConfirm': { hr: 'Sigurno želiš obrisati ovaj spremljeni plan?', en: 'Delete this saved plan?' },
+  'saved.deleteTitle': { hr: 'Obrisati plan?', en: 'Delete plan?' },
+  'saved.deleteConfirm': { hr: 'Sigurno želiš obrisati ovaj spremljeni plan? Ova radnja je trajna.', en: 'Are you sure you want to delete this saved plan? This cannot be undone.' },
+  'saved.deleting': { hr: 'Brišem…', en: 'Deleting…' },
   'saved.deleted': { hr: 'Plan je obrisan.', en: 'Plan deleted.' },
   'saved.emptySearch': { hr: 'Nema spremljenog plana za taj pojam.', en: 'No saved plan for that term.' },
 
