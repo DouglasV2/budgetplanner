@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Markér",
   "saved.open": "Åbn",
   "saved.emptySearch": "Ingen gemt plan for den søgning.",
-  "planner.examplePrompt": "Min stue står helt tom — jeg har omkring 1500 kr. og elsker en lys og luftig stemning. Jeg mangler en sofa, et tv-møbel, et sofabord, et tæppe og en lampe — både IKEA og JYSK er fint.",
+  "planner.examplePrompt": "Min stue står helt tom, og nu vil jeg endelig have den gjort færdig. Jeg har omkring 1500 kr. og elsker en lys og luftig stemning. Jeg mangler en sofa, et tv-møbel, et sofabord, et tæppe og en lampe.",
   "planner.noticeLoaded": "En gemt plan blev indlæst. Du kan kopiere den, redigere den eller bygge en ny version.",
   "planner.errorNotFound": "Jeg kunne ikke finde den gemte plan. Linket er måske forkert, eller serveren kører ikke.",
   "planner.partialNone": "Ikke nok produkter til denne forespørgsel. Prøv at hæve budgettet eller fjerne butiksbegrænsningen.",

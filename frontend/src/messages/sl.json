@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Označi",
   "saved.open": "Odpri",
   "saved.emptySearch": "Ni shranjenega načrta za ta pojem.",
-  "planner.examplePrompt": "Dnevna soba mi je čisto prazna, imam okoli 1500 € in obožujem svetlo in zračno. Rabim kavč, TV-komodo, klubsko mizico, preprogo in svetilko — IKEA in JYSK, oba mi pašeta.",
+  "planner.examplePrompt": "Dnevna soba mi je prazna in končno jo želim urediti. Imam okoli 1500 € in obožujem svetel, zračen prostor. Rabil bi kavč, TV-komodo, klubsko mizico, preprogo in svetilko.",
   "planner.noticeLoaded": "Naložen je shranjen načrt. Lahko ga kopiraš, urediš ali sestaviš novo različico.",
   "planner.errorNotFound": "Shranjenega načrta nisem našel. Morda je povezava napačna ali strežnik ne teče.",
   "planner.partialNone": "Ni dovolj izdelkov za to zahtevo. Poskusi zvišati proračun ali odstraniti omejitev trgovine.",

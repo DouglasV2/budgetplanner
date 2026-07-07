@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Marcar",
   "saved.open": "Abrir",
   "saved.emptySearch": "Não há nenhum plano guardado para esse termo.",
-  "planner.examplePrompt": "A minha sala está vazia — tenho uns 1500 € e adoro um ambiente claro e arejado. Falta-me um sofá, um móvel de TV, uma mesa de centro, um tapete e um candeeiro — a IKEA e a JYSK servem-me lindamente.",
+  "planner.examplePrompt": "A minha sala está vazia e finalmente quero tratar disso. Tenho uns 1500 € e gosto de um ambiente claro e arejado. Precisava de um sofá, um móvel de TV, uma mesa de centro, um tapete e um candeeiro.",
   "planner.noticeLoaded": "Foi carregado um plano guardado. Podes copiá-lo, editá-lo ou criar uma nova versão.",
   "planner.errorNotFound": "Não consegui encontrar o plano guardado. A ligação pode estar errada ou o servidor não está em execução.",
   "planner.partialNone": "Não há produtos suficientes para este pedido. Tenta aumentar o orçamento ou remover a restrição de loja.",

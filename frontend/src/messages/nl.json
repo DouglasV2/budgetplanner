@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Markeer",
   "saved.open": "Openen",
   "saved.emptySearch": "Geen opgeslagen plan voor die term.",
-  "planner.examplePrompt": "Mijn woonkamer is nog helemaal leeg. Ik heb zo'n € 1500 en ik hou van een lichte, luchtige sfeer. Ik zoek een bank, een tv-meubel, een salontafel, een tapijt en een lamp — IKEA en JYSK mogen allebei.",
+  "planner.examplePrompt": "Mijn woonkamer is leeg en ik wil hem nu eindelijk eens inrichten. Ik heb zo'n € 1500 en ik hou van een lichte, luchtige sfeer. Ik zou een bank nodig hebben, een tv-meubel, een salontafel, een tapijt en een lamp.",
   "planner.noticeLoaded": "Er is een opgeslagen plan geladen. Je kunt het kopiëren, bewerken of een nieuwe versie maken.",
   "planner.errorNotFound": "Ik kon het opgeslagen plan niet vinden. De link klopt misschien niet of de server draait niet.",
   "planner.partialNone": "Niet genoeg producten voor deze aanvraag. Probeer het budget te verhogen of de winkelbeperking te verwijderen.",

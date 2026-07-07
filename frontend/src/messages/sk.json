@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Označiť",
   "saved.open": "Otvoriť",
   "saved.emptySearch": "Žiadny uložený plán pre tento výraz.",
-  "planner.examplePrompt": "Obývačku mám úplne prázdnu, mám tak 1500 € a milujem svetlo a vzdušnosť. Potrebujem pohovku, TV skrinku, konferenčný stolík, koberec a lampu — kľudne IKEA aj JYSK.",
+  "planner.examplePrompt": "Obývačku mám prázdnu a konečne si ju chcem zariadiť. Mám tak 1500 € a mám rada svetlo a vzdušnosť. Potrebovala by som pohovku, TV skrinku, konferenčný stolík, koberec a lampu.",
   "planner.noticeLoaded": "Bol načítaný uložený plán. Môžeš ho skopírovať, upraviť alebo vytvoriť novú verziu.",
   "planner.errorNotFound": "Nepodarilo sa mi nájsť uložený plán. Odkaz môže byť chybný alebo server nebeží.",
   "planner.partialNone": "Nie je dosť produktov pre túto požiadavku. Skús zvýšiť rozpočet alebo odstrániť obmedzenie obchodu.",

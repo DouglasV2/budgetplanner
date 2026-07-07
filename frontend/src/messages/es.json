@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Marcar",
   "saved.open": "Abrir",
   "saved.emptySearch": "No hay ningún plan guardado para ese término.",
-  "planner.examplePrompt": "Tengo el salón vacío, unos 1500 € y me encanta que sea luminoso y ligero. Me falta un sofá, un mueble de TV, una mesa de centro, una alfombra y una lámpara — me valen IKEA y JYSK.",
+  "planner.examplePrompt": "Tengo el salón vacío y por fin quiero ponerlo a punto. Tengo unos 1500 € y me encanta que todo sea luminoso y ligero. Me haría falta un sofá, un mueble de TV, una mesa de centro, una alfombra y una lámpara.",
   "planner.noticeLoaded": "Se ha cargado un plan guardado. Puedes copiarlo, editarlo o crear una nueva versión.",
   "planner.errorNotFound": "No he podido encontrar el plan guardado. Puede que el enlace sea incorrecto o que el servidor no esté en marcha.",
   "planner.partialNone": "No hay suficientes productos para esta solicitud. Prueba a aumentar el presupuesto o a quitar la restricción de tienda.",

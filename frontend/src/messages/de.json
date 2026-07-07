@@ -74,7 +74,7 @@
   "saved.markStar": "☆ Markieren",
   "saved.open": "Öffnen",
   "saved.emptySearch": "Kein gespeicherter Plan für diesen Begriff.",
-  "planner.examplePrompt": "Mein Wohnzimmer ist leer — ich hab so €1500 und mag es hell und luftig. Ich bräuchte ein Sofa, ein TV-Möbel, einen Couchtisch, einen Teppich und eine Lampe — IKEA und JYSK passen beide.",
+  "planner.examplePrompt": "Mein Wohnzimmer ist leer und ich möchte es endlich einrichten. Ich habe etwa €1500 und mag es gern hell und luftig. Ich bräuchte ein Sofa, ein TV-Möbel, einen Couchtisch, einen Teppich und eine Lampe.",
   "planner.noticeLoaded": "Ein gespeicherter Plan wurde geladen. Du kannst ihn kopieren, bearbeiten oder eine neue Version erstellen.",
   "planner.errorNotFound": "Ich konnte den gespeicherten Plan nicht finden. Der Link ist vielleicht falsch oder der Server läuft nicht.",
   "planner.partialNone": "Nicht genug Produkte für diese Anfrage. Versuch, das Budget zu erhöhen oder die Geschäfts-Einschränkung zu entfernen.",

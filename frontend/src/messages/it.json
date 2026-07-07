@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Segna",
   "saved.open": "Apri",
   "saved.emptySearch": "Nessun piano salvato per questo termine.",
-  "planner.examplePrompt": "Il soggiorno è tutto vuoto, ho circa €1500 e adoro le atmosfere chiare e ariose. Mi servono un divano, un mobile TV, un tavolino, un tappeto e una lampada — IKEA e JYSK vanno benissimo entrambi.",
+  "planner.examplePrompt": "Il soggiorno è vuoto e finalmente voglio sistemarlo. Ho circa €1500 e adoro le atmosfere chiare e ariose. Mi servirebbero un divano, un mobile TV, un tavolino, un tappeto e una lampada.",
   "planner.noticeLoaded": "È stato caricato un piano salvato. Puoi copiarlo, modificarlo o creare una nuova versione.",
   "planner.errorNotFound": "Non sono riuscito a trovare il piano salvato. Il link potrebbe essere errato o il server non è attivo.",
   "planner.partialNone": "Prodotti insufficienti per questa richiesta. Prova ad aumentare il budget o a togliere la restrizione sui negozi.",

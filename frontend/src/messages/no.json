@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Merk",
   "saved.open": "Åpne",
   "saved.emptySearch": "Ingen lagret plan for det søket.",
-  "planner.examplePrompt": "Stua mi er helt tom. Jeg har rundt 15 000 kr og elsker lyst og luftig. Trenger sofa, TV-benk, salongbord, teppe og lampe — IKEA og JYSK funker fint.",
+  "planner.examplePrompt": "Stua mi er tom, og nå vil jeg endelig få den i orden. Jeg har rundt 15 000 kr, og jeg er glad i et lyst og luftig preg. Jeg trenger en sofa, en TV-benk, et salongbord, et teppe og en lampe.",
   "planner.noticeLoaded": "En lagret plan ble lastet inn. Du kan kopiere den, redigere den eller lage en ny versjon.",
   "planner.errorNotFound": "Jeg fant ikke den lagrede planen. Lenken kan være feil, eller så kjører ikke serveren.",
   "planner.partialNone": "Ikke nok produkter for denne forespørselen. Prøv å øke budsjettet eller fjerne butikkbegrensningen.",

@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Markera",
   "saved.open": "Öppna",
   "saved.emptySearch": "Ingen sparad plan för den sökningen.",
-  "planner.examplePrompt": "Vardagsrummet står helt tomt, jag har runt 1500 kr och gillar det ljust och luftigt. Skulle behöva en soffa, en tv-bänk, ett soffbord, en matta och en lampa — IKEA och JYSK funkar båda två.",
+  "planner.examplePrompt": "Mitt vardagsrum är tomt och jag vill äntligen fixa till det. Jag har runt 1500 kr och gillar det ljust och luftigt. Jag skulle behöva en soffa, en tv-bänk, ett soffbord, en matta och en lampa.",
   "planner.noticeLoaded": "En sparad plan har laddats. Du kan kopiera den, redigera den eller skapa en ny version.",
   "planner.errorNotFound": "Jag kunde inte hitta den sparade planen. Länken kanske är fel eller så är inte servern igång.",
   "planner.partialNone": "Inte tillräckligt med produkter för den här förfrågan. Testa att höja budgeten eller ta bort butiksbegränsningen.",

@@ -190,7 +190,7 @@ const DICTIONARY: Record<string, Entry> = {
   'saved.deleted': { hr: 'Plan je obrisan.', en: 'Plan deleted.' },
   'saved.emptySearch': { hr: 'Nema spremljenog plana za taj pojam.', en: 'No saved plan for that term.' },
 
-  'planner.examplePrompt': { hr: 'Prazan mi je dnevni boravak, imam oko 1500 € i volim svijetlo i prozračno. Treba mi kauč, TV komoda, stolić, tepih i lampa — može IKEA i JYSK.', en: 'My living room is empty — I have about €1500 and I love a light, airy feel. I need a sofa, a TV unit, a coffee table, a rug and a lamp — IKEA and JYSK both work.' },
+  'planner.examplePrompt': { hr: 'Prazan mi je dnevni boravak i konačno ga želim srediti. Imam oko 1500 €, volim svijetlo i prozračno. Trebao bi mi kauč, TV komoda, stolić, tepih i lampa.', en: 'My living room is empty and I finally want to sort it out. I have about €1500 and I love a light, airy feel. I would need a sofa, a TV unit, a coffee table, a rug and a lamp.' },
   'planner.noticeLoaded': { hr: 'Učitan je spremljeni plan. Možeš ga kopirati, mijenjati ili složiti novu verziju.', en: 'A saved plan was loaded. You can copy it, edit it, or build a new version.' },
   'planner.errorNotFound': { hr: 'Nisam našao spremljeni plan. Možda je link pogrešan ili server nije pokrenut.', en: 'I couldn\'t find the saved plan. The link may be wrong or the server isn\'t running.' },
   'planner.partialNone': { hr: 'Nema dovoljno proizvoda za ovaj zahtjev. Pokušaj povećati budžet ili ukloniti ograničenje trgovine.', en: 'Not enough products for this request. Try raising the budget or removing the store restriction.' },

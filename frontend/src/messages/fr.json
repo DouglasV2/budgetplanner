@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Marquer",
   "saved.open": "Ouvrir",
   "saved.emptySearch": "Aucun plan enregistré pour ce terme.",
-  "planner.examplePrompt": "Mon salon est tout vide, j'ai environ 1500 € et j'adore quand c'est lumineux et aéré. Il me faudrait un canapé, un meuble TV, une table basse, un tapis et une lampe — IKEA et JYSK, les deux me vont.",
+  "planner.examplePrompt": "Mon salon est tout vide et j'ai enfin envie de m'en occuper. J'ai environ 1500 € et j'adore quand c'est lumineux et aéré. Il me faudrait un canapé, un meuble TV, une table basse, un tapis et une lampe.",
   "planner.noticeLoaded": "Un plan enregistré a été chargé. Tu peux le copier, le modifier ou créer une nouvelle version.",
   "planner.errorNotFound": "Je n'ai pas trouvé le plan enregistré. Le lien est peut-être erroné ou le serveur n'est pas démarré.",
   "planner.partialNone": "Pas assez de produits pour cette demande. Essaie d'augmenter le budget ou de retirer la restriction sur les magasins.",

@@ -73,7 +73,7 @@
   "saved.markStar": "☆ Merkitse",
   "saved.open": "Avaa",
   "saved.emptySearch": "Ei tallennettua suunnitelmaa tällä haulla.",
-  "planner.examplePrompt": "Olohuone ammottaa tyhjyyttään, käytössä on noin 1500 € ja tykkään vaaleasta ja ilmavasta fiiliksestä. Tarvitsen sohvan, TV-tason, sohvapöydän, maton ja lampun — IKEA ja JYSK käyvät molemmat.",
+  "planner.examplePrompt": "Olohuoneeni on tyhjä ja haluaisin viimein sisustaa sen kunnolla. Minulla on noin 1500 € ja pidän vaaleasta ja ilmavasta tunnelmasta. Tarvitsisin sohvan, TV-tason, sohvapöydän, maton ja lampun.",
   "planner.noticeLoaded": "Tallennettu suunnitelma ladattiin. Voit kopioida sen, muokata sitä tai tehdä uuden version.",
   "planner.errorNotFound": "En löytänyt tallennettua suunnitelmaa. Linkki voi olla väärä tai palvelin ei ole käynnissä.",
   "planner.partialNone": "Tuotteita ei ole tarpeeksi tähän pyyntöön. Kokeile nostaa budjettia tai poistaa kauppojen rajaus.",
