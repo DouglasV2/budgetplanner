@@ -5,6 +5,8 @@ export type Retailer =
   | 'Decathlon'
   | 'Emmezeta'
   | 'Lesnina'
+  // Sprint 10.169: bathroom-fixture (sanitary-ware) retailers.
+  | 'VVS Eksperten'
   // Sprint 10.30: retailers that actually have verified products in some markets (mirrors the backend
   // PlannerService.RETAILERS list) so the store picker can offer them per country.
   | 'Harvey Norman'

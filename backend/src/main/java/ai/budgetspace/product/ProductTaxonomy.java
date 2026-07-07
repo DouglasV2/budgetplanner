@@ -41,6 +41,7 @@ public final class ProductTaxonomy {
     public static final Set<String> SUPPORTED_RETAILERS = Set.of(
             "IKEA",
             "JYSK",
+            "VVS Eksperten",
             "Pevex",
             "Emmezeta",
             "Decathlon",

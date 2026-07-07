@@ -73,6 +73,9 @@ public final class CatalogSourcePolicy {
         // feed-required to manually-verified so its web-verified bathroom fixtures (WC školjke, umivaonici, kade/
         // tuševi) are planner-eligible. HR only.
         map.put("Pevex", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.169: VVS Eksperten (DK) — sanitary-ware specialist; product pages serve JSON-LD price (DKK) +
+        // og:image and category listings SSR the product links → directly sourceable. Bathroom fixtures for DK.
+        map.put("VVS Eksperten", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Lesnina", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.16: reachable + hand-verified (link-out; have products in the catalog).
         map.put("Harvey Norman", SourcingStatus.MANUAL_VERIFIED_ONLY);

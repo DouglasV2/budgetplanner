@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class PlannerService {
     private static final Logger log = LoggerFactory.getLogger(PlannerService.class);
-    private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina",
+    private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "VVS Eksperten", "Emmezeta", "Decathlon", "Lesnina",
             // Sprint 10.16: additional retailers that have verified products (HR/SI/DE).
             "Harvey Norman", "Namjestaj.hr", "Otto", "Segmüller", "Poco",
             // Sprint 10.36: France — Camif (verified products).

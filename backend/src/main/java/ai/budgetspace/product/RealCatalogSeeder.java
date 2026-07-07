@@ -310,7 +310,10 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // WC školjke, umivaonici and kade/tuševi (name + itemprop=price EUR + og:image read live off pevex.hr).
             // New categories toilet/washbasin/bath-shower; HR only (Pevex is Croatia-only). Pevex flipped to
             // MANUAL_VERIFIED_ONLY in CatalogSourcePolicy so these are planner-eligible.
-            "/catalog/real-pevex-hr-bathroom-10-169.json"
+            "/catalog/real-pevex-hr-bathroom-10-169.json",
+            // Sprint 10.169: bathroom fixtures for DK — VVS Eksperten (sanitary-ware specialist), 42 web-verified
+            // toilets/washbasins/baths+showers (JSON-LD price in DKK + og:image, read live off vvs-eksperten.dk).
+            "/catalog/real-vvs-eksperten-dk-bathroom-10-169.json"
     );
 
     /**

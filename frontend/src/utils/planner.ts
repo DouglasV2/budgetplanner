@@ -53,7 +53,7 @@ export const retailersByMarket: Record<string, Retailer[]> = {
   // Sprint 10.46: Scandinavia — IKEA + JYSK, prices in the national currency.
   NO: ['IKEA', 'JYSK'],
   SE: ['IKEA', 'JYSK'],
-  DK: ['IKEA', 'JYSK'],
+  DK: ['IKEA', 'JYSK', 'VVS Eksperten'],
   // Sprint 10.55: United Kingdom — IKEA-only for now (JYSK has no UK stores), GBP prices.
   GB: ['IKEA'],
 };
