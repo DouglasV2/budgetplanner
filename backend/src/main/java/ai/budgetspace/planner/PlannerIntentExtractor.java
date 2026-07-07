@@ -104,6 +104,14 @@ public class PlannerIntentExtractor {
     }
 
     private PlannerInputDto applyRoom(String text, PlannerInputDto input) {
+        // Sprint 10.169: an EXPLICIT non-default room selection from the UI wins over a room merely INFERRED from
+        // the prompt text. The pre-filled example prompt is a living-room, so a user who picked Bathroom/Bedroom/etc.
+        // in "detailed settings" but left the example text was silently overridden back to living-room. On the
+        // living-room DEFAULT the prompt may still change the room (natural-language "make it a bedroom").
+        String selected = input.roomType();
+        if (selected != null && !selected.isBlank() && !"living-room".equals(selected)) {
+            return input;
+        }
         // Sprint 10.135: the room keywords are MULTILINGUAL so the rule-based fallback (used when the LLM call
         // fails / is throttled / the daily AI cap is spent) still classifies the room in every market's language.
         // Before this, a non-HR/EN prompt silently fell back to living-room (no bed, ignored budget) on any LLM

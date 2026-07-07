@@ -176,6 +176,21 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Bad renovieren, Budget 1500 €.").roomType()).isEqualTo("bathroom"); // verb
     }
 
+    @Test
+    void explicitNonDefaultRoomSelectionIsNotOverriddenByThePrompt() {
+        // Sprint 10.169 regression: the pre-filled example prompt is a living-room, so a user who explicitly picks
+        // Bathroom (or any non-living-room) in the UI but leaves the example text must still get THAT room — the
+        // prompt-inferred room only applies while the user is on the living-room default.
+        assertThat(extractor.enrich(baseWithRoom(
+                "Prazan mi je dnevni boravak, treba mi kauč, TV komoda i tepih.", "bathroom")).roomType())
+                .isEqualTo("bathroom");
+        assertThat(extractor.enrich(baseWithRoom("Dnevni boravak, treba mi kauč.", "bedroom")).roomType())
+                .isEqualTo("bedroom");
+        // On the living-room default the prompt may still switch the room (the natural-language flow is preserved).
+        assertThat(extractor.enrich(baseWithRoom("Zapravo spavaća soba, treba mi krevet.", "living-room")).roomType())
+                .isEqualTo("bedroom");
+    }
+
     private PlannerInputDto parse(String prompt) {
         return extractor.enrich(base(prompt));
     }
@@ -183,6 +198,14 @@ class PlannerIntentExtractorTest {
     private PlannerInputDto base(String prompt) {
         return new PlannerInputDto(
                 prompt, 1500, "living-room", "bright", "Zagreb", 20, "multi",
+                List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina"),
+                "best-value", "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0
+        );
+    }
+
+    private PlannerInputDto baseWithRoom(String prompt, String roomType) {
+        return new PlannerInputDto(
+                prompt, 1500, roomType, "bright", "Zagreb", 20, "multi",
                 List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina"),
                 "best-value", "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0
         );

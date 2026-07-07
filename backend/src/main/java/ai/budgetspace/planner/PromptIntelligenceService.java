@@ -131,7 +131,13 @@ public class PromptIntelligenceService {
         PlannerInputDto base = (baseInput == null ? new PlannerInputDto("", 0, null, null, null, 0, null, null, null,
                 null, null, null, null, null, null, 0) : baseInput).normalized();
 
-        String roomType = ProductTaxonomy.normalizeRoom(analysis.roomType()).orElse(base.roomType());
+        // Sprint 10.169: an explicit non-default room selection from the UI wins over the room the AI merely
+        // INFERRED from the prompt (the pre-filled example is a living-room, so picking Bathroom but leaving the
+        // example was overridden to living-room). On the living-room default the AI-detected room still applies.
+        String selectedRoom = base.roomType();
+        String roomType = (selectedRoom != null && !selectedRoom.isBlank() && !"living-room".equals(selectedRoom))
+                ? selectedRoom
+                : ProductTaxonomy.normalizeRoom(analysis.roomType()).orElse(selectedRoom);
         String style = analysis.style() != null && KNOWN_STYLES.contains(analysis.style().toLowerCase(Locale.ROOT))
                 ? analysis.style().toLowerCase(Locale.ROOT) : base.style();
         int ceiling = Markets.budgetCeiling(Markets.currencyFor(base.market()));
