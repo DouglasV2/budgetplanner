@@ -400,7 +400,7 @@ function itemsCountText(t: Translate, count: number) {
 
 // Sprint 10.59: budget breakdown — makes the planner's existing budget allocation VISIBLE. A single stacked
 // bar shows where the money goes (share per category) and the remaining budget is highlighted. Plan data only.
-const BUDGET_COLORS = ['#CF5F2A', '#66785F', '#B0894E', '#7C786F', '#9C6B4A', '#5E7488', '#A88A5C'];
+const BUDGET_COLORS = ['#253746', '#6F7A63', '#A96849', '#8C7A66', '#B0894E', '#5E7488', '#9C6B4A'];
 
 function BudgetBreakdown({ plan, input }: { plan: FurnishingPlan; input: PlannerInput }) {
   const { t } = useLocale();
@@ -908,7 +908,13 @@ export function PlanResults({
             <p>{t('results.emptyText')}</p>
             <div className="empty-example">
               <strong>{t('results.emptyGetLabel')}</strong>
-              <span>{t('results.emptyGetItems')}</span>
+              {/* Preview chips from the existing localized "products · prices · shopping list" string —
+                  gives the placeholder structure without new copy, so it reads helpful, not blank. */}
+              <ul className="empty-preview-chips">
+                {t('results.emptyGetItems').split(' · ').map((chip, i) => (
+                  <li key={i} className="empty-preview-chip">{chip}</li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

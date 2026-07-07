@@ -29,10 +29,11 @@ export interface PdfPlanArgs {
   };
 }
 
-const INK = '#211e19';
-const MUTED = '#7c746a';
-const ORANGE = '#cf5f2a';
-const RULE = '#bbbbbb';
+// Palette refresh: match the app's warm interior-planner tokens (was the retired orange/cool-grey set).
+const INK = '#1D1A16';
+const MUTED = '#70685E';
+const ACCENT = '#8F4E30'; // readable clay for section heads (matches on-screen section labels)
+const RULE = '#DDD1C2';
 
 // pdfmake's getBlob is callback-based in the browser build; wrap it (and tolerate a promise form).
 function toBlob(pdfDoc: { getBlob: (cb: (blob: Blob) => void) => unknown }): Promise<Blob> {
@@ -136,7 +137,7 @@ export async function openPlanPdf(args: PdfPlanArgs): Promise<void> {
         kicker: { fontSize: 8, color: MUTED },
         title: { fontSize: 20, bold: true, margin: [0, 6, 0, 0] },
         subtitle: { fontSize: 10, color: MUTED, margin: [0, 1, 0, 0] },
-        sectionHead: { fontSize: 9, bold: true, color: ORANGE },
+        sectionHead: { fontSize: 9, bold: true, color: ACCENT },
         itemName: { fontSize: 10, margin: [0, 1.5, 0, 1.5] },
         itemMeta: { fontSize: 8, color: MUTED, margin: [10, 1.5, 10, 1.5] },
         itemPrice: { fontSize: 10, margin: [0, 1.5, 0, 1.5] },

@@ -2,24 +2,51 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-family: var(--font-sans);
-  color: #211e19;
-  background: #f7f1e7;
+  color: var(--text);
+  background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --ink: #211e19;
-  --ink-soft: #4b463e;
-  --muted: #7c746a;
-  --line: rgba(33, 30, 25, 0.12);
-  --hairline: rgba(33, 30, 25, 0.08);
-  --card: #fffdf9;
-  --white: #fffdf8;
-  --paper: #f7f1e7;
-  --orange: #cf5f2a;
-  --orange-dark: #a8431a;
-  --clay: #cf5f2a;
-  --sage: #5f7257;
-  --sand: #ece0cd;
+
+  /* ── BudgetSpace palette — warm interior planner ──────────────────────────────
+     Navy (--primary) is the ONE action colour: primary CTAs, active tabs/selection,
+     focus. Clay (--accent) is a SMALL brand accent only — the "space" wordmark,
+     section labels, the beta tag, tiny decorative lines. Sage marks positive info.
+     Overall balance ~70% linen surfaces / ~20% navy / ~10% clay + sage. */
+  --bg: #F3EDE4;
+  --bg-soft: #F8F4EE;
+  --surface: #FFFDF8;
+  --surface-soft: #E9DFD1;
+  --text: #1D1A16;
+  --text-muted: #70685E;
+  --primary: #253746;
+  --primary-hover: #1E2D39;
+  --accent: #A96849;
+  --accent-soft: #EBD2C2;
+  --accent-strong: #8F4E30;         /* readable clay for small label TEXT + white-on-clay fills (AA) */
+  --sage: #6F7A63;
+  --sage-soft: #E3E8DC;
+  --border: #DED4C6;
+  --border-soft: #EAE1D5;           /* softer border for NESTED cards (product rows, metric boxes) */
+
+  /* Legacy token aliases remapped onto the palette above, so the existing rules
+     inherit the new roles without a full rewrite: warm text, navy actions, clay
+     accents, warm borders. The few places that used these as CTA/label/warning
+     colours are overridden explicitly below. */
+  --ink: var(--text);
+  --ink-soft: #4B463E;
+  --muted: var(--text-muted);
+  --line: var(--border);
+  --hairline: rgba(29, 26, 22, 0.08);
+  --card: var(--surface);
+  --white: var(--surface);
+  --paper: var(--bg);
+  --sand: var(--surface-soft);
+  --clay: var(--accent);            /* small brand accent — never a CTA */
+  --orange: var(--primary);         /* former orange CTAs/active states → navy */
+  --orange-dark: var(--primary-hover);
+  --sage-strong: #43503C;           /* readable dark sage for positive text */
+  --warn: #8A4A2E;                  /* warm terracotta for over-budget / warnings */
   --r-sm: 10px;
   --r-md: 14px;
   --r-lg: 20px;
@@ -42,7 +69,13 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--paper);
+  /* Palette polish: a very subtle warm-linen gradient (soft clay top-left glow + a gentle vertical warmth)
+     so large empty areas don't read as a flat slab of beige. Kept low-contrast and warm — never orange/
+     yellow, never white/grey. Viewport-anchored so the depth stays consistent while scrolling long results. */
+  background:
+    radial-gradient(circle at top left, rgba(169, 104, 73, 0.08), transparent 34rem),
+    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 42%, #EFE6DA 100%);
+  background-repeat: no-repeat;
 }
 
 /* Modern display grotesque for headings — characterful but clean and readable, not a system font. */
@@ -85,8 +118,8 @@ a {
   z-index: 20;
   width: 100%;
   backdrop-filter: blur(20px);
-  background: rgba(247, 241, 231, 0.82);
-  border-bottom: 2px solid var(--clay);
+  background: rgba(243, 237, 228, 0.82);
+  border-bottom: 1px solid var(--border);
 }
 .header-inner {
   display: flex;
@@ -123,7 +156,7 @@ a {
   place-items: center;
   border-radius: 10px;
   color: var(--white);
-  background: var(--ink);
+  background: var(--primary);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.15rem;
@@ -183,24 +216,25 @@ a {
 .nav-cta,
 .primary-button,
 .plan-button {
-  background: var(--ink);
+  background: var(--primary);
   color: white;
   box-shadow: 0 16px 35px rgba(31, 29, 26, 0.18);
 }
 
-/* Sprint 10.160: the primary CTA is CLAY, not generic dark — the warm brand colour makes the one action pop
-   and ties the header to the mark + fill line. A small arrow adds forward pull ("hooking"). */
+/* Palette refresh: the primary CTA is the brand NAVY (--primary) — the single strong action in the bar.
+   A small arrow adds forward pull ("hooking"). */
 .nav-cta {
-  height: 38px;
+  height: 36px;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 0 18px;
+  padding: 0 16px;
   border-radius: 10px;
-  background: var(--clay);
+  background: var(--primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(207, 95, 42, 0.26);
+  /* Palette polish: lighter shadow so the CTA stays prominent without feeling heavy/overpowering. */
+  box-shadow: 0 2px 8px rgba(37, 55, 70, 0.15);
 }
 
 .nav-cta:hover {
@@ -281,7 +315,7 @@ a {
   background: rgba(33, 30, 25, 0.05);
 }
 .lang-toggle.active {
-  background: var(--ink);
+  background: var(--primary);
   color: #fff;
 }
 
@@ -290,7 +324,7 @@ a {
   appearance: none;
   -webkit-appearance: none;
   padding-right: 28px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c746a' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2370685E' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
   background-repeat: no-repeat;
   background-position: right 9px center;
 }
@@ -321,9 +355,11 @@ a {
 }
 
 /* A touch of warmth on the lead line of the headline. */
+/* Keep the headline calm and unified — the emphasis is carried by the italic, not an
+   orange/clay hero phrase (see palette rule: no orange hero text). */
 .hero-copy h1 em {
   font-style: italic;
-  color: var(--clay);
+  color: var(--text);
 }
 
 .hero-copy p,
@@ -345,7 +381,7 @@ a {
   width: fit-content;
   padding: 0;
   background: none;
-  color: var(--orange-dark);
+  color: var(--accent-strong);
   font-weight: 600;
   font-size: 0.72rem;
   letter-spacing: 0.18em;
@@ -396,7 +432,7 @@ a {
   top: 22px;
   padding: 8px 13px;
   border-radius: var(--r-sm);
-  background: var(--ink);
+  background: var(--primary);
   color: white;
   font-size: 0.78rem;
   font-weight: 550;
@@ -553,7 +589,7 @@ label span,
 /* Sprint 10.145: the planner→"Kako radi" gap was ~220px (planner padding-bottom 110 + how padding-top 110).
    Tighten that specific boundary hard so the page doesn't open into a big empty beige void. */
 .planner-section {
-  padding-bottom: 20px;
+  padding-bottom: 14px;
 }
 #how {
   padding-top: 36px;
@@ -580,7 +616,7 @@ label span,
 /* Sprint 10.156: the hero "payoff" phrase in brand clay — warmth + personality so the headline reads
    crafted, not flat/generic. Colour only (no heavy effects) to stay editorial. */
 .hero-accent {
-  color: var(--clay);
+  color: var(--text);
 }
 
 .steps-grid,
@@ -666,8 +702,8 @@ select {
 
 input:focus,
 select:focus {
-  border-color: rgba(236, 122, 46, 0.55);
-  box-shadow: 0 0 0 4px rgba(236, 122, 46, 0.1);
+  border-color: rgba(37, 55, 70, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 55, 70, 0.1);
 }
 
 input[type='range'] {
@@ -690,7 +726,7 @@ input[type='range'] {
 }
 
 .choice {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   background: rgba(255,255,255,0.58);
   padding: 14px 10px;
@@ -717,8 +753,8 @@ input[type='range'] {
 
 .choice.active {
   color: var(--ink);
-  border-color: rgba(236, 122, 46, 0.4);
-  background: rgba(236, 122, 46, 0.12);
+  border-color: rgba(37, 55, 70, 0.4);
+  background: rgba(37, 55, 70, 0.12);
 }
 
 .plans-grid {
@@ -745,15 +781,15 @@ input[type='range'] {
 .total {
   padding: 11px 14px;
   border-radius: 999px;
-  background: rgba(102, 120, 95, 0.12);
-  color: #3f563a;
+  background: var(--sage-soft);
+  color: var(--sage-strong);
   font-weight: 620;
   white-space: nowrap;
 }
 
 .total.over {
-  background: rgba(236, 122, 46, 0.12);
-  color: var(--orange-dark);
+  background: rgba(169, 104, 73, 0.14);
+  color: var(--warn);
 }
 
 /* Small label indicating furnishing level (Osnovno/Udobnije/Kompletno) */
@@ -775,7 +811,7 @@ input[type='range'] {
   border-radius: 20px;
   padding: 14px;
   background: rgba(255,255,255,0.56);
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
 }
 
 .score-row strong {
@@ -797,7 +833,7 @@ input[type='range'] {
   padding: 12px;
   border-radius: 24px;
   background: rgba(255,255,255,0.56);
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
 }
 
 .product-row img {
@@ -1032,8 +1068,8 @@ input[type='range'] {
   gap: 12px;
   padding: 16px;
   border-radius: 28px;
-  border: 1px solid rgba(236, 122, 46, 0.18);
-  background: linear-gradient(160deg, rgba(236, 122, 46, 0.11), rgba(255,255,255,0.46));
+  border: 1px solid rgba(37, 55, 70, 0.18);
+  background: linear-gradient(160deg, rgba(37, 55, 70, 0.11), rgba(255,255,255,0.46));
 }
 
 textarea {
@@ -1050,8 +1086,8 @@ textarea {
 }
 
 textarea:focus {
-  border-color: rgba(236, 122, 46, 0.55);
-  box-shadow: 0 0 0 4px rgba(236, 122, 46, 0.1);
+  border-color: rgba(37, 55, 70, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 55, 70, 0.1);
 }
 
 .generate-button {
@@ -1060,15 +1096,15 @@ textarea:focus {
   /* Sprint 10.142: 22px read a touch bubbly; 15px is crisper/more editorial without going sharp-cornered. */
   border-radius: 15px;
   padding: 16px 18px;
-  /* Sprint 10.168: primary action in the app's orange (was dark ink), white text, orange-tinted lift. */
-  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  /* Palette refresh: primary action in the brand navy (--primary/--primary-hover), white text, navy-tinted lift. */
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   color: #fff;
   font-weight: 620;
   display: flex;
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-  box-shadow: 0 16px 34px rgba(207, 95, 42, 0.28);
+  box-shadow: 0 16px 34px rgba(37, 55, 70, 0.28);
 }
 
 /* Icon + label travel together on the left; the hint stays on the right. */
@@ -1141,14 +1177,14 @@ textarea:focus {
 
 .pill.active {
   color: var(--orange-dark);
-  border-color: rgba(236, 122, 46, 0.34);
-  background: rgba(236, 122, 46, 0.13);
+  border-color: rgba(37, 55, 70, 0.34);
+  background: rgba(37, 55, 70, 0.13);
 }
 
 .pill.muted-active {
-  color: #3f563a;
-  border-color: rgba(102, 120, 95, 0.32);
-  background: rgba(102, 120, 95, 0.12);
+  color: var(--sage-strong);
+  border-color: rgba(111, 122, 99, 0.32);
+  background: rgba(111, 122, 99, 0.12);
 }
 
 .optimization-grid {
@@ -1158,7 +1194,7 @@ textarea:focus {
 }
 
 .goal-card {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   background: rgba(255,255,255,0.55);
   padding: 12px;
@@ -1184,8 +1220,8 @@ textarea:focus {
 }
 
 .goal-card.active {
-  border-color: rgba(236, 122, 46, 0.34);
-  background: rgba(236, 122, 46, 0.12);
+  border-color: rgba(37, 55, 70, 0.34);
+  background: rgba(37, 55, 70, 0.12);
 }
 
 .enhanced-score-row {
@@ -1201,8 +1237,8 @@ textarea:focus {
   display: inline-flex;
   padding: 7px 10px;
   border-radius: 999px;
-  background: rgba(102, 120, 95, 0.12);
-  color: #3f563a;
+  background: rgba(111, 122, 99, 0.12);
+  color: var(--sage-strong);
   font-size: 0.82rem;
   font-weight: 620;
 }
@@ -1302,8 +1338,8 @@ textarea:focus {
   width: fit-content;
   padding: 7px 12px;
   border-radius: 999px;
-  background: #eef6ef;
-  color: #2b6f46;
+  background: var(--sage-soft);
+  color: var(--sage-strong);
   font-size: 0.78rem;
   font-weight: 620;
   text-transform: uppercase;
@@ -1326,7 +1362,7 @@ textarea:focus {
   width: fit-content;
   padding: 10px 12px;
   border-radius: 14px;
-  background: #111827;
+  background: var(--primary);
   color: #f9fafb;
   font-size: 0.86rem;
 }
@@ -1393,7 +1429,7 @@ textarea:focus {
 }
 
 .template-card {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.58);
   padding: 13px 14px;
@@ -1404,8 +1440,8 @@ textarea:focus {
 
 .template-card:hover {
   transform: translateY(-1px);
-  border-color: rgba(236, 122, 46, 0.32);
-  background: rgba(236, 122, 46, 0.08);
+  border-color: rgba(37, 55, 70, 0.32);
+  background: rgba(37, 55, 70, 0.08);
 }
 
 /* Sprint 10.57: "Choose a vibe" — premium one-tap style cards with a 3-tone palette swatch. */
@@ -1424,7 +1460,7 @@ textarea:focus {
   display: grid;
   gap: 7px;
   align-content: start;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.6);
   padding: 13px 14px;
@@ -1435,13 +1471,13 @@ textarea:focus {
 
 .vibe-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(236, 122, 46, 0.32);
+  border-color: rgba(37, 55, 70, 0.32);
   box-shadow: var(--shadow-soft);
 }
 
 .vibe-card.active {
-  border-color: rgba(236, 122, 46, 0.55);
-  background: rgba(236, 122, 46, 0.08);
+  border-color: rgba(37, 55, 70, 0.55);
+  background: rgba(37, 55, 70, 0.08);
 }
 
 .vibe-card strong {
@@ -1539,11 +1575,11 @@ textarea:focus {
 }
 
 .budget-breakdown-head .left-text {
-  color: #3f563a;
+  color: var(--sage-strong);
 }
 
 .budget-breakdown-head .over-text {
-  color: var(--orange-dark);
+  color: var(--warn);
 }
 
 .budget-bar {
@@ -1671,8 +1707,8 @@ textarea:focus {
 }
 
 .share-btn.primary {
-  background: #CF5F2A;
-  border-color: #CF5F2A;
+  background: var(--primary);
+  border-color: var(--primary);
   color: #fff;
 }
 
@@ -1713,8 +1749,8 @@ textarea:focus {
 }
 
 .space-chip.active {
-  border-color: rgba(236, 122, 46, 0.55);
-  background: rgba(236, 122, 46, 0.1);
+  border-color: rgba(37, 55, 70, 0.55);
+  background: rgba(37, 55, 70, 0.1);
   color: var(--orange-dark);
 }
 
@@ -1749,9 +1785,9 @@ textarea:focus {
 }
 
 .space-continue {
-  border: 1px solid rgba(236, 122, 46, 0.4);
+  border: 1px solid rgba(37, 55, 70, 0.4);
   border-radius: 12px;
-  background: rgba(236, 122, 46, 0.08);
+  background: rgba(37, 55, 70, 0.08);
   color: var(--orange-dark);
   padding: 5px 12px;
   font-size: 0.8rem;
@@ -1818,7 +1854,7 @@ textarea:focus {
 }
 
 .size-card {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.55);
   padding: 11px;
@@ -1842,8 +1878,8 @@ textarea:focus {
 }
 
 .size-card.active {
-  border-color: rgba(236, 122, 46, 0.36);
-  background: rgba(236, 122, 46, 0.12);
+  border-color: rgba(37, 55, 70, 0.36);
+  background: rgba(37, 55, 70, 0.12);
 }
 
 .custom-size-input {
@@ -1888,8 +1924,8 @@ textarea:focus {
 }
 
 .understood-card {
-  border: 1px solid rgba(102, 120, 95, 0.2);
-  background: linear-gradient(160deg, rgba(102, 120, 95, 0.12), rgba(255, 255, 255, 0.64));
+  border: 1px solid rgba(111, 122, 99, 0.2);
+  background: linear-gradient(160deg, rgba(111, 122, 99, 0.12), rgba(255, 255, 255, 0.64));
   border-radius: 30px;
   padding: 20px;
   box-shadow: 0 18px 45px rgba(66, 44, 19, 0.06);
@@ -1904,7 +1940,7 @@ textarea:focus {
 }
 
 .understood-header span {
-  color: #3f563a;
+  color: var(--sage-strong);
   font-weight: 650;
   text-transform: uppercase;
   font-size: 0.78rem;
@@ -1966,8 +2002,8 @@ textarea:focus {
 }
 
 .quick-action-row button {
-  border: 1px solid rgba(236, 122, 46, 0.22);
-  background: rgba(236, 122, 46, 0.09);
+  border: 1px solid rgba(37, 55, 70, 0.22);
+  background: rgba(37, 55, 70, 0.09);
   color: var(--orange-dark);
   border-radius: 12px;
   padding: 9px 12px;
@@ -2010,9 +2046,9 @@ textarea:focus {
 }
 
 .missing-box {
-  border: 1px solid rgba(236, 122, 46, 0.24);
-  background: rgba(236, 122, 46, 0.08);
-  color: var(--orange-dark);
+  border: 1px solid rgba(169, 104, 73, 0.30);
+  background: rgba(169, 104, 73, 0.10);
+  color: var(--warn);
   border-radius: 18px;
   padding: 12px 14px;
   margin: 0 0 14px;
@@ -2020,8 +2056,8 @@ textarea:focus {
 }
 
 .product-row.locked {
-  border-color: rgba(102, 120, 95, 0.32);
-  background: rgba(102, 120, 95, 0.08);
+  border-color: rgba(111, 122, 99, 0.32);
+  background: rgba(111, 122, 99, 0.08);
 }
 
 .product-actions button:disabled {
@@ -2056,9 +2092,9 @@ textarea:focus {
 
 /* Sprint 3: save, share, feedback and clearer product language */
 .planner-notice {
-  border: 1px solid rgba(102, 120, 95, 0.22);
-  background: rgba(102, 120, 95, 0.1);
-  color: #3f563a;
+  border: 1px solid rgba(111, 122, 99, 0.22);
+  background: rgba(111, 122, 99, 0.1);
+  color: var(--sage-strong);
   border-radius: 20px;
   padding: 13px 16px;
   margin: -18px 0 20px;
@@ -2068,9 +2104,9 @@ textarea:focus {
 
 /* Sprint 10.88: actionable Plus upsell shown at the Free saved-plan cap (replaces the passive notice). */
 .planner-upsell {
-  border: 1px solid var(--orange);
-  background: rgba(214, 173, 106, 0.12);
-  color: #6b4f23;
+  border: 1px solid rgba(169, 104, 73, 0.45);
+  background: rgba(169, 104, 73, 0.10);
+  color: var(--warn);
   border-radius: 20px;
   padding: 14px 16px;
   margin: -18px 0 20px;
@@ -2113,7 +2149,7 @@ textarea:focus {
 .planner-upsell-dismiss {
   border: none;
   background: none;
-  color: #6b4f23;
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.86rem;
   padding: 8px 6px;
@@ -2128,9 +2164,9 @@ textarea:focus {
 
 /* Sprint 10.13 (#3): "catalog still being populated" note for non-HR markets. */
 .planner-notice.market-note {
-  border-color: rgba(176, 137, 74, 0.28);
-  background: rgba(214, 173, 106, 0.14);
-  color: #6b4f23;
+  border-color: rgba(169, 104, 73, 0.28);
+  background: rgba(169, 104, 73, 0.10);
+  color: var(--warn);
 }
 
 /* Sprint 10.166: freshness note on an opened saved plan — prices are a snapshot from save time; offer a refresh. */
@@ -2143,8 +2179,8 @@ textarea:focus {
 }
 .saved-freshness-refresh {
   flex: none;
-  border: 1px solid var(--clay);
-  color: var(--clay);
+  border: 1px solid var(--primary);
+  color: var(--primary);
   background: transparent;
   border-radius: 999px;
   padding: 6px 14px;
@@ -2152,12 +2188,12 @@ textarea:focus {
   font-size: 0.85rem;
   cursor: pointer;
 }
-.saved-freshness-refresh:hover { background: var(--clay); color: #fff; }
+.saved-freshness-refresh:hover { background: var(--primary); color: #fff; }
 .saved-freshness-refresh:disabled { opacity: 0.5; cursor: default; }
 
 /* Sprint 10.13 (#2): per-product review aggregate + link out to the store. */
 .review-chip {
-  color: #6b4f23;
+  color: var(--accent-strong);
   font-weight: 620;
 }
 
@@ -2172,14 +2208,14 @@ textarea:focus {
 }
 
 .meta-line .sale-chip {
-  background: rgba(102, 120, 95, 0.18);
-  color: #3f563a;
+  background: rgba(111, 122, 99, 0.18);
+  color: var(--sage-strong);
   font-weight: 620;
 }
 
 .meta-line .sale-saving {
-  background: rgba(102, 120, 95, 0.1);
-  color: #33502d;
+  background: rgba(111, 122, 99, 0.1);
+  color: var(--sage-strong);
   font-weight: 620;
 }
 
@@ -2202,7 +2238,7 @@ textarea:focus {
   padding: 16px 18px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-md);
-  background: rgba(95, 114, 87, 0.07);
+  background: rgba(111, 122, 99, 0.07);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -2259,7 +2295,7 @@ textarea:focus {
 }
 
 .price-watch-submit {
-  background: var(--orange, #ec7a2e);
+  background: var(--primary);
   color: #fff;
   border: none;
 }
@@ -2271,7 +2307,7 @@ textarea:focus {
 }
 
 .price-watch-status.ok {
-  color: #33502d;
+  color: var(--sage-strong);
 }
 
 .price-watch-status.error {
@@ -2319,9 +2355,9 @@ textarea:focus {
 }
 
 .feedback-buttons button.active {
-  border-color: rgba(102, 120, 95, 0.32);
-  background: rgba(102, 120, 95, 0.12);
-  color: #3f563a;
+  border-color: rgba(111, 122, 99, 0.32);
+  background: rgba(111, 122, 99, 0.12);
+  color: var(--sage-strong);
 }
 
 /* Sprint 10.54: one-click "fix it" CTA shown after the user rates the plan (e.g. too expensive -> cheaper). */
@@ -2336,10 +2372,10 @@ textarea:focus {
 }
 
 .feedback-action-button {
-  border: 1px solid rgba(95, 114, 87, 0.34);
+  border: 1px solid rgba(111, 122, 99, 0.34);
   border-radius: 12px;
-  background: rgba(95, 114, 87, 0.12);
-  color: #3f563a;
+  background: rgba(111, 122, 99, 0.12);
+  color: var(--sage-strong);
   padding: 8px 16px;
   font-weight: 640;
   font-size: 0.86rem;
@@ -2348,7 +2384,7 @@ textarea:focus {
 
 .feedback-action-button:hover {
   transform: translateY(-1px);
-  background: rgba(95, 114, 87, 0.18);
+  background: rgba(111, 122, 99, 0.18);
 }
 
 .feedback-thanks {
@@ -2386,7 +2422,7 @@ textarea:focus {
 }
 
 .planner-heading-row {
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .planner-heading-row h2 {
@@ -2444,7 +2480,7 @@ textarea:focus {
   width: fit-content;
   padding: 0;
   background: none;
-  color: var(--orange-dark);
+  color: var(--accent-strong);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -2469,7 +2505,7 @@ textarea:focus {
 .prompt-first-card {
   border: 0;
   border-radius: 0;
-  background: linear-gradient(160deg, rgba(236, 122, 46, 0.13), rgba(255, 255, 255, 0.54));
+  background: linear-gradient(160deg, rgba(37, 55, 70, 0.13), rgba(255, 255, 255, 0.54));
 }
 
 .prompt-topline h3 {
@@ -2482,7 +2518,7 @@ textarea:focus {
 }
 
 .ai-chip {
-  background: var(--ink);
+  background: var(--primary);
   color: white;
 }
 
@@ -2510,7 +2546,7 @@ textarea {
 .product-actions a:focus-visible,
 .share-button:focus-visible,
 .plan-button:focus-visible {
-  outline: 4px solid rgba(236, 122, 46, 0.18);
+  outline: 4px solid rgba(37, 55, 70, 0.18);
   outline-offset: 2px;
 }
 
@@ -2541,7 +2577,7 @@ textarea {
 }
 
 .preset {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.62);
   padding: 10px 9px;
@@ -2552,8 +2588,8 @@ textarea {
 
 .preset.active {
   color: var(--orange-dark);
-  background: rgba(236, 122, 46, 0.12);
-  border-color: rgba(236, 122, 46, 0.32);
+  background: rgba(37, 55, 70, 0.12);
+  border-color: rgba(37, 55, 70, 0.32);
 }
 
 .friendly-rooms.choice-grid.rooms {
@@ -2587,7 +2623,7 @@ textarea {
 }
 
 .shop-mode {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.58);
   padding: 15px;
@@ -2613,8 +2649,8 @@ textarea {
 }
 
 .shop-mode.active {
-  border-color: rgba(236, 122, 46, 0.34);
-  background: rgba(236, 122, 46, 0.11);
+  border-color: rgba(37, 55, 70, 0.34);
+  background: rgba(37, 55, 70, 0.11);
 }
 
 .friendly-pills .pill {
@@ -2707,7 +2743,7 @@ textarea {
   margin-top: 8px;
   padding: 14px;
   border-radius: 18px;
-  background: rgba(236, 122, 46, 0.08);
+  background: rgba(37, 55, 70, 0.08);
   color: var(--ink);
 }
 
@@ -2722,6 +2758,40 @@ textarea {
   line-height: 1.5;
 }
 
+/* Empty-state preview chips: split the localized "products · prices · shopping list" string into three
+   small chips so the placeholder previews what the plan will contain — helpful, not a blank block. */
+.empty-preview-chips {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.empty-preview-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.empty-preview-chip::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
 .plan-total-card {
   display: grid;
   grid-template-columns: 0.8fr 0.8fr 1.3fr;
@@ -2730,7 +2800,7 @@ textarea {
 }
 
 .plan-total-card div {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   padding: 13px;
   background: rgba(255, 255, 255, 0.56);
@@ -2796,9 +2866,9 @@ textarea {
 }
 
 .feedback-buttons button.active {
-  color: #3f563a;
-  background: rgba(95, 114, 87, 0.12);
-  border-color: rgba(95, 114, 87, 0.34);
+  color: var(--sage-strong);
+  background: rgba(111, 122, 99, 0.12);
+  border-color: rgba(111, 122, 99, 0.34);
   font-weight: 600;
 }
 
@@ -2889,7 +2959,7 @@ textarea {
 }
 
 .plan-choice-card {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.7);
   color: var(--ink);
@@ -2918,19 +2988,19 @@ textarea {
 }
 
 .plan-choice-card.active {
-  border-color: rgba(236, 122, 46, 0.42);
-  background: rgba(236, 122, 46, 0.12);
-  box-shadow: 0 16px 35px rgba(236, 122, 46, 0.12);
+  border-color: rgba(37, 55, 70, 0.42);
+  background: rgba(37, 55, 70, 0.12);
+  box-shadow: 0 16px 35px rgba(37, 55, 70, 0.12);
 }
 
 .focused-plan-card {
-  border: 1px solid rgba(236, 122, 46, 0.16);
+  border: 1px solid rgba(37, 55, 70, 0.16);
 }
 
 .plan-summary-box {
-  border: 1px solid rgba(102, 120, 95, 0.18);
+  border: 1px solid rgba(111, 122, 99, 0.18);
   border-radius: 24px;
-  background: rgba(102, 120, 95, 0.09);
+  background: rgba(111, 122, 99, 0.09);
   padding: 16px;
   margin-top: 16px;
   display: grid;
@@ -2960,7 +3030,7 @@ textarea {
 }
 
 .plan-summary-box small {
-  color: #3f563a;
+  color: var(--sage-strong);
   line-height: 1.5;
   font-weight: 620;
 }
@@ -2973,7 +3043,7 @@ textarea {
 }
 
 .plan-explainer-grid div {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.5);
   padding: 14px;
@@ -3005,9 +3075,9 @@ textarea {
 
 .improved-missing-box button {
   width: fit-content;
-  border: 1px solid rgba(236, 122, 46, 0.28);
+  border: 1px solid rgba(37, 55, 70, 0.28);
   border-radius: 12px;
-  background: rgba(236, 122, 46, 0.1);
+  background: rgba(37, 55, 70, 0.1);
   color: var(--orange-dark);
   padding: 9px 12px;
   cursor: pointer;
@@ -3045,7 +3115,7 @@ textarea {
 }
 
 .level-card {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.58);
   padding: 12px;
@@ -3072,13 +3142,13 @@ textarea {
 }
 
 .level-card.active {
-  border-color: rgba(236, 122, 46, 0.36);
-  background: rgba(236, 122, 46, 0.12);
-  box-shadow: 0 12px 28px rgba(236, 122, 46, 0.1);
+  border-color: rgba(37, 55, 70, 0.36);
+  background: rgba(37, 55, 70, 0.12);
+  box-shadow: 0 12px 28px rgba(37, 55, 70, 0.1);
 }
 
 .shopping-steps-card {
-  border: 1px solid rgba(236, 122, 46, 0.16);
+  border: 1px solid rgba(37, 55, 70, 0.16);
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.58);
   padding: 16px;
@@ -3110,7 +3180,7 @@ textarea {
   gap: 12px;
   align-items: start;
   padding: 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.58);
 }
@@ -3121,7 +3191,7 @@ textarea {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(236, 122, 46, 0.12);
+  background: rgba(37, 55, 70, 0.12);
   color: var(--orange-dark);
   font-weight: 650;
 }
@@ -3156,13 +3226,13 @@ textarea {
 }
 
 .priority-chip.buy-first {
-  background: rgba(207, 95, 42, 0.13);
+  background: rgba(37, 55, 70, 0.13);
   color: var(--orange-dark);
 }
 
 .priority-chip.add-comfort {
-  background: rgba(102, 120, 95, 0.13);
-  color: #3f563a;
+  background: var(--sage-soft);
+  color: var(--sage-strong);
 }
 
 .priority-chip.later {
@@ -3194,9 +3264,9 @@ textarea {
 
 /* Sprint 6.4: budget trade-offs and friendlier replacement choices */
 .advisor-card {
-  border: 1px solid rgba(236, 122, 46, 0.18);
+  border: 1px solid rgba(37, 55, 70, 0.18);
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(236, 122, 46, 0.12), rgba(255, 255, 255, 0.68));
+  background: linear-gradient(135deg, rgba(37, 55, 70, 0.12), rgba(255, 255, 255, 0.68));
   padding: 16px;
   margin-top: 12px;
   display: grid;
@@ -3224,7 +3294,7 @@ textarea {
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(31, 29, 26, 0.08);
   padding: 11px 12px;
-  color: #3f563a;
+  color: var(--sage-strong);
   line-height: 1.45;
 }
 
@@ -3236,20 +3306,20 @@ textarea {
 }
 
 .tradeoff-card {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.56);
   padding: 15px;
 }
 
 .tradeoff-card.save {
-  border-color: rgba(102, 120, 95, 0.2);
-  background: rgba(102, 120, 95, 0.08);
+  border-color: rgba(111, 122, 99, 0.2);
+  background: rgba(111, 122, 99, 0.08);
 }
 
 .tradeoff-card.upgrade {
-  border-color: rgba(236, 122, 46, 0.18);
-  background: rgba(236, 122, 46, 0.08);
+  border-color: rgba(37, 55, 70, 0.18);
+  background: rgba(37, 55, 70, 0.08);
 }
 
 .tradeoff-card ul {
@@ -3273,14 +3343,14 @@ textarea {
 }
 
 .product-actions-grid button:nth-of-type(2) {
-  border-color: rgba(102, 120, 95, 0.24);
-  background: rgba(102, 120, 95, 0.1);
-  color: #3f563a;
+  border-color: rgba(111, 122, 99, 0.24);
+  background: rgba(111, 122, 99, 0.1);
+  color: var(--sage-strong);
 }
 
 .product-actions-grid button:nth-of-type(3) {
-  border-color: rgba(236, 122, 46, 0.28);
-  background: rgba(236, 122, 46, 0.1);
+  border-color: rgba(37, 55, 70, 0.28);
+  background: rgba(37, 55, 70, 0.1);
   color: var(--orange-dark);
 }
 
@@ -3305,11 +3375,9 @@ textarea {
 }
 
 .decision-card {
-  border: 1px solid rgba(236, 122, 46, 0.24);
+  border: 1px solid var(--border);
   border-radius: 30px;
-  background:
-    radial-gradient(circle at top left, rgba(236, 122, 46, 0.16), transparent 34%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 248, 238, 0.82));
+  background: linear-gradient(135deg, var(--surface), #F6EFE4);
   box-shadow: 0 22px 48px rgba(31, 29, 26, 0.08);
   padding: 20px;
   display: grid;
@@ -3326,7 +3394,7 @@ textarea {
 
 .decision-topline span {
   border-radius: 999px;
-  background: rgba(236, 122, 46, 0.14);
+  background: rgba(37, 55, 70, 0.14);
   color: var(--orange-dark);
   font-size: 0.78rem;
   font-weight: 650;
@@ -3451,13 +3519,13 @@ textarea {
 }
 
 .decision-metrics .over-text {
-  color: #b54826;
+  color: var(--warn);
 }
 
 .first-buy-strip {
   border-radius: 22px;
-  border: 1px dashed rgba(102, 120, 95, 0.34);
-  background: rgba(102, 120, 95, 0.1);
+  border: 1px dashed rgba(111, 122, 99, 0.34);
+  background: rgba(111, 122, 99, 0.1);
   padding: 13px 14px;
 }
 
@@ -3509,7 +3577,7 @@ textarea {
 }
 
 .step-product-section {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border-soft);
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.48);
   padding: 12px;
@@ -3811,7 +3879,7 @@ textarea {
 }
 
 .planner-section {
-  padding-top: 46px;
+  padding-top: 28px;
 }
 
 .planner-layout {
@@ -3902,8 +3970,8 @@ textarea {
 }
 
 .saved-plan-card.favorite {
-  border-color: rgba(236, 122, 46, 0.35);
-  background: rgba(236, 122, 46, 0.07);
+  border-color: rgba(37, 55, 70, 0.35);
+  background: rgba(37, 55, 70, 0.07);
 }
 
 .saved-plan-card span,
@@ -4143,7 +4211,7 @@ a.google-signin-button.google-signin-link:hover {
   font-weight: 640;
   font-size: 0.86rem;
   color: var(--ink);
-  background: rgba(102, 120, 95, 0.14);
+  background: rgba(111, 122, 99, 0.14);
   border: 1px solid var(--hairline);
   padding: 8px 14px;
   border-radius: 999px;
@@ -4162,7 +4230,7 @@ a.google-signin-button.google-signin-link:hover {
 }
 
 .account-signin-link:hover {
-  background: rgba(207, 95, 42, 0.06);
+  background: rgba(37, 55, 70, 0.06);
 }
 
 .header-user {
@@ -4395,8 +4463,8 @@ a.google-signin-button.google-signin-link:hover {
   gap: 8px;
   padding: 10px;
   border-radius: 16px;
-  background: rgba(236, 122, 46, 0.06);
-  border: 1px solid rgba(236, 122, 46, 0.16);
+  background: rgba(37, 55, 70, 0.06);
+  border: 1px solid rgba(37, 55, 70, 0.16);
 }
 
 .dislike-reasons span {
@@ -4408,9 +4476,9 @@ a.google-signin-button.google-signin-link:hover {
 }
 
 .existing-assets-note {
-  border: 1px solid rgba(102, 120, 95, 0.22);
+  border: 1px solid rgba(111, 122, 99, 0.22);
   border-radius: 18px;
-  background: rgba(102, 120, 95, 0.09);
+  background: rgba(111, 122, 99, 0.09);
   color: var(--ink);
   padding: 11px 12px;
   line-height: 1.45;
@@ -4430,10 +4498,10 @@ a.google-signin-button.google-signin-link:hover {
 }
 
 .store-advice-strip {
-  border: 1px solid rgba(102, 120, 95, 0.22);
+  border: 1px solid rgba(111, 122, 99, 0.28);
   border-radius: 18px;
-  background: rgba(102, 120, 95, 0.09);
-  color: #3f563a;
+  background: var(--sage-soft);
+  color: var(--sage-strong);
   padding: 11px 12px;
   font-weight: 620;
   line-height: 1.45;
@@ -4442,15 +4510,15 @@ a.google-signin-button.google-signin-link:hover {
 .budget-pressure-strip {
   display: grid;
   gap: 3px;
-  border: 1px solid rgba(236, 122, 46, 0.22);
+  border: 1px solid rgba(169, 104, 73, 0.28);
   border-radius: 18px;
-  background: rgba(236, 122, 46, 0.08);
+  background: rgba(169, 104, 73, 0.09);
   padding: 11px 12px;
   line-height: 1.45;
 }
 
 .budget-pressure-strip strong {
-  color: var(--orange-dark);
+  color: var(--warn);
   font-weight: 650;
 }
 
@@ -4504,16 +4572,16 @@ a.google-signin-button.google-signin-link:hover {
 .partial-plan-note {
   display: grid;
   gap: 3px;
-  border: 1px solid rgba(236, 122, 46, 0.24);
+  border: 1px solid rgba(169, 104, 73, 0.28);
   border-radius: 18px;
-  background: rgba(236, 122, 46, 0.08);
+  background: rgba(169, 104, 73, 0.09);
   padding: 12px 14px;
   margin-bottom: 14px;
   line-height: 1.45;
 }
 
 .partial-plan-note strong {
-  color: var(--orange-dark);
+  color: var(--warn);
   font-weight: 650;
 }
 
@@ -4576,7 +4644,7 @@ a.google-signin-button.google-signin-link:hover {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--clay);
+  background: var(--accent-strong);
   padding: 3px 8px;
   border-radius: 6px;
 }
@@ -4586,7 +4654,7 @@ a.google-signin-button.google-signin-link:hover {
 
 .shopping-list-lead {
   margin: 0;
-  color: #3f563a;
+  color: var(--sage-strong);
   font-weight: 620;
   line-height: 1.45;
 }
@@ -4614,8 +4682,8 @@ a.google-signin-button.google-signin-link:hover {
 }
 
 .favorite-toggle.active {
-  border-color: rgba(236, 122, 46, 0.38);
-  background: rgba(236, 122, 46, 0.12);
+  border-color: rgba(37, 55, 70, 0.38);
+  background: rgba(37, 55, 70, 0.12);
   color: var(--orange-dark);
 }
 
@@ -4796,8 +4864,8 @@ a.google-signin-button.google-signin-link:hover {
 }
 
 .pricing-card.featured {
-  border-color: rgba(236, 122, 46, 0.4);
-  box-shadow: 0 10px 30px rgba(236, 122, 46, 0.12);
+  border-color: rgba(37, 55, 70, 0.4);
+  box-shadow: 0 10px 30px rgba(37, 55, 70, 0.12);
 }
 
 .pricing-card-head {
@@ -5105,18 +5173,18 @@ a.google-signin-button.google-signin-link:hover {
 }
 /* Sprint 10.150: neutral primary confirm (sign-out isn't destructive — no red). Same shape as confirm-delete. */
 .confirm-primary {
-  border: 1px solid var(--ink);
+  border: 1px solid var(--primary);
   border-radius: 12px;
   padding: 10px 20px;
   font-weight: 620;
   cursor: pointer;
-  background: var(--ink);
+  background: var(--primary);
   color: #fff;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .confirm-primary:hover {
-  background: #000;
-  border-color: #000;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .confirm-delete:disabled,
@@ -5206,7 +5274,7 @@ a.google-signin-button.google-signin-link:hover {
   transition: background 0.15s ease, color 0.15s ease;
 }
 .scope-option.active {
-  background: var(--clay);
+  background: var(--primary);
   color: #fff;
 }
 
@@ -5293,12 +5361,12 @@ a.google-signin-button.google-signin-link:hover {
   white-space: nowrap;
 }
 .move-in-status.within {
-  color: var(--sage);
-  background: rgba(95, 114, 87, 0.12);
+  color: var(--sage-strong);
+  background: var(--sage-soft);
 }
 .move-in-status.over {
-  color: var(--orange-dark);
-  background: rgba(207, 95, 42, 0.12);
+  color: var(--warn);
+  background: rgba(169, 104, 73, 0.14);
 }
 
 /* Sprint 10.162: the "budget filling a space" bar — clay fill on a sand track. The header + brand mark share
@@ -5322,7 +5390,7 @@ a.google-signin-button.google-signin-link:hover {
   transition: width 0.45s ease;
 }
 .move-in-fillbar > span.over {
-  background: var(--orange-dark);
+  background: var(--warn);
 }
 
 .move-in-room-cards {
@@ -5551,8 +5619,8 @@ a.move-in-item-link:hover .move-in-item-price {
   transition: border-color 0.12s ease, color 0.12s ease;
 }
 .move-in-action-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: rgba(37, 55, 70, 0.34);
+  color: var(--primary);
 }
 /* Sprint 10.138: "what to buy where" — per-store rollup across the whole apartment. */
 .move-in-by-store {
@@ -5601,10 +5669,10 @@ a.move-in-item-link:hover .move-in-item-price {
 .move-in-budget-low {
   margin: 0 0 14px;
   padding: 12px 16px;
-  border: 1px solid rgba(207, 95, 42, 0.35);
+  border: 1px solid rgba(169, 104, 73, 0.32);
   border-radius: var(--r-md);
-  background: rgba(207, 95, 42, 0.08);
-  color: var(--orange-dark);
+  background: rgba(169, 104, 73, 0.09);
+  color: var(--warn);
   font-size: 0.92rem;
 }
 /* Sprint 10.115: honest "we don't sell that" banner — clear, calm, clearly informational (not AI chatter). */
@@ -5648,7 +5716,7 @@ a.move-in-item-link:hover .move-in-item-price {
   padding: 9px 16px;
   border: none;
   border-radius: var(--r-sm);
-  background: var(--clay);
+  background: var(--primary);
   color: #fff;
   font-weight: 600;
   font-size: 0.9rem;
