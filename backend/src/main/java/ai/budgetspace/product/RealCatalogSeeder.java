@@ -298,7 +298,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // under offers.price.unformatted.minSingle), og:image resolved, deduped vs the existing catalog, and
             // added up to +8 price-diverse rows per (market, category) cell (hard cap 35/cell) so plans gain real
             // breadth without bloat. Deterministic curl, agent-free; nothing fabricated.
-            "/catalog/real-jysk-deepen-10-168.json"
+            "/catalog/real-jysk-deepen-10-168.json",
+            // Sprint 10.168: IKEA cross-market DEEPEN — 850 web-verified products across all 15 IKEA markets.
+            // IKEA category ItemLists expose product URLs but NO price, so for each new URL the product page was
+            // fetched and its JSON-LD price + priceCurrency (currency-matched to the market: EUR/GBP/NOK/SEK/DKK)
+            // + og:image read live; anything without a matching-currency price or product image was dropped.
+            // Curated core categories (sofa/bed/wardrobe/desk/dining/rug/nightstand/dresser/tv/table/storage/chair)
+            // × 15 markets, +6 per (market, category) cell (cap 35). Deterministic curl, agent-free, no fabrication.
+            "/catalog/real-ikea-deepen-10-168.json"
     );
 
     /**
