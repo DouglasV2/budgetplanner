@@ -291,7 +291,14 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // curl, agent-free), deduped vs the existing catalog. Closes the "plan shows a sofa JYSK no longer
             // sells" trust gap: a discontinued product URL 200-bounces to the category listing, so the shopper
             // saw "all couches" instead of the one in the plan. This gives the planner today's real options.
-            "/catalog/real-jysk-hr-sofa-refresh-10-168.json"
+            "/catalog/real-jysk-hr-sofa-refresh-10-168.json",
+            // Sprint 10.168: JYSK cross-market DEEPEN — 1015 web-verified products across all 13 JYSK markets
+            // (AT/DE/DK/FI/FR/HR/IT/NL/NO/PT/SE/SI/SK). Each market's category pages were fetched, their JSON-LD
+            // ItemList read (name + local-currency price + product URL; the newer markets nest the current price
+            // under offers.price.unformatted.minSingle), og:image resolved, deduped vs the existing catalog, and
+            // added up to +8 price-diverse rows per (market, category) cell (hard cap 35/cell) so plans gain real
+            // breadth without bloat. Deterministic curl, agent-free; nothing fabricated.
+            "/catalog/real-jysk-deepen-10-168.json"
     );
 
     /**
