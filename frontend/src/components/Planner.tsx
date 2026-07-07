@@ -459,8 +459,17 @@ export function Planner() {
     }
   }
 
-  async function handleGenerate() {
-    await runGeneration(input);
+  function handleGenerate() {
+    void runGeneration(input);
+    // Sprint 10.169: on a stacked (mobile/tablet ≤980px) layout the results render BELOW the tall form, so after
+    // tapping "Složi plan" the user couldn't see where the plan appeared. Take them straight to the results panel
+    // (which already shows the loading state, then the plan). No-op on the 2-column desktop where results are
+    // always in view. requestAnimationFrame lets the loading state paint before we scroll to it.
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 980px)').matches) {
+      requestAnimationFrame(() => {
+        document.querySelector('.results-shell')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
   }
 
   async function handleReplace(planId: string, productId: string, changeType: ReplacementChoice = 'similar') {

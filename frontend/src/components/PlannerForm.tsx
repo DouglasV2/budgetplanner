@@ -260,6 +260,10 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
   const cityExample = citiesForMarket(market)[0] ?? '';
   const visibleCategoryOptions = visibleCategories(input);
   const alreadyHaveText = input.alreadyHaveCategories.map((category) => categoryLabels[category]).join(", ");
+  // Sprint 10.169: the sticky bar shows a "budget · room" summary next to a compact generate button, so it reads
+  // as a recap of what you're about to build (not a mysterious second CTA). Reuses the already-localised room label.
+  const activeRoom = rooms.find((room) => room.value === input.roomType);
+  const roomLabel = activeRoom ? t(activeRoom.label) : '';
 
   return (
     <form
@@ -633,9 +637,12 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
       </details>
 
       <div className="sticky-generate-bar">
-        <button className="generate-button" type="submit" disabled={isLoading}>
+        <div className="sticky-summary" aria-hidden="true">
+          <strong className="sticky-summary-budget">{formatCurrency(input.budget)}</strong>
+          {roomLabel && <span className="sticky-summary-room">· {roomLabel}</span>}
+        </div>
+        <button className="generate-button sticky-generate-button" type="submit" disabled={isLoading}>
           <span className="generate-button-label"><PlanIcon />{isLoading ? t('planner.generating') : t('planner.generate')}</span>
-          <span className="generate-button-hint">{t('form.budgetBarHint', { amount: formatCurrency(input.budget) })}</span>
         </button>
       </div>
     </form>

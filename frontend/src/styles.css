@@ -2634,10 +2634,37 @@ textarea {
   background: linear-gradient(180deg, rgba(255, 252, 245, 0.82), var(--white));
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--line);
+  /* Sprint 10.169: "budget · room" recap on the left, compact generate button on the right — reads as a summary
+     of what you're about to build, not a second competing CTA. */
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.sticky-generate-bar .generate-button {
-  width: 100%;
+.sticky-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.sticky-summary-budget {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.sticky-summary-room {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sticky-generate-bar .generate-button.sticky-generate-button {
+  width: auto;
+  flex: 0 0 auto;
 }
 
 .results-shell {
