@@ -170,7 +170,7 @@ class RetailerCollectorServiceTest {
         };
         RetailerCollectorService service = service(explodingFetcher, repository);
 
-        for (String retailer : new String[] {"Decathlon", "Pevex", "Lesnina"}) {
+        for (String retailer : new String[] {"Decathlon", "Lesnina"}) {
             CollectorRunSummaryDto summary = service.collect(
                     new CollectorRequestDto(retailer, List.of("https://www." + retailer.toLowerCase() + ".hr/p/x"), defaults, null));
 

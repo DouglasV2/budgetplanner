@@ -243,6 +243,29 @@ const CATEGORY_PATHS: Record<ProductCategory, React.ReactNode> = {
       <path d="M7 7v10M17 7v10" />
       <path d="M7 12h10" />
     </>
+  ),
+  // Sprint 10.169: bathroom fixtures (Pevex HR).
+  toilet: (
+    <>
+      <path d="M8 4h5v5H8z" />
+      <path d="M6 9h9c0 3-1.6 6-4.5 6S6 12 6 9z" />
+      <path d="M9.5 15v3H6.5" />
+    </>
+  ),
+  washbasin: (
+    <>
+      <path d="M4 11h16" />
+      <path d="M5 11c0 3.4 3 5.5 7 5.5s7-2.1 7-5.5" />
+      <path d="M12 5v3M12 5h2.5" />
+    </>
+  ),
+  'bath-shower': (
+    <>
+      <path d="M4 12h16v3a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" />
+      <path d="M7 18l-1 2M17 18l1 2" />
+      <path d="M9 12V7a2 2 0 0 1 2-2" />
+      <circle cx="11" cy="4.6" r="0.7" />
+    </>
   )
 };
 

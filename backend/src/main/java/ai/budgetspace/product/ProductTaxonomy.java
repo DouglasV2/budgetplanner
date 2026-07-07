@@ -163,7 +163,12 @@ public final class ProductTaxonomy {
             "wardrobe",
             "dresser",
             // Sprint 10.117: soft furnishings (curtains, cushions, throws).
-            "textiles"
+            "textiles",
+            // Sprint 10.169: bathroom fixtures / sanitary ware (Pevex HR) — the pieces a real bathroom is built
+            // around, which IKEA/JYSK don't sell. bath-shower covers both bathtubs and shower enclosures.
+            "toilet",
+            "washbasin",
+            "bath-shower"
     );
 
     public static final Set<String> KNOWN_STYLES = Set.of(
@@ -337,6 +342,11 @@ public final class ProductTaxonomy {
         // Sprint 10.117: soft furnishings (curtains, cushions, throws/blankets).
         alias(aliases, "textiles", "textiles", "tekstil", "zavjese", "zavjesa", "jastuci", "jastuk", "ukrasni jastuk",
                 "deke", "deka", "dekica", "pledovi", "pled", "prekrivač", "prekrivac", "curtains", "cushions", "throws", "blanket");
+        // Sprint 10.169: bathroom fixtures (Pevex HR sanitary ware).
+        alias(aliases, "toilet", "toilet", "wc", "wc školjka", "wc skoljka", "školjka", "skoljka", "zahod", "monoblok");
+        alias(aliases, "washbasin", "washbasin", "umivaonik", "lavabo", "sink", "basin");
+        alias(aliases, "bath-shower", "bath-shower", "bath shower", "kada", "bathtub", "tuš", "tus", "tuš kabina",
+                "tus kabina", "tuš kada", "tuš stijena", "tuš vrata", "shower");
         return Map.copyOf(aliases);
     }
 

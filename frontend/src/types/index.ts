@@ -97,7 +97,11 @@ export type ProductCategory =
   | 'nightstand'
   | 'wardrobe'
   | 'dresser'
-  | 'textiles';
+  | 'textiles'
+  // Sprint 10.169: bathroom fixtures (Pevex HR).
+  | 'toilet'
+  | 'washbasin'
+  | 'bath-shower';
 
 export interface Product {
   id: string;

@@ -141,7 +141,7 @@ const CORE_BY_ROOM: Record<RoomType, ProductCategory[]> = {
   kitchen: ['kitchen-cart'],
   'dining-room': ['dining-table', 'dining-chair'],
   hallway: ['storage'],
-  bathroom: ['storage'],
+  bathroom: ['toilet', 'washbasin', 'bath-shower'],
   studio: ['bed', 'mattress', 'sofa']
 };
 
@@ -167,7 +167,12 @@ const FALLBACK_IMAGES: Record<ProductCategory, string> = {
   wardrobe: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
   dresser: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
   // Soft furnishings — reuse the rug placeholder (textiles are imageVerified, so this fallback rarely shows).
-  textiles: 'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=240&q=70'
+  textiles: 'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=240&q=70',
+  // Sprint 10.169: bathroom fixtures — reuse a neutral placeholder (Pevex fixtures are imageVerified, so this
+  // fallback rarely shows).
+  toilet: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
+  washbasin: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
+  'bath-shower': 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70'
 };
 
 function priorityForItem(item: PlanItem, roomType: RoomType): ShoppingPriority {

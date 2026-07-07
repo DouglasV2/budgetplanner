@@ -68,7 +68,11 @@ public final class CatalogSourcePolicy {
         map.put("JYSK", SourcingStatus.DIRECT_VERIFIED);
         map.put("Emmezeta", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Decathlon", SourcingStatus.OFFICIAL_FEED_REQUIRED);
-        map.put("Pevex", SourcingStatus.OFFICIAL_FEED_REQUIRED);
+        // Sprint 10.169: re-verified 2026-07-07 — pevex.hr product pages ARE reachable with a browser UA and
+        // serve a static price (itemprop="price") + og:image (SSR microdata, despite the Nuxt shell). Flipped from
+        // feed-required to manually-verified so its web-verified bathroom fixtures (WC školjke, umivaonici, kade/
+        // tuševi) are planner-eligible. HR only.
+        map.put("Pevex", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Lesnina", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.16: reachable + hand-verified (link-out; have products in the catalog).
         map.put("Harvey Norman", SourcingStatus.MANUAL_VERIFIED_ONLY);

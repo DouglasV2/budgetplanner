@@ -305,7 +305,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // + og:image read live; anything without a matching-currency price or product image was dropped.
             // Curated core categories (sofa/bed/wardrobe/desk/dining/rug/nightstand/dresser/tv/table/storage/chair)
             // × 15 markets, +6 per (market, category) cell (cap 35). Deterministic curl, agent-free, no fabrication.
-            "/catalog/real-ikea-deepen-10-168.json"
+            "/catalog/real-ikea-deepen-10-168.json",
+            // Sprint 10.169: bathroom FIXTURES from Pevex HR (sanitary ware IKEA/JYSK don't sell) — 35 web-verified
+            // WC školjke, umivaonici and kade/tuševi (name + itemprop=price EUR + og:image read live off pevex.hr).
+            // New categories toilet/washbasin/bath-shower; HR only (Pevex is Croatia-only). Pevex flipped to
+            // MANUAL_VERIFIED_ONLY in CatalogSourcePolicy so these are planner-eligible.
+            "/catalog/real-pevex-hr-bathroom-10-169.json"
     );
 
     /**

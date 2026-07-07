@@ -39,7 +39,7 @@ export const retailers: Retailer[] = ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Deca
 // products now become selectable in their markets.
 export const retailersByMarket: Record<string, Retailer[]> = {
   // Sprint 10.48: retail re-sweep added one or more verified retailers to most markets.
-  HR: ['IKEA', 'JYSK', 'Emmezeta', 'Harvey Norman', 'Namjestaj.hr', 'Svijetnamještaja'],
+  HR: ['IKEA', 'JYSK', 'Pevex', 'Emmezeta', 'Harvey Norman', 'Namjestaj.hr', 'Svijetnamještaja'],
   SI: ['IKEA', 'JYSK', 'Harvey Norman', 'Svetpohištva'],
   AT: ['IKEA', 'JYSK', 'Interio'],
   DE: ['IKEA', 'JYSK', 'Otto', 'Segmüller', 'Poco'],
@@ -84,7 +84,10 @@ export const categoryLabels: Record<ProductCategory, string> = localisedLabels<P
   nightstand: 'cat.nightstand',
   wardrobe: 'cat.wardrobe',
   dresser: 'cat.dresser',
-  textiles: 'cat.textiles'
+  textiles: 'cat.textiles',
+  toilet: 'cat.toilet',
+  washbasin: 'cat.washbasin',
+  'bath-shower': 'cat.bath-shower'
 });
 
 export const roomLabels: Record<RoomType, string> = localisedLabels<RoomType>({

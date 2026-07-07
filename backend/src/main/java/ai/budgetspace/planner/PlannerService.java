@@ -46,7 +46,9 @@ public class PlannerService {
             Map.entry("kitchen", List.of("kitchen-cart", "kitchen-storage", "lighting", "storage", "decor")),
             Map.entry("dining-room", List.of("dining-table", "dining-chair", "lighting", "rug", "storage", "decor")),
             Map.entry("hallway", List.of("storage", "lighting", "rug", "decor")),
-            Map.entry("bathroom", List.of("storage", "lighting", "decor")),
+            // Sprint 10.169: bathroom fixtures first (toilet + washbasin + a bath/shower are what a bathroom is
+            // built around; Pevex HR), then the IKEA/JYSK cabinet/mirror/lighting/decor around them.
+            Map.entry("bathroom", List.of("toilet", "washbasin", "bath-shower", "storage", "lighting", "decor")),
             // Sprint 10.121: studio/one-room flat = living + bedroom combined (you sleep AND live here), so the
             // flow carries the essentials of both, sleeping pieces first. Products come from the living-room AND
             // bedroom catalog pools (see ROOM_CATALOG_TAGS / matchesRoom).
@@ -63,7 +65,7 @@ public class PlannerService {
             Map.entry("kitchen", Set.of("kitchen-cart")),
             Map.entry("dining-room", Set.of("dining-table", "dining-chair")),
             Map.entry("hallway", Set.of("storage")),
-            Map.entry("bathroom", Set.of("storage")),
+            Map.entry("bathroom", Set.of("toilet", "washbasin", "bath-shower")),
             Map.entry("studio", Set.of("bed", "mattress", "sofa"))
     );
 
@@ -77,7 +79,7 @@ public class PlannerService {
             Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
             Map.entry("hallway", Set.of("lighting", "rug")),
-            Map.entry("bathroom", Set.of("lighting")),
+            Map.entry("bathroom", Set.of("storage", "lighting")),
             Map.entry("studio", Set.of("dining-table", "wardrobe", "table", "storage", "lighting", "rug", "textiles"))
     );
 

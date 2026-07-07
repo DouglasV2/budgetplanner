@@ -86,7 +86,10 @@ const categoryOrder: ProductCategory[] = [
   'chair',
   'bed',
   'mattress',
-  'gym-equipment'
+  'gym-equipment',
+  'toilet',
+  'washbasin',
+  'bath-shower'
 ];
 
 const categoryOrderByRoom: Record<RoomType, ProductCategory[]> = {
@@ -97,7 +100,7 @@ const categoryOrderByRoom: Record<RoomType, ProductCategory[]> = {
   kitchen: ['kitchen-cart', 'kitchen-storage', 'lighting', 'storage', 'decor'],
   'dining-room': ['dining-table', 'dining-chair', 'lighting', 'rug', 'storage', 'decor'],
   hallway: ['storage', 'lighting', 'rug', 'decor'],
-  bathroom: ['storage', 'lighting', 'decor'],
+  bathroom: ['toilet', 'washbasin', 'bath-shower', 'storage', 'lighting', 'decor'],
   studio: ['bed', 'mattress', 'sofa', 'dining-table', 'wardrobe', 'table', 'storage', 'lighting', 'tv-unit', 'rug', 'nightstand', 'textiles', 'decor']
 };
 

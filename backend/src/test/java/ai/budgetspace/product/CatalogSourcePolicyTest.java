@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Sprint 10.14 — the sourcing policy. Proves the architectural rule in code:
  * <ul>
- *   <li>Decathlon / Pevex / Lesnina are OFFICIAL_FEED_REQUIRED (never scraped),</li>
+ *   <li>Decathlon / Lesnina are OFFICIAL_FEED_REQUIRED (never scraped),</li>
  *   <li>IKEA / JYSK are DIRECT_VERIFIED, Emmezeta is MANUAL_VERIFIED_ONLY,</li>
  *   <li>the production/verified-catalog gate excludes NEEDS_REVIEW, STALE and sample products, and</li>
  *   <li>the new explicit import-source provenance values are accepted.</li>
@@ -20,7 +20,7 @@ class CatalogSourcePolicyTest {
 
     @Test
     void feedRequiredRetailersAreBlockedFromDirectFetch() {
-        for (String retailer : new String[] {"Decathlon", "Pevex", "Lesnina"}) {
+        for (String retailer : new String[] {"Decathlon", "Lesnina"}) {
             assertThat(CatalogSourcePolicy.statusFor(retailer))
                     .as("%s status", retailer)
                     .isEqualTo(CatalogSourcePolicy.SourcingStatus.OFFICIAL_FEED_REQUIRED);
@@ -28,10 +28,11 @@ class CatalogSourcePolicyTest {
             assertThat(CatalogSourcePolicy.isDirectFetchAllowed(retailer)).as("%s direct fetch", retailer).isFalse();
             assertThat(CatalogSourcePolicy.reasonFor(retailer)).contains("403");
         }
-        // The original three are always feed-required; sprint 10.16 added more blocked retailers.
+        // Decathlon + Lesnina stay feed-required; sprint 10.16 added more blocked retailers. Sprint 10.169: Pevex
+        // flipped to MANUAL_VERIFIED_ONLY (its product pages now serve a static price + og:image with a browser UA).
         assertThat(CatalogSourcePolicy.feedRequiredRetailers())
-                .contains("Decathlon", "Lesnina", "Pevex")
-                .doesNotContain("IKEA", "JYSK", "Emmezeta", "Harvey Norman", "Otto");
+                .contains("Decathlon", "Lesnina")
+                .doesNotContain("IKEA", "JYSK", "Emmezeta", "Harvey Norman", "Otto", "Pevex");
         // Sprint 10.45: Finland's Sotka renders prices client-side (JS-only) → feed-required, so FI has no
         // non-IKEA/JYSK catalog. (JS-only, not a 403, so it is asserted apart from the 403-reason loop above.)
         assertThat(CatalogSourcePolicy.statusFor("Sotka"))
@@ -49,6 +50,9 @@ class CatalogSourcePolicyTest {
                 .isEqualTo(CatalogSourcePolicy.SourcingStatus.MANUAL_VERIFIED_ONLY);
         assertThat(CatalogSourcePolicy.isFeedRequired("Emmezeta")).isFalse();
         assertThat(CatalogSourcePolicy.isDirectFetchAllowed("Emmezeta")).isFalse();
+        // Sprint 10.169: Pevex (HR) re-verified 2026-07-07 — product pages serve a static price + og:image.
+        assertThat(CatalogSourcePolicy.statusFor("Pevex")).isEqualTo(CatalogSourcePolicy.SourcingStatus.MANUAL_VERIFIED_ONLY);
+        assertThat(CatalogSourcePolicy.isFeedRequired("Pevex")).isFalse();
         // Sprint 10.45: depth — Moviflor (PT) + Nábytok (SK) are manually verified (link-out, have products).
         for (String retailer : new String[] {"Moviflor", "Nábytok"}) {
             assertThat(CatalogSourcePolicy.statusFor(retailer)).as("%s status", retailer)
