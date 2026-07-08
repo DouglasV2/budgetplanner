@@ -240,7 +240,9 @@ export function Planner() {
       // Sprint 10.156: ignore a stored draft that STARTS with a blank line — that's the signature of the old
       // quick-action leak ("\n\n<suffix>"); a real typed prompt never begins with an empty line. This also
       // cleans up any draft already poisoned before the fix. Falls back to the localised example.
-      prompt: draft?.prompt && !/^\s*\n/.test(draft.prompt) ? draft.prompt : exampleSeed,
+      // Fresh visitors start with an EMPTY box — the short placeholder guides them, so there's no pre-filled
+      // example text to delete. Returning users still pick up their last edited prompt from the draft.
+      prompt: draft?.prompt && !/^\s*\n/.test(draft.prompt) ? draft.prompt : '',
       budget: draft?.budget && draft.budget > 0 ? draft.budget : initialInput.budget,
       market
     };

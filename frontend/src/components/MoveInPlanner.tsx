@@ -302,10 +302,13 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             <input
               aria-label={t('moveIn.totalBudgetLabel')}
               type="number"
+              inputMode="numeric"
               min="200"
               step="100"
-              value={totalBudget}
-              onChange={(event) => setTotalBudget(Number(event.target.value || 0))}
+              // Sprint: show empty (not a stuck "0") when cleared — value={number} forced a leading zero you
+              // couldn't delete (clear 5000 -> 0 -> "0", then typing gave "07000"). Mirrors the single-room field.
+              value={totalBudget || ''}
+              onChange={(event) => setTotalBudget(Math.min(10_000_000, Math.max(0, Math.floor(Number(event.target.value) || 0))))}
             />
             <span>€</span>
           </label>
