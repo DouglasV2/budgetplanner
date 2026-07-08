@@ -146,6 +146,33 @@ needs `OPENAI_API_KEY`, backend env only).
     watch a product and (when the re-check + a provider are enabled) gets a real price-drop notification (10.34)
     — with zero fabricated discounts. **Remaining before live alerts:** wire a real email provider + flip
     `recheck-enabled` on (the seam + logic are done and tested).
+- **P0 — Similar-item + budget-option discovery (owner-requested 2026-07-08).** Add the core shopping-assistant
+  flow that lets a user take any product/card/result row and ask for **similar items under their budget**, not only
+  a hard-coded €150 cap. UX quick caps: `Under €50`, `Under €100`, `Under €150`, and **Under my remaining budget**.
+  The result should show three decision buckets where possible: **Budget pick**, **Best value**, and **Nicer option**,
+  each with price, retailer, fit/reason, freshness/sale badge, and a direct **Open product** action. Search only the
+  current market's verified catalog first (same room/category, compatible style/size where known, existing in-stock
+  and freshness rules unchanged); optionally include compliant marketplace/feed results only when that feed is active.
+  Never fabricate matches, prices, discounts or product URLs, and never scrape blocked shops. Track `similar_items_open`,
+  `similar_item_click`, `budget_compare_open`, `budget_option_click`, and reuse/extend `product_click` so we can see
+  whether users actually use the flow.
+- **P0 — Deepen kitchen catalog quality before broader expansion.** Kitchen currently feels too thin for a move-in
+  planning app, so strengthen it before spreading effort across every room/market. Add/gap-fill verified products for:
+  cookware, plates, bowls, cutlery, glasses, mugs, food storage, spice/storage jars, trash bins, dish racks, kitchen
+  towels, cutting boards, basic utensils, small appliances where the market feed is reliable, shelves/carts, lighting
+  and simple decor. Work from a market × room × category gap report and prioritise DE/AT first, then HR, then the
+  remaining active EUR markets. Keep the existing no-fabrication rule: real product URL, price, image/source and
+  freshness evidence or no item.
+- **P1 — Add bathroom coverage for remaining markets.** Add bathroom only after the similar-item flow and kitchen
+  depth are on track. Prioritise practical move-in basics: towels, bath mats, shower curtains/screens where relevant,
+  bathroom storage, mirrors, bins, toilet brushes, laundry baskets, hooks, lighting and small decor. Use verified
+  retailers/feeds per market and avoid fake placeholder recommendations.
+- **P1 — Deepen core furniture for DE/AT/HR.** Add more breadth for the furniture items users expect in first-apartment
+  plans: bed, mattress, sofa, dining table, chairs, wardrobe, desk, shelves, nightstand, TV stand, dresser and basic
+  storage. Goal: reduce repeated IKEA-only/basic picks while keeping the plan honest and shoppable.
+- **P2 — Expand furniture depth for the remaining markets.** After the P0/P1 gaps are working, broaden furniture
+  coverage across the other active markets. Do this gap-first, not by bulk-filling: add only verified products that
+  improve actual plan quality and keep market-specific availability, currency and retailer freshness intact.
 - **Full-catalog re-verification** near launch (all 6 markets, ~665 rows) — same freshness rule as step 3.
 - **First real `RetailerFeed`** (Decathlon/Pevex/Lesnina) → unlocks `home-gym` and retires the last sample
   dependency (`ai.budgetspace.feed` seam already exists; never scrape).
