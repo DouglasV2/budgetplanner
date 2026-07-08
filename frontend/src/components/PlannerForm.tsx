@@ -3,6 +3,7 @@ import type { FurnishingLevel, OptimizationGoal, PlannerInput, ProductCategory, 
 import { categoryLabels, formatCurrency, retailersForMarket } from '../utils/planner';
 import { MARKETS, citiesForMarket } from '../markets';
 import { useLocale } from '../LocaleContext';
+import { useAuth } from '../AuthContext';
 import { RoomIcon } from './icons';
 
 interface PlannerFormProps {
@@ -256,6 +257,7 @@ function PlanIcon() {
 
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
   const { t, market, setMarket } = useLocale();
+  const { user, guestContinued } = useAuth();
   const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
   const marketRetailers = retailersForMarket(market);
@@ -268,16 +270,21 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
   const activeRoom = rooms.find((room) => room.value === input.roomType);
   const roomLabel = activeRoom ? t(activeRoom.label) : '';
 
-  // Send the user straight to the prompt box on entry — focus it and scroll it into view. Skips while the
-  // sign-in gate is still up so we don't pop the mobile keyboard behind the modal. Runs once on mount.
+  // Send the user straight to the prompt box the moment they're actually in the app — i.e. once the sign-in
+  // gate is gone (they continued as guest or signed in). Focusing only after the gate clears avoids popping
+  // the mobile keyboard behind the modal, and it fires on the guest/sign-in click too (not just a reload).
+  // Fires once.
+  const appEntered = !!user || guestContinued;
   const promptRef = useRef<HTMLTextAreaElement>(null);
+  const promptFocusedRef = useRef(false);
   useEffect(() => {
-    if (typeof document !== 'undefined' && document.querySelector('.auth-gate')) return;
+    if (!appEntered || promptFocusedRef.current) return;
     const el = promptRef.current;
     if (!el) return;
+    promptFocusedRef.current = true;
     el.focus({ preventScroll: true });
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, []);
+  }, [appEntered]);
 
   return (
     <form
