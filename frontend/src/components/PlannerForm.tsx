@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FurnishingLevel, OptimizationGoal, PlannerInput, ProductCategory, Retailer, RoomType, StyleType } from '../types';
 import { categoryLabels, formatCurrency, retailersForMarket } from '../utils/planner';
 import { MARKETS, citiesForMarket } from '../markets';
@@ -268,6 +268,17 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
   const activeRoom = rooms.find((room) => room.value === input.roomType);
   const roomLabel = activeRoom ? t(activeRoom.label) : '';
 
+  // Send the user straight to the prompt box on entry — focus it and scroll it into view. Skips while the
+  // sign-in gate is still up so we don't pop the mobile keyboard behind the modal. Runs once on mount.
+  const promptRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (typeof document !== 'undefined' && document.querySelector('.auth-gate')) return;
+    const el = promptRef.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
+
   return (
     <form
       className="planner-form friendly-form"
@@ -290,6 +301,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         <label>
           <span>{t('form.promptLabel')}</span>
           <textarea
+            ref={promptRef}
             aria-label={t('form.promptAriaLabel')}
             rows={7}
             value={input.prompt}

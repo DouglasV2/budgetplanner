@@ -165,7 +165,7 @@
   "form.easiestChip": "Lo más fácil",
   "form.promptLabel": "Escribe aquí tu deseo",
   "form.promptAriaLabel": "Descripción del espacio y los deseos",
-  "form.promptPlaceholder": "P. ej. Estoy arreglando el salón, tengo unos 1500 € y me gusta luminoso. Me falta un sofá, una mesa de centro, una alfombra y una lámpara — la TV ya la tengo.",
+  "form.promptPlaceholder": "P. ej. salón, unos 1500 €, me falta un sofá, una alfombra y una lámpara.",
   "form.generateHint": "obtienes una lista de productos y el precio total",
   "form.quickStartKicker": "Inicio rápido",
   "form.quickStartHeading": "¿No sabes qué escribir?",

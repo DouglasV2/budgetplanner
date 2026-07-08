@@ -293,6 +293,9 @@ a {
 
 .market-select {
   display: inline-flex;
+  /* Don't let the tight mobile header shrink the country picker — that clipped the label to nothing
+     (and the flag emoji doesn't paint on Android), so it looked blank. Keep it sized to its content. */
+  flex: none;
 }
 .market-select select,
 .lang-toggle {
@@ -1088,6 +1091,17 @@ textarea {
 textarea:focus {
   border-color: rgba(37, 55, 70, 0.55);
   box-shadow: 0 0 0 4px rgba(37, 55, 70, 0.1);
+}
+
+/* The prompt box is the primary input and is auto-focused on entry — give it a firmer default border and a
+   clear navy focus ring so it visibly reads as "start here". */
+.prompt-first-card textarea {
+  border-color: rgba(37, 55, 70, 0.30);
+  background: var(--surface);
+}
+.prompt-first-card textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 55, 70, 0.15);
 }
 
 .generate-button {

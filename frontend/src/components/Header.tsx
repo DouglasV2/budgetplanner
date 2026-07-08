@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MARKETS } from '../markets';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
@@ -15,6 +15,19 @@ export function Header() {
   const { user, loading, googleEnabled, openSignIn } = useAuth();
   // Sprint 10.150: a custom in-app confirm dialog for sign-out (replaces the native window.confirm).
   const [signingOut, setSigningOut] = useState(false);
+
+  // On a tight mobile header the country <select> gets shrunk, and Android/Windows don't render the flag
+  // emoji — so the selected country looked blank. Show the short ISO code on mobile (always legible text),
+  // keep the full country name on wider screens.
+  const [compactMarket, setCompactMarket] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 680px)').matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 680px)');
+    const onChange = (event: MediaQueryListEvent) => setCompactMarket(event.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   // Sprint 10.150: the header "Prijava" goes STRAIGHT to the Google redirect when sign-in is configured — no
   // dependency on the gate's open/close state (which is what could get stuck after a sign-in/out cycle). Falls
@@ -50,7 +63,7 @@ export function Header() {
               <select value={market} onChange={(event) => setMarket(event.target.value)}>
                 {MARKETS.map((option) => (
                   <option key={option.code} value={option.code}>
-                    {option.flag} {option.label}
+                    {option.flag} {compactMarket ? option.code : option.label}
                   </option>
                 ))}
               </select>

@@ -165,7 +165,7 @@
   "form.easiestChip": "Enklast",
   "form.promptLabel": "Skriv ditt önskemål här",
   "form.promptAriaLabel": "Beskrivning av rummet och önskemål",
-  "form.promptPlaceholder": "T.ex. Jag piffar upp vardagsrummet, har runt 1500 kr och gillar det ljust. Skulle behöva en soffa, ett soffbord, en matta och en lampa — tv har jag redan.",
+  "form.promptPlaceholder": "T.ex. vardagsrum, runt 1500 kr, behöver en soffa, en matta och en lampa.",
   "form.generateHint": "du får en produktlista och totalpriset",
   "form.quickStartKicker": "Snabbstart",
   "form.quickStartHeading": "Osäker på vad du ska skriva?",

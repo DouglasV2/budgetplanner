@@ -165,7 +165,7 @@
   "form.easiestChip": "Le plus facile",
   "form.promptLabel": "Écris ton envie ici",
   "form.promptAriaLabel": "Description de l'espace et des envies",
-  "form.promptPlaceholder": "Ex. Je refais mon salon, j'ai environ 1500 € et j'aime quand c'est lumineux. Il me faudrait un canapé, une table basse, un tapis et une lampe — la TV, je l'ai déjà.",
+  "form.promptPlaceholder": "Ex. salon, environ 1500 €, il me faut un canapé, un tapis et une lampe.",
   "form.generateHint": "tu obtiens une liste de produits et le prix total",
   "form.quickStartKicker": "Démarrage rapide",
   "form.quickStartHeading": "Tu ne sais pas quoi écrire ?",

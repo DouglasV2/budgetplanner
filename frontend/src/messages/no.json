@@ -165,7 +165,7 @@
   "form.easiestChip": "Enklest",
   "form.promptLabel": "Skriv ønsket ditt her",
   "form.promptAriaLabel": "Beskrivelse av rommet og ønsker",
-  "form.promptPlaceholder": "F.eks. Jeg pusser opp stua, har rundt 15 000 kr og liker det lyst. Trenger sofa, salongbord, teppe og lampe — TV har jeg allerede.",
+  "form.promptPlaceholder": "F.eks. stue, rundt 15 000 kr, trenger sofa, teppe og lampe.",
   "form.generateHint": "du får en produktliste og totalprisen",
   "form.quickStartKicker": "Rask start",
   "form.quickStartHeading": "Usikker på hva du skal skrive?",

@@ -165,7 +165,7 @@
   "form.easiestChip": "Più facile",
   "form.promptLabel": "Scrivi qui il tuo desiderio",
   "form.promptAriaLabel": "Descrizione dello spazio e dei desideri",
-  "form.promptPlaceholder": "Es. Sto sistemando il soggiorno, ho circa €1500 e mi piace luminoso. Mi servono un divano, un tavolino, un tappeto e una lampada — la TV ce l'ho già.",
+  "form.promptPlaceholder": "Es. soggiorno, circa 1500 €, mi servono un divano, un tappeto e una lampada.",
   "form.generateHint": "ottieni una lista dei prodotti e il prezzo totale",
   "form.quickStartKicker": "Avvio rapido",
   "form.quickStartHeading": "Non sai cosa scrivere?",

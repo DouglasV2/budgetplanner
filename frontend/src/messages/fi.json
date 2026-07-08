@@ -165,7 +165,7 @@
   "form.easiestChip": "Helpoin",
   "form.promptLabel": "Kirjoita toiveesi tähän",
   "form.promptAriaLabel": "Tilan ja toiveiden kuvaus",
-  "form.promptPlaceholder": "Esim. laitan olohuonetta kuntoon, käytössä on noin 1500 € ja tykkään vaaleasta. Tarvitsen sohvan, sohvapöydän, maton ja lampun — TV löytyy jo.",
+  "form.promptPlaceholder": "Esim. olohuone, noin 1500 €, tarvitsen sohvan, maton ja lampun.",
   "form.generateHint": "saat tuotelistan ja kokonaishinnan",
   "form.quickStartKicker": "Pikastartti",
   "form.quickStartHeading": "Etkö tiedä mitä kirjoittaa?",

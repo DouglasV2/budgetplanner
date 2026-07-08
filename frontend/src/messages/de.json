@@ -170,7 +170,7 @@
   "form.easiestChip": "Am einfachsten",
   "form.promptLabel": "Schreib deinen Wunsch hier rein",
   "form.promptAriaLabel": "Beschreibung des Raums und der Wünsche",
-  "form.promptPlaceholder": "Z. B. Ich mach mein Wohnzimmer schön, hab so €1500 und mag es hell. Ich bräuchte ein Sofa, einen Couchtisch, einen Teppich und eine Lampe — einen Fernseher hab ich schon.",
+  "form.promptPlaceholder": "Z. B. Wohnzimmer, ca. 1500 €, ich brauche ein Sofa, einen Teppich und eine Lampe.",
   "form.generateHint": "du bekommst eine Produktliste und den Gesamtpreis",
   "form.quickStartKicker": "Schnellstart",
   "form.quickStartHeading": "Nicht sicher, was du schreiben sollst?",

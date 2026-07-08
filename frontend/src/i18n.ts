@@ -328,7 +328,7 @@ const DICTIONARY: Record<string, Entry> = {
   'form.easiestChip': { hr: 'Najlakše', en: 'Easiest' },
   'form.promptLabel': { hr: 'Ovdje napiši želju', en: 'Write your wish here' },
   'form.promptAriaLabel': { hr: 'Opis prostora i želja', en: 'Description of the space and wishes' },
-  'form.promptPlaceholder': { hr: 'Npr. Sređujem dnevni boravak, imam oko 1500 € i volim svijetlo. Treba mi kauč, stolić, tepih i lampa — TV već imam.', en: 'E.g. I\'m doing up my living room, I have about €1500 and I like it light. I need a sofa, a coffee table, a rug and a lamp — I already have a TV.' },
+  'form.promptPlaceholder': { hr: 'Npr. dnevni boravak, oko 1500 €, treba mi kauč, tepih i lampa.', en: 'E.g. living room, about €1500, I need a sofa, a rug and a lamp.' },
   'form.generateHint': { hr: 'dobiješ popis proizvoda i ukupnu cijenu', en: 'you get a product list and the total price' },
   'form.quickStartKicker': { hr: 'Brzi početak', en: 'Quick start' },
   'form.quickStartHeading': { hr: 'Ne znaš što napisati?', en: 'Not sure what to write?' },
