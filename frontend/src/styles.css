@@ -1104,6 +1104,21 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(37, 55, 70, 0.15);
 }
 
+/* Required-field validation: warm terracotta nudge (matches the palette's warning role) shown when the user
+   tries to build with an empty prompt, plus a matching border on the box. */
+.prompt-first-card textarea.has-error {
+  border-color: var(--warn);
+  box-shadow: 0 0 0 3px rgba(138, 74, 46, 0.15);
+}
+/* Specific enough to beat the generic `.form-step p { color: var(--muted) }` rule. */
+.prompt-first-card .prompt-required-note {
+  margin: 4px 0 0;
+  color: var(--warn);
+  font-size: 0.86rem;
+  font-weight: 640;
+  line-height: 1.4;
+}
+
 .generate-button {
   border: 0;
   cursor: pointer;

@@ -151,6 +151,12 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
       setError(t('moveIn.needRooms'));
       return;
     }
+    // !(x > 0) catches 0, negatives AND NaN (a cleared number input can leave totalBudget NaN, and NaN <= 0
+    // is false — which would slip past a `<= 0` check).
+    if (!(totalBudget > 0)) {
+      setError(t('moveIn.budgetRequired'));
+      return;
+    }
     setError(null);
     setIsLoading(true);
     setResults(null);
@@ -298,6 +304,9 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
 
         <div className="control-block budget-block">
           <span className="friendly-label">{t('moveIn.totalBudgetLabel')}</span>
+          {/* value={totalBudget || ''} shows empty (not a stuck "0") when cleared — a plain value={number}
+              forced a leading zero you couldn't delete (clear 5000 -> 0 -> "0", then typing gave "07000").
+              Mirrors the single-room budget field. */}
           <label className="budget-input-wrap">
             <input
               aria-label={t('moveIn.totalBudgetLabel')}
@@ -305,8 +314,6 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
               inputMode="numeric"
               min="200"
               step="100"
-              // Sprint: show empty (not a stuck "0") when cleared — value={number} forced a leading zero you
-              // couldn't delete (clear 5000 -> 0 -> "0", then typing gave "07000"). Mirrors the single-room field.
               value={totalBudget || ''}
               onChange={(event) => setTotalBudget(Math.min(10_000_000, Math.max(0, Math.floor(Number(event.target.value) || 0))))}
             />

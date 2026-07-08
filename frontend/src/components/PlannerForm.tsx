@@ -260,6 +260,8 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
   const { user, guestContinued } = useAuth();
   const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+  // Require a described wish before building — no silent fallback to the default budget/room.
+  const [promptError, setPromptError] = useState(false);
   const marketRetailers = retailersForMarket(market);
   const shopMode = selectedShopMode(input, marketRetailers);
   const cityExample = citiesForMarket(market)[0] ?? '';
@@ -295,6 +297,14 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
+        // Don't silently build from the default budget/room when the box is empty — ask the user to describe it.
+        if (!input.prompt.trim()) {
+          setPromptError(true);
+          const el = promptRef.current;
+          if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+          return;
+        }
+        setPromptError(false);
         onGenerate();
       }}
     >
@@ -309,13 +319,19 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           <span>{t('form.promptLabel')}</span>
           <textarea
             ref={promptRef}
+            className={promptError ? 'has-error' : undefined}
             aria-label={t('form.promptAriaLabel')}
+            aria-invalid={promptError || undefined}
             rows={7}
             value={input.prompt}
             placeholder={t('form.promptPlaceholder')}
-            onChange={(event) => onChange({ ...input, prompt: event.target.value })}
+            onChange={(event) => {
+              if (promptError && event.target.value.trim()) setPromptError(false);
+              onChange({ ...input, prompt: event.target.value });
+            }}
           />
         </label>
+        {promptError && <p className="prompt-required-note" role="alert">{t('form.promptRequired')}</p>}
         {/* Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the typed text. */}
         <small className="field-help ai-interaction-notice">{t('planner.aiInteractionNotice')}</small>
         <button className="generate-button" type="submit" disabled={isLoading}>
