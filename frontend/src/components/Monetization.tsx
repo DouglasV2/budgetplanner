@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { recordPlusInterest, startCheckout } from '../api/client';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
+import { trackEvent } from '../utils/analytics';
 
 export function Monetization() {
   const { t } = useLocale();
@@ -17,12 +18,14 @@ export function Monetization() {
   const [error, setError] = useState<string | null>(null);
 
   function joinWaitlist() {
+    trackEvent('waitlist_join', { source: 'pricing', has_email: !!email.trim() });
     recordPlusInterest(email.trim() || undefined, 'pricing');
     setJoined(true);
   }
 
   // Sprint 10.70: Pro is "coming soon" — no checkout yet, just a demand signal.
   function notifyPro() {
+    trackEvent('pro_interest', { source: 'pricing' });
     recordPlusInterest(undefined, 'pro');
     setProNotified(true);
   }
@@ -31,6 +34,7 @@ export function Monetization() {
     setCheckoutBusy(true);
     setError(null);
     try {
+      trackEvent('checkout_start', { source: 'pricing' });
       const { url } = await startCheckout();
       window.location.href = url; // redirect to Stripe's hosted checkout
     } catch {

@@ -12,6 +12,7 @@ import { detectMarketFromText, marketConfig } from '../markets';
 import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
 import { MoveInPlanner } from './MoveInPlanner';
+import { trackEvent } from '../utils/analytics';
 
 const initialInput: PlannerInput = {
   prompt:
@@ -389,6 +390,13 @@ export function Planner() {
     // Sprint 10.102: capture the typed prompt up front (the AI response clears input.prompt) so the kitchen
     // scope note can tell a fitted-kitchen request from a normal one on the instant draft, not only after AI.
     setSubmittedPrompt((effectiveInput.prompt ?? '').trim());
+    trackEvent('plan_generate_start', {
+      room_type: effectiveInput.roomType,
+      budget: effectiveInput.budget,
+      market: effectiveInput.market ?? market,
+      retailer_mode: effectiveInput.retailerMode,
+      selected_retailers: effectiveInput.selectedRetailers.join('+')
+    });
 
     setIsLoading(true);
     setError(null);
@@ -428,6 +436,7 @@ export function Planner() {
         // Sprint 10.167: always show the localised, friendly error — never a raw thrown/backend string (which
         // was hardcoded Croatian and leaked the word "Backend" to users, incl. in English).
         setError(t('planner.errorUnavailable'));
+        trackEvent('plan_generate_error', { room_type: effectiveInput.roomType, budget: effectiveInput.budget, market: effectiveInput.market ?? market });
       }
       // else: AI failed but the deterministic draft is already shown — keep it (graceful).
     } finally {
@@ -458,6 +467,14 @@ export function Planner() {
     if (isFinal) {
       setSubmittedPrompt((effectiveInput.prompt ?? '').trim());
       setGenerationCount((count) => count + 1);
+      trackEvent('plan_generate_success', {
+        room_type: effectiveInput.roomType,
+        budget: effectiveInput.budget,
+        market: response.input.market ?? effectiveInput.market ?? market,
+        plan_count: response.plans.length,
+        item_count: response.plans.reduce((sum, plan) => sum + plan.items.length, 0),
+        partial_plan: !!response.partialPlan
+      });
     }
   }
 
@@ -515,6 +532,12 @@ export function Planner() {
     const url = `${window.location.origin}/plan/${savedPlan.id}`;
     setSaveLimitHit(false); // a save went through → clear any lingering upsell
     setSavedPlans((currentPlans) => [savedPlan, ...currentPlans.filter((currentPlan) => currentPlan.id !== savedPlan.id)]);
+    trackEvent('plan_save', {
+      room_type: input.roomType,
+      budget: input.budget,
+      item_count: plan.items.length,
+      copy_link: copyLink
+    });
 
     if (copyLink) {
       await navigator.clipboard.writeText(url);
@@ -531,6 +554,7 @@ export function Planner() {
   async function startUpgrade() {
     setUpgradeBusy(true);
     try {
+      trackEvent('checkout_start', { source: 'save_limit_upsell' });
       const { url } = await startCheckout();
       window.location.href = url; // Stripe's hosted checkout
     } catch {
@@ -541,6 +565,7 @@ export function Planner() {
 
   // For guests / when billing is off: take them to the pricing section (sign-in for Plus, or the waitlist).
   function goToPricing() {
+    trackEvent('pricing_view_intent', { source: 'save_limit_or_ai_nudge' });
     setSaveLimitHit(false);
     setAiNudgeDismissed(true);
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -572,6 +597,7 @@ export function Planner() {
 
   function handleProductClick(planId: string, product: Product) {
     trackProductClick(planId, product);
+    trackEvent('product_click', { retailer: product.retailer, category: product.category, source: 'plan_card' });
   }
 
   async function handleFeedback(planId: string, feedback: PlanFeedback) {

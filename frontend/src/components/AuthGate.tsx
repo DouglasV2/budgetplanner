@@ -10,6 +10,7 @@ import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
 import { googleStartUrl } from '../api/client';
 import { BrandMark } from './BrandMark';
+import { trackEvent } from '../utils/analytics';
 
 export function AuthGate() {
   const { googleEnabled, continueAsGuest } = useAuth();
@@ -38,7 +39,7 @@ export function AuthGate() {
 
         <div className="auth-gate-actions">
           {googleEnabled ? (
-            <a className="google-signin-button google-signin-link" href={googleStartUrl()}>
+            <a className="google-signin-button google-signin-link" href={googleStartUrl()} onClick={() => trackEvent('auth_google_start')}>
               <span className="g-mark" aria-hidden="true">G</span>
               <span>{t('account.signInGoogle')}</span>
             </a>
@@ -52,7 +53,7 @@ export function AuthGate() {
 
           {error && <p className="auth-gate-error" role="alert">{error}</p>}
 
-          <button type="button" className="auth-gate-guest" onClick={continueAsGuest}>
+          <button type="button" className="auth-gate-guest" onClick={() => { trackEvent('auth_continue_guest'); continueAsGuest(); }}>
             {t('auth.continueGuest')}
           </button>
           <small className="auth-gate-note">{t('auth.guestNote')}</small>
