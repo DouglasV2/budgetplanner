@@ -117,8 +117,15 @@ public class PlannerIntentExtractor {
         // the prompt text. The pre-filled example prompt is a living-room, so a user who picked Bathroom/Bedroom/etc.
         // in "detailed settings" but left the example text was silently overridden back to living-room. On the
         // living-room DEFAULT the prompt may still change the room (natural-language "make it a bedroom").
+        //
+        // Bug 2026-07-10: only honor the structured room when it was DELIBERATELY chosen (roomInferred=false). After
+        // a generate, the frontend writes the INFERRED room back into the form (roomType="bathroom"), so the next
+        // request carries a non-default room that is NOT a fresh UI pick. Without the roomInferred check, typing
+        // "Kupaonica…" then "Spavaća soba…" returned the bathroom plan again (this early return swallowed the new
+        // prompt). When roomInferred=true we fall through and re-derive from the prompt (and if the prompt names no
+        // room, the last-match-wins parsing leaves the carried room untouched anyway).
         String selected = input.roomType();
-        if (selected != null && !selected.isBlank() && !"living-room".equals(selected)) {
+        if (selected != null && !selected.isBlank() && !"living-room".equals(selected) && !input.roomInferred()) {
             return input;
         }
         // Sprint 10.135: the room keywords are MULTILINGUAL so the rule-based fallback (used when the LLM call

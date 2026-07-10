@@ -134,8 +134,14 @@ public class PromptIntelligenceService {
         // Sprint 10.169: an explicit non-default room selection from the UI wins over the room the AI merely
         // INFERRED from the prompt (the pre-filled example is a living-room, so picking Bathroom but leaving the
         // example was overridden to living-room). On the living-room default the AI-detected room still applies.
+        // Bug 2026-07-10: only honor the structured room when it was DELIBERATELY chosen (roomInferred=false). The
+        // frontend writes a generated plan's INFERRED room back into the form, so a following prompt ("Spavaća
+        // soba…") arrived with roomType="bathroom" and the AI's fresh room was discarded — same stale-room bug as
+        // the rule-based path. When roomInferred=true, the AI-detected room wins.
         String selectedRoom = base.roomType();
-        String roomType = (selectedRoom != null && !selectedRoom.isBlank() && !"living-room".equals(selectedRoom))
+        boolean honorSelectedRoom = selectedRoom != null && !selectedRoom.isBlank()
+                && !"living-room".equals(selectedRoom) && !base.roomInferred();
+        String roomType = honorSelectedRoom
                 ? selectedRoom
                 : ProductTaxonomy.normalizeRoom(analysis.roomType()).orElse(selectedRoom);
         String style = analysis.style() != null && KNOWN_STYLES.contains(analysis.style().toLowerCase(Locale.ROOT))

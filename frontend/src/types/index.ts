@@ -212,6 +212,10 @@ export interface PlannerInput {
   materialPreferences?: string[];
   // Sprint 10.13: market/country (e.g. HR, SI, AT, DE) for catalog + currency.
   market?: string;
+  // Bug 2026-07-10: true when roomType was INFERRED (from a prior prompt written back into the form, or the
+  // default), not deliberately chosen. When true the backend lets a new prompt re-derive the room; a false
+  // (explicit picker/template selection) is honored over the prompt. See Planner/PlannerForm for how it's set.
+  roomInferred?: boolean;
 }
 
 // Sprint 10.8: short description of a generated plan from the (rule-based) design assistant.

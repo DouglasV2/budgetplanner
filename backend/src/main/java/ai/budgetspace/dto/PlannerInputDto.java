@@ -28,7 +28,13 @@ public record PlannerInputDto(
         String market,
         // Sprint 10.120: per-category counts the user asked for (e.g. {"dining-chair":6}); the planner
         // multiplies the picked item by this count (price and budget). Empty = one of each (the old behaviour).
-        Map<String, Integer> quantities
+        Map<String, Integer> quantities,
+        // Bug 2026-07-10: true when this roomType was merely INFERRED (from a previous prompt written back into
+        // the form, or the living-room default), NOT deliberately chosen by the user. When true, a new prompt is
+        // allowed to re-derive the room; when false (an explicit UI pick / template / internal caller such as
+        // Move-In) the structured room is honored over the prompt (preserving Sprint 10.169). Defaults to false
+        // so callers that don't send it — and a missing JSON field — keep the "honor the room" behaviour.
+        boolean roomInferred
 ) {
     /**
      * Backwards-compatible constructor for callers created before Sprint 10.7 added colour/material
@@ -85,7 +91,7 @@ public record PlannerInputDto(
         this(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                 optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories,
                 lockedProductIds, preferredRetailers, excludedRetailers, maxStores,
-                colorPreferences, materialPreferences, market, Map.of());
+                colorPreferences, materialPreferences, market, Map.of(), false);
     }
 
     public PlannerInputDto normalized() {
@@ -111,7 +117,8 @@ public record PlannerInputDto(
                 colorPreferences == null ? List.of() : colorPreferences,
                 materialPreferences == null ? List.of() : materialPreferences,
                 blank(market) ? "HR" : market.trim().toUpperCase(java.util.Locale.ROOT),
-                quantities == null ? Map.of() : quantities
+                quantities == null ? Map.of() : quantities,
+                roomInferred
         );
     }
 
@@ -133,6 +140,10 @@ public record PlannerInputDto(
 
     public PlannerInputDto withRoomType(String nextRoomType) {
         return copy().roomType(nextRoomType).build();
+    }
+
+    public PlannerInputDto withRoomInferred(boolean nextRoomInferred) {
+        return copy().roomInferred(nextRoomInferred).build();
     }
 
     public PlannerInputDto withStyle(String nextStyle) {
@@ -206,6 +217,7 @@ public record PlannerInputDto(
         private List<String> materialPreferences;
         private String market;
         private Map<String, Integer> quantities;
+        private boolean roomInferred;
 
         private Builder(PlannerInputDto source) {
             this.prompt = source.prompt();
@@ -228,6 +240,7 @@ public record PlannerInputDto(
             this.materialPreferences = source.materialPreferences();
             this.market = source.market();
             this.quantities = source.quantities();
+            this.roomInferred = source.roomInferred();
         }
 
         private Builder budget(int value) { this.budget = value; return this; }
@@ -248,12 +261,13 @@ public record PlannerInputDto(
         private Builder materialPreferences(List<String> value) { this.materialPreferences = value; return this; }
         private Builder market(String value) { this.market = value; return this; }
         private Builder quantities(Map<String, Integer> value) { this.quantities = value; return this; }
+        private Builder roomInferred(boolean value) { this.roomInferred = value; return this; }
 
         private PlannerInputDto build() {
             return new PlannerInputDto(
                     prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                     optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds,
-                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences, market, quantities
+                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences, market, quantities, roomInferred
             ).normalized();
         }
     }

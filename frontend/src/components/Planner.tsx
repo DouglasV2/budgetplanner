@@ -28,7 +28,10 @@ const initialInput: PlannerInput = {
   furnishingLevel: 'comfort',
   mustHaveCategories: [],
   alreadyHaveCategories: [],
-  lockedProductIds: []
+  lockedProductIds: [],
+  // Bug 2026-07-10: the room starts INFERRED — a fresh visitor drives the room by typing a prompt, not by
+  // picking it. Flipped to false only when the user deliberately taps a room (or a template) in PlannerForm.
+  roomInferred: true
 };
 
 function mostUsedRetailer(plan?: FurnishingPlan): Retailer | undefined {
@@ -458,7 +461,10 @@ export function Planner() {
     // Sprint 10.168: keep the user's typed prompt in the textarea. The AI response returns input.prompt=''
     // (the server analysis is authoritative), but blanking the box loses what the user wrote and they can't
     // review/tweak/re-run their own request. submittedPrompt is captured separately, so nothing depends on this.
-    setInput({ ...response.input, prompt: effectiveInput.prompt, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [] });
+    // Bug 2026-07-10: keep the roomInferred flag from the request we just ran (not response.input, which the AI
+    // path resets). The room we're writing back is the RESOLVED one; preserving the flag means a typed-prompt plan
+    // (roomInferred=true) stays overridable by the next prompt, while an explicit pick (false) stays honored.
+    setInput({ ...response.input, prompt: effectiveInput.prompt, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [], roomInferred: effectiveInput.roomInferred ?? true });
     setPlans(response.plans);
     setAnalysis(response.intentAnalysis ?? null);
     setSecondHand(response.secondHandSuggestions ?? []);

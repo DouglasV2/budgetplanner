@@ -207,6 +207,21 @@ class PlannerIntentExtractorTest {
                 .isEqualTo("bedroom");
     }
 
+    @Test
+    void aRoomMerelyInferredFromAPreviousPromptIsOverriddenByANewPrompt() {
+        // Bug (2026-07-10): after generating a Bathroom plan the frontend writes the INFERRED room back into the
+        // form input, so the next request arrives with roomType="bathroom". A NEW prompt naming a different room
+        // (roomInferred=true) must re-derive it — the user typed "Kupaonica…" then "Spavaća soba…" and got the
+        // bathroom list again. An EXPLICIT pick (roomInferred=false) is still honored (Sprint 10.169 preserved).
+        assertThat(extractor.enrich(baseWithRoom("Spavaća soba za 1500 eura.", "bathroom").withRoomInferred(true)).roomType())
+                .isEqualTo("bedroom");
+        assertThat(extractor.enrich(baseWithRoom("Spavaća soba za 1500 eura.", "bathroom").withRoomInferred(false)).roomType())
+                .isEqualTo("bathroom");
+        // A new prompt that names NO room keeps the inferred room (there is nothing to re-derive to).
+        assertThat(extractor.enrich(baseWithRoom("Napravi jeftiniju verziju.", "bathroom").withRoomInferred(true)).roomType())
+                .isEqualTo("bathroom");
+    }
+
     private PlannerInputDto parse(String prompt) {
         return extractor.enrich(base(prompt));
     }

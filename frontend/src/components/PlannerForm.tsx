@@ -185,7 +185,9 @@ function applyTemplate(input: PlannerInput, template: Partial<PlannerInput>, pro
     ...input,
     ...template,
     prompt,
-    lockedProductIds: []
+    lockedProductIds: [],
+    // Bug 2026-07-10: a starter template deliberately sets its room → honor it over the prompt (roomInferred=false).
+    roomInferred: false
   };
 }
 
@@ -328,7 +330,9 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             placeholder={t('form.promptPlaceholder')}
             onChange={(event) => {
               if (promptError && event.target.value.trim()) setPromptError(false);
-              onChange({ ...input, prompt: event.target.value });
+              // Bug 2026-07-10: typing a prompt makes the room prompt-driven again, so a new "Spavaća soba…"
+              // overrides a room carried over (written back) from the previous generated plan.
+              onChange({ ...input, prompt: event.target.value, roomInferred: true });
             }}
           />
         </label>
@@ -445,7 +449,9 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 type="button"
                 className={input.roomType === room.value ? 'choice active' : 'choice'}
                 key={room.value}
-                onClick={() => onChange({ ...input, roomType: room.value })}
+                // Bug 2026-07-10: an explicit room tap is deliberate (roomInferred=false) → the backend honors it
+                // over the prompt text (Sprint 10.169), unlike a room merely inferred from a previous prompt.
+                onClick={() => onChange({ ...input, roomType: room.value, roomInferred: false })}
               >
                 <span className="choice-icon"><RoomIcon room={room.value} /></span>
                 <strong>{t(room.label)}</strong>
