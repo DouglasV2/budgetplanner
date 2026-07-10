@@ -26,7 +26,8 @@ import {
 } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
 import { useAuth } from '../AuthContext';
-import { watchProduct } from '../api/client';
+import { watchProduct, fetchSimilarItems, type SimilarItemsResult } from '../api/client';
+import { trackEvent } from '../utils/analytics';
 import { marketConfig } from '../markets';
 
 // Sprint 10.102: honest kitchen scope. We plan FREESTANDING kitchen furniture (island/cart, shelves,
@@ -61,6 +62,9 @@ interface PlanResultsProps {
   onQuickAction: (action: QuickPlanAction, plan?: FurnishingPlan) => void;
   onSavePlan: (plan: FurnishingPlan, copyLink: boolean) => Promise<string>;
   onProductClick: (planId: string, product: Product) => void;
+  // Sprint 10.173 (P0): a user opened one of the "similar under budget" alternatives — centralized analytics
+  // (similar_item_click + budget_option_click + product_click) live in Planner, like onProductClick.
+  onSimilarProductOpen: (planId: string, product: Product, bucket: string, cap: number) => void;
   onFeedback: (planId: string, feedback: PlanFeedback) => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
@@ -246,12 +250,6 @@ function localBudgetStatus(t: Translate, plan: FurnishingPlan, input: PlannerInp
   return t('results.budgetFits');
 }
 
-function localStoreAdvice(t: Translate, plan: FurnishingPlan) {
-  return plan.retailersUsed.length <= 1
-    ? t('results.storeAdviceOne')
-    : t('results.storeAdviceMany', { count: plan.retailersUsed.length });
-}
-
 function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   if (!plans.length) return null;
   const preferredId = input.optimizationGoal === 'lowest-price' || input.furnishingLevel === 'basic'
@@ -262,11 +260,7 @@ function preferredPlanId(plans: FurnishingPlan[], input: PlannerInput) {
   return plans.find((plan) => plan.id === preferredId)?.id ?? plans.find((plan) => plan.id === 'value')?.id ?? plans[0].id;
 }
 
-function shortBudgetText(t: Translate, plan: FurnishingPlan, input: PlannerInput) {
-  const difference = input.budget - plan.total;
-  if (difference >= 0) return t('results.budgetRemains', { amount: formatCurrency(difference) });
-  return t('results.budgetOver', { amount: formatCurrency(Math.abs(difference)) });
-}
+// Sprint 10.171: shortBudgetText removed — the report grid's Budžet card shows the remaining amount directly.
 
 
 function productImage(product: Product) {
@@ -715,12 +709,199 @@ function UnderstandingSummary({ input }: { input: PlannerInput }) {
   );
 }
 
+// Sprint 10.171: small line icons for the plan report cards (budget / products / stores / priorities).
+function CardIcon({ name }: { name: 'budget' | 'products' | 'stores' | 'priorities' | 'list' }) {
+  const glyph: Record<string, ReactNode> = {
+    budget: <><rect x="3" y="6" width="18" height="12" rx="2" /><path d="M3 10.5h18" /><circle cx="16.5" cy="14" r="1.1" /></>,
+    products: <><path d="M4.5 8h15l-1 11.5h-13z" /><path d="M9 8a3 3 0 0 1 6 0" /></>,
+    stores: <><path d="M4 4h2l1.8 11h9.4l1.8-8H7" /><circle cx="9.5" cy="19" r="1.3" /><circle cx="16.5" cy="19" r="1.3" /></>,
+    priorities: <path d="M12 3.5l2.5 5.3 5.8.7-4.3 4 1.1 5.7L12 16.4 6.9 19.2 8 13.5 3.7 9.5l5.8-.7z" />,
+    list: <><path d="M9 6h11" /><path d="M9 12h11" /><path d="M9 18h11" /><circle cx="4.5" cy="6" r="1.1" /><circle cx="4.5" cy="12" r="1.1" /><circle cx="4.5" cy="18" r="1.1" /></>,
+  };
+  return (
+    <svg className="report-card-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {glyph[name]}
+    </svg>
+  );
+}
+
 function ResultShell({ children }: { children: ReactNode }) {
   // Sprint 10.168: the separate REZULTAT title-bar was removed — the header now lives inside the plan card's
   // topline (with a "?" for the price caveat), so the card sits higher and there's no redundant mini-card.
   return (
     <div className="results-shell">
       {children}
+    </div>
+  );
+}
+
+// Sprint 10.173 (P0 — similar-item + budget-option discovery): a per-product "browse & open" panel. Given the
+// anchor row and a budget cap, it fetches up to three verified in-catalog alternatives (budget pick / best value
+// / nicer) and shows them as cards the user can open in the store. It NEVER mutates the plan (that's the separate
+// "Change" flow) and never fabricates — a bucket with no product just isn't shown.
+type SimilarBucket = 'budget' | 'value' | 'nicer';
+
+const SIMILAR_BUCKETS: Array<{
+  key: SimilarBucket;
+  field: 'budgetPick' | 'bestValue' | 'nicer';
+  titleKey: string;
+  whyKey: string;
+}> = [
+  { key: 'budget', field: 'budgetPick', titleKey: 'similar.budgetPick', whyKey: 'similar.budgetWhy' },
+  { key: 'value', field: 'bestValue', titleKey: 'similar.bestValue', whyKey: 'similar.valueWhy' },
+  { key: 'nicer', field: 'nicer', titleKey: 'similar.nicer', whyKey: 'similar.nicerWhy' }
+];
+
+// Budget-cap chips per currency. EUR/GBP use the spec's €50/€100/€150; higher-denomination currencies use
+// proportionate round numbers so a NOK/HUF user sees sensible caps instead of a literal "€50". (The 4th chip,
+// "under my remaining budget", is computed from the plan, not this table.)
+const CAP_TIERS_BY_CURRENCY: Record<string, [number, number, number]> = {
+  EUR: [50, 100, 150],
+  GBP: [50, 100, 150],
+  NOK: [500, 1000, 1500],
+  SEK: [500, 1000, 1500],
+  DKK: [350, 750, 1100],
+  CZK: [1200, 2500, 3800],
+  HUF: [20000, 40000, 60000],
+  PLN: [220, 450, 650],
+  RON: [250, 500, 750]
+};
+
+function SimilarItemsPanel({ anchor, input, remainingBudget, onOpenProduct }: {
+  anchor: Product;
+  input: PlannerInput;
+  remainingBudget: number;
+  onOpenProduct: (product: Product, bucket: SimilarBucket, cap: number) => void;
+}) {
+  const { t } = useLocale();
+  const market = input.market;
+  const currency = marketConfig(market).currency;
+  const tiers = CAP_TIERS_BY_CURRENCY[currency] ?? CAP_TIERS_BY_CURRENCY.EUR;
+  // "Under my remaining budget" is the differentiator over the fixed caps; offer it only when there's meaningful
+  // room left (≥ the smallest tier), otherwise the largest fixed tier is the sensible default.
+  const remainingCap = remainingBudget > 0 ? Math.round(remainingBudget) : 0;
+  const showRemaining = remainingCap >= tiers[0];
+  const [cap, setCap] = useState<number>(showRemaining ? remainingCap : tiers[2]);
+  const [data, setData] = useState<SimilarItemsResult | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  // Fire the "panel opened" event once when the panel mounts for a product.
+  useEffect(() => {
+    trackEvent('similar_items_open', { category: anchor.category, retailer: anchor.retailer, market: market ?? 'HR' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // (Re)fetch whenever the cap changes — including the initial default cap on mount.
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
+    fetchSimilarItems(anchor, input, cap)
+      .then((res) => { if (!cancelled) setData(res); })
+      .catch(() => { if (!cancelled) setError(true); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cap, anchor.id]);
+
+  function selectCap(next: number) {
+    if (next === cap) return;
+    trackEvent('budget_compare_open', { cap: next, category: anchor.category });
+    setCap(next);
+  }
+
+  const hasAnyCard = !!(data && (data.budgetPick || data.bestValue || data.nicer));
+
+  return (
+    <div className="similar-panel" role="region" aria-label={t('similar.title')}>
+      <div className="similar-head">
+        <strong>{t('similar.title')}</strong>
+        <small>{t('similar.subtitle', { name: anchor.name })}</small>
+      </div>
+      <div className="similar-caps" role="group" aria-label={t('similar.title')}>
+        {tiers.map((tier) => (
+          <button
+            key={tier}
+            type="button"
+            className={cap === tier ? 'similar-cap active' : 'similar-cap'}
+            aria-pressed={cap === tier}
+            onClick={() => selectCap(tier)}
+          >
+            {t('similar.capUnder', { amount: formatCurrency(tier, market) })}
+          </button>
+        ))}
+        {showRemaining && (
+          <button
+            type="button"
+            className={cap === remainingCap ? 'similar-cap active' : 'similar-cap'}
+            aria-pressed={cap === remainingCap}
+            onClick={() => selectCap(remainingCap)}
+          >
+            {t('similar.capRemaining', { amount: formatCurrency(remainingCap, market) })}
+          </button>
+        )}
+      </div>
+
+      {loading && <p className="similar-status" role="status">{t('similar.loading')}</p>}
+      {error && !loading && <p className="similar-status similar-error" role="status">{t('similar.error')}</p>}
+      {!loading && !error && data && !hasAnyCard && (
+        <p className="similar-status" role="status">{t('similar.empty', { amount: formatCurrency(cap, market) })}</p>
+      )}
+      {!loading && !error && data && hasAnyCard && (
+        <div className="similar-grid">
+          {SIMILAR_BUCKETS.map((bucket) => {
+            const product = data[bucket.field];
+            if (!product) return null;
+            const openUrl = productUrl(product);
+            const badge = marketBadge(product);
+            const sale = saleInfo(product);
+            const illustration = usesFallbackImage(product);
+            return (
+              <article className={`similar-card similar-card-${bucket.key}`} key={bucket.key}>
+                <span className={`similar-tag similar-tag-${bucket.key}`}>{t(bucket.titleKey)}</span>
+                <img
+                  src={productImage(product)}
+                  alt={illustration ? t('results.imageIllustrationAlt', { name: product.name }) : product.name}
+                  loading="lazy"
+                  onError={(event) => handleProductImageError(event, product.category)}
+                />
+                <strong className="similar-name">{product.name}</strong>
+                <div className="similar-price">
+                  <strong>{formatCurrency(product.price, market)}</strong>
+                  {sale && (
+                    <s className="original-price" title={t('results.regularPrice', { price: formatCurrency(sale.original, market) })}>
+                      {formatCurrency(sale.original, market)}
+                    </s>
+                  )}
+                </div>
+                <div className="meta-line similar-meta">
+                  <span>{product.retailer}</span>
+                  {badge && <span title={t('results.marketCatalogTitle', { market: badge })}>{t('results.marketLabel', { market: badge })}</span>}
+                  {sale && <span className="sale-chip">{t('results.onSale')}</span>}
+                  <span>{availabilityLabel(t, product)}</span>
+                </div>
+                <small className="similar-why">{t(bucket.whyKey)}</small>
+                {openUrl ? (
+                  <a
+                    className="similar-open"
+                    href={openUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => onOpenProduct(product, bucket.key, cap)}
+                  >
+                    {t('similar.openProduct')} ↗
+                  </a>
+                ) : (
+                  <button type="button" className="similar-open" disabled title={t('results.productLinkUnavailableTitle')}>
+                    {t('results.productLinkUnavailable')}
+                  </button>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -734,6 +915,7 @@ export function PlanResults({
   onQuickAction,
   onSavePlan,
   onProductClick,
+  onSimilarProductOpen,
   onFeedback,
   isLoading = false,
   error = null,
@@ -763,6 +945,8 @@ export function PlanResults({
   const [watchConsent, setWatchConsent] = useState(false);
   const [watchSubmitting, setWatchSubmitting] = useState(false);
   const [watchStatus, setWatchStatus] = useState<{ id: string; type: 'ok' | 'error'; message: string } | null>(null);
+  // Sprint 10.173 (P0): the row whose "Slično ispod budžeta" discovery panel is open (one at a time).
+  const [similarProductId, setSimilarProductId] = useState<string | null>(null);
 
   // Sprint 10.62: a genuinely new plan SET (fresh generation / opened plan) is identified by its plan ids; an
   // in-place product replace keeps the same ids. We key the per-row disclosure reset on the ids so the
@@ -792,6 +976,7 @@ export function PlanResults({
     setActionsProductId(null);
     setWatchProductId(null);
     setWatchStatus(null);
+    setSimilarProductId(null);
   }, [planIdsKey, selectedPlanId, input.optimizationGoal, input.furnishingLevel]);
 
   function openWatchForm(productId: string) {
@@ -899,24 +1084,61 @@ export function PlanResults({
   }
 
   if (!plans.length) {
+    // Sprint 10.170: a structured BLANK REPORT (not a friendly empty card) — it mirrors the filled report's
+    // skeleton (metrics row → budget-split → category sections) so "empty" reads as a form awaiting the brief
+    // and teaches the output shape. Recombines existing i18n keys only; invents no copy.
     return (
       <ResultShell>
         <div className="plans-column state-panel">
-          <div className="empty-state friendly-empty-state decision-empty-state">
-            <span>{t('results.emptyBadge')}</span>
-            <h3>{t('results.emptyHeading')}</h3>
-            <p>{t('results.emptyText')}</p>
-            <div className="empty-example">
-              <strong>{t('results.emptyGetLabel')}</strong>
-              {/* Preview chips from the existing localized "products · prices · shopping list" string —
-                  gives the placeholder structure without new copy, so it reads helpful, not blank. */}
-              <ul className="empty-preview-chips">
-                {t('results.emptyGetItems').split(' · ').map((chip, i) => (
-                  <li key={i} className="empty-preview-chip">{chip}</li>
-                ))}
-              </ul>
+          {/* Sprint 10.171: a structured BLANK REPORT that mirrors the filled card grid (owner mockup) — card
+              titles + hints stay readable; only the decorative "—" skeletons are aria-hidden. Existing keys only. */}
+          <section className="report-panel empty-report" aria-label={t('results.emptyHeading')}>
+            <div className="report-header">
+              <div className="report-header-titles">
+                <span className="report-kicker">{t('results.emptyBadge')}</span>
+                <h3>{t('results.resultHeading')}</h3>
+                <p>{t('results.overviewHint')}</p>
+              </div>
             </div>
-          </div>
+            <div className="report-grid is-empty">
+              <section className="report-card report-card-budget">
+                <div className="report-card-head"><CardIcon name="budget" /><h4>{t('results.budgetCardTitle')}</h4></div>
+                <div className="report-budget-metrics" aria-hidden="true">
+                  <div><span>{t('results.totalLabel')}</span><strong>—</strong></div>
+                  <div><span>{t('results.remainingLabel')}</span><strong>—</strong></div>
+                  <div><span>{t('results.storesLabel')}</span><strong>—</strong></div>
+                </div>
+                <div className="report-fill is-skeleton" aria-hidden="true"><span /></div>
+              </section>
+              <section className="report-card report-card-products">
+                <div className="report-card-head"><CardIcon name="products" /><h4>{t('results.productsCardTitle')}</h4></div>
+                <div className="report-empty-figure" aria-hidden="true"><span className="skeleton-thumb" /></div>
+                <p className="report-card-hint">{t('results.productsEmptyHint')}</p>
+              </section>
+              <section className="report-card report-card-stores">
+                <div className="report-card-head"><CardIcon name="stores" /><h4>{t('results.storesLabel')}</h4></div>
+                <p className="report-card-hint">{t('results.storesEmptyHint')}</p>
+                <ul className="report-store-list is-skeleton" aria-hidden="true">
+                  <li><span className="skeleton-bar" style={{ width: '70%' }} /><strong>— €</strong></li>
+                  <li><span className="skeleton-bar" style={{ width: '52%' }} /><strong>— €</strong></li>
+                  <li><span className="skeleton-bar" style={{ width: '38%' }} /><strong>— €</strong></li>
+                </ul>
+              </section>
+              <section className="report-card report-card-priorities">
+                <div className="report-card-head"><CardIcon name="priorities" /><h4>{t('results.prioritiesTitle')}</h4></div>
+                <p className="report-card-hint">{t('results.prioritiesEmptyHint')}</p>
+                <ol className="report-priority-list is-skeleton" aria-hidden="true">
+                  <li><span className="report-priority-rank">1</span><span className="skeleton-bar" style={{ width: '60%' }} /><strong>— €</strong></li>
+                  <li><span className="report-priority-rank">2</span><span className="skeleton-bar" style={{ width: '48%' }} /><strong>— €</strong></li>
+                  <li><span className="report-priority-rank">3</span><span className="skeleton-bar" style={{ width: '36%' }} /><strong>— €</strong></li>
+                </ol>
+              </section>
+            </div>
+            <div className="report-shopping-empty">
+              <div className="report-card-head"><CardIcon name="list" /><h4>{t('results.shoppingListTitle')}</h4></div>
+              <p className="report-card-hint">{t('results.shoppingListEmptyHint')}</p>
+            </div>
+          </section>
         </div>
       </ResultShell>
     );
@@ -929,11 +1151,13 @@ export function PlanResults({
     return (
       <ResultShell>
         <div className="plans-column state-panel">
-          <div className="empty-state friendly-empty-state decision-empty-state">
-            <span>{t('results.noResultsBadge')}</span>
-            <h3>{t('results.noResultsHeading')}</h3>
-            <p>{t('planner.partialNone')}</p>
-          </div>
+          <section className="empty-report is-noresults" aria-label={t('results.noResultsHeading')}>
+            <div className="empty-report-head">
+              <span className="report-kicker">{t('results.noResultsBadge')}</span>
+              <h3>{t('results.noResultsHeading')}</h3>
+              <p>{t('planner.partialNone')}</p>
+            </div>
+          </section>
         </div>
       </ResultShell>
     );
@@ -942,13 +1166,20 @@ export function PlanResults({
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans.find((plan) => plan.id === 'value') ?? plans[0];
   const overBudget = selectedPlan.total > input.budget;
   const breakdown = getRetailerBreakdown(selectedPlan);
-  const trip = resolveStoreTrip(selectedPlan);
   const budgetTight = selectedPlan.total >= input.budget * 0.92;
   const summaryBullets = selectedPlan.purchaseSummary ?? [];
   const repairTips = selectedPlan.budgetRepairSuggestions ?? [];
   const showBudgetBlock = repairTips.length > 0 || budgetTight;
   const missing = missingForRoom(selectedPlan, input);
   const steps = purchaseSteps(selectedPlan, input.roomType);
+  // Sprint 10.171: the report grid summarises the plan. "Prioriteti" is the app's own assessment of what
+  // matters first — items ranked by shopping priority (buy-first > add-comfort > later), then by price.
+  const remaining = input.budget - selectedPlan.total;
+  const priorityRank: Record<string, number> = { 'buy-first': 0, 'add-comfort': 1, later: 2 };
+  const rankedItems = [...selectedPlan.items].sort((a, b) => {
+    const d = (priorityRank[priorityForItem(a, input.roomType)] ?? 3) - (priorityRank[priorityForItem(b, input.roomType)] ?? 3);
+    return d !== 0 ? d : b.product.price - a.product.price;
+  });
   // Sprint 10.168: a clean shopping-list PDF (Print → "Save as PDF"). Build print sections from the same
   // purchase steps, and roll the items up by store for the "by store" summary.
   const printSections = steps.map((step) => ({
@@ -1041,19 +1272,60 @@ export function PlanResults({
               <p>{localize ? defaultSummary(t, selectedPlan, input) : (selectedPlan.advisorNote || defaultSummary(t, selectedPlan, input))}</p>
             )}
 
-            <div className="decision-metrics" aria-label={t('results.planKeyInfo')}>
-              <div>
-                <span>{t('results.totalLabel')}</span>
-                <strong>{formatCurrency(selectedPlan.total)}</strong>
-              </div>
-              <div>
-                <span>{overBudget ? t('results.needToReduce') : t('results.safety')}</span>
-                <strong className={overBudget ? 'over-text' : ''}>{shortBudgetText(t, selectedPlan, input)}</strong>
-              </div>
-              <div>
-                <span>{t('results.storesLabel')}</span>
-                <strong>{selectedPlan.retailersUsed.length || 0}</strong>
-              </div>
+            {/* Sprint 10.171: the plan REPORT as a card grid — Budžet / Proizvodi / Trgovine / Prioriteti (owner
+                mockup). Read-only summaries from the existing plan data; the actionable "Popis za kupnju" and all
+                detail panels follow below, unchanged. */}
+            <div className="report-grid" aria-label={t('results.planKeyInfo')}>
+              <section className="report-card report-card-budget">
+                <div className="report-card-head"><CardIcon name="budget" /><h4>{t('results.budgetCardTitle')}</h4></div>
+                <div className="report-budget-metrics">
+                  <div><span>{t('results.totalLabel')}</span><strong>{formatCurrency(selectedPlan.total)}</strong></div>
+                  <div><span>{overBudget ? t('results.needToReduce') : t('results.remainingLabel')}</span><strong className={remaining < 0 ? 'over-text' : ''}>{formatCurrency(Math.abs(remaining))}</strong></div>
+                  <div><span>{t('results.storesLabel')}</span><strong>{selectedPlan.retailersUsed.length || 0}</strong></div>
+                </div>
+                <div className="report-fill" aria-hidden="true"><span className={remaining < 0 ? 'over' : ''} style={{ width: `${Math.min(100, Math.round((selectedPlan.total / Math.max(1, input.budget)) * 100))}%` }} /></div>
+              </section>
+
+              <section className="report-card report-card-products">
+                <div className="report-card-head"><CardIcon name="products" /><h4>{t('results.productsCardTitle')}</h4><span className="report-card-count">{t('results.productsCount', { count: selectedPlan.items.length })}</span></div>
+                <div className="report-thumbs">
+                  {selectedPlan.items.slice(0, 6).map((item) => (
+                    <span className="report-thumb" key={item.product.id}>
+                      <img src={productImage(item.product)} alt="" loading="lazy" onError={(event) => handleProductImageError(event, item.product.category)} />
+                    </span>
+                  ))}
+                  {selectedPlan.items.length > 6 && <span className="report-thumb report-thumb-more">+{selectedPlan.items.length - 6}</span>}
+                </div>
+              </section>
+
+              <section className="report-card report-card-stores">
+                <div className="report-card-head"><CardIcon name="stores" /><h4>{t('results.storesLabel')}</h4></div>
+                {/* Sprint 10.171: use the qty-aware printStores (price × quantity), NOT getRetailerBreakdown,
+                    so a multi-qty item (e.g. 6 chairs) counts fully and the per-store totals sum to the Budžet total. */}
+                <ul className="report-store-list">
+                  {printStores.map((entry) => (
+                    <li key={entry.retailer}>
+                      <span className="report-store-name">{entry.retailer}</span>
+                      <span className="report-store-bar" aria-hidden="true"><span style={{ width: `${Math.round((entry.total / Math.max(1, selectedPlan.total)) * 100)}%` }} /></span>
+                      <strong>{formatCurrency(entry.total)}</strong>
+                    </li>
+                  ))}
+                </ul>
+                <div className="report-store-total"><span>{t('results.storesTotalLabel')}</span><strong>{selectedPlan.retailersUsed.length || 0}</strong></div>
+              </section>
+
+              <section className="report-card report-card-priorities">
+                <div className="report-card-head"><CardIcon name="priorities" /><h4>{t('results.prioritiesTitle')}</h4></div>
+                <ol className="report-priority-list">
+                  {rankedItems.slice(0, 3).map((item, i) => (
+                    <li key={item.product.id}>
+                      <span className="report-priority-rank">{i + 1}</span>
+                      <span className="report-priority-name">{categoryLabels[item.product.category]}</span>
+                      <strong>{formatCurrency(item.product.price * (item.quantity && item.quantity > 1 ? item.quantity : 1))}</strong>
+                    </li>
+                  ))}
+                </ol>
+              </section>
             </div>
 
             {showBudgetBlock && (
@@ -1075,10 +1347,8 @@ export function PlanResults({
               </div>
             )}
 
-            <div className="store-advice-strip">
-              {localize ? localStoreAdvice(t, selectedPlan) : trip.recommendation}
-            </div>
-
+            {/* Sprint 10.172: removed the green store-advice box — the "Trgovine" report card already lists the
+                stores and amounts, so this sentence was redundant. */}
             {!localize && selectedPlan.storeLimitNote && (
               <div className="store-limit-note">{selectedPlan.storeLimitNote}</div>
             )}
@@ -1087,6 +1357,9 @@ export function PlanResults({
               <button className="plan-button primary-copy-button" type="button" onClick={() => copyPlan(selectedPlan)}>
                 {copiedPlanId === selectedPlan.id ? t('results.listCopied') : t('results.copyShoppingList')}
               </button>
+              {/* Sprint 10.170: the three quiet actions group into a right-aligned toolbar (not four stacked
+                  full-width slabs) — primary Copy on the left, Save · Link · PDF as a secondary cluster. */}
+              <div className="toolbar-secondary">
               <button className="share-button soft" type="button" onClick={() => saveCurrentPlan(selectedPlan, false)} disabled={savingPlanId === selectedPlan.id}>
                 {savingPlanId === selectedPlan.id ? t('results.saving') : t('results.saveToMyPlans')}
               </button>
@@ -1110,26 +1383,26 @@ export function PlanResults({
               })}>
                 {t('print.downloadPdf')}
               </button>
+              </div>
             </div>
           </div>
 
           <div className="items-list step-items-list">
+            {/* Sprint 10.171: "Popis za kupnju" — one flat product list. The buy-first / add-comfort / later
+                DIVISION is gone (the Prioriteti card ranks importance now); this lists every product with its
+                actions, keeping open-in-store / replace / keep / watch exactly as before. */}
             <div className="result-section-heading">
-              <span>{t('results.productsInPlan')}</span>
+              <span>{t('results.shoppingListTitle')}</span>
               <p>{t('results.productsInPlanHint')}</p>
             </div>
-            {steps.map((step) => (
-              <section className="step-product-section" key={step.priority}>
-                <div className="step-product-section-title">
-                  <span>{t(step.titleKey)}</span>
-                  <strong>{formatCurrency(step.subtotal)}</strong>
-                </div>
-                {step.items.map((item) => {
+            <section className="step-product-section flat-product-list">
+                {selectedPlan.items.map((item) => {
                   const { product } = item;
                   const locked = lockedProductIds.includes(product.id);
                   const priority = priorityForItem(item, input.roomType);
                   const expanded = expandedProductId === product.id;
                   const actionsOpen = actionsProductId === product.id;
+                  const similarOpen = similarProductId === product.id;
                   const openUrl = productUrl(product);
                   const market = marketBadge(product);
                   const illustration = usesFallbackImage(product);
@@ -1213,6 +1486,10 @@ export function PlanResults({
                           <button type="button" className="more-options-toggle" aria-expanded={actionsOpen} onClick={() => toggleActions(product.id)}>
                             {actionsOpen ? t('results.hideOptions') : t('results.moreOptions')}
                           </button>
+                          {/* Sprint 10.173 (P0): open the "similar under budget" discovery panel for this row. */}
+                          <button type="button" className="similar-toggle" aria-expanded={similarOpen} onClick={() => setSimilarProductId(similarOpen ? null : product.id)}>
+                            {t('similar.action')}
+                          </button>
                         </div>
                         {actionsOpen && (
                           <div className="product-actions product-secondary-actions">
@@ -1272,12 +1549,20 @@ export function PlanResults({
                             {watchStatus.message}
                           </small>
                         )}
+                        {similarOpen && (
+                          <SimilarItemsPanel
+                            key={product.id}
+                            anchor={product}
+                            input={input}
+                            remainingBudget={input.budget - selectedPlan.total}
+                            onOpenProduct={(picked, bucket, cap) => onSimilarProductOpen(selectedPlan.id, picked, bucket, cap)}
+                          />
+                        )}
                       </div>
                     </div>
                   );
                 })}
-              </section>
-            ))}
+            </section>
           </div>
 
           {/* Sprint 10.62: one calm "more" panel collapses the supporting detail (breakdown, shopping-by-store,

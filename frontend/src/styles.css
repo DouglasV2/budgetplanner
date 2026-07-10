@@ -1,6 +1,7 @@
 :root {
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-family: var(--font-sans);
   color: var(--text);
   background: var(--bg);
@@ -13,21 +14,27 @@
      focus. Clay (--accent) is a SMALL brand accent only — the "space" wordmark,
      section labels, the beta tag, tiny decorative lines. Sage marks positive info.
      Overall balance ~70% linen surfaces / ~20% navy / ~10% clay + sage. */
-  --bg: #F3EDE4;
-  --bg-soft: #F8F4EE;
-  --surface: #FFFDF8;
-  --surface-soft: #E9DFD1;
-  --text: #1D1A16;
-  --text-muted: #70685E;
-  --primary: #253746;
-  --primary-hover: #1E2D39;
-  --accent: #A96849;
-  --accent-soft: #EBD2C2;
-  --accent-strong: #8F4E30;         /* readable clay for small label TEXT + white-on-clay fills (AA) */
-  --sage: #6F7A63;
-  --sage-soft: #E3E8DC;
-  --border: #DED4C6;
-  --border-soft: #EAE1D5;           /* softer border for NESTED cards (product rows, metric boxes) */
+  /* Redesign 2026-07-10 ("Fit-Out Desk"): cooler, more restrained warm-stone — off the creamy beige toward
+     a neutral planner surface. Navy stays the ONE action colour; copper is a small accent for labels /
+     dividers / the budget-fill track / the prompt caret; sage only for positive status. */
+  --bg: #E9E4DB;                    /* cooler stone page ground (was creamy #F3EDE4) */
+  --bg-soft: #F1ECE3;
+  --bg-alt: #F1ECE3;                /* left-panel ground so the white prompt console floats above it */
+  --surface: #FAF8F4;               /* cool near-white panel / card surface */
+  --surface-soft: #E7E0D5;
+  --text: #17150F;                  /* near-black */
+  --text-muted: #6B645A;
+  --primary: #22303C;               /* deep navy — the only fill / CTA colour */
+  --primary-hover: #1A2732;
+  --accent: #A5623F;                /* copper — labels, dividers, the budget-fill track, the prompt caret */
+  --accent-soft: #E7D0C0;
+  --accent-strong: #8A4E30;         /* readable copper for small label TEXT + white-on-copper fills (AA) */
+  --sage: #5F6E52;
+  --sage-soft: #E1E6DA;
+  --border: #D7CDBF;
+  --border-soft: #E3DACD;           /* softer border for NESTED rows (product rows, metric boxes) */
+  --border-strong: #C4B7A4;         /* key dividers / section rules — the ledger lines */
+  --surface-2: #F1ECE3;             /* subtle inset surface (nested rows / the prompt console tint) */
 
   /* Legacy token aliases remapped onto the palette above, so the existing rules
      inherit the new roles without a full rewrite: warm text, navy actions, clay
@@ -46,15 +53,30 @@
   --orange: var(--primary);         /* former orange CTAs/active states → navy */
   --orange-dark: var(--primary-hover);
   --sage-strong: #43503C;           /* readable dark sage for positive text */
-  --warn: #8A4A2E;                  /* warm terracotta for over-budget / warnings */
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 26px;
-  /* Tighter, layered shadows instead of one huge diffuse blur (which reads as a generic template). */
-  --shadow-sm: 0 1px 2px rgba(45, 31, 14, 0.06), 0 2px 6px rgba(45, 31, 14, 0.05);
-  --shadow: 0 2px 4px rgba(45, 31, 14, 0.06), 0 14px 34px rgba(45, 31, 14, 0.10);
-  --shadow-lg: 0 4px 8px rgba(45, 31, 14, 0.07), 0 24px 60px rgba(45, 31, 14, 0.13);
+  --warn: #99451F;                  /* warm terracotta for over-budget / warnings */
+  /* Redesign 2026-07-09: radius pulled way down so the whole app reads engineered,
+     not bubbly. Pills (--r-pill) are reserved for true mode switches + tiny tags. */
+  --r-xs: 3px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 16px;
+  --r-pill: 999px;
+  /* Flatter, realistic shadows — depth comes from borders + one tight shadow, not a diffuse glow. */
+  --shadow-sm: 0 1px 1px rgba(45, 31, 14, 0.05);
+  --shadow-soft: 0 1px 2px rgba(45, 31, 14, 0.05);
+  --shadow: 0 1px 2px rgba(45, 31, 14, 0.04), 0 6px 16px rgba(45, 31, 14, 0.06);
+  --shadow-lg: 0 2px 4px rgba(45, 31, 14, 0.05), 0 14px 30px rgba(45, 31, 14, 0.09);
+  /* Spacing scale — a tighter, deliberate rhythm for the workspace. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 56px;
 }
 
 * {
@@ -73,8 +95,8 @@ body {
      so large empty areas don't read as a flat slab of beige. Kept low-contrast and warm — never orange/
      yellow, never white/grey. Viewport-anchored so the depth stays consistent while scrolling long results. */
   background:
-    radial-gradient(circle at top left, rgba(169, 104, 73, 0.08), transparent 34rem),
-    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 42%, #EFE6DA 100%);
+    radial-gradient(circle at top left, rgba(165, 98, 63, 0.05), transparent 32rem),
+    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 46%, #E4DED4 100%);
   background-repeat: no-repeat;
 }
 
@@ -1095,13 +1117,25 @@ textarea:focus {
 
 /* The prompt box is the primary input and is auto-focused on entry — give it a firmer default border and a
    clear navy focus ring so it visibly reads as "start here". */
+/* Sprint 10.174: the prompt is the primary, auto-focused input — a navy caret + a subtle inset well signal
+   "type here". The firm border, white fill, copper rail and focus ring live in the editorial block further down
+   (which wins on order), so they're set there; these two only add what that block doesn't. */
 .prompt-first-card textarea {
-  border-color: rgba(37, 55, 70, 0.30);
-  background: var(--surface);
+  box-shadow: inset 0 1px 2px rgba(37, 55, 70, 0.06);
+  caret-color: var(--primary);
 }
-.prompt-first-card textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 55, 70, 0.15);
+.prompt-first-card textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.9;
+}
+/* The label is the one-line instruction above the box — keep it clear and readable, not a muted whisper. */
+.prompt-first-card label > span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.92rem;
+  font-weight: 560;
+  line-height: 1.45;
+  color: var(--ink);
 }
 
 /* Required-field validation: warm terracotta nudge (matches the palette's warning role) shown when the user
@@ -5755,4 +5789,1132 @@ a.move-in-item-link:hover .move-in-item-price {
 }
 .multi-room-cta:hover {
   background: var(--orange-dark);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   EDITORIAL REDESIGN — "Budget estimate sheet" · 2026-07-09
+   Presentation-only refit toward a mature planner workspace. Pure CSS: no markup,
+   logic, i18n, routing or data changes. Keeps the owner-approved navy/clay/sage
+   palette; changes the FORM — lower radius, flatter shadows, crisper surfaces,
+   tabular money, hairline structure over stacked cards, stronger selected states.
+   Placed last on purpose so it overrides the earlier base-era rules by source order.
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+/* — Money reads like a spec sheet: tabular, aligned figures wherever a price shows — */
+.decision-metrics strong,
+.total,
+.move-in-total-value,
+.move-in-room-total,
+.product-title-line span,
+.plan-choice-card strong,
+.budget-legend strong,
+.budget-legend small,
+.shopping-list-head strong,
+.shopping-list-group-title strong,
+.shopping-list-group li strong,
+.breakdown-row strong,
+.sticky-summary-budget,
+.step-product-section-title strong,
+.pricing-price,
+.score-row strong,
+.saved-plan-card small {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "cv01" 1;
+}
+
+/* — Editorial type: the planner header stops shouting; sharper, tighter, smaller — */
+.section-heading h2,
+.planner-heading-row h2 {
+  font-size: clamp(1.55rem, 2.5vw, 2.15rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.section-heading { margin-bottom: var(--space-6); }
+.planner-heading-row p,
+.section-heading p { font-size: 1.02rem; line-height: 1.6; }
+.eyebrow, .step-kicker { letter-spacing: 0.14em; }
+
+/* — Density: the planner is a workspace, not a landing page (kill the beige voids) — */
+.planner-section { padding-top: var(--space-8); padding-bottom: var(--space-3); }
+.section { padding: var(--space-9) 0; }
+#how { padding-top: var(--space-7); }
+
+/* — Header: crisper edges, keep the flush bar — */
+.header { background: rgba(243, 237, 228, 0.9); }
+.brand-mark { border-radius: var(--r-sm); }
+.nav-cta { border-radius: var(--r-sm); }
+
+/* ── Left panel = a project-brief console: one crisp surface divided by hairlines ── */
+.planner-panel {
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  border-color: var(--border);
+  backdrop-filter: none;
+}
+/* Uniform steps: drop the milky per-step tints; the step-kickers + hairline dividers
+   carry the structure, so the console reads as one sheet, not a stack of cards. */
+.starter-template-panel,
+.easy-controls,
+.vibe-panel { background: transparent; }
+.prompt-first-card,
+.prompt-card {
+  background: rgba(37, 55, 70, 0.045);   /* subtle "start here" wash, flat (no gradient/glass) */
+  border-radius: 0;
+}
+.form-step { border-bottom: 1px solid var(--border); }
+
+/* Inputs: structured corners, solid fields, firm navy focus — */
+input, select, textarea { border-radius: var(--r-sm); background: var(--surface); }
+textarea { border-radius: var(--r-md); }
+.prompt-first-card textarea { min-height: 168px; }
+
+/* Generate button: confident + compact, flat navy (not a cartoonish gradient slab) — */
+.generate-button {
+  border-radius: var(--r-md);
+  background: var(--primary);
+  box-shadow: 0 1px 2px rgba(37, 55, 70, 0.18), 0 4px 12px rgba(37, 55, 70, 0.16);
+  min-height: 52px;
+}
+.generate-button:hover:not(:disabled) { background: var(--primary-hover); }
+.sticky-generate-bar {
+  background: rgba(255, 252, 245, 0.92);
+  border-top: 1px solid var(--border);
+}
+.sticky-generate-bar .generate-button.sticky-generate-button {
+  border-radius: var(--r-sm);
+  min-height: 44px;
+}
+
+/* Quick-start template cards: quiet outlined cells, distinct from the pickers below — */
+.template-card {
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+.template-card:hover { border-color: var(--primary); transform: none; }
+
+/* Vibe cards + moodboard: structured tiles — */
+.vibe-card, .moodboard-placeholder { border-radius: var(--r-md); }
+.vibe-swatch, .vibe-swatch > span { border-radius: var(--r-xs); }
+
+/* ── Selection tiles (room / size / level / shop-mode / preset): outlined cells with a
+      clear, un-mistakable navy selected state — never a washed-out grey card ── */
+.choice, .size-card, .level-card, .shop-mode {
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border-color: var(--border-soft);
+}
+.preset { border-radius: var(--r-sm); background: var(--surface); }
+.choice.active,
+.size-card.active,
+.level-card.active,
+.shop-mode.active,
+.preset.active {
+  border-color: var(--primary);
+  background: rgba(37, 55, 70, 0.06);
+  box-shadow: inset 0 0 0 1px var(--primary);
+  color: var(--text);
+}
+.choice.active .choice-icon { color: var(--primary); opacity: 1; }
+.preset.active { color: var(--primary); }
+.level-card.active, .size-card.active, .shop-mode.active { box-shadow: inset 0 0 0 1px var(--primary); }
+
+/* Toggle chips (retailers / must-have / already-have): de-bubbled, still legible — */
+.pill { border-radius: var(--r-sm); }
+
+/* ── Right panel = the shopping plan / estimate sheet ── */
+.decision-plan-card { box-shadow: none; padding: var(--space-4); }
+.plan-card, .focused-plan-card { border-radius: var(--r-lg); box-shadow: var(--shadow); }
+.decision-card {
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.decision-card .decision-result-title h3 { font-size: 1.35rem; letter-spacing: -0.03em; }
+
+/* Money is the hero: the three metrics become a tidy figure row, total emphasised — */
+.decision-metrics { gap: var(--space-2); }
+.decision-metrics div {
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border-color: var(--border-soft);
+  padding: var(--space-3) var(--space-4);
+}
+.decision-metrics div:first-child {
+  background: rgba(37, 55, 70, 0.05);
+  border-color: rgba(37, 55, 70, 0.2);
+}
+.decision-metrics strong {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.total {
+  border-radius: var(--r-sm);
+  padding: 7px 11px;
+  font-weight: 640;
+}
+
+/* Actions: primary filled + compact, secondary quiet outline — not a stack of slabs — */
+.decision-actions { gap: var(--space-2); }
+.primary-copy-button { flex: 0 1 auto; }
+.share-button.soft {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: auto;
+  box-shadow: none;
+}
+.share-button.soft:hover { border-color: var(--primary); color: var(--primary); transform: none; }
+
+/* Category groups = shopping-list sections: a labelled header over a hairline, subtotal aligned — */
+.step-product-section {
+  border-radius: var(--r-lg);
+  background: transparent;
+  border-color: var(--border-soft);
+}
+.step-product-section-title {
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0 var(--space-1) var(--space-2);
+}
+.step-product-section-title span {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 0.72rem;
+}
+.step-product-section-title strong { color: var(--accent-strong); }
+
+/* Product rows = buying-decision cards: crisp surface, structured image, clear price — */
+.product-row, .decision-product-row {
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border-color: var(--border-soft);
+}
+.product-row img { border-radius: var(--r-sm); }
+.product-title-line strong { font-weight: 650; }
+.product-title-line span { font-size: 1.02rem; font-weight: 640; }
+.product-actions button, .product-actions a, .share-button { border-radius: var(--r-sm); }
+
+/* Metadata: flat quiet tags, not a row of candy pills (kills the "pill clutter") — */
+.meta-line span {
+  border-radius: var(--r-xs);
+  background: rgba(29, 26, 22, 0.05);
+  color: var(--text-muted);
+  padding: 3px 7px;
+  font-size: 0.74rem;
+}
+.priority-chip, .review-chip, .meta-line .sale-chip,
+.meta-line .condition-chip, .move-in-store-chip, .move-in-room-count,
+.move-in-status { border-radius: var(--r-xs); }
+.priority-chip { letter-spacing: 0.06em; }
+
+/* Collapsible detail panels: crisp, solid, low radius — */
+.alternate-plans-panel,
+.secondary-info-panel,
+.compact-understood-card,
+.more-about-plan,
+.saved-plans-inbox {
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border-color: var(--border);
+}
+.score-row div, .compact-plan-header, .plan-summary-box,
+.plan-explainer-grid div, .retailer-breakdown, .missing-box,
+.tradeoff-card { border-radius: var(--r-md); }
+
+/* Budget breakdown = a precise measured bar (the "budget filling a space" signature) — */
+.budget-breakdown-card, .share-card {
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: none;
+}
+.budget-bar { border-radius: var(--r-xs); height: 12px; }
+.budget-bar-seg:first-child { border-radius: var(--r-xs) 0 0 var(--r-xs); }
+.budget-bar-seg:last-child { border-radius: 0 var(--r-xs) var(--r-xs) 0; }
+.share-btn { border-radius: var(--r-sm); }
+
+/* Feedback + share: compact, utilitarian, quiet — don't compete with the plan — */
+.feedback-card {
+  border-radius: var(--r-md);
+  background: var(--surface);
+  padding: var(--space-3) var(--space-4);
+}
+.feedback-buttons button { border-radius: var(--r-sm); }
+
+/* Empty / loading / error states + saved-plan cards: same crisp language — */
+.empty-state, .saved-plan-card { border-radius: var(--r-md); }
+.saved-plan-card { background: var(--surface); border-color: var(--border-soft); }
+
+/* ── Scope switch: a boxed segmented control (a real mode switch), not a soft pill ── */
+.scope-toggle {
+  border-radius: var(--r-sm);
+  gap: 0;
+  padding: 3px;
+  border-color: var(--border);
+  background: var(--surface);
+}
+.scope-option { border-radius: var(--r-xs); padding: 8px 20px; }
+.scope-option.active { box-shadow: var(--shadow-sm); }
+
+/* ── Full-apartment room tiles reuse .choice.active above; keep results crisp ── */
+.move-in-room-card { border-radius: var(--r-md); background: var(--surface); }
+.move-in-total-card { border-radius: var(--r-md); }
+
+/* ── How-it-works: a small, NUMBERED process strip — distinct from planner cards,
+      clearly secondary, so the app doesn't relapse into a landing page ── */
+.steps-grid { counter-reset: how-step; gap: var(--space-4); }
+.step-card, .money-card {
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: transparent;
+  box-shadow: none;
+  padding: var(--space-8) var(--space-5) var(--space-5);
+}
+.step-card {
+  counter-increment: how-step;
+  position: relative;
+}
+.step-card::before {
+  content: counter(how-step, decimal-leading-zero);
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-5);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--accent-strong);
+}
+.step-card h3, .money-card h3 { font-size: 1.05rem; letter-spacing: -0.01em; }
+#how .section-heading h2 { font-size: clamp(1.35rem, 2vw, 1.75rem); }
+
+/* ── Accessibility floor: honour reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Responsive: keep money scannable + actions thumb-friendly on phones ── */
+@media (max-width: 760px) {
+  .decision-metrics { grid-template-columns: 1fr 1fr; }
+  .decision-metrics div:first-child { grid-column: 1 / -1; }
+  .decision-actions .primary-copy-button,
+  .decision-actions .share-button { flex: 1 1 auto; }
+  .scope-toggle { display: flex; width: 100%; }
+  .scope-option { flex: 1; text-align: center; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FIT-OUT DESK — app-first planner workspace · 2026-07-10
+   Structural pass: the app reads as a furniture-buyer's terminal, not a landing page.
+   The hero collapses into a status strip; the mode toggle becomes a copper NAVTRACK;
+   the prompt is the single lit console; the right panel is a shopping REPORT with a
+   structured blank-report empty state. Presentation only — no logic/i18n/data changes.
+   Last in source order → overrides the earlier layers.
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. STATUS STRIP (was the hero) — compact product header ───────────────────── */
+.status-strip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  max-width: none;
+  margin: 0 0 var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+.status-strip-headline { min-width: 0; }
+.status-strip .eyebrow { margin-bottom: var(--space-2); }
+.status-strip h2 {
+  margin: 0 0 var(--space-1);
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  max-width: none;
+}
+.status-strip .status-strip-headline p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  max-width: 62ch;
+}
+.status-strip .hero-accent { color: var(--text-muted); }
+.status-strip-account { flex: none; padding-top: var(--space-1); }
+.status-strip-account .account-strip-badge,
+.status-strip-account .account-signin-link { white-space: nowrap; }
+
+/* ── 2. NAVTRACK — the signature copper rail (repurposed scope toggle) ─────────── */
+.scope-toggle.navtrack {
+  display: flex;
+  gap: var(--space-6);
+  width: 100%;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+}
+.navtrack .scope-option {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 12px 2px;
+  box-shadow: none;
+}
+.navtrack .scope-option::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.navtrack .scope-option:hover { color: var(--text); }
+.navtrack .scope-option.active {
+  color: var(--text);
+  background: none;
+  box-shadow: none;
+}
+.navtrack .scope-option.active::after { transform: scaleX(1); }
+/* The navtrack tabs are promoted to primary nav — give them the app's deliberate focus ring. */
+.navtrack .scope-option:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: var(--r-xs); }
+
+/* ── 3. LEFT PANEL = a brief console; the prompt is the ONE lit object ─────────── */
+.planner-panel { background: var(--bg-alt); }
+/* Sticky clamp ONLY on the two-column desktop. At ≤980px the stacked-layout reset (position:static,
+   max-height:none, overflow:visible) must win, or the tall stacked form is clipped/overlaps on iPad portrait. */
+@media (min-width: 981px) {
+  .planner-panel { top: 78px; max-height: calc(100vh - 94px); }
+}
+.planner-section { padding-top: var(--space-5); }
+
+/* The prompt card floats (white + soft shadow) above the tinted panel ground. */
+.prompt-first-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+.prompt-first-card .step-kicker { color: var(--accent-strong); }
+.prompt-first-card .prompt-topline h3 { font-size: 1.2rem; letter-spacing: -0.02em; }
+/* The copper caret rail — the only warm vertical line in the quiet console. Sprint 10.174: firmer border + a
+   bright white well (vs the tinted card) so first-time users read it as a fillable field; the copper rail is a
+   touch bolder and the auto-focus ring is stronger, so on entry the box visibly says "start here". */
+.prompt-first-card textarea {
+  background: #fff;
+  border: 1.5px solid var(--border-strong);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--r-md);
+  min-height: 170px;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.prompt-first-card textarea:focus {
+  border-color: var(--primary);
+  border-left-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(34, 48, 60, 0.2);
+}
+.prompt-first-card textarea.has-error { border-left-color: var(--warn); }
+
+/* De-emphasise the secondary steps so NOTHING competes with the prompt console. */
+.vibe-panel, .starter-template-panel { background: transparent; }
+.vibe-panel > h3, .starter-template-panel > h3 { font-size: 1rem; }
+.vibe-panel > p, .starter-template-panel > p { font-size: 0.86rem; }
+
+/* Generate button: the one solid-navy fill in the left panel (prompt → button = one instruction). */
+.prompt-first-card .generate-button { min-height: 50px; }
+
+/* ── 4. RIGHT PANEL = a shopping REPORT ───────────────────────────────────────── */
+/* Action toolbar: primary Copy left, Save · Link · PDF as a segmented cluster right. */
+.decision-actions { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+/* width:auto so flex-basis:auto uses content width (else .plan-button's width:100% fills row 1 and the
+   secondary toolbar wraps below — the opposite of a single-row toolbar). Mobile ≤760 stacks it full-width. */
+.decision-actions .primary-copy-button { flex: 0 0 auto; width: auto; }
+.toolbar-secondary {
+  display: flex;
+  align-items: stretch;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.toolbar-secondary .share-button.soft {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  width: auto;
+}
+.toolbar-secondary .share-button.soft + .share-button.soft { border-left: 1px solid var(--border); }
+.toolbar-secondary .share-button.soft:hover { background: var(--surface-2); color: var(--primary); }
+/* The group's overflow:hidden clips the app's outset focus ring — use a clip-safe INSET ring so keyboard
+   focus stays visible on Save / Copy-link / PDF. */
+.toolbar-secondary .share-button.soft:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--primary); }
+
+/* Blank REPORT empty state — a ruled form awaiting the brief, mirroring the filled report. */
+.empty-report {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+}
+.empty-report-head { display: grid; gap: var(--space-2); }
+.report-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+.empty-report-head h3 { margin: 0; font-size: 1.2rem; letter-spacing: -0.02em; }
+.empty-report-head p { margin: 0; color: var(--text-muted); line-height: 1.5; max-width: 54ch; }
+.empty-report-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+.empty-report-metrics div {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  padding: var(--space-3);
+  background: var(--bg-alt);
+}
+.empty-report-metrics span {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+.empty-report-metrics strong {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--border-strong);
+}
+.budget-bar.is-skeleton { height: 12px; background: transparent; gap: 4px; overflow: visible; }
+.budget-bar.is-skeleton span {
+  border: 1px dashed var(--border-strong);
+  background: var(--bg-alt);
+  border-radius: var(--r-xs);
+}
+.empty-report-sections { display: grid; gap: var(--space-3); }
+.report-section-rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: var(--space-2);
+}
+.report-section-rule::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.skeleton-row { display: flex; align-items: center; gap: var(--space-3); }
+.skeleton-thumb {
+  width: 44px; height: 44px; flex: none;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--bg-alt);
+}
+.skeleton-lines { flex: 1; display: grid; gap: 6px; }
+.skeleton-lines i {
+  height: 9px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+}
+.skeleton-lines i:first-child { width: 68%; }
+.skeleton-lines i:last-child { width: 40%; }
+.skeleton-price {
+  font-variant-numeric: tabular-nums;
+  color: var(--border-strong);
+  font-weight: 600;
+  flex: none;
+}
+.empty-report-foot { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+.empty-report-lead { margin: 0 0 var(--space-1); font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+.empty-report.is-noresults { gap: 0; }
+
+/* ── 5. PRODUCT ROWS = commerce list rows (tighter, price-forward) ─────────────── */
+.decision-product-row { grid-template-columns: 64px 1fr; gap: var(--space-3); padding: var(--space-3); align-items: start; }
+.decision-product-row img { width: 64px; height: 64px; }
+.decision-product-row .product-title-line span { font-size: 1.05rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.decision-product-row:hover .product-title-line span { color: var(--primary); }
+.decision-product-row .meta-line { gap: 6px; }
+.decision-product-row .meta-line span { font-size: 0.72rem; padding: 2px 6px; }
+
+/* ── 6. FULL-APARTMENT room tiles: compact, dense, copper check when selected ──── */
+.choice { position: relative; }
+.choice.active::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.move-in .friendly-rooms .choice { min-height: 82px; padding: var(--space-3); }
+.move-in .friendly-rooms .choice .choice-icon { font-size: 1.2rem; }
+
+/* ── 7. HOW IT WORKS: compact secondary strip (not a marketing section) ────────── */
+#how {
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-7);
+  border-top: 1px solid var(--border);
+}
+#how .section-heading { text-align: left; max-width: none; margin: 0 auto var(--space-4); }
+#how .section-heading h2 { font-size: clamp(1.05rem, 1.5vw, 1.3rem); margin: 0; }
+#how .section-heading p { font-size: 0.9rem; margin-top: var(--space-1); }
+#how .steps-grid { gap: var(--space-3); }
+#how .step-card { padding: var(--space-4) var(--space-4) var(--space-4) var(--space-7); }
+#how .step-card::before { top: var(--space-4); left: var(--space-4); }
+#how .step-card h3 { font-size: 0.98rem; margin-bottom: var(--space-1); }
+#how .step-card p { font-size: 0.85rem; line-height: 1.5; }
+
+/* ── 8. Saved-plans inbox now sits below the workspace — give it a little air ───── */
+.saved-plans-inbox { margin-top: var(--space-6); }
+
+/* ── 9. ENTRANCE CHOREOGRAPHY — the workspace "wakes up" around the prompt ─────── */
+@keyframes bs-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes bs-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bs-track-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes bs-seg-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.status-strip { animation: bs-rise 220ms ease both; }
+.scope-toggle.navtrack { animation: bs-rise 240ms ease both 80ms; }
+.scope-toggle.navtrack { position: relative; }
+.scope-toggle.navtrack::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--border);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: bs-track-draw 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both 120ms;
+}
+.planner-layout .planner-panel { animation: bs-fade 320ms ease both 150ms; }
+.planner-layout .results-shell { animation: bs-rise 300ms ease both 280ms; }
+.prompt-first-card { animation: bs-rise 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both 210ms; }
+
+/* On GENERATE: the budget split fills left-to-right, product rows arrive in sequence. */
+.budget-bar-seg { transform-origin: left; animation: bs-seg-grow 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.budget-bar-seg:nth-child(2) { animation-delay: 60ms; }
+.budget-bar-seg:nth-child(3) { animation-delay: 120ms; }
+.budget-bar-seg:nth-child(4) { animation-delay: 180ms; }
+.budget-bar-seg:nth-child(5) { animation-delay: 240ms; }
+.budget-bar-seg:nth-child(6) { animation-delay: 300ms; }
+.budget-bar.is-skeleton span { animation: none; }
+.step-product-section .decision-product-row { animation: bs-rise 260ms ease both; }
+.step-product-section .decision-product-row:nth-child(2) { animation-delay: 45ms; }
+.step-product-section .decision-product-row:nth-child(3) { animation-delay: 90ms; }
+.step-product-section .decision-product-row:nth-child(4) { animation-delay: 135ms; }
+.step-product-section .decision-product-row:nth-child(5) { animation-delay: 180ms; }
+
+/* Reduced motion: neutralise delays too, so nothing waits invisibly (complements the
+   earlier duration guard). The design is complete without a single animation. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-delay: 0ms !important; }
+  .scope-toggle.navtrack::before { transform: scaleX(1); }
+}
+
+/* ── 10. MOBILE: status strip + toolbar stack cleanly, no overflow ─────────────── */
+@media (max-width: 760px) {
+  .status-strip { flex-direction: column; gap: var(--space-3); }
+  .status-strip-account { padding-top: 0; }
+  .toolbar-secondary { width: 100%; margin-left: 0; }
+  .toolbar-secondary .share-button.soft { flex: 1; text-align: center; }
+  .empty-report-metrics { grid-template-columns: 1fr 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PLAN REPORT CARD GRID + LEFT-PANEL TWEAKS · 2026-07-11 (owner mockup)
+   The right panel is a shopping-report dashboard: Budžet / Proizvodi / Trgovine /
+   Prioriteti summary cards over the flat "Popis za kupnju" list. Left panel gains a
+   char counter + a slim account strip above "Brzi stil". Presentation only.
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+/* Status header: title (was eyebrow) + one-line explainer, with the navtrack right below. */
+.status-strip h2 { font-size: clamp(1.4rem, 2.1vw, 1.85rem); font-weight: 600; }
+.status-strip .status-strip-headline p { font-size: 0.95rem; }
+
+/* Left console: char counter + account strip */
+.prompt-counter {
+  margin: 2px 0 0;
+  text-align: right;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+/* "/ 1000" is a soft guideline, not a hard cap (server accepts up to 4000) — just warm the count past it. */
+.prompt-counter.over { color: var(--warn); }
+.form-account-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+.form-account-hint { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+.form-account-strip .account-strip-badge { flex: none; }
+
+/* ── Report dashboard ─────────────────────────────────────────────────────────── */
+.report-panel { display: grid; gap: var(--space-4); }
+.report-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); }
+.report-header-titles { display: grid; gap: var(--space-1); }
+.report-header-titles h3 { margin: 0; font-size: 1.3rem; letter-spacing: -0.02em; }
+.report-header-titles p { margin: 0; color: var(--text-muted); line-height: 1.5; max-width: 54ch; }
+.report-kicker {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent-strong);
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-2) 0 var(--space-3);
+}
+.report-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.report-card-head { display: flex; align-items: center; gap: var(--space-2); }
+.report-card-glyph { color: var(--accent); flex: none; }
+.report-card-head h4 {
+  margin: 0; font-family: var(--font-display);
+  font-size: 0.98rem; font-weight: 600; letter-spacing: -0.01em;
+}
+.report-card-count {
+  margin-left: auto; font-size: 0.76rem; color: var(--text-muted);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.report-card-hint { margin: 0; font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Budžet card */
+.report-budget-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+.report-budget-metrics > div { min-width: 0; }
+.report-budget-metrics span {
+  display: block; font-size: 0.64rem; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 2px;
+}
+.report-budget-metrics strong {
+  font-family: var(--font-display); font-size: 1.1rem; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.report-budget-metrics strong.over-text { color: var(--warn); }
+.report-fill { height: 8px; border-radius: var(--r-xs); background: var(--surface-2); overflow: hidden; }
+.report-fill > span { display: block; height: 100%; background: var(--accent); border-radius: var(--r-xs); transition: width 0.5s ease; }
+.report-fill > span.over { background: var(--warn); }
+
+/* Proizvodi card */
+.report-thumbs { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.report-thumb {
+  width: 46px; height: 46px; flex: none;
+  border: 1px solid var(--border-soft); border-radius: var(--r-sm);
+  background: #fff; overflow: hidden; display: grid; place-items: center;
+}
+.report-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
+.report-thumb-more {
+  background: var(--surface-2); color: var(--text-muted);
+  font-weight: 650; font-size: 0.82rem; font-variant-numeric: tabular-nums;
+}
+
+/* Trgovine card */
+.report-store-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.report-store-list li {
+  display: grid; grid-template-columns: minmax(56px, auto) minmax(0, 1fr) auto;
+  align-items: center; gap: var(--space-2); font-size: 0.84rem;
+}
+.report-store-name { color: var(--text); font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.report-store-bar { height: 6px; border-radius: var(--r-xs); background: var(--surface-2); overflow: hidden; }
+.report-store-bar > span { display: block; height: 100%; background: var(--primary); border-radius: var(--r-xs); }
+.report-store-list strong { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.report-store-total {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-top: 1px solid var(--border-soft); padding-top: var(--space-2);
+}
+.report-store-total span { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.64rem; }
+.report-store-total strong { font-variant-numeric: tabular-nums; }
+
+/* Prioriteti card */
+.report-priority-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.report-priority-list li {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center; gap: var(--space-2); font-size: 0.87rem;
+}
+.report-priority-rank {
+  width: 20px; height: 20px; flex: none; display: grid; place-items: center;
+  border-radius: 50%; background: var(--surface-2); color: var(--accent-strong);
+  font-size: 0.7rem; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.report-priority-name { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.report-priority-list strong { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+
+/* Popis za kupnju: the flat product list (no priority section headers) */
+.flat-product-list { border-radius: var(--r-lg); }
+
+/* Empty-report skeletons — dashed, static, mirror the filled cards */
+.report-grid.is-empty .report-budget-metrics strong,
+.report-store-list.is-skeleton strong,
+.report-priority-list.is-skeleton strong { color: var(--border-strong); font-family: var(--font-display); }
+.report-fill.is-skeleton { border: 1px dashed var(--border-strong); background: var(--bg-alt); }
+.report-fill.is-skeleton > span { display: none; }
+.report-empty-figure { height: 60px; }
+.report-empty-figure .skeleton-thumb { width: 100%; height: 100%; }
+.skeleton-bar { height: 8px; border-radius: var(--r-xs); background: var(--surface-2); border: 1px solid var(--border-soft); }
+.report-shopping-empty {
+  border: 1px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface); padding: var(--space-4); display: grid; gap: var(--space-2);
+}
+
+@media (max-width: 560px) {
+  .report-grid { grid-template-columns: 1fr; }
+  .report-budget-metrics { grid-template-columns: repeat(3, 1fr); }
+  .form-account-strip { flex-wrap: wrap; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   HEADER NAV-TRACK + SLIM CONTEXT STRIP · 2026-07-11 (owner mockup)
+   The nav link for the section in view keeps a navy underline; a slim strip under the
+   header shows the planner context + a BETA badge (replaces the old BetaNotice bar).
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+/* Nav-track: navy underline on the active (or hovered) nav link, at the header foot. */
+.nav a::after { background: var(--primary); height: 2px; bottom: -6px; border-radius: 2px; }
+.nav a.active { color: var(--text); }
+.nav a.active::after { transform: scaleY(1); }
+
+/* Slim product-context strip under the header. */
+.planner-subnav {
+  width: 100%;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--border);
+}
+.planner-subnav-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 42px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.planner-subnav-label { display: inline-flex; align-items: center; gap: var(--space-2); flex: none; }
+.planner-subnav-icon { color: var(--accent); flex: none; }
+.planner-subnav-label strong { font-size: 0.9rem; font-weight: 650; color: var(--text); white-space: nowrap; }
+.planner-subnav-sep { width: 1px; height: 16px; background: var(--border); flex: none; }
+.planner-subnav-tagline {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.planner-subnav-beta {
+  flex: none;
+  background: var(--surface);
+  color: var(--accent-strong);
+  border: 1px solid var(--accent-soft);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--r-xs);
+}
+@media (max-width: 680px) {
+  .planner-subnav-inner { min-height: 38px; gap: var(--space-2); }
+  .planner-subnav-sep,
+  .planner-subnav-tagline { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CRAFTED TITLE + ENGAGING MODE SWITCH · 2026-07-11c (owner feedback)
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+/* Editorial title (owner mockup): an eyebrow + copper dash over a crafted SERIF title (Playfair) whose
+   last word is set in brand copper. */
+.status-strip .status-eyebrow {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  margin-bottom: var(--space-3);
+}
+.status-strip .status-eyebrow::before { display: none; }
+.status-strip .status-eyebrow::after {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.9;
+}
+.status-strip h2 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(1.95rem, 3.2vw, 2.85rem);
+  letter-spacing: -0.005em;
+  line-height: 1.08;
+}
+.status-strip .status-strip-headline p { margin-top: var(--space-2); }
+.title-accent { color: var(--accent); }
+
+/* Mode switch (Jedna soba / Cijeli stan): a crisp, engaging segmented control with icons and a
+   confident navy active state — not a flat, plain rail. */
+.scope-toggle.scope-switch {
+  display: inline-flex;
+  width: auto;
+  gap: 3px;
+  padding: 4px;
+  margin: var(--space-2) 0 var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.scope-toggle.scope-switch::before { display: none; }
+.scope-switch .scope-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 17px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.scope-switch .scope-option::after { display: none; }
+.scope-switch .scope-icon {
+  display: inline-flex;
+  color: var(--accent);
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+.scope-switch .scope-option:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.scope-switch .scope-option:hover .scope-icon { transform: translateY(-1px); }
+.scope-switch .scope-option.active {
+  color: #fff;
+  background: var(--primary);
+  box-shadow: 0 1px 2px rgba(34, 48, 60, 0.28), 0 3px 9px rgba(34, 48, 60, 0.18);
+}
+.scope-switch .scope-option.active .scope-icon { color: #fff; transform: none; }
+.scope-switch .scope-option:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .scope-toggle.scope-switch { display: flex; width: 100%; }
+  .scope-switch .scope-option { flex: 1; justify-content: center; }
+}
+
+/* Style (vibe) cards now lead with a real interior PHOTO of the style, not colour blocks. */
+.vibe-card { align-content: start; }
+.vibe-thumb {
+  display: block;
+  width: 100%;
+  height: 92px;
+  margin-bottom: 6px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px rgba(29, 26, 22, 0.06);
+}
+.vibe-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.vibe-card:hover .vibe-thumb img { transform: scale(1.04); }
+.vibe-card.active .vibe-thumb { box-shadow: inset 0 0 0 2px var(--primary); }
+
+/* Sprint 10.173 (P0 — similar-item + budget-option discovery). A quiet per-row action opens a "browse & open"
+   panel of up to three verified alternatives under a chosen budget cap. It never mutates the plan (that stays the
+   "Change" flow). Uses theme tokens throughout so it adapts to light/dark like the rest of the results view. */
+.decision-product-actions .similar-toggle {
+  background: transparent;
+  color: var(--accent-strong);
+  border: 1px solid var(--border-strong);
+}
+.decision-product-actions .similar-toggle[aria-expanded='true'] {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+.similar-panel {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.similar-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 10px;
+}
+.similar-head strong { font-weight: 660; color: var(--ink); }
+.similar-head small { color: var(--muted); font-size: 0.82rem; }
+
+.similar-caps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.similar-cap {
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 560;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.similar-cap:hover { border-color: var(--accent-strong); }
+.similar-cap.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.similar-status {
+  margin: 6px 2px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.similar-status.similar-error { color: var(--accent-strong); }
+
+.similar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.similar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.similar-tag {
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  font-size: 0.66rem;
+  font-weight: 640;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+}
+.similar-tag-value { background: var(--primary); color: #fff; }
+.similar-tag-nicer { background: var(--accent-soft); color: var(--accent-strong); }
+.similar-tag-budget { background: var(--sage-soft); color: var(--sage-strong); }
+
+.similar-card img {
+  width: 100%;
+  height: 108px;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+  background: var(--surface-soft);
+}
+
+.similar-name {
+  font-size: 0.9rem;
+  font-weight: 620;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.similar-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.similar-price strong { font-size: 1rem; font-weight: 680; }
+.similar-price .original-price { color: var(--muted); font-size: 0.8rem; }
+
+.similar-meta { gap: 6px 8px; font-size: 0.72rem; }
+.similar-why { color: var(--muted); font-size: 0.78rem; line-height: 1.3; }
+
+.similar-open {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 7px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.similar-open:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.similar-open[disabled] {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border-strong);
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .similar-grid { grid-template-columns: 1fr; }
 }

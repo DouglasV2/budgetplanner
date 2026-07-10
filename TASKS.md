@@ -146,7 +146,7 @@ needs `OPENAI_API_KEY`, backend env only).
     watch a product and (when the re-check + a provider are enabled) gets a real price-drop notification (10.34)
     — with zero fabricated discounts. **Remaining before live alerts:** wire a real email provider + flip
     `recheck-enabled` on (the seam + logic are done and tested).
-- **P0 — Similar-item + budget-option discovery (owner-requested 2026-07-08).** Add the core shopping-assistant
+- **P0 — Similar-item + budget-option discovery (owner-requested 2026-07-08).** ✅ **Done 2026-07-10 (Sprint 10.173)** — browse-&-open panel shipped; catalog-only (marketplace inclusion deferred). See the sprint entry below. Add the core shopping-assistant
   flow that lets a user take any product/card/result row and ask for **similar items under their budget**, not only
   a hard-coded €150 cap. UX quick caps: `Under €50`, `Under €100`, `Under €150`, and **Under my remaining budget**.
   The result should show three decision buckets where possible: **Budget pick**, **Best value**, and **Nicer option**,
@@ -164,9 +164,9 @@ needs `OPENAI_API_KEY`, backend env only).
   remaining active EUR markets. Keep the existing no-fabrication rule: real product URL, price, image/source and
   freshness evidence or no item.
 - **P1 — Add bathroom coverage for remaining markets.** Add bathroom only after the similar-item flow and kitchen
-  depth are on track. Prioritise practical move-in basics: towels, bath mats, shower curtains/screens where relevant,
-  bathroom storage, mirrors, bins, toilet brushes, laundry baskets, hooks, lighting and small decor. Use verified
-  retailers/feeds per market and avoid fake placeholder recommendations.
+  depth are on track. Prioritize what was added to HR which is toilet seats and bathtubs, which  obviously people want, for extra:
+  bath mats, shower curtains/screens where relevant, bathroom storage, mirrors, bins, laundry baskets, hooks, lighting and small decor. 
+  Use verified retailers/feeds per market and avoid fake placeholder recommendations.
 - **P1 — Deepen core furniture for DE/AT/HR.** Add more breadth for the furniture items users expect in first-apartment
   plans: bed, mattress, sofa, dining table, chairs, wardrobe, desk, shelves, nightstand, TV stand, dresser and basic
   storage. Goal: reduce repeated IKEA-only/basic picks while keeping the plan honest and shoppable.
@@ -186,6 +186,30 @@ needs `OPENAI_API_KEY`, backend env only).
 - **Scale/perf**: load test, query/caching review, CDN for assets.
 
 ## Recently done
+
+### Sprint 10.173 — P0: similar-item + budget-option discovery (browse & open) (current)
+- Every plan product row gets a **"Slično ispod budžeta"** action that opens an inline discovery panel: budget-cap
+  chips (**Do 50 € / 100 € / 150 € / Do preostalog budžeta**, the last selected by default; non-EUR markets show
+  proportionate round caps via a per-currency table), then up to **three distinct verified in-catalog alternatives** —
+  **Budget pick** (cheapest), **Best value** (the balanced `scoreProduct` winner) and **Nicer option** (a rating-weighted
+  step up priced above the best-value pick). Each card shows price, retailer, market badge, a localized *why*, sale +
+  availability badges and a direct **Otvori proizvod ↗**. **Browse-only** — it never mutates the plan (that stays the
+  "Change/replace" flow) and never fabricates: a thin catalog degrades to 2 or 1 cards, an empty pool to an honest "try
+  a higher budget" nudge.
+- **Backend:** new `POST /api/plans/similar` (rule-based, no AI/auth, like generate-fast/replace) →
+  `PlannerService.findSimilar` reuses `marketCatalog` (verified, market-scoped, second-hand-excluded) + the existing
+  `scoreProduct`; new `SimilarItemsRequest`/`SimilarItemsResponse` DTOs. **Catalog only** (eBay/marketplace inclusion
+  deferred per the spec's "optional"). `PlannerServiceTest` +5 (distinct buckets within cap, anchor+over-cap exclusion,
+  empty-pool → all null, market scoping, never suggests second-hand). Whole backend suite green.
+- **Frontend:** co-located `SimilarItemsPanel` in `PlanResults` (reuses the row image/sale/availability helpers, one
+  panel open per row); `fetchSimilarItems` client fn; **16 new `similar.*` i18n keys** in hr+en (`i18n.ts`) + all 12
+  message JSONs (subagent-translated, placeholders preserved, all valid). Analytics: the five spec events —
+  `similar_items_open` (open), `budget_compare_open` (cap change), `similar_item_click` + `budget_option_click`
+  (open a bucket, carrying bucket+cap), and `product_click` extended with `source: 'similar_panel'` (+ first-party
+  product-click log). `trackProductClick` gained an optional `source` arg.
+- **Verified live** (HR, preview on :5173): a €549 sofa → panel opens with GLOSTAD €129 (budget) / FILIP €158 (value) /
+  VIMLE €609 (nicer) under the €615 remaining-budget cap; switching to **Do 150 €** refetches to the single sofa under
+  €150. No console errors; tsc build + backend tests green.
 
 ### Sprint 10.93 — Honest, coherent Free→Plus pricing copy (current)
 - Read the pricing from the **user's perspective** and it was incoherent: the subtitle said "Plus **unlocks** … the

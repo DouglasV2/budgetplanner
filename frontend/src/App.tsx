@@ -2,7 +2,7 @@ import { AuthGate } from './components/AuthGate';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { HowItWorks } from './components/HowItWorks';
-import { BetaNotice } from './components/BetaNotice';
+import { PlannerSubnav } from './components/PlannerSubnav';
 import { Planner } from './components/Planner';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LocaleProvider } from './LocaleContext';
@@ -14,7 +14,7 @@ function isSharedPlanLink() {
 }
 
 function AppShell() {
-  const { user, loading, guestContinued, betaMode } = useAuth();
+  const { user, loading, guestContinued } = useAuth();
   const shared = isSharedPlanLink();
   // Returning guests and shared-link recipients are decided synchronously (sessionStorage / pathname), so they
   // render immediately. Only a truly-undecided first visit waits for the /me round-trip — showing a neutral
@@ -29,9 +29,9 @@ function AppShell() {
   return (
     <main>
       <Header />
-      {/* Sprint 10.105: one-time Design Session model (no subscriptions). During the free beta a slim notice tells
-          users premium is temporarily free; the old subscription pricing section is no longer rendered. */}
-      {betaMode && <BetaNotice />}
+      {/* Sprint 10.172: slim product-context strip under the header (clipboard + "Planer za kupnju" + tagline +
+          BETA badge). Replaces the old full-width BetaNotice bar; beta state is read inside the component. */}
+      <PlannerSubnav />
       <Planner />
       <HowItWorks />
       <Footer />

@@ -46,6 +46,8 @@ const DICTIONARY: Record<string, Entry> = {
     hr: 'Nema komplicirane forme. Opiši prostor svojim riječima, a zatim po potrebi dotjeraj budžet, trgovine ili stvari koje već imaš.',
     en: 'No complicated form. Describe your space in your own words, then tweak budget, stores or what you already own.'
   },
+  'planner.subnavTagline': { hr: 'Opiši prostor, postavi budžet i dobij popis za kupnju.', en: 'Describe the space, set a budget and get a shopping list.' },
+  'planner.spaceKicker': { hr: 'Složi svoj prostor', en: 'Plan your space' },
   'planner.generate': { hr: 'Složi plan', en: 'Build plan' },
   'planner.generating': { hr: 'Slažem plan...', en: 'Building plan...' },
   'planner.marketComingSoon': {
@@ -64,6 +66,25 @@ const DICTIONARY: Record<string, Entry> = {
   },
 
   'product.reviews': { hr: 'Recenzije u trgovini', en: 'Reviews in store' },
+
+  // Sprint 10.173 (P0 — similar-item + budget-option discovery). A per-product "browse & open" panel that shows
+  // up to three verified in-catalog alternatives (budget pick / best value / nicer) under a chosen budget cap.
+  'similar.action': { hr: 'Slično ispod budžeta', en: 'Similar under budget' },
+  'similar.title': { hr: 'Slično ispod budžeta', en: 'Similar within budget' },
+  'similar.subtitle': { hr: 'Zamjene za {name} unutar tvog budžeta', en: 'Alternatives to {name} within your budget' },
+  'similar.capUnder': { hr: 'Do {amount}', en: 'Under {amount}' },
+  'similar.capRemaining': { hr: 'Do preostalog budžeta ({amount})', en: 'Under remaining budget ({amount})' },
+  'similar.close': { hr: 'Zatvori', en: 'Close' },
+  'similar.loading': { hr: 'Tražim slične proizvode…', en: 'Finding similar products…' },
+  'similar.error': { hr: 'Trenutno ne mogu dohvatiti slične proizvode.', en: 'Couldn’t load similar products right now.' },
+  'similar.empty': { hr: 'Nema opcija ispod {amount}. Probaj viši budžet.', en: 'No options under {amount}. Try a higher budget.' },
+  'similar.budgetPick': { hr: 'Povoljan izbor', en: 'Budget pick' },
+  'similar.bestValue': { hr: 'Najbolji omjer', en: 'Best value' },
+  'similar.nicer': { hr: 'Ljepša opcija', en: 'Nicer option' },
+  'similar.budgetWhy': { hr: 'Najniža cijena u kategoriji', en: 'Lowest price in this category' },
+  'similar.valueWhy': { hr: 'Najbolji omjer cijene i kvalitete', en: 'Best balance of price and quality' },
+  'similar.nicerWhy': { hr: 'Korak više — bolje ocijenjeno', en: 'A step up — higher rated' },
+  'similar.openProduct': { hr: 'Otvori proizvod', en: 'Open product' },
 
   // Sprint 10.28: full EN localisation of the landing + planner shell (HR unchanged for Croatia).
   'hero.eyebrow': { hr: 'Planer kupnje za dom', en: 'Home shopping planner' },
@@ -327,7 +348,7 @@ const DICTIONARY: Record<string, Entry> = {
   'form.describeHeading': { hr: 'Što želiš opremiti?', en: 'What do you want to furnish?' },
   'form.describeIntro': { hr: 'Napiši normalno, kao da šalješ poruku prijatelju. Ne moraš znati stručne izraze.', en: 'Write it naturally, like texting a friend. You don\'t need to know any technical terms.' },
   'form.easiestChip': { hr: 'Najlakše', en: 'Easiest' },
-  'form.promptLabel': { hr: 'Ovdje napiši želju', en: 'Write your wish here' },
+  'form.promptLabel': { hr: 'Upiši svojim riječima — soba, budžet i što trebaš — pa klikni Složi plan.', en: 'Type in your own words — room, budget and what you need — then click Build plan.' },
   'form.promptAriaLabel': { hr: 'Opis prostora i želja', en: 'Description of the space and wishes' },
   'form.promptPlaceholder': { hr: 'Npr. dnevni boravak, oko 1500 €, treba mi kauč, tepih i lampa.', en: 'E.g. living room, about €1500, I need a sofa, a rug and a lamp.' },
   'form.promptRequired': { hr: 'Prvo napiši što želiš opremiti.', en: 'First describe what you want to furnish.' },
@@ -514,6 +535,16 @@ const DICTIONARY: Record<string, Entry> = {
   'results.copyLink': { hr: 'Kopiraj link', en: 'Copy link' },
   'results.productsInPlan': { hr: 'Proizvodi u ovom planu', en: 'Products in this plan' },
   'results.productsInPlanHint': { hr: 'Prvo vidiš konkretne proizvode. Zamjene otvori samo ako ti nešto ne odgovara.', en: 'You see the actual products first. Open replacements only if something doesn\'t suit you.' },
+  'results.budgetCardTitle': { hr: 'Budžet', en: 'Budget' },
+  'results.remainingLabel': { hr: 'Ostaje', en: 'Left' },
+  'results.productsCardTitle': { hr: 'Proizvodi', en: 'Products' },
+  'results.prioritiesTitle': { hr: 'Prioriteti', en: 'Priorities' },
+  'results.storesTotalLabel': { hr: 'Ukupno trgovina', en: 'Stores total' },
+  'results.overviewHint': { hr: 'Ovdje ćeš vidjeti svoj plan za kupnju: budžet, proizvode i popis.', en: 'Here you\'ll see your shopping plan: budget, products and the list.' },
+  'results.productsEmptyHint': { hr: 'Ovdje će se pojaviti odabrani proizvodi s cijenama.', en: 'Your chosen products with prices will appear here.' },
+  'results.storesEmptyHint': { hr: 'Ovdje ćeš vidjeti gdje kupuješ i koliko trošiš po trgovinama.', en: 'You\'ll see where you buy and how much you spend per store.' },
+  'results.prioritiesEmptyHint': { hr: 'Ovdje ćeš vidjeti što je najvažnije prema tvom budžetu.', en: 'You\'ll see what matters most for your budget.' },
+  'results.shoppingListEmptyHint': { hr: 'Ovdje će biti tvoj gotov popis proizvoda za kupnju.', en: 'Your finished shopping list will appear here.' },
   'results.imageIllustrationAlt': { hr: '{name} — ilustracija (nije stvarna fotografija proizvoda)', en: '{name} — illustration (not an actual product photo)' },
   'results.marketCatalogTitle': { hr: 'Tržište / katalog: {market}', en: 'Market / catalog: {market}' },
   'results.marketLabel': { hr: 'Tržište: {market}', en: 'Market: {market}' },
@@ -549,6 +580,7 @@ const DICTIONARY: Record<string, Entry> = {
   // Sprint 10.53: honest account seam. Plans are session-scoped (this browser) today; Google login lands later.
   'account.title': { hr: 'Tvoji planovi', en: 'Your plans' },
   'account.hint': { hr: 'Za sada se spremaju u ovaj preglednik. Prijavom će biti vezani uz tvoj račun.', en: 'For now they\'re saved in this browser. Sign in to tie them to your account.' },
+  'account.saveHint': { hr: 'Prijavom spremaš svoje planove i možeš ih uređivati.', en: 'Sign in to save your plans and edit them.' },
   'account.signInGoogle': { hr: 'Prijava s Google-om', en: 'Sign in with Google' },
   'account.soonBadge': { hr: 'uskoro', en: 'soon' },
   'account.signInTooltip': { hr: 'Uskoro — planovi će se vezati uz tvoj Google račun, ne uz ovaj preglednik.', en: 'Coming soon — your plans will be tied to your Google account, not this browser.' },

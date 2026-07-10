@@ -51,15 +51,16 @@ type Vibe = {
   colors: string[];
   materials: string[];
   swatch: [string, string, string];
+  image: string;
 };
 
 const vibes: Vibe[] = [
-  { id: 'scandinavian', label: 'form.vibeScandinavianLabel', desc: 'form.vibeScandinavianDesc', promptKey: 'form.vibeScandinavianPrompt', style: 'bright', colors: ['white', 'grey', 'natural'], materials: ['wood', 'fabric'], swatch: ['#EFEADF', '#CFC7B7', '#A98E68'] },
-  { id: 'japandi', label: 'form.vibeJapandiLabel', desc: 'form.vibeJapandiDesc', promptKey: 'form.vibeJapandiPrompt', style: 'minimal', colors: ['beige', 'natural', 'black'], materials: ['wood', 'rattan'], swatch: ['#E6DCC9', '#B79A6F', '#2C2A26'] },
-  { id: 'minimalist', label: 'form.vibeMinimalistLabel', desc: 'form.vibeMinimalistDesc', promptKey: 'form.vibeMinimalistPrompt', style: 'minimal', colors: ['white', 'grey'], materials: ['metal', 'glass'], swatch: ['#FBFBFA', '#D4D4D2', '#2B2B2B'] },
-  { id: 'industrial', label: 'form.vibeIndustrialLabel', desc: 'form.vibeIndustrialDesc', promptKey: 'form.vibeIndustrialPrompt', style: 'industrial', colors: ['black', 'grey', 'brown'], materials: ['metal', 'wood', 'leather'], swatch: ['#3A3936', '#7C786F', '#5A4332'] },
-  { id: 'warm-modern', label: 'form.vibeWarmModernLabel', desc: 'form.vibeWarmModernDesc', promptKey: 'form.vibeWarmModernPrompt', style: 'warm', colors: ['beige', 'brown', 'natural'], materials: ['wood', 'fabric', 'velvet'], swatch: ['#E4C9A6', '#B07C4F', '#6E4A2D'] },
-  { id: 'luxury-hotel', label: 'form.vibeLuxuryLabel', desc: 'form.vibeLuxuryDesc', promptKey: 'form.vibeLuxuryPrompt', style: 'classic', colors: ['black', 'grey', 'gold'], materials: ['velvet', 'marble', 'leather'], swatch: ['#1E1A15', '#C2A86B', '#6F6F6F'] }
+  { id: 'scandinavian', label: 'form.vibeScandinavianLabel', desc: 'form.vibeScandinavianDesc', promptKey: 'form.vibeScandinavianPrompt', style: 'bright', colors: ['white', 'grey', 'natural'], materials: ['wood', 'fabric'], swatch: ['#EFEADF', '#CFC7B7', '#A98E68'], image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=400&q=70' },
+  { id: 'japandi', label: 'form.vibeJapandiLabel', desc: 'form.vibeJapandiDesc', promptKey: 'form.vibeJapandiPrompt', style: 'minimal', colors: ['beige', 'natural', 'black'], materials: ['wood', 'rattan'], swatch: ['#E6DCC9', '#B79A6F', '#2C2A26'], image: 'https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=400&q=70' },
+  { id: 'minimalist', label: 'form.vibeMinimalistLabel', desc: 'form.vibeMinimalistDesc', promptKey: 'form.vibeMinimalistPrompt', style: 'minimal', colors: ['white', 'grey'], materials: ['metal', 'glass'], swatch: ['#FBFBFA', '#D4D4D2', '#2B2B2B'], image: 'https://images.unsplash.com/photo-1616137466211-f939a420be84?auto=format&fit=crop&w=400&q=70' },
+  { id: 'industrial', label: 'form.vibeIndustrialLabel', desc: 'form.vibeIndustrialDesc', promptKey: 'form.vibeIndustrialPrompt', style: 'industrial', colors: ['black', 'grey', 'brown'], materials: ['metal', 'wood', 'leather'], swatch: ['#3A3936', '#7C786F', '#5A4332'], image: 'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=400&q=70' },
+  { id: 'warm-modern', label: 'form.vibeWarmModernLabel', desc: 'form.vibeWarmModernDesc', promptKey: 'form.vibeWarmModernPrompt', style: 'warm', colors: ['beige', 'brown', 'natural'], materials: ['wood', 'fabric', 'velvet'], swatch: ['#E4C9A6', '#B07C4F', '#6E4A2D'], image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=400&q=70' },
+  { id: 'luxury-hotel', label: 'form.vibeLuxuryLabel', desc: 'form.vibeLuxuryDesc', promptKey: 'form.vibeLuxuryPrompt', style: 'classic', colors: ['black', 'grey', 'gold'], materials: ['velvet', 'marble', 'leather'], swatch: ['#1E1A15', '#C2A86B', '#6F6F6F'], image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=70' }
 ];
 
 const furnishingLevels: Array<{ value: FurnishingLevel; label: string; description: string }> = [
@@ -257,7 +258,7 @@ function PlanIcon() {
 
 export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: PlannerFormProps) {
   const { t, market, setMarket } = useLocale();
-  const { user, guestContinued } = useAuth();
+  const { user, guestContinued, openSignIn } = useAuth();
   const [alreadyHaveFreeText, setAlreadyHaveFreeText] = useState('');
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
   // Require a described wish before building — no silent fallback to the default budget/room.
@@ -331,6 +332,7 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
             }}
           />
         </label>
+        <div className={input.prompt.length > 1000 ? 'prompt-counter over' : 'prompt-counter'} aria-hidden="true">{input.prompt.length} / 1000</div>
         {promptError && <p className="prompt-required-note" role="alert">{t('form.promptRequired')}</p>}
         {/* Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the typed text. */}
         <small className="field-help ai-interaction-notice">{t('planner.aiInteractionNotice')}</small>
@@ -338,6 +340,16 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
           <span className="generate-button-label"><PlanIcon />{isLoading ? t('planner.generating') : t('planner.generate')}</span>
           <span className="generate-button-hint">{t('form.generateHint')}</span>
         </button>
+      </div>
+
+      {/* Sprint 10.171: slim account strip above "Brzi stil" — guest → sign in to save; signed-in → badge. */}
+      <div className="form-account-strip">
+        <span className="form-account-hint">{t('account.saveHint')}</span>
+        {user ? (
+          <span className="account-strip-badge">{t('auth.signedInAs', { name: user.name || user.email || '' })}</span>
+        ) : (
+          <button type="button" className="account-signin-link" onClick={openSignIn}>{t('auth.signIn')}</button>
+        )}
       </div>
 
       <div className="form-step vibe-panel">
@@ -356,10 +368,10 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
                 onChange(applyVibe(input, vibe, t(vibe.promptKey)));
               }}
             >
-              <span className="vibe-swatch" aria-hidden="true">
-                {vibe.swatch.map((colour, index) => (
-                  <span key={index} style={{ background: colour }} />
-                ))}
+              {/* Sprint 10.172c: a real style photo (owner request) instead of colour blocks. The tile keeps a
+                  palette gradient behind the image, so if the image ever fails to load it degrades to the swatch. */}
+              <span className="vibe-thumb" aria-hidden="true" style={{ background: `linear-gradient(135deg, ${vibe.swatch[0]}, ${vibe.swatch[1]} 52%, ${vibe.swatch[2]})` }}>
+                <img src={vibe.image} alt="" loading="lazy" referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.style.display = 'none'; }} />
               </span>
               <strong>{t(vibe.label)}</strong>
               <small>{t(vibe.desc)}</small>

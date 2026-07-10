@@ -9,6 +9,8 @@ import ai.budgetspace.dto.PlanItemDto;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.ProductDto;
 import ai.budgetspace.dto.ReplaceProductRequest;
+import ai.budgetspace.dto.SimilarItemsRequest;
+import ai.budgetspace.dto.SimilarItemsResponse;
 import ai.budgetspace.dto.StoreTotalDto;
 import ai.budgetspace.dto.StoreTripDto;
 import ai.budgetspace.product.Product;
@@ -121,6 +123,112 @@ class PlannerServiceTest {
         assertThat(replaced.items()).hasSize(1);
         assertThat(replaced.items().get(0).product().id()).isEqualTo("sofa-cheap");
         assertThat(replaced.items().get(0).product().price()).isLessThan(BigDecimal.valueOf(900));
+    }
+
+    // Sprint 10.173 (P0 — similar-item + budget discovery).
+    @Test
+    void findSimilarReturnsThreeDistinctBucketsWithinCap() {
+        Product cheap = product("sofa-cheap", "Povoljni kauč", "IKEA", "sofa", 120, 3.5);
+        Product mid = product("sofa-mid", "Uravnoteženi kauč", "IKEA", "sofa", 300, 4.9);
+        Product nice = product("sofa-nice", "Ljepši kauč", "JYSK", "sofa", 500, 4.7);
+        Product anchor = product("sofa-anchor", "Trenutni kauč", "IKEA", "sofa", 400, 4.0);
+        PlannerService service = serviceWithProducts(List.of(cheap, mid, nice, anchor));
+
+        SimilarItemsResponse res = service.findSimilar(
+                new SimilarItemsRequest(ProductDto.from(anchor), input("Imam 1500 € za dnevni boravak."), 600));
+
+        // The cheapest is the budget pick, the balanced (higher-rated mid) is best value, the priciest steps up.
+        assertThat(res.budgetPick().id()).isEqualTo("sofa-cheap");
+        assertThat(res.bestValue().id()).isEqualTo("sofa-mid");
+        assertThat(res.nicer().id()).isEqualTo("sofa-nice");
+        // All three distinct, all within the cap, and the nicer step is strictly above the best-value pick.
+        assertThat(res.budgetPick().price()).isLessThan(res.bestValue().price());
+        assertThat(res.nicer().price()).isGreaterThan(res.bestValue().price());
+        assertThat(res.nicer().price()).isLessThanOrEqualTo(BigDecimal.valueOf(600));
+        assertThat(res.cap()).isEqualTo(600);
+        assertThat(res.currency()).isEqualTo("EUR");
+        // The anchor is never suggested back to the user.
+        assertThat(List.of(res.budgetPick().id(), res.bestValue().id(), res.nicer().id()))
+                .doesNotContain("sofa-anchor");
+    }
+
+    @Test
+    void findSimilarExcludesTheAnchorAndAnythingOverTheCap() {
+        Product cheap = product("sofa-cheap", "Povoljni kauč", "IKEA", "sofa", 120, 4.0);
+        Product mid = product("sofa-mid", "Srednji kauč", "IKEA", "sofa", 300, 4.6);
+        Product over = product("sofa-over", "Preskupi kauč", "JYSK", "sofa", 500, 4.8);
+        Product anchor = product("sofa-anchor", "Trenutni kauč", "IKEA", "sofa", 280, 4.2);
+        PlannerService service = serviceWithProducts(List.of(cheap, mid, over, anchor));
+
+        SimilarItemsResponse res = service.findSimilar(
+                new SimilarItemsRequest(ProductDto.from(anchor), input("Imam 1500 € za dnevni boravak."), 350));
+
+        // Only the two under-cap products can be suggested; the over-cap one and the anchor never appear.
+        assertThat(res.budgetPick()).isNotNull();
+        assertThat(res.bestValue()).isNotNull();
+        assertThat(res.nicer()).isNull();
+        List<String> ids = new ArrayList<>();
+        ids.add(res.budgetPick().id());
+        ids.add(res.bestValue().id());
+        assertThat(ids).doesNotContain("sofa-over", "sofa-anchor");
+        assertThat(res.budgetPick().price()).isLessThanOrEqualTo(BigDecimal.valueOf(350));
+        assertThat(res.bestValue().price()).isLessThanOrEqualTo(BigDecimal.valueOf(350));
+    }
+
+    @Test
+    void findSimilarReturnsEmptyBucketsWhenNothingFitsInsteadOfFabricating() {
+        Product a = product("sofa-a", "Kauč A", "IKEA", "sofa", 120, 4.5);
+        Product b = product("sofa-b", "Kauč B", "JYSK", "sofa", 300, 4.6);
+        Product anchor = product("sofa-anchor", "Trenutni kauč", "IKEA", "sofa", 400, 4.0);
+        PlannerService service = serviceWithProducts(List.of(a, b, anchor));
+
+        SimilarItemsResponse res = service.findSimilar(
+                new SimilarItemsRequest(ProductDto.from(anchor), input("Imam 1500 € za dnevni boravak."), 50));
+
+        assertThat(res.budgetPick()).isNull();
+        assertThat(res.bestValue()).isNull();
+        assertThat(res.nicer()).isNull();
+        assertThat(res.cap()).isEqualTo(50);
+    }
+
+    @Test
+    void findSimilarStaysInTheRequestedMarket() {
+        Product hrA = product("sofa-hr-a", "HR kauč A", "IKEA", "sofa", 150, 4.3);
+        hrA.setMarket("HR");
+        Product hrB = product("sofa-hr-b", "HR kauč B", "IKEA", "sofa", 320, 4.7);
+        hrB.setMarket("HR");
+        Product si = product("sofa-si", "SI kauč", "IKEA", "sofa", 200, 4.9);
+        si.setMarket("SI");
+        Product anchor = product("sofa-anchor", "Trenutni kauč", "IKEA", "sofa", 400, 4.0);
+        anchor.setMarket("HR");
+        PlannerService service = serviceWithProducts(List.of(hrA, hrB, si, anchor));
+
+        SimilarItemsResponse res = service.findSimilar(
+                new SimilarItemsRequest(ProductDto.from(anchor), input("Imam 1500 € za dnevni boravak."), 600));
+
+        List<String> ids = new ArrayList<>();
+        if (res.budgetPick() != null) ids.add(res.budgetPick().id());
+        if (res.bestValue() != null) ids.add(res.bestValue().id());
+        if (res.nicer() != null) ids.add(res.nicer().id());
+        assertThat(ids).doesNotContain("sofa-si");
+        assertThat(ids).contains("sofa-hr-a", "sofa-hr-b");
+    }
+
+    @Test
+    void findSimilarNeverSuggestsSecondHandListings() {
+        Product retail = product("sofa-new", "Novi kauč", "IKEA", "sofa", 300, 4.6);
+        Product used = product("sofa-used", "Rabljeni kauč", "IKEA", "sofa", 150, 4.9);
+        used.setSecondHand(true);
+        Product anchor = product("sofa-anchor", "Trenutni kauč", "IKEA", "sofa", 400, 4.0);
+        PlannerService service = serviceWithProducts(List.of(retail, used, anchor));
+
+        SimilarItemsResponse res = service.findSimilar(
+                new SimilarItemsRequest(ProductDto.from(anchor), input("Imam 1500 € za dnevni boravak."), 600));
+
+        // Only the new-retail product can be suggested; the used listing is never in a bucket.
+        assertThat(res.bestValue().id()).isEqualTo("sofa-new");
+        assertThat(res.budgetPick()).isNull();
+        assertThat(res.nicer()).isNull();
     }
 
 

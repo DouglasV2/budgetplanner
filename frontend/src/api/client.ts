@@ -177,6 +177,24 @@ export function replaceProduct(plan: FurnishingPlan, input: PlannerInput, produc
   });
 }
 
+// Sprint 10.173 (P0 — similar-item + budget-option discovery): given the anchor product the user is looking at
+// and a budget cap, ask the backend for up to three verified in-catalog alternatives. Any bucket can be null
+// when nothing in the current market's catalog fits — the panel then shows only what exists (never fabricated).
+export interface SimilarItemsResult {
+  budgetPick: Product | null;
+  bestValue: Product | null;
+  nicer: Product | null;
+  cap: number;
+  currency: string;
+}
+
+export function fetchSimilarItems(product: Product, input: PlannerInput, budgetCap: number) {
+  return request<SimilarItemsResult>('/api/plans/similar', {
+    method: 'POST',
+    body: JSON.stringify({ product, input, budgetCap: Math.round(budgetCap) })
+  });
+}
+
 // Sprint 10.53: send the browser session so the backend scopes saved plans to this owner — the "Moji
 // planovi" inbox returns only the caller's own plans. getSavedPlan deliberately omits the header: it is the
 // shareable link, open by id, so a recipient on another session can still open a plan shared with them.
@@ -215,12 +233,12 @@ export function deleteSavedPlan(id: string) {
   });
 }
 
-export function trackProductClick(planId: string, product: Product) {
+export function trackProductClick(planId: string, product: Product, source = 'plan-card') {
   fireAndForget('/api/events/product-click', {
     planId,
     productId: product.id,
     retailer: product.retailer,
-    source: 'plan-card'
+    source
   });
 }
 

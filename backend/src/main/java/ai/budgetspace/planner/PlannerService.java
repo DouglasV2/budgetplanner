@@ -557,6 +557,76 @@ public class PlannerService {
         return recalculate(plan, input, orderItemsForShopping(input, nextItems));
     }
 
+    // Sprint 10.173 (P0 — similar-item + budget-option discovery): given an anchor product and a budget cap,
+    // return up to three DISTINCT alternatives from the SAME market's verified catalog (same category + room,
+    // within the cap): a cheapest "budget pick", the balanced-score "best value" pick, and a "nicer" step up.
+    // Browse-only — this never mutates a plan. No fabrication: an empty pool yields empty buckets. Catalog only:
+    // marketCatalog already excludes second-hand/marketplace listings, so used items never leak in here.
+    public SimilarItemsResponse findSimilar(SimilarItemsRequest request) {
+        if (request == null || request.product() == null || request.input() == null) {
+            throw new IllegalArgumentException("product and input are required");
+        }
+        ProductDto anchor = request.product();
+        PlannerInputDto input = request.input().normalized();
+        String currency = Markets.currencyFor(input.market());
+        String category = anchor.category();
+        if (category == null || category.isBlank()) {
+            return SimilarItemsResponse.empty(Math.max(1, request.budgetCap()), currency);
+        }
+        // Clamp the cap into a sane [1, per-currency ceiling] band so a bogus or huge value can't distort results.
+        int cap = Math.max(1, Math.min(request.budgetCap(), Markets.budgetCeiling(currency)));
+        String anchorId = anchor.id();
+        List<String> allowedRetailers = selectedRetailers(input);
+
+        List<Product> pool = marketCatalog(input).stream()
+                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                .filter(product -> matchesRoom(product, input.roomType()))
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> anchorId == null || !anchorId.equalsIgnoreCase(product.getId()))
+                .filter(product -> allowedRetailers.contains(product.getRetailer()))
+                .filter(product -> product.getPrice().doubleValue() <= cap)
+                .toList();
+
+        if (pool.isEmpty()) {
+            return SimilarItemsResponse.empty(cap, currency);
+        }
+
+        // Pick each bucket in turn, excluding what an earlier bucket already claimed, so the three cards are
+        // DISTINCT products where the catalog allows (and degrade gracefully to 2 or 1 when it's thin).
+        Set<String> used = new LinkedHashSet<>();
+
+        // Best value = the balanced score winner (the hero), using the same "value" scoring the planner trusts.
+        Product bestValue = pool.stream()
+                .max(Comparator.comparingDouble(product -> scoreProduct(product, input, "value", Set.of(), 0)))
+                .orElse(null);
+        if (bestValue != null) used.add(bestValue.getId());
+
+        // Budget pick = the cheapest remaining option — a genuine lower-cost alternative to compare against.
+        Product budgetPick = pool.stream()
+                .filter(product -> !used.contains(product.getId()))
+                .min(Comparator.comparing(Product::getPrice))
+                .orElse(null);
+        if (budgetPick != null) used.add(budgetPick.getId());
+
+        // Nicer = a real step up: the best-scoring remaining option priced STRICTLY above the best-value pick
+        // (still within the cap), rating-weighted. Honestly empty when the cap leaves no room above the hero.
+        double stepFloor = bestValue != null ? bestValue.getPrice().doubleValue() : 0;
+        Product nicer = pool.stream()
+                .filter(product -> !used.contains(product.getId()))
+                .filter(product -> product.getPrice().doubleValue() > stepFloor)
+                .max(Comparator.comparingDouble(product ->
+                        scoreProduct(product, input, "stretch", Set.of(), 0) + product.getRating() * 4))
+                .orElse(null);
+
+        return new SimilarItemsResponse(
+                budgetPick == null ? null : ProductDto.from(budgetPick),
+                bestValue == null ? null : ProductDto.from(bestValue),
+                nicer == null ? null : ProductDto.from(nicer),
+                cap,
+                currency
+        );
+    }
+
     private FurnishingPlanDto buildPlan(PlannerInputDto input, String mode, boolean focused) {
         double multiplier = switch (mode) {
             case "stretch" -> 1.12;

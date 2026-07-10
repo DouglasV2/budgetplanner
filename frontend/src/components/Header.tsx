@@ -29,6 +29,27 @@ export function Header() {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  // Sprint 10.172: nav-track — the nav link for the section in view gets the active underline. The page is
+  // short and the "how" section sits at the bottom, so an IntersectionObserver "most-visible" test can never
+  // pick it; instead mark "how" active once its top crosses the lower viewport (works on scroll AND on a nav
+  // click, which scrolls). Presentation only; defaults to "planner" (the landing view).
+  const [activeSection, setActiveSection] = useState<'planner' | 'how'>('planner');
+  useEffect(() => {
+    const update = () => {
+      const how = document.getElementById('how');
+      const line = window.innerHeight * 0.6;
+      const next: 'planner' | 'how' = how && how.getBoundingClientRect().top < line ? 'how' : 'planner';
+      setActiveSection((prev) => (prev === next ? prev : next));
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
   // Sprint 10.150: the header "Prijava" goes STRAIGHT to the Google redirect when sign-in is configured — no
   // dependency on the gate's open/close state (which is what could get stuck after a sign-in/out cycle). Falls
   // back to opening the gate (with its guest option / disabled placeholder) when Google isn't configured.
@@ -51,8 +72,8 @@ export function Header() {
           <span className="brand-word">budget<span className="brand-word-accent">space</span></span>
         </a>
         <nav className="nav" aria-label={t('aria.mainNav')}>
-          <a href="#how">{t('nav.how')}</a>
-          <a href="#planner">{t('nav.planner')}</a>
+          <a href="#planner" className={activeSection === 'planner' ? 'active' : undefined} aria-current={activeSection === 'planner' ? 'true' : undefined}>{t('nav.planner')}</a>
+          <a href="#how" className={activeSection === 'how' ? 'active' : undefined} aria-current={activeSection === 'how' ? 'true' : undefined}>{t('nav.how')}</a>
         </nav>
         <div className="header-actions">
           {/* Sprint 10.156: the header right side is now two clearly-grouped clusters split by a hairline —

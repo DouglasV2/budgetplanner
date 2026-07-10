@@ -10,6 +10,8 @@ import ai.budgetspace.dto.PlanGenerationResponse;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.PlannerIntentAnalysisDto;
 import ai.budgetspace.dto.ReplaceProductRequest;
+import ai.budgetspace.dto.SimilarItemsRequest;
+import ai.budgetspace.dto.SimilarItemsResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -73,6 +75,14 @@ public class PlanController {
     @PostMapping("/api/plans/replace")
     public FurnishingPlanDto replaceProduct(@RequestBody ReplaceProductRequest request) {
         return plannerService.replaceProduct(request);
+    }
+
+    // Sprint 10.173 (P0): "find similar items under my budget" — given the anchor product the user is looking at
+    // and a budget cap, return up to three verified in-catalog alternatives (budget pick / best value / nicer).
+    // Rule-based, no AI/auth (like generate-fast/replace); browse-only, never mutates a plan.
+    @PostMapping("/api/plans/similar")
+    public SimilarItemsResponse similarItems(@RequestBody SimilarItemsRequest request) {
+        return plannerService.findSimilar(request);
     }
 
     // Sprint 10.8: the frontend calls this after /api/plans/generate, passing the generation result

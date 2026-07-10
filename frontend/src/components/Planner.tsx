@@ -600,6 +600,16 @@ export function Planner() {
     trackEvent('product_click', { retailer: product.retailer, category: product.category, source: 'plan_card' });
   }
 
+  // Sprint 10.173 (P0): a user opened one of the "similar under budget" alternatives. Fire the feature-specific
+  // events (similar_item_click + budget_option_click, both carrying the bucket + cap) AND the shared product_click
+  // funnel with a distinct source, plus the first-party product-click log, so panel opens are measurable.
+  function handleSimilarProductOpen(planId: string, product: Product, bucket: string, cap: number) {
+    trackProductClick(planId, product, 'similar-panel');
+    trackEvent('product_click', { retailer: product.retailer, category: product.category, source: 'similar_panel' });
+    trackEvent('similar_item_click', { retailer: product.retailer, category: product.category, bucket, cap });
+    trackEvent('budget_option_click', { retailer: product.retailer, category: product.category, bucket, cap });
+  }
+
   async function handleFeedback(planId: string, feedback: PlanFeedback) {
     await sendPlanFeedback(planId, feedback);
     setNotice(t('planner.noticeFeedback'));
@@ -711,23 +721,22 @@ export function Planner() {
 
   return (
     <section className="planner-section shell" id="planner">
-      {/* Sprint 10.144: dropped the floating "Složeno planova / 0" stat card — an empty "0" stat reads as a
-          generic AI-dashboard mockup (founder flagged the hero as AI-evski). The hero is now a clean, confident
-          left-aligned editorial header at a comfortable measure. */}
-      <div className="section-heading left planner-heading-row">
-        <div>
-          <span className="eyebrow">{t('planner.eyebrow')}</span>
-          {/* Sprint 10.156: give the headline brand personality (less flat/generic) — the "payoff" second
-              sentence renders in the brand clay. Robust across locales: if there's no sentence break we just
-              show the plain heading. */}
+      {/* Sprint 10.170 ("Fit-Out Desk"): the old hero collapses into a slim product STATUS STRIP — brand kicker,
+          a compact title + one-line explainer on the left, live account state on the right — so the workspace
+          (prompt → plan) clears the fold instead of sitting under a 3.5rem hero. */}
+      {/* Sprint 10.171: a clean product header — big title + one-line explainer — with the mode navtrack directly
+          below it (per owner mockup). Account state now lives in the left brief console, above "Brzi stil". */}
+      <div className="section-heading left planner-heading-row status-strip">
+        <div className="status-strip-headline">
+          {/* Sprint 10.172c: editorial title (owner mockup) — an eyebrow + copper dash over a crafted SERIF
+              title (Playfair) whose last word is set in brand copper. */}
+          <span className="eyebrow status-eyebrow">{t('planner.spaceKicker')}</span>
           <h2>{(() => {
-            const heading = t('planner.heading');
-            const at = heading.indexOf('. ');
-            return at < 0
-              ? heading
-              : <>{heading.slice(0, at + 1)} <span className="hero-accent">{heading.slice(at + 2)}</span></>;
+            const title = t('planner.eyebrow');
+            const idx = title.lastIndexOf(' ');
+            return idx < 0 ? title : <>{title.slice(0, idx + 1)}<span className="title-accent">{title.slice(idx + 1)}</span></>;
           })()}</h2>
-          <p>{t('planner.subheading')}</p>
+          <p>{t('planner.heading')}</p>
         </div>
       </div>
 
@@ -756,38 +765,24 @@ export function Planner() {
         </div>
       )}
 
-      {/* Sprint 10.63: real account state. Signed in → plans are tied to the account; guest → saved in this
-          browser, with a one-click way back to the sign-in front door. */}
-      <div className="account-strip">
-        <div className="account-strip-text">
-          <span>{t('account.title')}</span>
-          <small>{user ? t('account.signedInHint') : t('account.hint')}</small>
-        </div>
-        {user ? (
-          <span className="account-strip-badge">{t('auth.signedInAs', { name: user.name || user.email || '' })}</span>
-        ) : (
-          <button type="button" className="account-signin-link" onClick={openSignIn}>{t('auth.signIn')}</button>
-        )}
-      </div>
+      {/* Sprint 10.170: account state moved into the status strip above; the SavedPlansInbox moved BELOW the
+          workspace (rendered after the apartment block) so the planner console clears the fold on entry. */}
 
-      <SavedPlansInbox
-        plans={savedPlans}
-        search={savedSearch}
-        onSearchChange={setSavedSearch}
-        onOpen={openSavedPlan}
-        onFavorite={toggleSavedFavorite}
-        onDelete={handleDeleteSaved}
-        activeSpace={activeSpace}
-        onActiveSpaceChange={setActiveSpace}
-        onContinueSpace={handleContinueSpace}
-        defaultSpaceName={t('spaces.defaultName')}
-      />
-
-      {/* Sprint 10.109: scope switch — one room (default) vs the whole apartment. Same prompt/engine; the
-          apartment branch is a self-contained orchestration over the single-room generator. */}
-      <div className="scope-toggle" role="group" aria-label={t('moveIn.scopeAria')}>
-        <button type="button" className={scope === 'single' ? 'scope-option active' : 'scope-option'} aria-pressed={scope === 'single'} onClick={() => setScope('single')}>{t('moveIn.scopeSingle')}</button>
-        <button type="button" className={scope === 'apartment' ? 'scope-option active' : 'scope-option'} aria-pressed={scope === 'apartment'} onClick={() => setScope('apartment')}>{t('moveIn.scopeApartment')}</button>
+      {/* Sprint 10.170: the scope switch is now the workspace NAVTRACK — a full-bleed tracked rail (single room
+          vs whole apartment) with a copper active-underline, the same copper as the budget-fill + prompt caret. */}
+      <div className="scope-toggle navtrack scope-switch" role="group" aria-label={t('moveIn.scopeAria')}>
+        <button type="button" className={scope === 'single' ? 'scope-option active' : 'scope-option'} aria-pressed={scope === 'single'} onClick={() => setScope('single')}>
+          <span className="scope-icon" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4 11V8.5A2.5 2.5 0 0 1 6.5 6h11A2.5 2.5 0 0 1 20 8.5V11" /><path d="M3.5 11a2 2 0 0 1 2 2v2.5h13V13a2 2 0 0 1 2-2" /><path d="M6 16v2M18 16v2" /></svg>
+          </span>
+          <span className="scope-text">{t('moveIn.scopeSingle')}</span>
+        </button>
+        <button type="button" className={scope === 'apartment' ? 'scope-option active' : 'scope-option'} aria-pressed={scope === 'apartment'} onClick={() => setScope('apartment')}>
+          <span className="scope-icon" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5" /><path d="M12 3.5v17M3.5 12H12M12 8h8.5" /></svg>
+          </span>
+          <span className="scope-text">{t('moveIn.scopeApartment')}</span>
+        </button>
       </div>
 
       {/* Both panes stay MOUNTED; we toggle visibility so switching scope never loses your work
@@ -849,6 +844,7 @@ export function Planner() {
           onQuickAction={handleQuickAction}
           onSavePlan={handleSavePlan}
           onProductClick={handleProductClick}
+          onSimilarProductOpen={handleSimilarProductOpen}
           onFeedback={handleFeedback}
           isLoading={isLoading}
           error={error}
@@ -891,6 +887,21 @@ export function Planner() {
           seed={moveInSeed}
         />
       </div>
+
+      {/* Sprint 10.170: saved plans live below the workspace now — a quiet collapsed disclosure, not a block
+          stacked above the planner (which is what pushed the workspace under the fold). Same props/handlers. */}
+      <SavedPlansInbox
+        plans={savedPlans}
+        search={savedSearch}
+        onSearchChange={setSavedSearch}
+        onOpen={openSavedPlan}
+        onFavorite={toggleSavedFavorite}
+        onDelete={handleDeleteSaved}
+        activeSpace={activeSpace}
+        onActiveSpaceChange={setActiveSpace}
+        onContinueSpace={handleContinueSpace}
+        defaultSpaceName={t('spaces.defaultName')}
+      />
 
       {/* Sprint 10.168: in-app confirm modal for deleting a saved plan (reuses the legal/confirm modal styling). */}
       {deleteTarget && (
