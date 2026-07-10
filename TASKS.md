@@ -156,23 +156,39 @@ needs `OPENAI_API_KEY`, backend env only).
   Never fabricate matches, prices, discounts or product URLs, and never scrape blocked shops. Track `similar_items_open`,
   `similar_item_click`, `budget_compare_open`, `budget_option_click`, and reuse/extend `product_click` so we can see
   whether users actually use the flow.
-- **P0 — Deepen kitchen catalog quality before broader expansion.** Kitchen currently feels too thin for a move-in
-  planning app, so strengthen it before spreading effort across every room/market. Add/gap-fill verified products for:
-  cookware, plates, bowls, cutlery, glasses, mugs, food storage, spice/storage jars, trash bins, dish racks, kitchen
-  towels, cutting boards, basic utensils, small appliances where the market feed is reliable, shelves/carts, lighting
-  and simple decor. Work from a market × room × category gap report and prioritise DE/AT first, then HR, then the
-  remaining active EUR markets. Keep the existing no-fabrication rule: real product URL, price, image/source and
-  freshness evidence or no item.
-- **P1 — Add bathroom coverage for remaining markets.** Add bathroom only after the similar-item flow and kitchen
-  depth are on track. Prioritize what was added to HR which is toilet seats and bathtubs, which  obviously people want, for extra:
-  bath mats, shower curtains/screens where relevant, bathroom storage, mirrors, bins, laundry baskets, hooks, lighting and small decor. 
-  Use verified retailers/feeds per market and avoid fake placeholder recommendations.
-- **P1 — Deepen core furniture for DE/AT/HR.** Add more breadth for the furniture items users expect in first-apartment
-  plans: bed, mattress, sofa, dining table, chairs, wardrobe, desk, shelves, nightstand, TV stand, dresser and basic
-  storage. Goal: reduce repeated IKEA-only/basic picks while keeping the plan honest and shoppable.
-- **P2 — Expand furniture depth for the remaining markets.** After the P0/P1 gaps are working, broaden furniture
-  coverage across the other active markets. Do this gap-first, not by bulk-filling: add only verified products that
-  improve actual plan quality and keep market-specific availability, currency and retailer freshness intact.
+- **P0 — Kitchen: plan a real kitchen (REFRAMED by owner 2026-07-10).** ⏳ **Increment 1 DONE (Sprint 10.175):**
+  the code for the **complete-kitchen (modular sets)** mode ships — deterministic intent routing (complete /
+  component / kitchenware / none), a lean `kitchen-set` taxonomy, honest modular-not-fitted framing replacing the
+  old IKEA-planner dead-end, DE/AT/HR IKEA set sourcing. See the sprint entry below + the spec/plan under
+  `docs/superpowers/`. **The reframe:** kitchen is *planning/buying a real kitchen* — (A) a **complete kitchen**
+  (whole thing as a package; honest = show real modular sets, not a faked fitted-kitchen price), (B) **individual
+  components** (kitchen furniture: base/wall/tall/corner cabinets, islands; appliances built-in/freestanding: oven,
+  hob, hood, fridge, freezer, dishwasher, microwave; sink area; worktops/backsplash/panels/handles/plinths), and
+  only as a SECONDARY, opt-in layer (C) **kitchenware** (cookware/tableware/utensils/food-storage) — **never
+  auto-injected** when someone just says "kitchen". (This supersedes the earlier "deepen kitchenware" framing.)
+  ✅ **Increment 3 DONE (Sprint 10.176):** kitchen APPLIANCES (oven/hob/hood/fridge/freezer/dishwasher/microwave)
+  into the normal plan when the user names them — 32 verified IKEA appliances (HR/AT/DE). (IKEA sells its own
+  appliances, so **no new retailer was needed** — the earlier "appliances need MediaMarkt-class" assumption was
+  wrong.) **Remaining increments:** components—furniture/cabinets (base/wall/tall/corner; note "2 ormara"
+  partly works today via kitchen-storage), sink area + worktops/install, kitchenware (opt-in, never auto), and
+  cross-market port + complete-kitchen sourcing depth. No-fabrication rule throughout: real product URL, price,
+  image/source or no item; prioritise DE/AT + HR.
+- **P1 — Add bathroom coverage for remaining markets.** ✅ **Largely done 2026-07-10 (Sprint 10.177).** The biggest
+  gap was **bathroom textiles = 0 in ALL 15 markets** (a bathroom plan never got a bath mat/shower curtain); filled with
+  IKEA bath mats + shower curtains everywhere (~15/market), plus bathroom **storage** depth (bins, laundry baskets,
+  shelves, towel rails, hooks, mirrors, accessories — ~26/market) and **bath wall lights** (~5/market; FR bath-lights
+  category returned nothing). Harvested from each market's OWN live IKEA category listing + per-product JSON-LD; no
+  fabrication. **Not done:** toilet-seat/bathtub **fixtures** for non-HR/DK markets — IKEA/JYSK don't sell sanitary ware,
+  so those still need a per-market sanitary-ware retailer (Pevex=HR-only, VVS Eksperten=DK-only). Small bathroom **decor**
+  for GB (decor=1) also still thin.
+- **P1 — Deepen core furniture for DE/AT/HR.** ✅ **Done 2026-07-10 (Sprint 10.177)**, and extended to all 15 markets.
+  Added IKEA depth for the thin (market×category) cells the coverage map surfaced — **desk, mattress, chair, dining-chair,
+  nightstand** + **kitchen-storage / kitchen-cart**. (bed/sofa/wardrobe/tv-unit/dresser were already deep enough — not
+  the gap.) Kept the plan honest: dedup-vs-catalog concentrates the additions in the thinnest markets, METOD/UTRUSTA
+  cabinet components pruned, a multilingual judge pass removed mis-categorized/non-standalone rows.
+- **P2 — Expand furniture depth for the remaining markets.** ✅ **Done 2026-07-10 (Sprint 10.177)** in the same pass —
+  the harvest ran across all 15 active markets gap-first (per-market live assortment, per-market currency), so IT/FI/FR/
+  ES/PT/GB/NO/SE/DK/NL/SI/SK gained the same core-furniture depth. See the sprint entry below.
 - **Full-catalog re-verification** near launch (all 6 markets, ~665 rows) — same freshness rule as step 3.
 - **First real `RetailerFeed`** (Decathlon/Pevex/Lesnina) → unlocks `home-gym` and retires the last sample
   dependency (`ai.budgetspace.feed` seam already exists; never scrape).
@@ -186,6 +202,87 @@ needs `OPENAI_API_KEY`, backend env only).
 - **Scale/perf**: load test, query/caching review, CDN for assets.
 
 ## Recently done
+
+### Sprint 10.177 — P1/P2 catalog depth: bathroom textiles (0→everywhere) + core furniture, all 15 markets (current)
+- **The gap map (deduped catalog) surfaced one glaring hole: bathroom `textiles` = 0 in ALL 15 markets** — a bathroom
+  plan literally never shipped a bath mat or shower curtain, though IKEA sells them in every market. Plus the P1/P2
+  furniture cells (desk / mattress / chair / dining-chair / nightstand + kitchen-storage / kitchen-cart) were thin in
+  the smaller markets (IT/FI/FR/ES/PT/GB ~10-16).
+- **+1290 web-verified IKEA products, no fabrication.** Technique refinement over the 10.167/10.168 cross-market port:
+  IKEA's **category-by-id redirect** (`/{cc}/{lang}/cat/x-{id}/`) resolves to each market's OWN localized listing, so
+  instead of porting one market's articles we harvested **each market's real in-market assortment** per category, then
+  re-read every product page's JSON-LD **price + priceCurrency (currency-matched to the market) + og:image + og:title**
+  by deterministic curl (agent-free async pool). Bounced / currency-mismatched / already-in-catalog rows dropped.
+  - **Bathroom (`real-ikea-bathroom-depth-10-177.json`, 685):** textiles ~15/market (bath mats + shower curtains) +
+    storage ~26/market (bins, laundry baskets, shelves, towel rails, hooks, mirrors, accessories) + bath wall lights
+    ~5/market (FR bath-lights category returned nothing). All 15 markets.
+  - **Furniture (`real-ikea-furniture-depth-10-177.json`, 605):** desk/mattress/chair/dining-chair/nightstand +
+    kitchen-storage/kitchen-cart across all 15 markets; **dedup-vs-catalog concentrates the additions in the thinnest
+    markets** (well-stocked DE/AT/HR/SI mostly dedup out), so it's gap-first, not bulk-fill.
+- **Curation (adversarial):** a deterministic prune of IKEA internal-fitting series (METOD/UTRUSTA/… — cabinet
+  components, not standalone) removed 27, then a **24-agent multilingual judge** (one per ~55-row batch) flagged the
+  residue → 17 more junk dropped in EVERY market they appeared (not just the sampled one): SIGGERUD mattress gap-filler
+  wedge mis-filed as a foam mattress (×5 markets), LAGKAPTEN bare tabletop as a desk, a shower-curtain **ring** as a
+  shower curtain (×10), a UTRUSTA corner-cabinet shelf the keyword prune missed.
+- **Planner:** added `textiles` to the bathroom category flow + comfort set (`PlannerService`) — otherwise the new bath
+  mats/curtains would never surface organically (they weren't in the bathroom flow at all). Same pattern living-room /
+  bedroom already use; no test pinned the flow.
+- **Verified:** `StoreLinkIntegrityTest` green (0 dup URL / 0 dup externalId across the whole 9338-row catalog);
+  **full backend suite 361/361**. **Live boot:** `received=9338, created=9338, skipped=0` (every new row passed import
+  validation, zero rejections); catalog 8048→**9338** (IKEA 6815). Real plans: DE bathroom → **ALMTJÄRN Badematte
+  €24.99** (was impossible); GB bathroom → **KABOMBA wall light** (GB bath lighting was 0); IT home-office → LAGKAPTEN/
+  ALEX desk €120. Files added to `RealCatalogSeeder`.
+- **Known small gaps (follow-ups):** FR bathroom lighting still 0 (category empty on ikea.fr); bathroom `decor` for GB
+  still thin (decor=1); toilet/washbasin/bath-shower **fixtures** for non-HR/DK markets still need a per-market
+  sanitary-ware retailer (IKEA/JYSK don't sell them).
+
+### Sprint 10.176 — Kitchen Increment 3: appliances into the normal plan
+- **Owner model:** when a user NAMES components ("imam 800 €, trebam pećnicu i frižider za kuhinju"), they go
+  into the **normal shopping plan** (not a separate flow); the "Kompletna kuhinja" section (10.175) stays only for a
+  whole-kitchen ask. Appliances first (standalone, clean to show); cabinets next.
+- **7 appliance categories** (oven / hob / cooker-hood / fridge / freezer / dishwasher / microwave) wired through
+  the whole taxonomy: `ProductTaxonomy` (known + HR/DE aliases), frontend `ProductCategory` + `categoryLabels` +
+  `FALLBACK_IMAGES` + `CATEGORY_PATHS` (hand-drawn glyphs), `cat.*` i18n in hr/en + all 12 message JSONs.
+- **Routing:** `PlannerIntentExtractor` now parses appliance keywords → **must-have** and infers the kitchen room
+  even without the word "kuhinja" ("mikrovalna pećnica" = microwave, not oven, via a stem lookbehind). Because
+  `desiredCategories` unions must-have, a named appliance is picked into the plan **only when asked** — a generic
+  "opremi kuhinju" does NOT force a €400 fridge. (No new UI: appliances render as normal product rows.)
+- **Sourcing:** **32 verified IKEA appliances** (HR 10 / AT 12 / DE 10, €65–899) across all 7 categories — fetched
+  then independently re-fetched (32 confirmed, **1 rejected for a price mismatch**) → `real-ikea-kitchen-appliances-
+  10-176.json` + seeder entry; `StoreLinkIntegrityTest` green.
+- Tests: `PlannerIntentExtractorTest` (+1), `PlannerServiceTest` (+1: appliance picked when asked / not when
+  generic), `ProductTaxonomyTest` (+1). **Full backend suite 361 / 0.** Frontend tsc clean.
+- **Verified live** (HR, :5173): "imam 800 €, trebam pećnicu i frižider za kuhinju" → a 2-item plan **Pećnica
+  (MATTRADITION €349) + Hladnjak (LAGAN €229) = €578**, real IKEA products + correct category labels.
+
+### Sprint 10.175 — Kitchen Increment 1: complete-kitchen (modular sets) + prompt-box focus (current)
+- **Reframe (owner):** kitchen = planning a REAL kitchen (complete / components / kitchenware-secondary), not a
+  kitchenware fill. Spec + plan written under `docs/superpowers/specs|plans/2026-07-10-kitchen-complete-mode.*`.
+- **Increment 1 — complete-kitchen (modular sets):** a deterministic `KitchenIntentClassifier`
+  (complete/component/kitchenware/none, HR/DE/EN, diacritics + đ handled, AND-logic so "kompletna **L** kuhinja"
+  matches) routes a complete-kitchen prompt to a new **"Kompletna kuhinja"** inline section of real modular kitchen
+  **sets** (`kitchen-set` category, `PlannerService.buildCompleteKitchen`, on `PlanGenerationResponse.completeKitchen`).
+  It replaces the old "go to IKEA planner" dead-end with real priced sets + an honest **modular-not-fitted** note
+  (+ the planner link for true made-to-measure); parses shape (single-wall/L/U/galley/island) + include-appliances
+  as display-only "understanding", never hard filters. Browse-only; the freestanding plan is untouched. Empty pool →
+  an honest "no set under {budget}" state. **AI-path fix:** the AI clears the resolved prompt, so the controller
+  classifies the ORIGINAL prompt (`maybeAttachCompleteKitchen`) — otherwise the section vanished on the AI path.
+- **Scope:** only `kitchen-set` added to the taxonomy (the rest come with their sourcing); components/appliances/
+  kitchenware are later increments; IKEA-only, DE/AT/HR, this round.
+- Backend: `KitchenIntentClassifier` + `CompleteKitchenDto` + `ProductTaxonomy` (kitchen-set) + `PlannerService`
+  (buildCompleteKitchen / maybeAttachCompleteKitchen) + `PlanController` branch. Tests: `KitchenIntentClassifierTest`
+  (7) + `PlannerServiceTest` (+5) + `ProductTaxonomyTest` (+1); full backend suite green.
+- Frontend: inline `CompleteKitchenSection` in `PlanResults` (reuses the product-card helpers), `kitchen.*` +
+  `cat.kitchen-set` i18n in hr/en + all 12 message JSONs, `kitchen-set` wired through every exhaustive
+  `ProductCategory` map (labels/fallback-image/icon), analytics (`kitchen_intent`, `complete_kitchen_view`,
+  `kitchen_set_click`). Verified live (HR, :5173): section renders with parsed L-shape + appliances, modular note,
+  IKEA-planner link, real KNOXHULT set cards, old kitchen note suppressed. tsc build clean.
+- **Sourcing (Task 7):** **14 verified IKEA KNOXHULT modular kitchen sets** (DE 5 / AT 4 / HR 5, €130–420) —
+  fetched then independently re-fetched (14 confirmed, 0 rejected) → `catalog/real-ikea-kitchen-sets-10-175.json`
+  + seeder entry; `StoreLinkIntegrityTest` green; live-boot confirmed sets show for all three markets.
+- **Also (Sprint 10.174, folded in):** desktop prompt-box discoverability — the quiet label became a one-line
+  instruction ("Upiši svojim riječima … pa klikni Složi plan", per-language button label) + the auto-focused box
+  now reads as a clear white input well (firm border, copper rail, navy caret + focus ring). All 14 languages.
 
 ### Sprint 10.173 — P0: similar-item + budget-option discovery (browse & open) (current)
 - Every plan product row gets a **"Slično ispod budžeta"** action that opens an inline discovery panel: budget-cap

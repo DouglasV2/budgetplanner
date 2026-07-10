@@ -50,10 +50,16 @@ public class PlanController {
         // Understand the prompt first (AI when enabled + within the tier's allowance, else rule-based), then plan.
         Caller caller = resolveCaller(authToken, sessionId, request);
         PlannerIntentAnalysisDto analysis = promptIntelligenceService.analyze(input, caller.countingKey(), caller.tier());
+        PlannerInputDto resolvedInput = analysis.aiUsed()
+                ? promptIntelligenceService.toPlannerInput(analysis, input)
+                : input;
         PlanGenerationResponse response = analysis.aiUsed()
-                ? plannerService.generateResolved(promptIntelligenceService.toPlannerInput(analysis, input), analysis.specificItemsOnly())
+                ? plannerService.generateResolved(resolvedInput, analysis.specificItemsOnly())
                 : plannerService.generate(input);
-        return response.withAnalysis(analysis);
+        response = response.withAnalysis(analysis);
+        // Sprint 10.175: the AI path clears the resolved input's prompt, so buildResponse's own classification sees
+        // nothing — classify the ORIGINAL prompt here to decide the complete-kitchen section (no-op if already set).
+        return plannerService.maybeAttachCompleteKitchen(response, input.prompt(), resolvedInput);
     }
 
     // Sprint 10.78: an INSTANT deterministic plan (rule-based parse, no AI/LLM call, no auth needed) so the

@@ -1,4 +1,4 @@
-import type { DesignAssistant, FurnishingPlan, MoveInApiResponse, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, RoomType, SavedPlanResponse } from '../types';
+import type { CompleteKitchen, DesignAssistant, FurnishingPlan, MoveInApiResponse, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, RoomType, SavedPlanResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
@@ -13,6 +13,8 @@ export interface PlanGenerationResponse {
   // Sprint 10.51: matched second-hand ("Rabljeno") listings — a separate block shown under the new-retail
   // plans, never counted into any plan total. Empty when no marketplace feed is configured or nothing matches.
   secondHandSuggestions?: Product[];
+  // Sprint 10.175: present only on a complete-kitchen prompt — real modular sets + honest note. Null otherwise.
+  completeKitchen?: CompleteKitchen | null;
 }
 
 // Stable per-browser id so the backend can apply per-session AI usage limits + scope a guest's saved plans.

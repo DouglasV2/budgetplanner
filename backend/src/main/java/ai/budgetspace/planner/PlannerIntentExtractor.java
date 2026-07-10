@@ -59,7 +59,16 @@ public class PlannerIntentExtractor {
             Map.entry("kitchen-cart", Pattern.compile("kuhinjska kolica|servirna kolica|kitchen cart")),
             Map.entry("nightstand", Pattern.compile("nocni ormar|nightstand")),
             Map.entry("wardrobe", Pattern.compile("ormar za odjec|garderobni ormar|plakar|wardrobe")),
-            Map.entry("dresser", Pattern.compile("komoda s ladic|ladicar|dresser"))
+            Map.entry("dresser", Pattern.compile("komoda s ladic|ladicar|dresser")),
+            // Sprint 10.176 (kitchen Increment 3): kitchen appliances (parsed as must-have when named). A
+            // "mikrovalna pecnica" is a microwave, so the oven pattern excludes that phrase.
+            Map.entry("oven", Pattern.compile("(?<!mikrovaln. )pecnic|\\brerna\\b|backofen|\\boven\\b")),
+            Map.entry("hob", Pattern.compile("ploca za kuhanj|indukcijsk\\w* ploc|\\bkuhalo\\b|kochfeld|\\bhob\\b|cooktop")),
+            Map.entry("cooker-hood", Pattern.compile("\\bnapa\\b|\\bnapu\\b|kuhinjsk\\w* nap|dunstabzug|cooker hood|extractor hood")),
+            Map.entry("fridge", Pattern.compile("hladnjak|frizider|kuhlschrank|\\bfridge\\b|refrigerator")),
+            Map.entry("freezer", Pattern.compile("zamrziva|\\bskrinj|gefrierschrank|\\bfreezer\\b")),
+            Map.entry("dishwasher", Pattern.compile("perilic\\w* posu|perilic\\w* sud|geschirrspul|dishwasher")),
+            Map.entry("microwave", Pattern.compile("mikrovaln|mikrowell|microwave"))
     );
 
     // Sprint 10.7: colour and material preferences. Keys are the canonical tags shared with
@@ -123,6 +132,9 @@ public class PlannerIntentExtractor {
         // room defaults instead so the user still gets a (non-empty) plan rather than an empty home-gym.
         // Sprint 10.7: new rooms. Checked after the originals, so the last room mentioned wins.
         if (matches(text, "kuhinj|kitchen|kuche|cucina|cuisine|keuken|kuchyn|cocina|cozinha|keitti|kjokken|kokken")) input = input.withRoomType("kitchen");
+        // Sprint 10.176: a named kitchen APPLIANCE implies the kitchen room even without the word "kuhinja"
+        // (e.g. "trebam pećnicu i frižider"), so the appliance is planned in the kitchen (its products' room).
+        if (matches(text, "(?<!mikrovaln. )pecnic|hladnjak|frizider|perilic\\w* posu|\\bnapa\\b|zamrziva|mikrovaln|\\bkuhalo\\b|indukcijsk\\w* ploc")) input = input.withRoomType("kitchen");
         if (matches(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|comedor|sala de jantar|ruokailu|spisestue|matsal")) input = input.withRoomType("dining-room");
         if (matches(text, "hodnik|predsoblje|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b")) input = input.withRoomType("hallway");
         // German "Bad" = bathroom, but a bare \bbad\b also matched the English adjective "bad" (e.g. "my sofa is

@@ -47,8 +47,10 @@ public class PlannerService {
             Map.entry("dining-room", List.of("dining-table", "dining-chair", "lighting", "rug", "storage", "decor")),
             Map.entry("hallway", List.of("storage", "lighting", "rug", "decor")),
             // Sprint 10.169: bathroom fixtures first (toilet + washbasin + a bath/shower are what a bathroom is
-            // built around; Pevex HR), then the IKEA/JYSK cabinet/mirror/lighting/decor around them.
-            Map.entry("bathroom", List.of("toilet", "washbasin", "bath-shower", "storage", "lighting", "decor")),
+            // built around; Pevex HR), then the IKEA/JYSK cabinet/mirror/lighting/textiles/decor around them.
+            // Sprint 10.177: textiles (bath mat / shower curtain) added — now sourced for every market, they belong
+            // in a real bathroom plan (a comfort item, after storage + lighting).
+            Map.entry("bathroom", List.of("toilet", "washbasin", "bath-shower", "storage", "lighting", "textiles", "decor")),
             // Sprint 10.121: studio/one-room flat = living + bedroom combined (you sleep AND live here), so the
             // flow carries the essentials of both, sleeping pieces first. Products come from the living-room AND
             // bedroom catalog pools (see ROOM_CATALOG_TAGS / matchesRoom).
@@ -79,7 +81,7 @@ public class PlannerService {
             Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
             Map.entry("hallway", Set.of("lighting", "rug")),
-            Map.entry("bathroom", Set.of("storage", "lighting")),
+            Map.entry("bathroom", Set.of("storage", "lighting", "textiles")),
             Map.entry("studio", Set.of("dining-table", "wardrobe", "table", "storage", "lighting", "rug", "textiles"))
     );
 
@@ -115,6 +117,9 @@ public class PlannerService {
     // — tests that don't exercise second-hand build the planner without it, and then no used items are surfaced.
     private final EbayBrowseFeed ebayMarketplace;
     private final PlannerIntentExtractor intentExtractor = new PlannerIntentExtractor();
+    // Sprint 10.175 (kitchen Increment 1): deterministic complete/component/kitchenware intent routing.
+    private final KitchenIntentClassifier kitchenClassifier = new KitchenIntentClassifier();
+    private static final int MAX_KITCHEN_SETS = 6;
 
     public PlannerService(ProductRepository productRepository) {
         this(productRepository, null);
@@ -418,7 +423,55 @@ public class PlannerService {
         String catalogWarning = partial ? buildCatalogWarning(missingImportant) : null;
         List<ProductDto> secondHand = secondHandSuggestions(input);
         logPlanSummary(input, plans, missingImportant);
-        return new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning, secondHand);
+        PlanGenerationResponse response = new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning, secondHand);
+        // Sprint 10.175: a complete-kitchen prompt also gets a "Kompletna kuhinja" section of real modular sets
+        // (browse-only; it never touches the freestanding plan above). Only COMPLETE intent attaches it.
+        KitchenIntentClassifier.KitchenBrief kitchenBrief = kitchenClassifier.classify(input.prompt());
+        if (kitchenBrief.intent() == KitchenIntentClassifier.KitchenIntent.COMPLETE) {
+            response = response.withCompleteKitchen(buildCompleteKitchen(input, kitchenBrief));
+        }
+        return response;
+    }
+
+    // Sprint 10.175 (kitchen Increment 1): select real modular kitchen SETS (category kitchen-set) for the
+    // market within budget, ranked by the same "value" score the planner trusts. Browse-only, no plan mutation.
+    // An empty list is an honest "no set fits" state (the UI still shows the modular note). Catalog only —
+    // marketCatalog already excludes second-hand/marketplace listings, so used items never leak in.
+    public CompleteKitchenDto buildCompleteKitchen(PlannerInputDto rawInput, KitchenIntentClassifier.KitchenBrief brief) {
+        PlannerInputDto input = rawInput.normalized();
+        List<String> allowed = selectedRetailers(input);
+        List<ProductDto> sets = marketCatalog(input).stream()
+                .filter(product -> "kitchen-set".equalsIgnoreCase(product.getCategory()))
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> allowed.contains(product.getRetailer()))
+                .filter(product -> product.getPrice().doubleValue() <= input.budget())
+                .sorted(Comparator.comparingDouble((Product product) -> scoreProduct(product, input, "value", Set.of(), 0)).reversed())
+                .limit(MAX_KITCHEN_SETS)
+                .map(ProductDto::from)
+                .toList();
+        return new CompleteKitchenDto(sets, shapeKey(brief.shape()), brief.includeAppliances(), true);
+    }
+
+    // Sprint 10.175: attach the complete-kitchen section from an EXPLICIT prompt. The AI path clears the resolved
+    // input's prompt (analysis is authoritative), so buildResponse's own classification sees nothing there — the
+    // controller calls this with the ORIGINAL prompt. No-op if a section is already present (the rule-based path
+    // attached it) or the original prompt isn't a complete-kitchen ask.
+    public PlanGenerationResponse maybeAttachCompleteKitchen(PlanGenerationResponse response, String originalPrompt, PlannerInputDto input) {
+        if (response == null || response.completeKitchen() != null) return response;
+        KitchenIntentClassifier.KitchenBrief brief = kitchenClassifier.classify(originalPrompt);
+        if (brief.intent() != KitchenIntentClassifier.KitchenIntent.COMPLETE) return response;
+        return response.withCompleteKitchen(buildCompleteKitchen(input, brief));
+    }
+
+    private String shapeKey(KitchenIntentClassifier.KitchenShape shape) {
+        return switch (shape) {
+            case SINGLE_WALL -> "single-wall";
+            case L_SHAPED -> "l-shaped";
+            case U_SHAPED -> "u-shaped";
+            case GALLEY -> "galley";
+            case ISLAND -> "island";
+            default -> "unknown";
+        };
     }
 
     // Sprint 10.51: the separate "Rabljeno" block. Used marketplace listings matched to the request's room +

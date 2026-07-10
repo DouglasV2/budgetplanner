@@ -160,6 +160,18 @@ public final class ProductTaxonomy {
             "dining-chair",
             "kitchen-storage",
             "kitchen-cart",
+            // Sprint 10.175 (kitchen Increment 1): a complete/modular kitchen unit (e.g. IKEA KNOXHULT/ENHET),
+            // sold as one priced product. Used only by the complete-kitchen flow, not the freestanding room flow.
+            "kitchen-set",
+            // Sprint 10.176 (kitchen Increment 3): kitchen appliances. Added to the normal plan only when the user
+            // asks for them (must-have), never forced into a generic kitchen plan.
+            "oven",
+            "hob",
+            "cooker-hood",
+            "fridge",
+            "freezer",
+            "dishwasher",
+            "microwave",
             "nightstand",
             "wardrobe",
             "dresser",
@@ -337,6 +349,17 @@ public final class ProductTaxonomy {
         alias(aliases, "dining-chair", "dining-chair", "dining chair", "blagovaonska stolica", "trpezarijska stolica", "stolica za blagovanje");
         alias(aliases, "kitchen-storage", "kitchen-storage", "kitchen storage", "kuhinjski ormarić", "kuhinjski ormaric", "kuhinjska polica", "kuhinjsko spremanje");
         alias(aliases, "kitchen-cart", "kitchen-cart", "kitchen cart", "kuhinjska kolica", "servirna kolica");
+        // Sprint 10.175: complete/modular kitchen sets.
+        alias(aliases, "kitchen-set", "kitchen-set", "modular-kitchen", "complete-kitchen", "kitchen-package",
+                "kompletna kuhinja", "modularna kuhinja", "cijela kuhinja", "modular kitchen", "complete kitchen");
+        // Sprint 10.176: kitchen appliances.
+        alias(aliases, "oven", "oven", "pecnica", "pećnica", "rerna", "backofen", "forno");
+        alias(aliases, "hob", "hob", "ploca za kuhanje", "ploča za kuhanje", "kuhalo", "indukcijska ploca", "cooktop", "kochfeld");
+        alias(aliases, "cooker-hood", "cooker-hood", "napa", "kuhinjska napa", "dunstabzug", "extractor hood", "cooker hood");
+        alias(aliases, "fridge", "fridge", "hladnjak", "frizider", "frižider", "refrigerator", "kuhlschrank");
+        alias(aliases, "freezer", "freezer", "zamrzivac", "zamrzivač", "skrinja", "gefrierschrank");
+        alias(aliases, "dishwasher", "dishwasher", "perilica posuda", "perilica posuđa", "perilica sudja", "geschirrspuler");
+        alias(aliases, "microwave", "microwave", "mikrovalna", "mikrovalna pecnica", "mikrowelle");
         alias(aliases, "nightstand", "nightstand", "noćni ormarić", "nocni ormaric", "noćni ormar");
         alias(aliases, "wardrobe", "wardrobe", "ormar za odjeću", "ormar za odjecu", "garderobni ormar", "plakar");
         alias(aliases, "dresser", "dresser", "komoda s ladicama", "ladičar", "ladicar");

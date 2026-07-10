@@ -96,6 +96,16 @@ export type ProductCategory =
   | 'dining-chair'
   | 'kitchen-storage'
   | 'kitchen-cart'
+  // Sprint 10.175: a complete/modular kitchen unit (KNOXHULT/ENHET-class), sold as one priced product.
+  | 'kitchen-set'
+  // Sprint 10.176: kitchen appliances (added to the plan only when the user asks for them).
+  | 'oven'
+  | 'hob'
+  | 'cooker-hood'
+  | 'fridge'
+  | 'freezer'
+  | 'dishwasher'
+  | 'microwave'
   | 'nightstand'
   | 'wardrobe'
   | 'dresser'
@@ -290,3 +300,13 @@ export interface MoveInApiResponse {
 }
 
 export type PlanFeedback = 'useful' | 'too-expensive' | 'wrong-style' | 'too-many-stores';
+
+// Sprint 10.175 (kitchen Increment 1): the "complete kitchen" result section. `sets` are real modular kitchen
+// sets (each a Product, category 'kitchen-set'); shape/includeAppliances are display-only "understanding";
+// showModularNote drives the honest "modular, not fitted" note. Empty `sets` = an honest "no set fits" state.
+export interface CompleteKitchen {
+  sets: Product[];
+  shape: string;
+  includeAppliances: boolean;
+  showModularNote: boolean;
+}

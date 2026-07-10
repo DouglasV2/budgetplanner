@@ -1,5 +1,6 @@
 package ai.budgetspace.planner;
 
+import ai.budgetspace.dto.CompleteKitchenDto;
 import ai.budgetspace.dto.FurnishingPlanDto;
 import ai.budgetspace.dto.MoveInRequestDto;
 import ai.budgetspace.dto.MoveInResponse;
@@ -229,6 +230,99 @@ class PlannerServiceTest {
         assertThat(res.bestValue().id()).isEqualTo("sofa-new");
         assertThat(res.budgetPick()).isNull();
         assertThat(res.nicer()).isNull();
+    }
+
+    // Sprint 10.175 (kitchen Increment 1 — complete-kitchen modular sets).
+    @Test
+    void completeKitchenReturnsSetsWithinBudgetRankedAndMarketScoped() {
+        Product setCheap = product("set-1", "KNOXHULT kuhinja 220cm", "IKEA", "kitchen-set", 900, 4.4);
+        Product setMid = product("set-2", "ENHET kuhinja 243cm", "IKEA", "kitchen-set", 1600, 4.7);
+        Product setOver = product("set-3", "Velika kuhinja 340cm", "IKEA", "kitchen-set", 5200, 4.8);
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 600, 4.5); // must NOT appear
+        for (Product s : List.of(setCheap, setMid, setOver, sofa)) s.setRoomTags("kitchen");
+        PlannerService service = serviceWithProducts(List.of(setCheap, setMid, setOver, sofa));
+
+        var brief = new KitchenIntentClassifier.KitchenBrief(
+                KitchenIntentClassifier.KitchenIntent.COMPLETE, KitchenIntentClassifier.KitchenShape.L_SHAPED, true);
+        CompleteKitchenDto ck = service.buildCompleteKitchen(input("kompletna kuhinja").withBudget(2000), brief);
+
+        List<String> ids = ck.sets().stream().map(ProductDto::id).toList();
+        assertThat(ids).contains("set-1", "set-2");           // both under 2000
+        assertThat(ids).doesNotContain("set-3", "sofa-1");    // over budget / not a set
+        assertThat(ck.showModularNote()).isTrue();
+        assertThat(ck.shape()).isEqualTo("l-shaped");
+        assertThat(ck.includeAppliances()).isTrue();
+    }
+
+    @Test
+    void completeKitchenIsHonestlyEmptyWhenNothingFits() {
+        Product setOver = product("set-1", "Skupa kuhinja", "IKEA", "kitchen-set", 5000, 4.8);
+        setOver.setRoomTags("kitchen");
+        PlannerService service = serviceWithProducts(List.of(setOver));
+        var brief = new KitchenIntentClassifier.KitchenBrief(
+                KitchenIntentClassifier.KitchenIntent.COMPLETE, KitchenIntentClassifier.KitchenShape.UNKNOWN, false);
+        CompleteKitchenDto ck = service.buildCompleteKitchen(input("kompletna kuhinja").withBudget(2000), brief);
+        assertThat(ck.sets()).isEmpty();
+        assertThat(ck.showModularNote()).isTrue(); // the honest modular note still shows
+    }
+
+    @Test
+    void generateAttachesCompleteKitchenOnCompletePrompt() {
+        Product set = product("set-1", "KNOXHULT kuhinja", "IKEA", "kitchen-set", 900, 4.5);
+        set.setRoomTags("kitchen");
+        PlannerService service = serviceWithProducts(List.of(set));
+        PlanGenerationResponse res = service.generate(input("trebam kompletnu kuhinju do 2000 eura").withBudget(2000));
+        assertThat(res.completeKitchen()).isNotNull();
+        assertThat(res.completeKitchen().sets()).extracting(ProductDto::id).contains("set-1");
+    }
+
+    @Test
+    void generateDoesNotAttachCompleteKitchenOnAPlainRoomPrompt() {
+        PlannerService service = serviceWithProducts(defaultProducts());
+        PlanGenerationResponse res = service.generate(input("dnevni boravak s kaučem"));
+        assertThat(res.completeKitchen()).isNull(); // NONE intent → no section, normal plan unaffected
+    }
+
+    // Sprint 10.176 (kitchen Increment 3): a named appliance is picked into the normal plan.
+    @Test
+    void mustHaveApplianceIsPickedIntoTheKitchenPlan() {
+        Product fridge = product("fridge-1", "Hladnjak KYLIG", "IKEA", "fridge", 349, 4.5);
+        fridge.setRoomTags("kitchen");
+        Product cart = product("cart-1", "RÅSKOG kolica", "IKEA", "kitchen-cart", 40, 4.4);
+        cart.setRoomTags("kitchen");
+        PlannerService service = serviceWithProducts(List.of(fridge, cart));
+        // generate() runs the extractor: "trebam frižider za kuhinju" → must-have fridge + kitchen room.
+        PlanGenerationResponse res = service.generate(input("trebam frižider za kuhinju do 800 eura").withBudget(800));
+        List<String> categories = res.plans().stream()
+                .flatMap(plan -> plan.items().stream())
+                .map(item -> item.product().category())
+                .toList();
+        assertThat(categories).contains("fridge");
+        // A generic kitchen prompt (no appliance named) must NOT force the fridge into the plan.
+        PlanGenerationResponse generic = service.generate(input("opremi kuhinju do 800 eura").withBudget(800));
+        List<String> genericCats = generic.plans().stream()
+                .flatMap(plan -> plan.items().stream())
+                .map(item -> item.product().category())
+                .toList();
+        assertThat(genericCats).doesNotContain("fridge");
+    }
+
+    @Test
+    void maybeAttachCompleteKitchenUsesTheOriginalPromptWhenResolvedPromptIsCleared() {
+        Product set = product("set-1", "KNOXHULT kuhinja", "IKEA", "kitchen-set", 900, 4.5);
+        set.setRoomTags("kitchen");
+        PlannerService service = serviceWithProducts(List.of(set));
+        // Simulate the AI path: the resolved input's prompt is cleared, and no section is attached yet.
+        PlannerInputDto cleared = input("").withBudget(2000);
+        PlanGenerationResponse base = new PlanGenerationResponse(cleared, List.of(), false, List.of(), null);
+
+        PlanGenerationResponse attached = service.maybeAttachCompleteKitchen(base, "trebam kompletnu kuhinju do 2000 eura", cleared);
+        assertThat(attached.completeKitchen()).isNotNull();
+        assertThat(attached.completeKitchen().sets()).extracting(ProductDto::id).contains("set-1");
+
+        // A non-complete original prompt leaves it null, and an already-attached section is left untouched.
+        assertThat(service.maybeAttachCompleteKitchen(base, "dnevni boravak s kaučem", cleared).completeKitchen()).isNull();
+        assertThat(service.maybeAttachCompleteKitchen(attached, "dnevni boravak", cleared)).isSameAs(attached);
     }
 
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { deleteSavedPlan, generatePlan, generatePlanFast, getSavedPlan, listSavedPlans, replaceProduct, savePlan, sendPlanFeedback, setSavedPlanFavorite, startCheckout, trackProductClick } from '../api/client';
-import type { FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
+import type { CompleteKitchen, FurnishingPlan, OptimizationGoal, PlanFeedback, PlannerInput, PlannerIntentAnalysis, Product, ReplacementChoice, Retailer, RoomType, SavedPlanResponse } from '../types';
 import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../utils/planner';
 import { detectOutOfScope } from '../utils/outOfScope';
 import { detectDimensionConstraint } from '../utils/dimensions';
@@ -281,6 +281,8 @@ export function Planner() {
   const [refining, setRefining] = useState(false);
   // Sprint 10.51: the separate "Rabljeno" (second-hand) suggestions — kept entirely out of every plan total.
   const [secondHand, setSecondHand] = useState<Product[]>([]);
+  // Sprint 10.175: the complete-kitchen section from the last generate (null unless it was a complete-kitchen prompt).
+  const [completeKitchen, setCompleteKitchen] = useState<CompleteKitchen | null>(null);
   // Sprint 10.61: the active "space" (home) that new room-plans save into; default "Moj dom".
   const [activeSpace, setActiveSpace] = useState<string>(() => t('spaces.defaultName'));
   // Sprint 10.13 (#3): reversible "we picked your country from the prompt" note.
@@ -357,6 +359,7 @@ export function Planner() {
         setInput(savedPlan.input);
         setPlans([savedPlan.plan]);
         setSecondHand([]);
+        setCompleteKitchen(null);
         setOpenedSavedAt(savedPlan.createdAt);
         // Sprint 10.167: view a shared plan in ITS OWN market — a UK plan shows £ (not the viewer's €) and its
         // labels in that market's language, coherently. Aligning the whole LocaleContext (not just a currency
@@ -404,6 +407,7 @@ export function Planner() {
     setPartialNotice(null);
     setAnalysis(null);
     setSecondHand([]);
+    setCompleteKitchen(null);
     setRefining(false);
     setOpenedSavedAt(null); // a fresh generation prices against the current catalog → drop the "saved plan" note
 
@@ -458,6 +462,7 @@ export function Planner() {
     setPlans(response.plans);
     setAnalysis(response.intentAnalysis ?? null);
     setSecondHand(response.secondHandSuggestions ?? []);
+    setCompleteKitchen(response.completeKitchen ?? null);
     const hasAnyItems = response.plans.some((plan) => plan.items.length > 0);
     // Sprint 10.124: use the LOCALIZED generic notice — the backend catalogWarning is Croatian-only and lists
     // the room's core categories (often not what a focused user asked for), so it leaked Croatian + wrong info.
@@ -475,6 +480,11 @@ export function Planner() {
         item_count: response.plans.reduce((sum, plan) => sum + plan.items.length, 0),
         partial_plan: !!response.partialPlan
       });
+      // Sprint 10.175: measure the complete-kitchen mode — did the prompt route to it, and how many sets showed.
+      if (response.completeKitchen) {
+        trackEvent('kitchen_intent', { intent: 'complete', market: response.input.market ?? effectiveInput.market ?? market });
+        trackEvent('complete_kitchen_view', { set_count: response.completeKitchen.sets.length, budget: effectiveInput.budget });
+      }
     }
   }
 
@@ -608,6 +618,14 @@ export function Planner() {
     trackEvent('product_click', { retailer: product.retailer, category: product.category, source: 'similar_panel' });
     trackEvent('similar_item_click', { retailer: product.retailer, category: product.category, bucket, cap });
     trackEvent('budget_option_click', { retailer: product.retailer, category: product.category, bucket, cap });
+  }
+
+  // Sprint 10.175: a user opened one of the complete-kitchen modular sets — fire the set-click funnel + the
+  // shared product_click (distinct source) + the first-party product-click log.
+  function handleKitchenSetClick(product: Product) {
+    trackProductClick('complete-kitchen', product, 'complete-kitchen');
+    trackEvent('product_click', { retailer: product.retailer, category: product.category, source: 'complete_kitchen' });
+    trackEvent('kitchen_set_click', { retailer: product.retailer, market: input.market ?? 'HR' });
   }
 
   async function handleFeedback(planId: string, feedback: PlanFeedback) {
@@ -838,6 +856,8 @@ export function Planner() {
           input={input}
           submittedPrompt={submittedPrompt}
           secondHandSuggestions={secondHand}
+          completeKitchen={completeKitchen}
+          onKitchenSetClick={handleKitchenSetClick}
           onReplace={handleReplace}
           onToggleLock={handleToggleLock}
           lockedProductIds={input.lockedProductIds}

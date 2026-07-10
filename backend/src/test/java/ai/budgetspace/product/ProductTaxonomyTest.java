@@ -18,6 +18,25 @@ class ProductTaxonomyTest {
     }
 
     @Test
+    void kitchenSetIsAKnownCategoryWithModularAliases() {
+        assertThat(ProductTaxonomy.isKnownCategory("kitchen-set")).isTrue();
+        assertThat(ProductTaxonomy.normalizeCategory("modular-kitchen")).contains("kitchen-set");
+        assertThat(ProductTaxonomy.normalizeCategory("kompletna kuhinja")).contains("kitchen-set");
+        // A modular kitchen set must NOT collapse into the freestanding kitchen-storage/cart categories.
+        assertThat(ProductTaxonomy.normalizeCategory("kitchen-set")).contains("kitchen-set");
+    }
+
+    @Test
+    void kitchenAppliancesAreKnownCategories() {
+        assertThat(ProductTaxonomy.isKnownCategory("oven")).isTrue();
+        assertThat(ProductTaxonomy.isKnownCategory("fridge")).isTrue();
+        assertThat(ProductTaxonomy.isKnownCategory("dishwasher")).isTrue();
+        assertThat(ProductTaxonomy.normalizeCategory("pecnica")).contains("oven");
+        assertThat(ProductTaxonomy.normalizeCategory("hladnjak")).contains("fridge");
+        assertThat(ProductTaxonomy.normalizeCategory("perilica posuda")).contains("dishwasher");
+    }
+
+    @Test
     void mapsStyleSynonymsToPlannerFriendlyValues() {
         assertThat(ProductTaxonomy.normalizeStyle("moderno")).contains("modern");
         assertThat(ProductTaxonomy.normalizeStyle("simple")).contains("minimal");

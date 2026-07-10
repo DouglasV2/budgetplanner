@@ -123,6 +123,22 @@ class PlannerIntentExtractorTest {
     }
 
     @Test
+    void parsesKitchenAppliancesAsMustHaveAndInfersKitchen() {
+        var parsed = parse("Imam 800 €, trebam pećnicu i frižider za kuhinju.");
+        assertThat(parsed.mustHaveCategories()).contains("oven", "fridge");
+        assertThat(parsed.roomType()).isEqualTo("kitchen");
+
+        // An appliance alone implies the kitchen even without the word "kuhinja".
+        var dishwasher = parse("Trebam perilicu posuđa do 400 €.");
+        assertThat(dishwasher.mustHaveCategories()).contains("dishwasher");
+        assertThat(dishwasher.roomType()).isEqualTo("kitchen");
+
+        // "mikrovalna pećnica" is a microwave, not a full oven.
+        var micro = parse("Trebam mikrovalnu pećnicu.");
+        assertThat(micro.mustHaveCategories()).contains("microwave").doesNotContain("oven");
+    }
+
+    @Test
     void fallbackClassifiesRoomsInOtherMarketLanguages() {
         // Sprint 10.135: when the LLM is down/throttled/capped, the rule-based fallback must still get the room
         // right in every market's language. Before this, any non-HR/EN prompt collapsed to living-room (no bed).

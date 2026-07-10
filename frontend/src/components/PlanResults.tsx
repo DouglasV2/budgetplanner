@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode, type SyntheticEvent } from 'react';
 import { openPlanPdf } from '../utils/planPdf';
 import type {
+  CompleteKitchen,
   FurnishingPlan,
   PlanFeedback,
   PlannerInput,
@@ -74,6 +75,9 @@ interface PlanResultsProps {
   submittedPrompt?: string;
   // Sprint 10.51: matched second-hand listings, shown in a separate "Rabljeno" block (never in any total).
   secondHandSuggestions?: Product[];
+  // Sprint 10.175: the complete-kitchen section (present only on a complete-kitchen prompt) + its click handler.
+  completeKitchen?: CompleteKitchen | null;
+  onKitchenSetClick?: (product: Product) => void;
 }
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
@@ -167,6 +171,16 @@ const FALLBACK_IMAGES: Record<ProductCategory, string> = {
   'dining-chair': 'https://images.unsplash.com/photo-1589384267710-7a25bc5ca5f3?auto=format&fit=crop&w=240&q=70',
   'kitchen-storage': 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
   'kitchen-cart': 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
+  // Sprint 10.175: modular kitchen set — a neutral kitchen photo (real sets are imageVerified, so this rarely shows).
+  'kitchen-set': 'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?auto=format&fit=crop&w=240&q=70',
+  // Sprint 10.176: kitchen appliances (real IKEA appliances are imageVerified, so these fallbacks rarely show).
+  oven: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=240&q=70',
+  hob: 'https://images.unsplash.com/photo-1556910633-5099dc3971e8?auto=format&fit=crop&w=240&q=70',
+  'cooker-hood': 'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?auto=format&fit=crop&w=240&q=70',
+  fridge: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=240&q=70',
+  freezer: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=240&q=70',
+  dishwasher: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=240&q=70',
+  microwave: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=240&q=70',
   nightstand: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
   wardrobe: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
   dresser: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&w=240&q=70',
@@ -906,6 +920,82 @@ function SimilarItemsPanel({ anchor, input, remainingBudget, onOpenProduct }: {
   );
 }
 
+// Sprint 10.175 (kitchen Increment 1): the inline "Kompletna kuhinja" section. Shows real modular kitchen sets
+// (each a Product, category kitchen-set) for a complete-kitchen prompt, with an honest "modular, not fitted"
+// note + the IKEA-planner link for true made-to-measure kitchens. Browse-only; never mutates the plan. Empty
+// sets => an honest "no set fits" message (the note still shows).
+const KITCHEN_SHAPE_KEYS: Record<string, string> = {
+  'single-wall': 'kitchen.shapeSingleWall',
+  'l-shaped': 'kitchen.shapeLShaped',
+  'u-shaped': 'kitchen.shapeUShaped',
+  galley: 'kitchen.shapeGalley',
+  island: 'kitchen.shapeIsland'
+};
+
+function CompleteKitchenSection({ completeKitchen, input, onSetClick }: {
+  completeKitchen: CompleteKitchen;
+  input: PlannerInput;
+  onSetClick: (product: Product) => void;
+}) {
+  const { t } = useLocale();
+  const market = input.market;
+  const shapeKey = KITCHEN_SHAPE_KEYS[completeKitchen.shape];
+  const understoodParts: string[] = [];
+  if (shapeKey) understoodParts.push(t(shapeKey));
+  if (completeKitchen.includeAppliances) understoodParts.push(t('kitchen.withAppliances'));
+  const understood = understoodParts.join(' · ');
+
+  return (
+    <section className="complete-kitchen" aria-label={t('kitchen.completeTitle')}>
+      <div className="complete-kitchen-head">
+        <strong>{t('kitchen.completeTitle')}</strong>
+        <small>{t('kitchen.completeSubtitle')}</small>
+      </div>
+      {understood && <p className="complete-kitchen-understood">{t('kitchen.understood', { details: understood })}</p>}
+      <p className="kitchen-modular-note" role="note">{t('kitchen.modularNote')}</p>
+      {completeKitchen.sets.length === 0 ? (
+        <p className="complete-kitchen-empty">{t('kitchen.emptySets', { budget: formatCurrency(input.budget, market) })}</p>
+      ) : (
+        <div className="complete-kitchen-grid">
+          {completeKitchen.sets.map((set) => {
+            const openUrl = productUrl(set);
+            const badge = marketBadge(set);
+            const illustration = usesFallbackImage(set);
+            return (
+              <article className="kitchen-set-card" key={set.id}>
+                <img
+                  src={productImage(set)}
+                  alt={illustration ? t('results.imageIllustrationAlt', { name: set.name }) : set.name}
+                  loading="lazy"
+                  onError={(event) => handleProductImageError(event, set.category)}
+                />
+                <strong className="kitchen-set-name">{set.name}</strong>
+                <div className="meta-line kitchen-set-meta">
+                  <span>{set.retailer}</span>
+                  {badge && <span title={t('results.marketCatalogTitle', { market: badge })}>{t('results.marketLabel', { market: badge })}</span>}
+                  <strong>{formatCurrency(set.price, market)}</strong>
+                </div>
+                {openUrl ? (
+                  <a className="similar-open" href={openUrl} target="_blank" rel="noopener noreferrer" onClick={() => onSetClick(set)}>
+                    {t('kitchen.openSet')} ↗
+                  </a>
+                ) : (
+                  <button type="button" className="similar-open" disabled title={t('results.productLinkUnavailableTitle')}>
+                    {t('results.productLinkUnavailable')}
+                  </button>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
+      <a className="kitchen-planner-link" href={ikeaMarketUrl(market)} target="_blank" rel="noopener noreferrer">
+        {t('kitchen.plannerLink')} ↗
+      </a>
+    </section>
+  );
+}
+
 export function PlanResults({
   plans,
   input,
@@ -921,7 +1011,9 @@ export function PlanResults({
   error = null,
   partialNotice = null,
   submittedPrompt = '',
-  secondHandSuggestions = []
+  secondHandSuggestions = [],
+  completeKitchen = null,
+  onKitchenSetClick
 }: PlanResultsProps) {
   const { t, config, lang } = useLocale();
   // Sprint 10.112: for any non-Croatian locale the backend's Croatian narrative is replaced by localized text.
@@ -1054,6 +1146,12 @@ export function PlanResults({
     await onFeedback(planId, feedback);
   }
 
+  // Sprint 10.175: the complete-kitchen section renders whenever a complete-kitchen prompt returned one — even
+  // if the freestanding plan is empty — so it lives outside the plan-specific branches below.
+  const kitchenSection = completeKitchen
+    ? <CompleteKitchenSection completeKitchen={completeKitchen} input={input} onSetClick={(set) => onKitchenSetClick?.(set)} />
+    : null;
+
   if (error) {
     return (
       <ResultShell>
@@ -1151,13 +1249,18 @@ export function PlanResults({
     return (
       <ResultShell>
         <div className="plans-column state-panel">
-          <section className="empty-report is-noresults" aria-label={t('results.noResultsHeading')}>
-            <div className="empty-report-head">
-              <span className="report-kicker">{t('results.noResultsBadge')}</span>
-              <h3>{t('results.noResultsHeading')}</h3>
-              <p>{t('planner.partialNone')}</p>
-            </div>
-          </section>
+          {/* Sprint 10.175: a complete-kitchen prompt may leave the freestanding plan empty while still having real
+              kitchen sets — show those (they ARE the result) and skip the misleading "no products" card. */}
+          {kitchenSection}
+          {!completeKitchen && (
+            <section className="empty-report is-noresults" aria-label={t('results.noResultsHeading')}>
+              <div className="empty-report-head">
+                <span className="report-kicker">{t('results.noResultsBadge')}</span>
+                <h3>{t('results.noResultsHeading')}</h3>
+                <p>{t('planner.partialNone')}</p>
+              </div>
+            </section>
+          )}
         </div>
       </ResultShell>
     );
@@ -1215,13 +1318,14 @@ export function PlanResults({
           from useAuth() and, when it's false, render a PREVIEW here (recommended style + budget-by-category +
           "N matching products found") instead of the full output, gating the exact products / store links /
           alternatives / downloadable list behind a purchased session. No premium feature is gated during beta. */}
+      {kitchenSection}
       {partialNotice && (
         <div className="partial-plan-note" role="status">
           <strong>{t('results.partialPlan')}</strong>
           <span>{partialNotice}</span>
         </div>
       )}
-      {input.roomType === 'kitchen' && (
+      {input.roomType === 'kitchen' && !completeKitchen && (
         isFittedKitchenIntent(submittedPrompt || input.prompt) ? (
           <div className="kitchen-scope-note is-fitted" role="note">
             <strong>{t('results.kitchenFittedNote')}</strong>

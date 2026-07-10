@@ -166,6 +166,70 @@ const CATEGORY_PATHS: Record<ProductCategory, React.ReactNode> = {
       <circle cx="16" cy="18.5" r="1.4" />
     </>
   ),
+  // Sprint 10.175: a modular kitchen set — base cabinets under a continuous worktop with an upper cabinet.
+  'kitchen-set': (
+    <>
+      <path d="M3 8h18" />
+      <rect x="3" y="8" width="18" height="11" rx="1" />
+      <path d="M9 8v11M15 8v11" />
+      <path d="M6 12.5h1M12 12.5h1M18 12.5h1" />
+      <rect x="14" y="3" width="6" height="4" rx="0.6" />
+    </>
+  ),
+  // Sprint 10.176: kitchen appliances.
+  oven: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="1.5" />
+      <path d="M4 9h16" />
+      <path d="M7 6.5h2M15 6.5h2" />
+      <rect x="7" y="11.5" width="10" height="6" rx="0.8" />
+    </>
+  ),
+  hob: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="1.5" />
+      <circle cx="9" cy="9" r="2" />
+      <circle cx="15" cy="9" r="2" />
+      <circle cx="9" cy="15" r="2" />
+      <circle cx="15" cy="15" r="2" />
+    </>
+  ),
+  'cooker-hood': (
+    <>
+      <path d="M3 10l3-4h12l3 4z" />
+      <path d="M3 10h18" />
+      <path d="M8 10v3M16 10v3" />
+    </>
+  ),
+  fridge: (
+    <>
+      <rect x="6" y="3" width="12" height="18" rx="1.5" />
+      <path d="M6 10h12" />
+      <path d="M9 6v2M9 12.5v3" />
+    </>
+  ),
+  freezer: (
+    <>
+      <rect x="4" y="6" width="16" height="12" rx="1.5" />
+      <path d="M12 6v12M4 12h16" />
+      <path d="M7.5 9h1M15.5 9h1M7.5 15h1M15.5 15h1" />
+    </>
+  ),
+  dishwasher: (
+    <>
+      <rect x="5" y="3" width="14" height="18" rx="1.5" />
+      <path d="M5 7h14" />
+      <path d="M8 5h4" />
+      <circle cx="12" cy="14" r="3.5" />
+    </>
+  ),
+  microwave: (
+    <>
+      <rect x="3" y="6" width="18" height="12" rx="1.5" />
+      <rect x="5.5" y="8.5" width="9" height="7" rx="0.8" />
+      <path d="M17 9v1M17 12v1M17 15v1" />
+    </>
+  ),
   rug: (
     <>
       <rect x="3" y="7" width="18" height="10" rx="1.5" />

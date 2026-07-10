@@ -6918,3 +6918,79 @@ textarea { border-radius: var(--r-md); }
 @media (max-width: 720px) {
   .similar-grid { grid-template-columns: 1fr; }
 }
+
+/* Sprint 10.175 (kitchen Increment 1): the inline "Kompletna kuhinja" section — real modular sets + the honest
+   modular-not-fitted note. Sits at the top of the results; reuses theme tokens like the rest of the view. */
+.complete-kitchen {
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.complete-kitchen-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.complete-kitchen-head strong { font-size: 1.05rem; font-weight: 680; color: var(--ink); }
+.complete-kitchen-head small { color: var(--muted); font-size: 0.86rem; }
+.complete-kitchen-understood {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  color: var(--accent-strong);
+  font-weight: 560;
+}
+.kitchen-modular-note {
+  margin: 10px 0 14px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+.complete-kitchen-empty {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.complete-kitchen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.kitchen-set-card {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
+}
+.kitchen-set-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+.kitchen-set-name { font-size: 0.92rem; font-weight: 640; color: var(--ink); line-height: 1.25; }
+.kitchen-set-meta { gap: 6px 8px; font-size: 0.74rem; align-items: baseline; }
+.kitchen-set-meta > strong { margin-left: auto; font-size: 0.98rem; font-weight: 680; }
+.kitchen-planner-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+.kitchen-planner-link:hover { text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .complete-kitchen-grid { grid-template-columns: 1fr; }
+}

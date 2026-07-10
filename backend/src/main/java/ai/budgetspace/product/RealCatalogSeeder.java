@@ -208,6 +208,16 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // independently re-fetched by a second agent (33 confirmed, 0 rejected). 3 SI images not re-loaded
             // (imageVerified=false). Verified on ikea.com/* on 2026-06-22; re-check before production.
             "/catalog/real-ikea-kitchen-carts-10-80.json",
+            // Sprint 10.175 (kitchen Increment 1): real IKEA KNOXHULT modular kitchen SETS (category kitchen-set)
+            // for DE/AT/HR — the "complete kitchen" mode's honest, priced results. Each row's name + EUR price +
+            // og:image was fetched, then independently re-fetched by a second agent (14 confirmed, 0 rejected).
+            // Verified on ikea.com/{de,at,hr} on 2026-07-10; re-check before production.
+            "/catalog/real-ikea-kitchen-sets-10-175.json",
+            // Sprint 10.176 (kitchen Increment 3): real IKEA kitchen APPLIANCES (oven/hob/cooker-hood/fridge/
+            // freezer/dishwasher/microwave) for HR/AT/DE — added to the normal plan only when the user asks. Each
+            // row's name + EUR price + og:image fetched then independently re-fetched (32 confirmed, 1 rejected for
+            // a price mismatch). Verified on ikea.com/{hr,at,de} on 2026-07-10; re-check before production.
+            "/catalog/real-ikea-kitchen-appliances-10-176.json",
             // Sprint 10.87: depth for the thinnest hallway/home-office/dining cells — verified IKEA staples
             // (BISSA/STÄLL/MACKAPÄR/TRONES/NISSEDAL, ALEX desk+drawers, MARKUS, DANDERYD, ODGER) into DK/GB/SE/
             // DE/SI/AT. Each row's name + local-currency price was fetched, then independently re-fetched by a
@@ -313,7 +323,21 @@ public class RealCatalogSeeder implements ApplicationRunner {
             "/catalog/real-pevex-hr-bathroom-10-169.json",
             // Sprint 10.169: bathroom fixtures for DK — VVS Eksperten (sanitary-ware specialist), 42 web-verified
             // toilets/washbasins/baths+showers (JSON-LD price in DKK + og:image, read live off vvs-eksperten.dk).
-            "/catalog/real-vvs-eksperten-dk-bathroom-10-169.json"
+            "/catalog/real-vvs-eksperten-dk-bathroom-10-169.json",
+            // Sprint 10.177 (P1 bathroom depth): IKEA bathroom textiles (bath mats + shower curtains — the biggest
+            // catalog gap: bathroom textiles were 0 in ALL 15 markets) + storage (bins/laundry baskets/shelves/
+            // towel rails/hooks/mirrors/accessories) + bath wall lights, across all 15 markets. Harvested from each
+            // market's OWN live IKEA category listing (category-by-id cross-market redirect), then EACH product page
+            // re-read live: JSON-LD price + priceCurrency (currency-matched to the market) + og:image + og:title.
+            // Bounced / currency-mismatched / dup rows dropped; internal METOD fittings pruned; a 24-agent
+            // multilingual judge pass removed mis-categorized/non-standalone items. Deterministic curl, no fabrication.
+            "/catalog/real-ikea-bathroom-depth-10-177.json",
+            // Sprint 10.177 (P1/P2 furniture depth): IKEA core-furniture depth for the thin (market×category) cells
+            // the coverage map surfaced — desk / mattress / chair / dining-chair / nightstand + kitchen-storage /
+            // kitchen-cart, across all 15 markets. Same technique: each market's live category listing → per-product
+            // live JSON-LD price+currency + og:image; dedup vs the existing catalog concentrates additions in the
+            // thinnest markets. METOD/UTRUSTA cabinet components pruned; judge-verified. No fabrication.
+            "/catalog/real-ikea-furniture-depth-10-177.json"
     );
 
     /**
