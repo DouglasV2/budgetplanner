@@ -369,7 +369,12 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // GB sanitary retailer (DE/IT sanitary sites probed 403/JS-gated, per the 10.169b finding). 6 toilets +
             // 28 baths/showers (category toilet / bath-shower), name (og:title) + GBP price (JSON-LD Offer) + og:image
             // read live per product. Gives GB the WC/bath fixtures IKEA doesn't sell (GB had 0). Re-check before production.
-            "/catalog/real-vp-gb-bathroom-10-178.json"
+            "/catalog/real-vp-gb-bathroom-10-178.json",
+            // Sprint 10.178: FR bathroom lighting top-up (FR was the one market below the 5-8 target at 4). Ported
+            // existing IKEA bath wall/ceiling lamp articles (FRIHULT/KABOMBA/FLASKPOST) to /fr/fr/ via the bare-article
+            // trick, re-read live (EUR price + og:image). FR bathroom lighting 4->10. (GB stayed 5: its bare-article
+            // ports bounced to /cat/ — honest, not forced.)
+            "/catalog/real-ikea-bathroom-lighting-fr-10-178.json"
     );
 
     /**

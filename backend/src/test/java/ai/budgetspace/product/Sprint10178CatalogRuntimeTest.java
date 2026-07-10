@@ -1,10 +1,16 @@
 package ai.budgetspace.product;
 
 import ai.budgetspace.dto.CompleteKitchenDto;
+import ai.budgetspace.dto.FurnishingPlanDto;
 import ai.budgetspace.dto.ImportSummaryDto;
 import ai.budgetspace.dto.PlanGenerationResponse;
+import ai.budgetspace.dto.PlanItemDto;
 import ai.budgetspace.dto.PlannerInputDto;
+import ai.budgetspace.dto.ProductDto;
+import ai.budgetspace.dto.ReplaceProductRequest;
 import ai.budgetspace.dto.RetailerProductSnapshotDto;
+import ai.budgetspace.dto.SimilarItemsRequest;
+import ai.budgetspace.dto.SimilarItemsResponse;
 import ai.budgetspace.planner.KitchenIntentClassifier;
 import ai.budgetspace.planner.PlannerService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -182,8 +188,55 @@ class Sprint10178CatalogRuntimeTest {
         assertThat(complete.sets()).allSatisfy(set -> assertThat(set.category()).isEqualTo("kitchen-set"));
     }
 
-    private PlannerService plannerFromWholeCatalog() throws Exception {
+    @Test
+    void deBathroomPlanFillsAcrossBudgetTiers() throws Exception {
+        PlannerService planner = plannerFromWholeCatalog();
+        // Small / medium / large budgets all produce a non-empty bathroom plan that includes a wash-basin (scenarios
+        // 3-5: mali/srednji/veći budžet). The cheapest DE wash-basin is ~€17, so even a tight budget fits one.
+        for (int budget : new int[] {300, 900, 2000}) {
+            PlanGenerationResponse response = planner.generateResolved(bathroomInput("DE", budget));
+            assertThat(response.plans().get(0).items()).as("DE bathroom @%d€ non-empty", budget).isNotEmpty();
+            assertThat(planCategories(response)).as("DE bathroom @%d€ has a washbasin", budget).contains("washbasin");
+        }
+    }
+
+    @Test
+    void findSimilarOnADeWashbasinReturnsDistinctOptions() throws Exception {
         List<Product> all = importWholeCatalog();
+        Product anchor = all.stream()
+                .filter(CatalogSourcePolicy::isPlannerEligible)
+                .filter(p -> "DE".equals(p.getMarket()) && "washbasin".equals(p.getCategory()))
+                .findFirst().orElseThrow();
+        PlannerService planner = plannerFromCatalog(all);
+        // "Find similar under budget" / "compare budget options" (scenarios 7-8): distinct alternatives to the anchor.
+        SimilarItemsResponse res = planner.findSimilar(
+                new SimilarItemsRequest(ProductDto.from(anchor), bathroomInput("DE", 900), 900));
+        assertThat(res.bestValue()).as("a best-value washbasin alternative exists").isNotNull();
+        assertThat(res.budgetPick()).as("a cheaper washbasin alternative exists").isNotNull();
+        assertThat(res.bestValue().id()).isNotEqualTo(res.budgetPick().id());
+        assertThat(res.bestValue().category()).isEqualTo("washbasin");
+    }
+
+    @Test
+    void replacingADeWashbasinReturnsAnotherWashbasin() throws Exception {
+        PlannerService planner = plannerFromWholeCatalog();
+        FurnishingPlanDto plan = planner.generateResolved(bathroomInput("DE", 900)).plans().get(0);
+        PlanItemDto washbasinItem = plan.items().stream()
+                .filter(i -> "washbasin".equals(i.product().category())).findFirst().orElseThrow();
+        FurnishingPlanDto replaced = planner.replaceProduct(
+                new ReplaceProductRequest(plan, bathroomInput("DE", 900), washbasinItem.product().id(), "different"));
+        // The swapped slot is still a washbasin, and a different product than the original (DE has 9 wash-basins).
+        PlanItemDto swapped = replaced.items().stream()
+                .filter(i -> "washbasin".equals(i.product().category())).findFirst().orElseThrow();
+        assertThat(swapped.product().id())
+                .as("replace returned a different washbasin").isNotEqualTo(washbasinItem.product().id());
+    }
+
+    private PlannerService plannerFromWholeCatalog() throws Exception {
+        return plannerFromCatalog(importWholeCatalog());
+    }
+
+    private PlannerService plannerFromCatalog(List<Product> all) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(all);
         return new PlannerService(repository);
