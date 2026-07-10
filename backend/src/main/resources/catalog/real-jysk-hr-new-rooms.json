@@ -1,6 +1,7 @@
 [
   {
     "externalId": "jysk-hr-jegind-o105-bijela-natur",
+    "market": "HR",
     "name": "Blagovaonski stol JEGIND Ø105 bijela/natur",
     "retailer": "JYSK",
     "category": "dining-table",
@@ -26,6 +27,7 @@
   },
   {
     "externalId": "jysk-hr-marstrand-o110-bijela-natur",
+    "market": "HR",
     "name": "Blagovaonski stol MARSTRAND Ø110/110x200 bijela/natur",
     "retailer": "JYSK",
     "category": "dining-table",
@@ -51,6 +53,7 @@
   },
   {
     "externalId": "jysk-hr-bovrup-natur-hrast-bez",
+    "market": "HR",
     "name": "Blagovaonska stolica BOVRUP natur hrast/bež tkanina",
     "retailer": "JYSK",
     "category": "dining-chair",
@@ -76,6 +79,7 @@
   },
   {
     "externalId": "jysk-hr-kanstrup-polica-kotaci-crna",
+    "market": "HR",
     "name": "Polica s kotačima KANSTRUP crna",
     "retailer": "JYSK",
     "category": "kitchen-cart",
@@ -101,6 +105,7 @@
   },
   {
     "externalId": "jysk-hr-kanstrup-polica-kotaci-svijetli-pijesak",
+    "market": "HR",
     "name": "Polica s kotačima KANSTRUP svijetli pijesak",
     "retailer": "JYSK",
     "category": "kitchen-cart",
@@ -126,6 +131,7 @@
   },
   {
     "externalId": "jysk-hr-damhus-4-police-tamnosiva",
+    "market": "HR",
     "name": "Ormar za cipele DAMHUS 4 police tamnosiva",
     "retailer": "JYSK",
     "category": "storage",
@@ -150,6 +156,7 @@
   },
   {
     "externalId": "jysk-hr-terpet-2-odjeljka-bijela",
+    "market": "HR",
     "name": "Ormar za cipele TERPET 2 odjeljka bijela",
     "retailer": "JYSK",
     "category": "storage",
@@ -176,6 +183,7 @@
   },
   {
     "externalId": "jysk-hr-elverum-3-police-crna-celik",
+    "market": "HR",
     "name": "Regal za hodnik ELVERUM 3 police crna čelik",
     "retailer": "JYSK",
     "category": "storage",

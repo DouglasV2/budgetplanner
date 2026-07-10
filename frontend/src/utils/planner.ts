@@ -54,8 +54,9 @@ export const retailersByMarket: Record<string, Retailer[]> = {
   NO: ['IKEA', 'JYSK'],
   SE: ['IKEA', 'JYSK'],
   DK: ['IKEA', 'JYSK', 'VVS Eksperten'],
-  // Sprint 10.55: United Kingdom — IKEA-only for now (JYSK has no UK stores), GBP prices.
-  GB: ['IKEA'],
+  // Sprint 10.55: United Kingdom — IKEA for furniture; Sprint 10.178 added Victorian Plumbing for GB
+  // bathroom fixtures (toilets/baths/showers — IKEA doesn't sell them, and there's no JYSK in the UK).
+  GB: ['IKEA', 'Victorian Plumbing'],
 };
 
 export function retailersForMarket(code?: string): Retailer[] {

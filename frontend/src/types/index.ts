@@ -7,6 +7,8 @@ export type Retailer =
   | 'Lesnina'
   // Sprint 10.169: bathroom-fixture (sanitary-ware) retailers.
   | 'VVS Eksperten'
+  // Sprint 10.178: GB sanitary-ware specialist (toilets/baths/showers).
+  | 'Victorian Plumbing'
   // Sprint 10.30: retailers that actually have verified products in some markets (mirrors the backend
   // PlannerService.RETAILERS list) so the store picker can offer them per country.
   | 'Harvey Norman'

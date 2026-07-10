@@ -1,6 +1,7 @@
 [
   {
     "externalId": "ikea-hr-nysjoen-visoki-element-bijela",
+    "market": "HR",
     "name": "NYSJÖN visoki element, bijela, 30x190 cm",
     "retailer": "IKEA",
     "category": "storage",
@@ -26,6 +27,7 @@
   },
   {
     "externalId": "ikea-hr-enhet-element-ogledalo-bijela",
+    "market": "HR",
     "name": "ENHET element s ogledalom, bijela, 60x17x75 cm",
     "retailer": "IKEA",
     "category": "storage",
@@ -51,6 +53,7 @@
   },
   {
     "externalId": "jysk-hr-vedde-140x200-divlji-tamni-hrast",
+    "market": "HR",
     "name": "Okvir kreveta VEDDE 140x200 divlji tamni hrast boja",
     "retailer": "JYSK",
     "category": "bed",
@@ -76,6 +79,7 @@
   },
   {
     "externalId": "jysk-hr-trya-140x200-madrac",
+    "market": "HR",
     "name": "Madrac od pjene 140x200 TRYA vrlo tvrd",
     "retailer": "JYSK",
     "category": "mattress",
@@ -100,6 +104,7 @@
   },
   {
     "externalId": "jysk-hr-limfjorden-nocni-ormaric-svijetli-hrast",
+    "market": "HR",
     "name": "Noćni ormarić LIMFJORDEN 2 ladice svijetli hrast boja",
     "retailer": "JYSK",
     "category": "nightstand",
@@ -125,6 +130,7 @@
   },
   {
     "externalId": "jysk-hr-tapdrup-nocni-ormaric-bijela",
+    "market": "HR",
     "name": "Noćni ormarić TAPDRUP 1 ladica bijela",
     "retailer": "JYSK",
     "category": "nightstand",
@@ -150,6 +156,7 @@
   },
   {
     "externalId": "jysk-hr-damhus-ormar-100x174-tamnosiva",
+    "market": "HR",
     "name": "Ormar DAMHUS 100x174 tamnosiva",
     "retailer": "JYSK",
     "category": "wardrobe",
@@ -175,6 +182,7 @@
   },
   {
     "externalId": "ikea-hr-lagkapten-adils-radni-stol-bijela",
+    "market": "HR",
     "name": "LAGKAPTEN / ADILS radni stol, bijela, 120x60 cm",
     "retailer": "IKEA",
     "category": "desk",
@@ -200,6 +208,7 @@
   },
   {
     "externalId": "ikea-hr-flintan-uredska-stolica-crna",
+    "market": "HR",
     "name": "FLINTAN uredska stolica, crna",
     "retailer": "IKEA",
     "category": "chair",
@@ -225,6 +234,7 @@
   },
   {
     "externalId": "ikea-hr-billy-biblioteka-bijela",
+    "market": "HR",
     "name": "BILLY biblioteka, bijela, 80x28x202 cm",
     "retailer": "IKEA",
     "category": "storage",
@@ -250,6 +260,7 @@
   },
   {
     "externalId": "ikea-hr-kallax-regal-bijela",
+    "market": "HR",
     "name": "KALLAX regal, bijela, 182x182 cm",
     "retailer": "IKEA",
     "category": "storage",
@@ -275,6 +286,7 @@
   },
   {
     "externalId": "jysk-hr-svaneke-podizni-radni-stol-bijela",
+    "market": "HR",
     "name": "Podizni radni stol SVANEKE 80x160 bijela",
     "retailer": "JYSK",
     "category": "desk",

@@ -42,6 +42,9 @@ public final class ProductTaxonomy {
             "IKEA",
             "JYSK",
             "VVS Eksperten",
+            // Sprint 10.178: Victorian Plumbing (victorianplumbing.co.uk) — GB sanitary-ware specialist; product
+            // pages SSR og:title + JSON-LD Offer price (GBP) + og:image, so its toilets/baths/showers are web-verifiable.
+            "Victorian Plumbing",
             "Pevex",
             "Emmezeta",
             "Decathlon",

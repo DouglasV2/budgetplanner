@@ -1,6 +1,7 @@
 [
   {
     "externalId": "emmezeta-hr-spring-trosjed-koza-dollaro",
+    "market": "HR",
     "name": "Spring trosjed koža Dollaro 225x92x84cm",
     "retailer": "Emmezeta",
     "category": "sofa",
@@ -24,6 +25,7 @@
   },
   {
     "externalId": "emmezeta-hr-evora-trosjed-lezaj-mint",
+    "market": "HR",
     "name": "Evora trosjed s ležajem mint 276x137x71cm",
     "retailer": "Emmezeta",
     "category": "sofa",
@@ -47,6 +49,7 @@
   },
   {
     "externalId": "emmezeta-hr-capital-tv-stalak-140",
+    "market": "HR",
     "name": "Capital TV stalak 140x42x60 cm",
     "retailer": "Emmezeta",
     "category": "tv-unit",
@@ -69,6 +72,7 @@
   },
   {
     "externalId": "emmezeta-hr-linkastyle-komoda-135",
+    "market": "HR",
     "name": "LinkaStyle komoda 135x41x86 cm",
     "retailer": "Emmezeta",
     "category": "dresser",

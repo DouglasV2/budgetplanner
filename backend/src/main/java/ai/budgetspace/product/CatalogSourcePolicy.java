@@ -76,6 +76,10 @@ public final class CatalogSourcePolicy {
         // Sprint 10.169: VVS Eksperten (DK) — sanitary-ware specialist; product pages serve JSON-LD price (DKK) +
         // og:image and category listings SSR the product links → directly sourceable. Bathroom fixtures for DK.
         map.put("VVS Eksperten", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.178: Victorian Plumbing (GB) — sanitary-ware specialist; product pages SSR og:title + JSON-LD
+        // Offer price (GBP) + og:image (category listings SSR the product links too) → directly sourceable. GB toilets
+        // + baths/showers, the fixtures IKEA doesn't sell (GB is IKEA-only, so this is its only WC/bath source).
+        map.put("Victorian Plumbing", SourcingStatus.MANUAL_VERIFIED_ONLY);
         map.put("Lesnina", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.16: reachable + hand-verified (link-out; have products in the catalog).
         map.put("Harvey Norman", SourcingStatus.MANUAL_VERIFIED_ONLY);

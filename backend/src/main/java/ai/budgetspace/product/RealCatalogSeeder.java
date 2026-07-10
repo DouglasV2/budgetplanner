@@ -337,7 +337,39 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // kitchen-cart, across all 15 markets. Same technique: each market's live category listing → per-product
             // live JSON-LD price+currency + og:image; dedup vs the existing catalog concentrates additions in the
             // thinnest markets. METOD/UTRUSTA cabinet components pruned; judge-verified. No fabrication.
-            "/catalog/real-ikea-furniture-depth-10-177.json"
+            "/catalog/real-ikea-furniture-depth-10-177.json",
+            // Sprint 10.178 (P1 bathroom fixtures for every market): IKEA wash-basin / vanity units (category
+            // `washbasin`) harvested from each market's OWN live "bathroom vanities" listing (global category id
+            // 20719 via the /cat/x-{id}/ cross-market redirect), then EACH product page re-read live: JSON-LD price +
+            // priceCurrency (currency-matched to the market: EUR/GBP/NOK/SEK/DKK) + og:image + og:title. Non-fixture
+            // items (shelves) pruned by a multilingual wash-basin name guard; budget→premium price spread, ~8-9/market.
+            // Fills the washbasin core that was 0 in 13 markets (only HR/DK had it, via Pevex/VVS). Deterministic curl,
+            // no fabrication, all image-verified. Re-check before production.
+            "/catalog/real-ikea-bathroom-washbasin-10-178.json",
+            // Sprint 10.178: IKEA bathroom MIRRORS (category `decor`) per market (global cat ids 20490/20498/48006),
+            // same live re-read pipeline, multilingual "mirror" name guard, ~6/market ×15. Pairs with the planner
+            // change that promoted bathroom `decor` to a comfort category so a mirror actually surfaces in the plan.
+            "/catalog/real-ikea-bathroom-mirror-10-178.json",
+            // Sprint 10.178 (P2 kitchen): IKEA complete/modular kitchen SETS (category `kitchen-set` — KNOXHULT /
+            // SUNNERSTA / ÄSPINGE) for the 12 markets that had 0 (HR/AT/DE already had them). Harvested from the
+            // complete-unit categories (48978/48986/700404) via the cross-market redirect, per-product live price +
+            // currency + og:image, multilingual "kitchen" name guard, 8/market. Feeds the "Kompletna kuhinja" mode.
+            "/catalog/real-ikea-kitchen-sets-eu-10-178.json",
+            // Sprint 10.178 (P2 kitchen): IKEA kitchen APPLIANCES (oven/hob/cooker-hood/fridge/freezer/dishwasher/
+            // microwave) ported from the HR/AT/DE set to the 12 other markets via the bare global-article trick
+            // (/p/-{article}/); each row re-read live (price + currency-match + og:image), rows that 404 / bounce to
+            // /cat/ / mismatch currency dropped (so GB is honestly thin — IKEA barely stocks appliances there). Added
+            // to a plan only on explicit request (must-have), never forced — same behaviour as HR/AT/DE.
+            "/catalog/real-ikea-kitchen-appliances-eu-10-178.json",
+            // Sprint 10.178 (P3 GB core): IKEA GB depth for the below-floor cells — sofa 10→21, bed 11→20,
+            // mattress 12→17 — harvested from GB sofa/bed/mattress category listings, live price + og:image, price
+            // spread. GB is IKEA-only (no JYSK in the UK), so this is the available diversity lever.
+            "/catalog/real-ikea-gb-core-10-178.json",
+            // Sprint 10.178 (GB bathroom FIXTURES): Victorian Plumbing (victorianplumbing.co.uk) — the one clean-SSR
+            // GB sanitary retailer (DE/IT sanitary sites probed 403/JS-gated, per the 10.169b finding). 6 toilets +
+            // 28 baths/showers (category toilet / bath-shower), name (og:title) + GBP price (JSON-LD Offer) + og:image
+            // read live per product. Gives GB the WC/bath fixtures IKEA doesn't sell (GB had 0). Re-check before production.
+            "/catalog/real-vp-gb-bathroom-10-178.json"
     );
 
     /**

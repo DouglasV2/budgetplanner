@@ -1,6 +1,7 @@
 [
   {
     "externalId": "ikea-hr-poaeng-fotelja-crno-smeda-knisa-crna",
+    "market": "HR",
     "name": "POÄNG fotelja, crno-smeđa/Knisa crna",
     "retailer": "IKEA",
     "category": "chair",
@@ -24,6 +25,7 @@
   },
   {
     "externalId": "ikea-hr-poaeng-fotelja-crno-smeda-gunnared-tamno-siva",
+    "market": "HR",
     "name": "POÄNG fotelja, crno-smeđa/Gunnared tamno siva",
     "retailer": "IKEA",
     "category": "chair",
@@ -47,6 +49,7 @@
   },
   {
     "externalId": "ikea-hr-poaeng-fotelja-brezov-furnir-gunnared-tamno-siva",
+    "market": "HR",
     "name": "POÄNG fotelja, brezov furnir/Gunnared tamno siva",
     "retailer": "IKEA",
     "category": "chair",
@@ -70,6 +73,7 @@
   },
   {
     "externalId": "ikea-hr-strandmon-naslonjac-nordvalla-tamno-siva",
+    "market": "HR",
     "name": "STRANDMON naslonjač, Nordvalla tamno siva",
     "retailer": "IKEA",
     "category": "chair",
@@ -93,6 +97,7 @@
   },
   {
     "externalId": "ikea-hr-strandmon-fotelja-podnoznik-grann-bomstad-tamno-smeda",
+    "market": "HR",
     "name": "STRANDMON fotelja i podnožnik, Grann/Bomstad tamno smeđa",
     "retailer": "IKEA",
     "category": "chair",

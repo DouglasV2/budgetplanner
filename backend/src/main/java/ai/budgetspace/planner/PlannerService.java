@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class PlannerService {
     private static final Logger log = LoggerFactory.getLogger(PlannerService.class);
-    private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "VVS Eksperten", "Emmezeta", "Decathlon", "Lesnina",
+    private static final List<String> RETAILERS = List.of("IKEA", "JYSK", "Pevex", "VVS Eksperten", "Victorian Plumbing", "Emmezeta", "Decathlon", "Lesnina",
             // Sprint 10.16: additional retailers that have verified products (HR/SI/DE).
             "Harvey Norman", "Namjestaj.hr", "Otto", "Segmüller", "Poco",
             // Sprint 10.36: France — Camif (verified products).
@@ -81,7 +81,9 @@ public class PlannerService {
             Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
             Map.entry("hallway", Set.of("lighting", "rug")),
-            Map.entry("bathroom", Set.of("storage", "lighting", "textiles")),
+            // Sprint 10.178: decor promoted from "later" (complete-only) to comfort, so bathroom mirrors and
+            // accessories (category `decor`) surface at the default comfort level — a real bathroom shows a mirror.
+            Map.entry("bathroom", Set.of("storage", "lighting", "textiles", "decor")),
             Map.entry("studio", Set.of("dining-table", "wardrobe", "table", "storage", "lighting", "rug", "textiles"))
     );
 

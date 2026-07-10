@@ -1,6 +1,7 @@
 [
   {
     "externalId": "ikea-hr-kivik-trosjed-tresund-svijetlo-bez",
+    "market": "HR",
     "reviewRating": 4.1,
     "reviewCount": 518,
     "name": "KIVIK trosjed, Tresund svijetlo bež",
@@ -29,6 +30,7 @@
   },
   {
     "externalId": "ikea-hr-glostad-dvosjed-knisa-tamno-siva",
+    "market": "HR",
     "reviewRating": 4.5,
     "reviewCount": 612,
     "name": "GLOSTAD dvosjed, Knisa tamno siva",
@@ -57,6 +59,7 @@
   },
   {
     "externalId": "ikea-hr-saltmyran-trosjed-oereryd-sivo-bez",
+    "market": "HR",
     "name": "SALTMYRAN trosjed, Öreryd sivo-bež",
     "retailer": "IKEA",
     "category": "sofa",
@@ -83,6 +86,7 @@
   },
   {
     "externalId": "ikea-hr-klippan-dvosjed-vissle-siva",
+    "market": "HR",
     "name": "KLIPPAN dvosjed, Vissle siva",
     "retailer": "IKEA",
     "category": "sofa",
@@ -109,6 +113,7 @@
   },
   {
     "externalId": "ikea-hr-brissund-trosjed-hakebo-tamno-siva",
+    "market": "HR",
     "name": "BRISSUND trosjed na razvlačenje, Hakebo tamno siva",
     "retailer": "IKEA",
     "category": "sofa",
@@ -135,6 +140,7 @@
   },
   {
     "externalId": "ikea-hr-ektorp-trosjed-kilanda-svijetlo-bez",
+    "market": "HR",
     "reviewRating": 4.3,
     "reviewCount": 529,
     "name": "EKTORP trosjed, Kilanda svijetlo bež",
@@ -163,6 +169,7 @@
   },
   {
     "externalId": "ikea-hr-friheten-trosjed-skiftebo-tamno-siva",
+    "market": "HR",
     "reviewRating": 4.1,
     "reviewCount": 1317,
     "name": "FRIHETEN trosjed na razvlačenje, Skiftebo tamno siva",
@@ -191,6 +198,7 @@
   },
   {
     "externalId": "ikea-hr-ektorp-dvosjed-hakebo-sivo-zelena",
+    "market": "HR",
     "name": "EKTORP dvosjed, Hakebo sivo-zelena",
     "retailer": "IKEA",
     "category": "sofa",
@@ -217,6 +225,7 @@
   },
   {
     "externalId": "ikea-hr-byas-tv-klupa-visoki-sjaj-bijela",
+    "market": "HR",
     "name": "BYÅS TV klupa, visoki sjaj bijela",
     "retailer": "IKEA",
     "category": "tv-unit",
@@ -243,6 +252,7 @@
   },
   {
     "externalId": "ikea-hr-fjaellbo-tv-klupa-crna",
+    "market": "HR",
     "reviewRating": 4.4,
     "reviewCount": 879,
     "name": "FJÄLLBO TV klupa, crna",
@@ -271,6 +281,7 @@
   },
   {
     "externalId": "ikea-hr-lack-tv-klupa-bijela-120",
+    "market": "HR",
     "reviewRating": 4.5,
     "reviewCount": 305,
     "name": "LACK TV klupa, bijela, 120x35x36 cm",
@@ -299,6 +310,7 @@
   },
   {
     "externalId": "ikea-hr-brimnes-tv-klupa-bijela-180",
+    "market": "HR",
     "reviewRating": 4.5,
     "reviewCount": 547,
     "name": "BRIMNES TV klupa, bijela, 180x41x53 cm",
@@ -327,6 +339,7 @@
   },
   {
     "externalId": "ikea-hr-idanaes-tv-klupa-bijela",
+    "market": "HR",
     "name": "IDANÄS TV klupa, bijela",
     "retailer": "IKEA",
     "category": "tv-unit",
@@ -353,6 +366,7 @@
   },
   {
     "externalId": "ikea-hr-lack-stolic-bijela-90",
+    "market": "HR",
     "reviewRating": 4.5,
     "reviewCount": 4076,
     "name": "LACK stolić, bijela, 90x55 cm",
@@ -381,6 +395,7 @@
   },
   {
     "externalId": "ikea-hr-vittsjoe-stolic-crno-smeda-staklo",
+    "market": "HR",
     "reviewRating": 4.7,
     "reviewCount": 699,
     "name": "VITTSJÖ stolić, crno-smeđa/staklo",
@@ -409,6 +424,7 @@
   },
   {
     "externalId": "ikea-hr-gladom-stol-posluzavnik-crna",
+    "market": "HR",
     "reviewRating": 4.7,
     "reviewCount": 3398,
     "name": "GLADOM stol/poslužavnik, crna",
@@ -437,6 +453,7 @@
   },
   {
     "externalId": "ikea-hr-listerby-stolic-hrastov-furnir",
+    "market": "HR",
     "reviewRating": 3.9,
     "reviewCount": 69,
     "name": "LISTERBY stolić, hrastov furnir",
@@ -465,6 +482,7 @@
   },
   {
     "externalId": "ikea-hr-lack-stolic-bijela-118",
+    "market": "HR",
     "name": "LACK stolić, bijela, 118x78 cm",
     "retailer": "IKEA",
     "category": "table",
@@ -491,6 +509,7 @@
   },
   {
     "externalId": "ikea-hr-stoense-tepih-krem-50426802",
+    "market": "HR",
     "name": "STOENSE tepih, niski flor, krem",
     "retailer": "IKEA",
     "category": "rug",
@@ -517,6 +536,7 @@
   },
   {
     "externalId": "ikea-hr-arstid-podna-lampa-mjed-bijela",
+    "market": "HR",
     "name": "ÅRSTID podna lampa, mjed/bijela",
     "retailer": "IKEA",
     "category": "lighting",
@@ -542,6 +562,7 @@
   },
   {
     "externalId": "ikea-hr-lauters-podna-lampa-jasen-bijela",
+    "market": "HR",
     "name": "LAUTERS podna lampa, jasen/bijela",
     "retailer": "IKEA",
     "category": "lighting",
@@ -568,6 +589,7 @@
   },
   {
     "externalId": "ikea-hr-kallax-regal-bijela-77x147",
+    "market": "HR",
     "name": "KALLAX regal, bijela",
     "retailer": "IKEA",
     "category": "storage",
@@ -594,6 +616,7 @@
   },
   {
     "externalId": "ikea-hr-kallax-regal-bijela-147x147",
+    "market": "HR",
     "name": "KALLAX regal, bijela, 147x147 cm",
     "retailer": "IKEA",
     "category": "storage",
@@ -620,6 +643,7 @@
   },
   {
     "externalId": "ikea-hr-roedeby-pladanj-bambus",
+    "market": "HR",
     "name": "RÖDEBY pladanj za naslon za ruke, bambus",
     "retailer": "IKEA",
     "category": "decor",
@@ -646,6 +670,7 @@
   },
   {
     "externalId": "jysk-hr-fotelja-udsbjerg-siva",
+    "market": "HR",
     "name": "Fotelja UDSBJERG siva tkanina/hrast",
     "retailer": "JYSK",
     "category": "chair",
@@ -672,6 +697,7 @@
   },
   {
     "externalId": "jysk-hr-fotelja-udsbjerg-bez",
+    "market": "HR",
     "name": "Fotelja UDSBJERG bež tkanina/hrast",
     "retailer": "JYSK",
     "category": "chair",
@@ -698,6 +724,7 @@
   },
   {
     "externalId": "jysk-hr-fotelja-lyngaa-bez",
+    "market": "HR",
     "name": "Fotelja LYNGAA bež tkanina",
     "retailer": "JYSK",
     "category": "chair",
@@ -726,6 +753,7 @@
   },
   {
     "externalId": "jysk-hr-podesiva-fotelja-vejlby-svijetli-pijesak",
+    "market": "HR",
     "name": "Podesiva fotelja VEJLBY svijetli pijesak tkanina",
     "retailer": "JYSK",
     "category": "chair",
@@ -752,6 +780,7 @@
   },
   {
     "externalId": "jysk-hr-tv-stalak-favrbo-svijetli-hrast-bijela",
+    "market": "HR",
     "name": "TV-stalak FAVRBO boja svijetli hrast/bijela",
     "retailer": "JYSK",
     "category": "tv-unit",
@@ -780,6 +809,7 @@
   },
   {
     "externalId": "jysk-hr-tv-stalak-dense-topli-hrast-crna",
+    "market": "HR",
     "name": "TV-stalak DENSE 2 vrata 1 ladica topli hrast boja/crna",
     "retailer": "JYSK",
     "category": "tv-unit",
@@ -808,6 +838,7 @@
   },
   {
     "externalId": "jysk-hr-tv-stalak-astrup-crna",
+    "market": "HR",
     "name": "TV-stalak ASTRUP 1 polica crna",
     "retailer": "JYSK",
     "category": "tv-unit",
@@ -834,6 +865,7 @@
   },
   {
     "externalId": "jysk-hr-tv-stalak-evetofte-svijetli-hrast",
+    "market": "HR",
     "name": "TV-stalak EVETOFTE boja svijetli hrast",
     "retailer": "JYSK",
     "category": "tv-unit",
@@ -862,6 +894,7 @@
   },
   {
     "externalId": "jysk-hr-tv-stalak-limfjorden-bijela",
+    "market": "HR",
     "name": "TV-stalak LIMFJORDEN 2 ladice 1 vrata bijela",
     "retailer": "JYSK",
     "category": "tv-unit",
@@ -888,6 +921,7 @@
   },
   {
     "externalId": "jysk-hr-stolic-agerby-staklo-natur-hrast",
+    "market": "HR",
     "name": "Stolić AGERBY 60x100 staklo/natur hrast",
     "retailer": "JYSK",
     "category": "table",
@@ -914,6 +948,7 @@
   },
   {
     "externalId": "jysk-hr-stolic-nybo-topli-hrast-crna",
+    "market": "HR",
     "name": "Stolić NYBO Ø40 topli hrast boja/crna",
     "retailer": "JYSK",
     "category": "table",
@@ -940,6 +975,7 @@
   },
   {
     "externalId": "jysk-hr-stolic-nielshave-travertin",
+    "market": "HR",
     "name": "Stolić NIELSHAVE Ø55 boja travertin",
     "retailer": "JYSK",
     "category": "table",
@@ -968,6 +1004,7 @@
   },
   {
     "externalId": "jysk-hr-tepih-lingon-natur",
+    "market": "HR",
     "name": "Tepih LINGON 140x200 natur",
     "retailer": "JYSK",
     "category": "rug",
@@ -994,6 +1031,7 @@
   },
   {
     "externalId": "jysk-hr-tepih-birk-siva",
+    "market": "HR",
     "name": "Tepih BIRK 140x200 siva",
     "retailer": "JYSK",
     "category": "rug",
@@ -1020,6 +1058,7 @@
   },
   {
     "externalId": "jysk-hr-tepih-odon-krem",
+    "market": "HR",
     "name": "Tepih ODON 135x190 krem",
     "retailer": "JYSK",
     "category": "rug",
@@ -1046,6 +1085,7 @@
   },
   {
     "externalId": "jysk-hr-tepih-lucerne-bez",
+    "market": "HR",
     "name": "Tepih LUCERNE 140x200 bež",
     "retailer": "JYSK",
     "category": "rug",
@@ -1072,6 +1112,7 @@
   },
   {
     "externalId": "jysk-hr-tepih-mogop-natur",
+    "market": "HR",
     "name": "Tepih MOGOP 140x200 natur",
     "retailer": "JYSK",
     "category": "rug",
@@ -1098,6 +1139,7 @@
   },
   {
     "externalId": "jysk-hr-podna-lampa-kristof-celik",
+    "market": "HR",
     "name": "Podna lampa KRISTOF Ø35xV145 cm čelik",
     "retailer": "JYSK",
     "category": "lighting",
@@ -1130,6 +1172,7 @@
   },
   {
     "externalId": "jysk-hr-podna-lampa-hugo-crna",
+    "market": "HR",
     "name": "Podna lampa HUGO V154cm crna",
     "retailer": "JYSK",
     "category": "lighting",
@@ -1162,6 +1205,7 @@
   },
   {
     "externalId": "jysk-hr-podna-lampa-dani-smeda",
+    "market": "HR",
     "name": "Podna lampa DANI V54cm smeđa",
     "retailer": "JYSK",
     "category": "lighting",
@@ -1190,6 +1234,7 @@
   },
   {
     "externalId": "jysk-hr-podna-lampa-hansson-crna",
+    "market": "HR",
     "name": "Podna lampa HANSSON V155cm crna",
     "retailer": "JYSK",
     "category": "lighting",
@@ -1216,6 +1261,7 @@
   },
   {
     "externalId": "jysk-hr-lampa-mejse-baterije",
+    "market": "HR",
     "name": "Lampa na baterije MEJSE Ø14xV17 cm svijetlosmeđa",
     "retailer": "JYSK",
     "category": "lighting",
@@ -1242,6 +1288,7 @@
   },
   {
     "externalId": "jysk-hr-zidni-modul-skals-polica",
+    "market": "HR",
     "name": "Zidni modul SKALS polica za knjige divlji natur hrast boja",
     "retailer": "JYSK",
     "category": "storage",
@@ -1268,6 +1315,7 @@
   },
   {
     "externalId": "jysk-hr-policni-element-trappedal",
+    "market": "HR",
     "name": "Polični element TRAPPEDAL 7 polica topli hrast boja/crna",
     "retailer": "JYSK",
     "category": "storage",
@@ -1295,6 +1343,7 @@
   },
   {
     "externalId": "jysk-hr-polica-herning-bijela",
+    "market": "HR",
     "name": "Polica za knjige HERNING 5 polica bijela",
     "retailer": "JYSK",
     "category": "storage",
@@ -1321,6 +1370,7 @@
   },
   {
     "externalId": "jysk-hr-polica-mosbjerg-bijela",
+    "market": "HR",
     "name": "Polica za knjige MOSBJERG 10 polica bijela",
     "retailer": "JYSK",
     "category": "storage",
@@ -1347,6 +1397,7 @@
   },
   {
     "externalId": "jysk-hr-policni-element-astrup-crna",
+    "market": "HR",
     "name": "Polični element ASTRUP 6 polica crna",
     "retailer": "JYSK",
     "category": "storage",
@@ -1373,6 +1424,7 @@
   },
   {
     "externalId": "jysk-hr-ukrasni-pladanj-nielsen",
+    "market": "HR",
     "name": "Ukrasni pladanj NIELSEN Š17xD30cm brončana",
     "retailer": "JYSK",
     "category": "decor",
@@ -1399,6 +1451,7 @@
   },
   {
     "externalId": "jysk-hr-zidni-sat-askild-smeda",
+    "market": "HR",
     "name": "Zidni sat ASKILD Ø30cm smeđa",
     "retailer": "JYSK",
     "category": "decor",
@@ -1425,6 +1478,7 @@
   },
   {
     "externalId": "jysk-hr-ukrasni-pladanj-gerner-drvo",
+    "market": "HR",
     "name": "Ukrasni pladanj GERNER Ø30cm drvo",
     "retailer": "JYSK",
     "category": "decor",
@@ -1451,6 +1505,7 @@
   },
   {
     "externalId": "jysk-hr-ukrasni-pladanj-valdemar-mramor",
+    "market": "HR",
     "name": "Ukrasni pladanj VALDEMAR Ø25cm mramor",
     "retailer": "JYSK",
     "category": "decor",
