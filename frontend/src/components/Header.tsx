@@ -16,6 +16,23 @@ export function Header() {
   // Sprint 10.150: a custom in-app confirm dialog for sign-out (replaces the native window.confirm).
   const [signingOut, setSigningOut] = useState(false);
 
+  // Sprint 10.178: on phones the country + read-in-English + sign-in controls used to crowd the bar (and overflow).
+  // They now collapse behind a hamburger that opens a small dropdown. Closes on outside-click, Escape, or an action.
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDocMouseDown = (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest('.header-inner')) setMenuOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('mousedown', onDocMouseDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDocMouseDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
+
   // On a tight mobile header the country <select> gets shrunk, and Android/Windows don't render the flag
   // emoji — so the selected country looked blank. Show the short ISO code on mobile (always legible text),
   // keep the full country name on wider screens.
@@ -75,13 +92,26 @@ export function Header() {
           <a href="#planner" className={activeSection === 'planner' ? 'active' : undefined} aria-current={activeSection === 'planner' ? 'true' : undefined}>{t('nav.planner')}</a>
           <a href="#how" className={activeSection === 'how' ? 'active' : undefined} aria-current={activeSection === 'how' ? 'true' : undefined}>{t('nav.how')}</a>
         </nav>
-        <div className="header-actions">
+        {/* Sprint 10.178: mobile hamburger — collapses the utility + sign-in controls on phones (hidden on desktop). */}
+        <button
+          type="button"
+          className="header-menu-toggle"
+          aria-label={t('header.menu')}
+          aria-expanded={menuOpen}
+          aria-controls="header-menu"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <div id="header-menu" className={menuOpen ? 'header-actions open' : 'header-actions'}>
           {/* Sprint 10.156: the header right side is now two clearly-grouped clusters split by a hairline —
               a subtle UTILITY group (country + read-in-English) and a PRIMARY group (sign-in + the CTA) —
               so it reads as an intentionally designed bar, not a row of mismatched controls. */}
           <div className="header-utility">
             <label className="market-select" aria-label={t('header.market')}>
-              <select value={market} onChange={(event) => setMarket(event.target.value)}>
+              <select value={market} onChange={(event) => { setMarket(event.target.value); setMenuOpen(false); }}>
                 {MARKETS.map((option) => (
                   <option key={option.code} value={option.code}>
                     {option.flag} {compactMarket ? option.code : option.label}
@@ -98,7 +128,7 @@ export function Header() {
                 aria-label={t('header.language')}
                 aria-pressed={englishOverride}
                 title={englishOverride ? t('header.readNative') : t('header.readEnglish')}
-                onClick={() => setEnglishOverride(!englishOverride)}
+                onClick={() => { setEnglishOverride(!englishOverride); setMenuOpen(false); }}
               >
                 {englishOverride ? config.lang.toUpperCase() : 'EN'}
               </button>
@@ -114,7 +144,7 @@ export function Header() {
                 <button type="button" className="header-signout" onClick={() => setSigningOut(true)}>{t('auth.signOut')}</button>
               </div>
             ) : (
-              !loading && <button type="button" className="header-signin" onClick={startSignIn}>{t('auth.signIn')}</button>
+              !loading && <button type="button" className="header-signin" onClick={() => { startSignIn(); setMenuOpen(false); }}>{t('auth.signIn')}</button>
             )}
             <a className="nav-cta" href="#planner">{t('nav.cta')}<span className="nav-cta-arrow" aria-hidden="true">→</span></a>
           </div>

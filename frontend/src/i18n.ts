@@ -37,6 +37,7 @@ const DICTIONARY: Record<string, Entry> = {
   'nav.cta': { hr: 'Složi prostor', en: 'Plan a room' },
   'header.market': { hr: 'Država', en: 'Country' },
   'header.language': { hr: 'Jezik', en: 'Language' },
+  'header.menu': { hr: 'Izbornik', en: 'Menu' },
   'header.readEnglish': { hr: 'Pročitaj na engleskom', en: 'Read in English' },
   'header.readNative': { hr: 'Vrati na jezik države', en: 'Back to your country’s language' },
 
@@ -104,11 +105,11 @@ const DICTIONARY: Record<string, Entry> = {
   'how.eyebrow': { hr: 'Kako radi', en: 'How it works' },
   'how.heading': { hr: 'Od ideje do shopping liste u par klikova.', en: 'From idea to shopping list in a few clicks.' },
   'how.subheading': { hr: 'Ne dobiješ samo lijepu ideju za sobu, nego što kupiti, gdje i koliko ukupno košta.', en: 'You don\'t just get a nice room idea, but what to buy, where, and how much it costs in total.' },
-  'how.step1Title': { hr: '1. Opišeš što želiš', en: '1. Describe what you want' },
+  'how.step1Title': { hr: 'Opišeš što želiš', en: 'Describe what you want' },
   'how.step1Text': { hr: 'Napišeš prostoriju, budžet, stil i trgovine koje želiš. Nema dugog ispunjavanja forme.', en: 'Write the room, budget, style and stores you want. No long form to fill in.' },
-  'how.step2Title': { hr: '2. Dobiješ konkretne proizvode', en: '2. Get concrete products' },
+  'how.step2Title': { hr: 'Dobiješ konkretne proizvode', en: 'Get concrete products' },
   'how.step2Text': { hr: 'Prvo vidiš najvažnije komade, ukupnu cijenu i trgovine. Detalji idu niže.', en: 'You first see the key pieces, the total price and the stores. Details come below.' },
-  'how.step3Title': { hr: '3. Dobiješ popis za kupnju', en: '3. Get a shopping list' },
+  'how.step3Title': { hr: 'Dobiješ popis za kupnju', en: 'Get a shopping list' },
   'how.step3Text': { hr: 'Vidiš ukupnu cijenu, trošak po trgovini, proizvode i linkove gdje ih možeš otvoriti.', en: 'You see the total price, cost per store, the products and links where you can open them.' },
 
   'stats.suggestions': { hr: 'prijedloga po upitu', en: 'suggestions per request' },
