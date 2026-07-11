@@ -1639,6 +1639,45 @@ needs `OPENAI_API_KEY`, backend env only).
 > webhook shipped (10.69/10.84), **Flyway** owns the prod schema with `ddl-auto=validate` (10.83), and the AI
 > usage ledger is **persisted to the DB** (10.86). Treat MEMORY.md as the source of truth for current state.
 
+### 🆕 `size` (m²) → piece-fit signal — added 2026-07-11 · DESIGN APPROVED, NOT YET IMPLEMENTED
+
+**Problem.** `PlannerInputDto.size` (room m² — frontend size presets 12/20/32 or a custom 0–1000) is captured but
+the planner does NOT use it: it only appears in the plan description text (`PlannerService.describePlan`, the
+"Uravnoteženo za N m²…" line). A user who writes "20 m²" expects the plan to fit the space; today it changes nothing.
+
+**Decision (owner, 2026-07-11).** Implement as a **soft "fit" signal** (owner chose "Veličina komada (fit)" over a
+fullness variant or a size/budget warning). We have NO structured dimensions — they live only in product NAMES
+("KIVIK 3-seat", "MALM 160x200", "ÄNGSJÖN … 80x48x63"), so this is a NUDGE, not a 2D layout, and it acts only where
+the name carries a size/seat signal. **Do NOT fabricate dimensions.**
+
+**Design (approved in direction — re-confirm before coding).**
+- New helper `roomFit(product, roomSizeM2)` in `PlannerService`:
+  - Extract the product footprint from the NAME: largest width in cm from patterns like `160x200`, `80x48x63`,
+    `200 cm`. For sofas without dims, use seat count (`2-seat`/`2-Sitzer`/`dvosjed`/`2 posti`/`2 plazas`/`2-sits`/
+    `2-personers`/`2 places`/… → 2 = compact, 3 = normal, 4+/corner/sectional = large). No signal → neutral (0).
+  - Room band: **SMALL ≤14 m²**, **LARGE ≥26 m²**, else **MEDIUM** (neutral).
+  - Piece band, ONLY for footprint categories `sofa, bed, wardrobe, dining-table, dresser, tv-unit, desk, storage`:
+    **COMPACT <130 cm**, **LARGE >190 cm**, else MID.
+  - Soft capped bias in `scoreProduct` (thread it exactly like the 10.178 colour-coherence `currentColors` bonus —
+    add a param through `pickBest`): SMALL room → compact **+10** / large **−10**; LARGE room → large **+8** /
+    compact **−4**; MEDIUM → **0**. Cap sits BELOW styleScore(38)/roomScore(36) → only breaks ties, never overrides
+    budget/style.
+  - **Default `size=20` → MEDIUM → 0 bias**, so existing behaviour + tests are unchanged (low regression risk; only
+    explicitly small/large rooms shift picks).
+- **Files:** `backend/src/main/java/ai/budgetspace/planner/PlannerService.java` (helper + `scoreProduct` bias,
+  threaded through `pickBest` — copy the `currentColors` wiring pattern from Sprint 10.178, commit `c9a45eb`).
+- **Tests (TDD).** Unit: the footprint/seat parser (dims + multilingual seat count; no signal → neutral; no
+  collisions). Planner (`PlannerServiceTest`, synthetic products): a SMALL room (12 m²) prefers a 2-seat sofa over a
+  3-seat; a LARGE room (32 m²) prefers the 3-seat; DEFAULT 20 m² changes nothing (guards the no-regression claim).
+  Full backend suite must stay green (**380** as of 2026-07-11). Then reseed the Docker backend + a live smoke.
+- **Acceptance:** small room leans compact, large room leans larger, medium/default unchanged; soft (won't fight
+  budget/style); honest partial coverage (acts only where the name has a size/seat signal).
+- **Out of scope:** true spatial/2D fitting; a fullness variant (small → fewer items); a budget-vs-size warning.
+- **Context to read first:** `MEMORY.md` → *sprint-10-178-catalog-expansion* (the colour-coherence feature uses the
+  SAME `currentColors`/`scoreProduct`/`pickBest` bias pattern to copy). Catalog + colour-coherence + the two UI
+  fixes (step-number bug, mobile hamburger) are already on `main` (latest `cdfa3db`); **`main` is not pushed to
+  `origin` yet** — check with the owner before pushing.
+
 1. **[x] LLM is live (Gemini Flash, not OpenAI).** ✅ Shipped 10.66+: `BUDGETSPACE_AI_ENABLED=true`,
    `BUDGETSPACE_LLM_PROVIDER=gemini`, `GEMINI_API_KEY=...` (backend env only); `AiUsageTracker` caps
    (monthly USD / per-day / per-session) verified live across 15 markets. Rule-based path stays the fallback.
