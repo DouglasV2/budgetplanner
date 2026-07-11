@@ -687,6 +687,57 @@ class PlannerServiceTest {
         return products;
     }
 
+    // Sprint 10.178 (B): without a stated colour the plan should self-coordinate the bathroom fixtures to a coherent
+    // neutral palette (the "black toilet + white washbasin" bug). Ratings are rigged so that WITHOUT the coherence /
+    // neutral-anchor bonus the planner picks a black toilet (4.9) + a white washbasin (4.9) — a mismatch.
+    @Test
+    void bathroomFixturesCoordinateToANeutralPaletteWhenNoColourStated() {
+        PlannerService service = serviceWithProducts(List.of(
+                coloredFixture("wc-black", "WC crna", "toilet", "black", 4.9),
+                coloredFixture("wc-white", "WC bijela", "toilet", "white", 4.5),
+                coloredFixture("basin-white", "Umivaonik bijeli", "washbasin", "white", 4.9),
+                coloredFixture("basin-black", "Umivaonik crni", "washbasin", "black", 4.5)));
+
+        FurnishingPlanDto plan = service.generateResolved(bathroomInput(List.of())).plans().get(0);
+        List<String> toilet = fixtureColour(plan, "toilet");
+        List<String> washbasin = fixtureColour(plan, "washbasin");
+        assertThat(toilet).as("toilet colour matches washbasin").isEqualTo(washbasin);  // coherent (not black+white)
+        assertThat(toilet).as("neutral default").contains("white");                     // neutral anchor
+    }
+
+    @Test
+    void anExplicitColourStillDrivesTheFixtureSelection() {
+        PlannerService service = serviceWithProducts(List.of(
+                coloredFixture("wc-black", "WC crna", "toilet", "black", 4.5),
+                coloredFixture("wc-white", "WC bijela", "toilet", "white", 4.9),
+                coloredFixture("basin-white", "Umivaonik bijeli", "washbasin", "white", 4.9),
+                coloredFixture("basin-black", "Umivaonik crni", "washbasin", "black", 4.5)));
+
+        // "crna" (black) requested → the black fixture wins despite the white one's higher rating + neutral pull.
+        FurnishingPlanDto plan = service.generateResolved(bathroomInput(List.of("black"))).plans().get(0);
+        assertThat(fixtureColour(plan, "toilet")).as("explicit black toilet").contains("black");
+    }
+
+    private List<String> fixtureColour(FurnishingPlanDto plan, String category) {
+        return plan.items().stream()
+                .filter(item -> category.equals(item.product().category()))
+                .map(item -> item.product().colorTags())
+                .findFirst().orElse(List.of());
+    }
+
+    private Product coloredFixture(String id, String name, String category, String colour, double rating) {
+        Product product = product(id, name, "IKEA", category, 200, rating);
+        product.setRoomTags("bathroom");
+        product.setColorTags(colour);
+        return product;
+    }
+
+    private PlannerInputDto bathroomInput(List<String> colourPreferences) {
+        return new PlannerInputDto("kupaonica", 1500, "bathroom", "modern", "Zagreb", 20, "multi", List.of(),
+                "best-value", "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0,
+                colourPreferences, List.of(), "HR");
+    }
+
     private Product product(String id, String name, String retailer, String category, int price, double rating) {
         Product product = new Product();
         product.setId(id);

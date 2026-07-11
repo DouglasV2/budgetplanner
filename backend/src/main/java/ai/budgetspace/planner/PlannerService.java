@@ -692,6 +692,8 @@ public class PlannerService {
         List<String> categories = new ArrayList<>(focused ? focusedCategories(input) : desiredCategories(input));
         Set<String> picked = new LinkedHashSet<>();
         Set<String> currentRetailers = new LinkedHashSet<>();
+        // Sprint 10.178 (B): the colours already picked in THIS plan — used to self-coordinate later picks.
+        Set<String> currentColors = new LinkedHashSet<>();
         List<PlanItemDto> items = new ArrayList<>();
         double total = 0;
 
@@ -709,6 +711,7 @@ public class PlannerService {
                 if (picked.contains(lockedProduct.getId())) continue;
                 picked.add(lockedProduct.getId());
                 currentRetailers.add(lockedProduct.getRetailer());
+                currentColors.addAll(splitCsv(lockedProduct.getColorTags()));
                 total += lockedProduct.getPrice().doubleValue();
                 categories.removeIf(category -> category.equalsIgnoreCase(lockedProduct.getCategory()));
                 items.add(new PlanItemDto(
@@ -757,9 +760,9 @@ public class PlannerService {
             // resolves to an office chair, not the priciest lounge armchair the anyRoom pool offered), and fall
             // back to any room only when the item genuinely isn't in the plan's room (so a cross-room "bed + sofa"
             // ask still finds the sofa). Whole-room plans (focused=false) stay strictly room-scoped as before.
-            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget, false);
+            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, currentColors, perUnitTarget, false);
             if (product == null && focused) {
-                product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, perUnitTarget, true);
+                product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, currentColors, perUnitTarget, true);
             }
             // Sprint 10.122: the user explicitly asked for this category (focused or must-have) but nothing fits
             // the budget/cap — rather than an empty tier ("Najbolji izbor" with no items, which looks broken),
@@ -774,6 +777,7 @@ public class PlannerService {
 
             picked.add(product.getId());
             currentRetailers.add(product.getRetailer());
+            currentColors.addAll(splitCsv(product.getColorTags()));
             total += product.getPrice().doubleValue() * qty;
             items.add(createPlanItem(product, input, mode, ""));
         }
@@ -800,7 +804,7 @@ public class PlannerService {
     }
 
     private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers,
-                            double perItemTarget, boolean anyRoom) {
+                            Set<String> currentColors, double perItemTarget, boolean anyRoom) {
         List<String> allowedRetailers = selectedRetailers(input);
         boolean coreCategory = isCoreCategory(input.roomType(), category);
         double realisticLimit = coreCategory && !mode.equals("budget")
@@ -817,11 +821,15 @@ public class PlannerService {
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
                 .filter(product -> product.getPrice().doubleValue() <= realisticLimit || mode.equals("stretch"))
-                .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers, perItemTarget)))
+                .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers, currentColors, perItemTarget)))
                 .orElse(null);
     }
 
     private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, double perItemTarget) {
+        return scoreProduct(product, input, mode, currentRetailers, Set.of(), perItemTarget);
+    }
+
+    private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, Set<String> currentColors, double perItemTarget) {
         double styleScore = styleMatches(product, input.style()) ? 38 : 12;
         double roomScore = matchesRoom(product, input.roomType()) ? 36 : 0;
         double ratingScore = product.getRating() * 5;
@@ -861,11 +869,32 @@ public class PlannerService {
         double storeCapBonus = storeCapBonus(input, product, currentRetailers);
         double dataQualityBonus = dataQualityBonus(product);
         double preferenceBonus = colorMaterialBonus(product, input);
+        double coherenceBonus = colorCoherenceBonus(product, input, currentColors);
 
         return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias
                 + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus
                 + preferredRetailerBonus + requestedBonus + storeCapBonus + dataQualityBonus
-                + preferenceBonus;
+                + preferenceBonus + coherenceBonus;
+    }
+
+    // Sprint 10.178 (B): colours that read as a clean "neutral base" (bathroom fixtures anchor to these).
+    private static final Set<String> NEUTRAL_COLORS = Set.of("white", "grey", "beige", "natural");
+    private static final Set<String> FIXTURE_CATEGORIES = Set.of("toilet", "washbasin", "bath-shower");
+
+    // Sprint 10.178 (B): when the user did NOT state a colour, gently self-coordinate the plan — reward a candidate
+    // whose colour overlaps the palette already picked (currentColors), and anchor bathroom FIXTURES to a neutral
+    // base so the first fixture (which seeds the palette) defaults to white/neutral instead of a random loud colour
+    // (the "black toilet + white washbasin" bug). Capped well below styleScore(38)/roomScore(36) so it only breaks
+    // ties — never overrides style, room or budget. An explicit colour keeps full control (colorMaterialBonus drives
+    // it; this returns 0 then).
+    private double colorCoherenceBonus(Product product, PlannerInputDto input, Set<String> currentColors) {
+        if (input.colorPreferences() != null && !input.colorPreferences().isEmpty()) return 0;
+        Set<String> productColors = new LinkedHashSet<>(splitCsv(product.getColorTags()));
+        if (productColors.isEmpty()) return 0;
+        double coherence = currentColors != null && currentColors.stream().anyMatch(productColors::contains) ? 12 : 0;
+        double neutralAnchor = FIXTURE_CATEGORIES.contains(product.getCategory())
+                && productColors.stream().anyMatch(NEUTRAL_COLORS::contains) ? 8 : 0;
+        return coherence + neutralAnchor;
     }
 
     // Sprint 10.118: should this plan spend toward the budget on nicer pieces instead of flooring to the
@@ -1534,7 +1563,7 @@ public class PlannerService {
 
         for (String category : desired) {
             if (pickedCategories.contains(category) || input.alreadyHaveCategories().contains(category)) continue;
-            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, 0, false);
+            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, Set.of(), 0, false);
             if (option != null) {
                 tips.add("Za oko " + money(option.getPrice().doubleValue()) + " možeš dodati " + categoryLabel(category).toLowerCase(Locale.ROOT) + " i prostor će izgledati potpunije.");
             }

@@ -5,6 +5,41 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProductTaxonomyTest {
+    // Sprint 10.178: colour derivation must be MULTILINGUAL (product names are localized in 15 markets) and must not
+    // collide (short colour stems inside unrelated words). Underpins the plan colour-coherence coordination.
+    @Test
+    void derivesColoursFromCroatianAndEnglishNames() {
+        assertThat(ProductTaxonomy.deriveColorTags("Kauč bijela tkanina")).contains("white");
+        assertThat(ProductTaxonomy.deriveColorTags("Stolica crna")).contains("black");
+        assertThat(ProductTaxonomy.deriveColorTags("WC školjka Stil Remi Rimless black viseća")).contains("black");
+        assertThat(ProductTaxonomy.deriveColorTags("Ormar hrast efekt")).contains("natural");
+    }
+
+    @Test
+    void derivesColoursFromOtherMarketLanguages() {
+        assertThat(ProductTaxonomy.deriveColorTags("KABOMBA Wandleuchte, weiß")).contains("white");
+        assertThat(ProductTaxonomy.deriveColorTags("STENABY forno termoventilato, nero")).contains("black");
+        assertThat(ProductTaxonomy.deriveColorTags("Miroir NISSEDAL noir")).contains("black");
+        assertThat(ProductTaxonomy.deriveColorTags("ENHET Waschbeckenschrank, grau")).contains("grey");
+        assertThat(ProductTaxonomy.deriveColorTags("ÄNGSJÖN element, Eichenachbildung")).contains("natural");
+        assertThat(ProductTaxonomy.deriveColorTags("Armoire chêne")).contains("natural");
+        assertThat(ProductTaxonomy.deriveColorTags("Mueble blanco")).contains("white");
+        assertThat(ProductTaxonomy.deriveColorTags("MATÄLSKARE mikroaaltouuni, musta")).contains("black");
+    }
+
+    @Test
+    void doesNotFalselyDeriveColoursFromLookalikeWordsOrRangeNames() {
+        // A colour stem must not fire from INSIDE an unrelated word / IKEA range name.
+        // "blumenförmig" (flower-shaped) must NOT read as blue; a black product must not also read as blue.
+        assertThat(ProductTaxonomy.deriveColorTags("SKOGSDUVA Kissen, blumenförmig/weiß"))
+                .contains("white").doesNotContain("blue");
+        assertThat(ProductTaxonomy.deriveColorTags("BLACK trosjed"))
+                .contains("black").doesNotContain("blue");
+        // IKEA range names that begin like a colour word must not be mis-derived.
+        assertThat(ProductTaxonomy.deriveColorTags("GRISSLAN kanta")).doesNotContain("grey");
+        assertThat(ProductTaxonomy.deriveColorTags("VITTSJÖ klupa")).doesNotContain("white");
+    }
+
     @Test
     void mapsCategorySynonymsWithoutMixingChairAndCoffeeTable() {
         assertThat(ProductTaxonomy.normalizeCategory("kauč")).contains("sofa");

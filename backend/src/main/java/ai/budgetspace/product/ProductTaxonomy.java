@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public final class ProductTaxonomy {
     /** A product whose last check is older than this is shown as "provjeri u trgovini". */
@@ -414,19 +415,28 @@ public final class ProductTaxonomy {
      * {@code Product.colorTags} at import time when a snapshot does not declare it.
      */
     private static Map<String, List<String>> colorKeywords() {
+        // Sprint 10.178: multilingual (15 markets) but CURATED to avoid IKEA range-name / word collisions — every
+        // stem is matched at a word start (see compilePatterns). Deliberately omitted the collision-prone short
+        // foreign words (vit→VITTSJÖ, gris→GRISSLAN, blu→blumen, sort→sortiment, grå/blå/grønn diacritic-ambiguous):
+        // better to under-tag than mis-tag a soft coherence signal. Keep entries accent-free + lower-case.
         LinkedHashMap<String, List<String>> map = new LinkedHashMap<>();
-        map.put("white", List.of("bijel", "white"));
-        map.put("black", List.of("crn", "black"));
-        map.put("grey", List.of("siv", "grey", "gray", "antracit"));
-        map.put("beige", List.of("bezboj", "krem", "cream", "bjelokost", "ivory"));
-        map.put("brown", List.of("smed", "braon", "brown"));
-        map.put("green", List.of("zelen", "green", "maslinast"));
-        map.put("blue", List.of("plav", "blue", "teget", "navy"));
-        map.put("yellow", List.of("zut", "yellow", "oker"));
-        map.put("red", List.of("crven", "red", "bordo"));
-        map.put("pink", List.of("roza", "roze", "pink"));
-        map.put("natural", List.of("natur", "prirodn", "hrast", "oak", "orah"));
-        map.put("gold", List.of("zlatn", "gold", "mjed", "brass"));
+        map.put("white", List.of("bijel", "bela", "biela", "white", "weiss", "weiß", "blanc", "bianco", "bianca",
+                "blanco", "blanca", "branco", "branca", "valko", "hvid", "hvit"));
+        map.put("black", List.of("crn", "black", "schwarz", "noir", "noire", "nero", "nera", "negro", "negra",
+                "preto", "preta", "zwart", "musta", "svart", "ciern"));
+        map.put("grey", List.of("siv", "grey", "gray", "grau", "hellgrau", "dunkelgrau", "grigio", "grigia",
+                "antracit", "anthrazit", "harmaa"));
+        map.put("beige", List.of("bezboj", "krem", "cream", "bjelokost", "ivory", "beige"));
+        map.put("brown", List.of("smed", "braon", "brown", "braun", "dunkelbraun", "hellbraun", "brun", "bruin",
+                "marron", "marrone", "castanho", "ruskea"));
+        map.put("green", List.of("zelen", "green", "vert", "verde", "groen", "vihrea", "maslinast"));
+        map.put("blue", List.of("plav", "blue", "blau", "bleu", "azul", "blauw", "sinin", "modr", "teget", "navy"));
+        map.put("yellow", List.of("zut", "yellow", "oker", "gelb", "jaune", "giallo", "amarillo", "amarelo"));
+        map.put("red", List.of("crven", "red", "bordo", "rouge", "rosso", "rojo", "vermelho", "rood"));
+        map.put("pink", List.of("roza", "roze", "pink", "rosa"));
+        map.put("natural", List.of("natur", "prirodn", "hrast", "oak", "orah", "eiche", "eichen", "chene", "rovere",
+                "roble", "carvalho", "eik", "tammi", "dub", "bambus", "bamboo"));
+        map.put("gold", List.of("zlatn", "gold", "mjed", "brass", "dore", "messing"));
         return Map.copyOf(map);
     }
 
@@ -444,29 +454,42 @@ public final class ProductTaxonomy {
         return Map.copyOf(map);
     }
 
+    // Sprint 10.178: the colour/material vocabularies are compiled to WORD-START patterns so a stem fires from a real
+    // word ("crna", "weiße", "Eichenachbildung") but NOT from inside an unrelated word or IKEA range name — the old
+    // naive substring match tagged "credenza"→red, "GRISSLAN"→grey, "blumen"→blue. Keywords are matched against the
+    // accent-stripped, lower-cased name (see normalizeText), so keep them accent-free (ß/ø/æ are NOT decomposed).
+    private static final Map<String, Pattern> COLOR_PATTERNS = compilePatterns(COLOR_KEYWORDS);
+    private static final Map<String, Pattern> MATERIAL_PATTERNS = compilePatterns(MATERIAL_KEYWORDS);
+
     /** Derives canonical colour tags from one or more free-text fields (e.g. product name). */
     public static List<String> deriveColorTags(String... texts) {
-        return deriveTags(COLOR_KEYWORDS, texts);
+        return deriveTags(COLOR_PATTERNS, texts);
     }
 
     /** Derives canonical material tags from one or more free-text fields (e.g. product name). */
     public static List<String> deriveMaterialTags(String... texts) {
-        return deriveTags(MATERIAL_KEYWORDS, texts);
+        return deriveTags(MATERIAL_PATTERNS, texts);
     }
 
-    private static List<String> deriveTags(Map<String, List<String>> vocabulary, String... texts) {
+    private static Map<String, Pattern> compilePatterns(Map<String, List<String>> vocabulary) {
+        LinkedHashMap<String, Pattern> patterns = new LinkedHashMap<>();
+        vocabulary.forEach((tag, keywords) -> {
+            String alternation = String.join("|", keywords.stream().map(Pattern::quote).toList());
+            // (?<![a-z0-9]) = the keyword must begin a word (not sit inside a longer word), which kills the
+            // mid-word / range-name false positives while still matching inflections ("bijel"->"bijela").
+            patterns.put(tag, Pattern.compile("(?<![a-z0-9])(?:" + alternation + ")"));
+        });
+        return Map.copyOf(patterns);
+    }
+
+    private static List<String> deriveTags(Map<String, Pattern> patterns, String... texts) {
         String haystack = normalizeText(Arrays.stream(texts)
                 .filter(Objects::nonNull)
                 .reduce("", (a, b) -> a + " " + b));
         if (haystack.isBlank()) return List.of();
         List<String> found = new ArrayList<>();
-        vocabulary.forEach((tag, keywords) -> {
-            for (String keyword : keywords) {
-                if (haystack.contains(keyword)) {
-                    found.add(tag);
-                    break;
-                }
-            }
+        patterns.forEach((tag, pattern) -> {
+            if (pattern.matcher(haystack).find()) found.add(tag);
         });
         return List.copyOf(found);
     }
