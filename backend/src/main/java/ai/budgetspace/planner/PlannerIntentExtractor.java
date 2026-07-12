@@ -352,49 +352,12 @@ public class PlannerIntentExtractor {
     }
 
     private Optional<Integer> findBudget(String text) {
-        // Sprint 10.91: accept European thousands separators — "1.500 €" / "1 500 €" must read as 1500, not the
-        // "500" after the separator. The number token allows dot/space grouping; strip them before parsing.
-        // Sprint 10.135: multilingual + multi-currency so the rule-based fallback reads the budget in every market —
-        // non-EUR amounts ("9000 kr", "£1800") and non-HR verbs ("around/circa/hasta/omkring/bis ...") — not just
-        // "… €". Without this, a Danish "omkring 9000 kr" found no budget and silently fell back to the 1500 default.
-        String number = "(\\d{1,3}(?:[.\\s]\\d{3})+|\\d{3,5})";
-        String currency = "(?:€|eur|eura|euro|kr|kroner|kronor|nok|sek|dkk|kn|kuna|gbp|pund|pounds)";
-        String verbs = "(?:budget|budzet|budjet|do|ispod|maksimalno|maks|max|maximum|maximal|najvise|ne preko|ne vise od|imam|oko|otprilike|around|about|approx|circa|cirka|\\bca\\b|etwa|environ|jusqu|fino a|hasta|alrededor|\\bate\\b|omkring|runt|noin|under|up to|bis)";
-        List<Pattern> patterns = List.of(
-                Pattern.compile(number + "\\s*" + currency),
-                Pattern.compile("(?:£|\\$)\\s*" + number),
-                Pattern.compile(verbs + "\\s*" + number)
-        );
-        int bestIndex = Integer.MAX_VALUE;
-        Integer bestValue = null;
-        for (Pattern pattern : patterns) {
-            Matcher matcher = pattern.matcher(text);
-            // Only accept a match whose number parses into a sane budget. A pathological grouped number
-            // like "111.111.111.111" would otherwise overflow Integer.parseInt and 500 the (unauthenticated)
-            // rule-based endpoint; parseBudget skips it so a later pattern — or the default — takes over.
-            if (matcher.find() && matcher.start() < bestIndex) {
-                Integer parsed = parseBudget(matcher.group(1));
-                if (parsed != null) {
-                    bestIndex = matcher.start();
-                    bestValue = parsed;
-                }
-            }
-        }
-        return Optional.ofNullable(bestValue);
-    }
-
-    /**
-     * Parse a (possibly dot/space-grouped) budget number into a sane amount, or {@code null} if it does not
-     * parse or falls outside {@code 1..100_000_000} (covers every real budget incl. high-denomination NOK/SEK
-     * while rejecting nonsense). Never throws — a hostile huge number must not crash the rule-based path.
-     */
-    private Integer parseBudget(String grouped) {
-        try {
-            long value = Long.parseLong(grouped.replaceAll("[.\\s]", ""));
-            return (value >= 1 && value <= 100_000_000L) ? (int) value : null;
-        } catch (NumberFormatException overflowOrGarbage) {
-            return null;
-        }
+        // Sprint 10.181: budget/amount parsing lives in the centralized, unit-tested AmountParser so the rule-based
+        // fallback reads how real users actually write money — grouped thousands ("1.500 €"), multi-currency
+        // ("9000 kr", "£1800"), the "k" shorthand ("1.5k"), the "e" shorthand ("800e"), a bare standalone number
+        // ("boravak 1000") and Croatian number-words/slang ("soma", "dva soma", "soma i po") — while never turning a
+        // room size, quantity, phone/order number or year into a budget. See AmountParser + AmountParserTest.
+        return AmountParser.parseBudget(text);
     }
 
     private Optional<Integer> firstNumber(String text, Pattern pattern) {
