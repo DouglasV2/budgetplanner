@@ -48,8 +48,8 @@ public class PlannerIntentExtractor {
             Map.entry("decor", Pattern.compile("dekor|ukras|slik|jastuk|biljk|svijec")),
             Map.entry("desk", Pattern.compile("radni stol|pisaci stol|\\bdesk\\b")),
             Map.entry("chair", Pattern.compile("\\bstolica\\b|\\bstolice\\b|\\bstolicu\\b|\\bstolicom\\b|fotelj|\\bchair\\b")),
-            Map.entry("bed", Pattern.compile("krevet|\\bbed\\b")),
-            Map.entry("mattress", Pattern.compile("madrac|mattress")),
+            Map.entry("bed", Pattern.compile("krevet|\\bbed\\b|postelj|\\bbett|\\bletto\\b|\\blit\\b|\\bcama\\b|\\bseng|\\bsang\\b|\\bpostel|\\bkonty|\\blozko")),
+            Map.entry("mattress", Pattern.compile("madrac|mattress|matratze|materass|matelas|colchon|colchao|patja|madrass|madras|matrac")),
             Map.entry("gym-equipment", Pattern.compile("bucic|utez|girja|klup|bench|sprava|traka za trcanje|bicikl|oprema za vjezb")),
             // Sprint 10.7: new-room categories. These are precise multi-word phrases so they do not
             // collide with the single-word kitchen/bedroom synonyms above.
@@ -57,7 +57,7 @@ public class PlannerIntentExtractor {
             Map.entry("dining-chair", Pattern.compile("blagovaonsk[ae] stolic|trpezarijsk[ae] stolic|dining chair")),
             Map.entry("kitchen-storage", Pattern.compile("kuhinjski ormar|kuhinjska polic|kuhinjsko spreman|kitchen storage")),
             Map.entry("kitchen-cart", Pattern.compile("kuhinjska kolica|servirna kolica|kitchen cart")),
-            Map.entry("nightstand", Pattern.compile("nocni ormar|nightstand")),
+            Map.entry("nightstand", Pattern.compile("nocn\\w* ormar|nightstand|nachttisch|comodino|table de chevet|nattbord|natbord")),
             Map.entry("wardrobe", Pattern.compile("ormar za odjec|garderobni ormar|plakar|wardrobe")),
             Map.entry("dresser", Pattern.compile("komoda s ladic|ladicar|dresser")),
             // Sprint 10.176 (kitchen Increment 3): kitchen appliances (parsed as must-have when named). A
@@ -65,17 +65,17 @@ public class PlannerIntentExtractor {
             Map.entry("oven", Pattern.compile("(?<!mikrovaln. )pecnic|\\brerna\\b|backofen|\\boven\\b")),
             Map.entry("hob", Pattern.compile("ploca za kuhanj|indukcijsk\\w* ploc|\\bkuhalo\\b|kochfeld|\\bhob\\b|cooktop")),
             Map.entry("cooker-hood", Pattern.compile("\\bnapa\\b|\\bnapu\\b|kuhinjsk\\w* nap|dunstabzug|cooker hood|extractor hood")),
-            Map.entry("fridge", Pattern.compile("hladnjak|frizider|kuhlschrank|\\bfridge\\b|refrigerator")),
+            Map.entry("fridge", Pattern.compile("hladnjak|hladilnik|frizid|frizd|kuhlschrank|\\bfridge\\b|refrigerat|frigo|jaakaappi|koelkast|chladnick|kylskap|kjoleskap|koleskab|geladeira|nevera")),
             Map.entry("freezer", Pattern.compile("zamrziva|\\bskrinj|gefrierschrank|\\bfreezer\\b")),
-            Map.entry("dishwasher", Pattern.compile("perilic\\w* posu|perilic\\w* sud|geschirrspul|dishwasher")),
+            Map.entry("dishwasher", Pattern.compile("peril\\w* posu|peril\\w* sud|geschirrspul|dishwasher|lave-vaisselle|lavavajillas|lavastoviglie")),
             Map.entry("microwave", Pattern.compile("mikrovaln|mikrowell|microwave")),
             // Sprint 10.181: bathroom fixtures. toilet + washbasin are their own categories; a bathtub vs a shower is
             // told apart (kada -> bathtub, tuš -> shower) so an explicit "želim kadu" / "treba mi tuš" is honored. The
             // words are multilingual and word-boundary-anchored so "status"/"blokade" never trip them.
-            Map.entry("toilet", Pattern.compile("wc skoljk|\\bwc\\b|skoljk|zahod|monoblok|toalet|klozet|\\btoilet\\b")),
-            Map.entry("washbasin", Pattern.compile("umivaonik|lavabo|\\bsink\\b|washbasin|waschbecken|\\bbasin\\b")),
+            Map.entry("toilet", Pattern.compile("wc skoljk|\\bwc\\b|skoljk|zahod|monoblok|toalet|klozet|\\btoilet|stranisc|gabinetto|\\bwater\\b|sanitario|inodoro|sanita|vessa|toalett|\\bklo\\b|zachod")),
+            Map.entry("washbasin", Pattern.compile("umivaonik|umivalnik|lavabo|\\bsink\\b|washbasin|waschbecken|\\bbasin\\b|lavandino|lavamanos|lavatorio|pesuallas|handvask|\\bvask\\b|tvattstall|umyvadlo|wastafel|handfat|vaskeservant|servant")),
             Map.entry("bathtub", Pattern.compile("\\bkad[aeiou]|bathtub|badewanne|\\bvasca\\b|baignoire|kylpyamme|badekar|ligbad")),
-            Map.entry("shower", Pattern.compile("\\btus(?:a|u|em)?\\b|tus kabin|tus kad|tuskabin|\\bshower\\b|dusche|doccia|douche|ducha|suihku|\\bdusj|\\bdusch"))
+            Map.entry("shower", Pattern.compile("\\btus(?:a|u|em)?\\b|tus kabin|tus kad|tuskabin|\\bshower\\b|dusche|doccia|douche|ducha|duche|suihku|\\bdusj|\\bdusch|sprch|chuveiro|bruse"))
     );
 
     // Sprint 10.7: colour and material preferences. Keys are the canonical tags shared with
@@ -87,7 +87,9 @@ public class PlannerIntentExtractor {
     // Group 1 marks an "already have / exclude" clause, group 2 marks a "need" clause.
     // Longer and negated phrases come first so "ne treba mi" wins over "treba".
     private static final Pattern CLAUSE_TRIGGER = Pattern.compile(
-            "(vec imam|imam vec|imam doma|imam kod kuce|ne treba mi|ne trebam|ne treba|ne dodavaj|ne dodaj|ne zelim|bez|preskoci|maknuti|makni|imam(?!\\s*\\d))"
+            "(vec imam|imam vec|imam doma|imam kod kuce|ne treba mi|ne trebam|ne treba|ne dodavaj|ne dodaj|ne zelim"
+                    + "|bez|brez|keine|\\bkein\\b|sans|senza|\\bsin\\b|\\bsem\\b|utan|\\buden\\b|\\buten\\b|ilman|zonder|\\bgeen\\b"
+                    + "|preskoci|maknuti|makni|imam(?!\\s*\\d))"
                     + "|(treba mi|trebam|treba|fali mi|fali|dodaj|zelim|obavezno|prioritet|najvazniji|najvazni|najvise mi|volio bih|voljela bih)");
 
     // Sprint 10.181: object-verb (Croatian) reverse triggers — the owned/excluded noun comes BEFORE the verb.
@@ -144,25 +146,27 @@ public class PlannerIntentExtractor {
         // Before this, a non-HR/EN prompt silently fell back to living-room (no bed, ignored budget) on any LLM
         // hiccup. "Last match wins", so a later-checked room overrides; the studio container is checked last.
         if (matches(text, "dnevn|boravak|living|wohnzimmer|wohnraum|soggiorno|salotto|salon|sejour|woonkamer|zitkamer|obyvack|obyvacia|sala de estar|olohuone|vardagsrum|\\bstue")) input = input.withRoomType("living-room");
-        if (matches(text, "radni kutak|radni prostor|home office|homeoffice|\\bured\\b|\\boffice\\b|posao|arbeitszimmer|\\bburo\\b|ufficio|bureau|werkkamer|kantoor|pracovn|oficina|despacho|escritorio|tyohuone|kotitoimisto|kontor")) input = input.withRoomType("home-office");
-        if (matches(text, "spava|bedroom|spavac|schlafzimmer|camera da letto|chambre|slaapkamer|spalna|dormitorio|habitacion|recamara|quarto|makuuhuone|soverom|sovrum|sovevaer")) input = input.withRoomType("bedroom");
+        if (matches(text, "radni kutak|radni prostor|home office|homeoffice|\\bured\\b|\\boffice\\b|posao|arbeitszimmer|\\bburo\\b|ufficio|bureau|werkkamer|kantoor|pracovn|oficina|despacho|escritorio|tyohuone|kotitoimisto|kontor|pisarn|delovni|radn\\w* sob|radnu sob")) input = input.withRoomType("home-office");
+        if (matches(text, "spava|bedroom|spavac|schlafzimmer|camera da letto|chambre|slaapkamer|spaln|dormitorio|habitacion|recamara|quarto|makuuhuone|soverom|sovrum|sovevaer|makuu")) input = input.withRoomType("bedroom");
         // Sprint 10.79: home-gym de-scoped (no verified gym products) — a gym prompt no longer maps to it; the
         // room defaults instead so the user still gets a (non-empty) plan rather than an empty home-gym.
         // Sprint 10.7: new rooms. Checked after the originals, so the last room mentioned wins.
-        if (matches(text, "kuhinj|kitchen|kuche|cucina|cuisine|keuken|kuchyn|cocina|cozinha|keitti|kjokken|kokken")) input = input.withRoomType("kitchen");
+        if (matches(text, "kuhinj|kitchen|kuche|cucina|cuisine|keuken|kuchyn|cocina|cozinha|keitti|kjokken|kokken|\\bkok\\b|koket|kuhinu")) input = input.withRoomType("kitchen");
         // Sprint 10.176: a named kitchen APPLIANCE implies the kitchen room even without the word "kuhinja"
         // (e.g. "trebam pećnicu i frižider"), so the appliance is planned in the kitchen (its products' room).
         if (matches(text, "(?<!mikrovaln. )pecnic|hladnjak|frizider|perilic\\w* posu|\\bnapa\\b|zamrziva|mikrovaln|\\bkuhalo\\b|indukcijsk\\w* ploc")) input = input.withRoomType("kitchen");
-        if (matches(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|comedor|sala de jantar|ruokailu|spisestue|matsal")) input = input.withRoomType("dining-room");
-        if (matches(text, "hodnik|predsoblje|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b")) input = input.withRoomType("hallway");
+        if (matches(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|jedilnic|comedor|sala de jantar|ruokailu|spisestue|matsal|spisestue|spisrum")) input = input.withRoomType("dining-room");
+        // Sprint 10.181: a dining-table / dining-chair phrase implies the dining room even without the room word.
+        if (matches(text, "blagovaonski stol|trpezarijski stol|stol za blagovanje|za blagovanje|za objedovanje|blagovaonsk\\w* stolic|dining table|dining chair")) input = input.withRoomType("dining-room");
+        if (matches(text, "hodnik|predsob|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b|vorzimmer|entree|\\bentre\\b|vindfang|hodch|\\bhal\\b|\\bgang\\b|halle|hodnika")) input = input.withRoomType("hallway");
         // German "Bad" = bathroom, but a bare \bbad\b also matched the English adjective "bad" (e.g. "my sofa is
         // bad, help with the living room" was reclassified to bathroom). Require a German determiner/verb context
         // so the noun still resolves without hijacking English prompts; "badezimmer" still catches the full word.
-        if (matches(text, "kupaon|kupatil|bathroom|badezimmer|(?:\\b(?:das|mein|meine|unser|unsere|euer|im|ins|ein)\\s+bad\\b|\\bbad\\s+(?:einricht|renovier|umbau|gestalt))|bagno|salle de bain|badkamer|kupelna|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum")) input = input.withRoomType("bathroom");
+        if (matches(text, "kupaon|kupatil|bathroom|badezimmer|(?:\\b(?:das|mein|meine|unser|unsere|euer|im|ins|ein)\\s+bad\\b|\\bbad\\s+(?:einricht|renovier|umbau|gestalt))|bagno|salle de bain|badkamer|kupeln|kopalnic|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum|baderom|baderum|badevaerelse|kopalnico|\\bbadet\\b|badezimer")) input = input.withRoomType("bathroom");
         // Sprint 10.181: a named bathroom FIXTURE implies the bathroom even without the word "kupaonica" (e.g.
         // "treba mi tuš i umivaonik") — mirrors the appliance→kitchen rule above. Word-boundary-anchored so
         // "status"/"blokade"/"komad" never mis-route.
-        if (matches(text, "wc skoljk|skoljk|umivaonik|lavabo|washbasin|\\btus(?:a|u|em)?\\b|tus kabin|\\bkad[aeiou]|bathtub|\\bshower\\b|\\btoilet\\b")) input = input.withRoomType("bathroom");
+        if (matches(text, "wc skoljk|\\bwc\\b|skoljk|umivaonik|umivalnik|lavabo|washbasin|\\btus(?:a|u|em)?\\b|tus kabin|\\bkad[aeiou]|bathtub|\\bshower\\b|\\btoilet\\b|stranisc|sprch")) input = input.withRoomType("bathroom");
         // Sprint 10.179: utility rooms (garage / pantry / laundry / attic / basement) — furnished from the shared
         // storage/lighting pool. Checked after the standard rooms; studio (combined room) still wins last. Patterns
         // are in the NORMALIZED form the text is matched in (ASCII, diacritics stripped: ž→z, š→s, č→c) and stay
@@ -183,7 +187,7 @@ public class PlannerIntentExtractor {
         if (matches(text, "ne znam|svejedno|predlozi")) input = input.withStyle("surprise");
         if (matches(text, "svijetl|prozrac|skandi|scandi|nordic|skandinav")) input = input.withStyle("bright");
         if (matches(text, "toplo|ugodno|mekano|domac|cozy")) input = input.withStyle("warm");
-        if (matches(text, "modern|uredno")) input = input.withStyle("modern");
+        if (matches(text, "moder|uredno")) input = input.withStyle("modern");
         if (matches(text, "minimal|jednostavn|cisto")) input = input.withStyle("minimal");
         if (matches(text, "classic|klasic|klasc")) input = input.withStyle("classic");
         if (matches(text, "industrial|industrij|tamno|crno|metal")) input = input.withStyle("industrial");
@@ -227,20 +231,38 @@ public class PlannerIntentExtractor {
             String before = text.substring(Math.max(0, idx - 22), idx);
             int boundary = Math.max(before.lastIndexOf(','), before.lastIndexOf(';'));
             if (boundary >= 0) before = before.substring(boundary + 1);
-            if (matches(before, "\\bbez\\b|izbjegni|izbaci|ne zelim|ne trebam|ne treba|\\bosim\\b|preskoci")) {
+            // Sprint 10.181: also read a short window AFTER the retailer, bounded at the next clause, for the Croatian
+            // object-verb negation "lesninu nemoj" / "ikeu ne treba" (the "no" follows the store name).
+            String after = text.substring(Math.min(text.length(), idx + stem.length()),
+                    Math.min(text.length(), idx + stem.length() + 16));
+            int cComma = after.indexOf(',');
+            int cSemi = after.indexOf(';');
+            int cut = cComma < 0 ? cSemi : (cSemi < 0 ? cComma : Math.min(cComma, cSemi));
+            if (cut >= 0) after = after.substring(0, cut);
+            boolean excludeBefore = matches(before, "\\bbez\\b|izbjegni|izbaci|ne zelim|ne trebam|ne treba|\\bosim\\b|preskoci"
+                    + "|brez|keine|\\bkein\\b|sans|senza|\\bsin\\b|utan|\\buden\\b|\\buten\\b|ilman|zonder|\\bgeen\\b|\\bno\\b|\\bnie\\b|niente");
+            boolean excludeAfter = matches(after, "\\bnemoj\\b|ne treba|ne zelim|izbaci|izbjegni|preskoci");
+            boolean preferBefore = matches(before, "najvise|radije|preferiram|ako moze|po mogucnosti|volio bih|voljela bih|prvenstveno|preferira"
+                    + "|najraje|liebsten|de preference|preferibilmente|preferiblemente|de preferencia|mieluiten|helst|liefst|najradsej|\\bprefer");
+            // "ikea može" / "ikea moze proci" — a mild preference where the OK follows the store name.
+            boolean preferAfter = matches(after, "\\bmoze\\b|moze proci|u redu|smije");
+            if (excludeBefore || excludeAfter) {
                 excluded.add(retailer);
-            } else if (matches(before, "najvise|radije|preferiram|ako moze|po mogucnosti|volio bih|voljela bih|prvenstveno|preferira")) {
+            } else if (preferBefore || preferAfter) {
                 preferred.add(retailer);
             }
         }
 
         // Store limit: explicit numbers win over the soft "fewer stores" wish.
         int maxStores = 0;
-        if (matches(text, "jedna trgovina|jednu trgovinu|samo jedna|iz jedne trgovine|jedan odlazak|sve iz jedne")) {
+        if (matches(text, "jedna trgovina|jednu trgovinu|samo jedna|iz jedne trgovine|jedan odlazak|sve iz jedne"
+                + "|ene trgovine|eni trgovini|einem geschaft|einem laden|einem geschaeft|un negozio|un solo negozio"
+                + "|yhdesta|un seul magasin|une seule|un magasin|een winkel|jednej predajne|jednom obchode|una tienda"
+                + "|numa loja|uma loja|en butikk|en butik|ett stalle|one store|one shop|single store|samo iz ene")) {
             maxStores = 1;
         } else if (matches(text, "dvije trgovine|dvije trgovina|maksimalno dvije|maks dvije|ne vise od dvije|do dvije trgovine|najvise dvije|dvije trgovin")) {
             maxStores = 2;
-        } else if (matches(text, "ne zelim puno trgovina|sto manje trgovina|manje trgovina|bez puno obilazaka|bez obilazaka|manje obilazaka|ne zelim obilaziti|bez puno trgovina")) {
+        } else if (matches(text, "ne zelim puno trgovina|sto manje trgovina|manje trgovina|bez puno obilazaka|bez obilazaka|manje obilazaka|ne zelim obilaziti|bez puno trgovina|ne bi obilaz|ne bih obilaz|ne bi da obilaz")) {
             maxStores = 2;
             if ("best-value".equals(input.optimizationGoal())) input = input.withOptimizationGoal("least-stores");
         }
@@ -304,6 +326,13 @@ public class PlannerIntentExtractor {
             }
         }
 
+        // Sprint 10.181: telegraphic prompts with NO clause trigger at all ("kuhinja 2k frizider napa",
+        // "ured 600 stol i stolica") — the user is just listing what they want, so treat every named category as a
+        // wish. Skipped whenever any need/have/exclude trigger is present (then the clause logic above is authoritative).
+        if (markers.isEmpty()) {
+            mustHave.addAll(categoriesIn(text));
+        }
+
         // Sprint 10.181: object-verb word order (Croatian) — the noun PRECEDES the verb: "krevet imam" (I have a
         // bed), "kadu necu" (I don't want a bathtub). The forward clause scan above misses these because it only
         // reads what comes AFTER a trigger, so scan the short window BEFORE each such verb.
@@ -312,6 +341,16 @@ public class PlannerIntentExtractor {
         reverseClauseCategories(text, REVERSE_EXCLUDE, excluded, true);
         mustHave.removeAll(excluded);        // "kadu necu" wins over a forward mis-capture of "kadu" as a wish
         alreadyHave.addAll(excluded);        // an excluded fixture is treated as not-to-add (drives excludedFixtureFacet)
+
+        // Sprint 10.181: bathroom fixtures are unambiguous wants — a mentioned toilet/washbasin/bathtub/shower is a
+        // wish unless it's the one being excluded ("bez kade"). Catches triggerless "tuš, bez kade" (want the shower,
+        // drop the tub) and "shower bez bathtub" where the wanted fixture carries no explicit "treba mi".
+        for (String fixture : List.of("toilet", "washbasin", "bathtub", "shower")) {
+            if (!excluded.contains(fixture) && !alreadyHave.contains(fixture)
+                    && CATEGORY_PATTERNS.get(fixture).matcher(text).find()) {
+                mustHave.add(fixture);
+            }
+        }
 
         // A category the user explicitly asked for wins over an ambiguous "already have".
         // e.g. "već imam TV ... treba mi TV komoda" -> tv-unit stays requested.
@@ -424,8 +463,12 @@ public class PlannerIntentExtractor {
 
     private String normalize(String value) {
         if (value == null) return "";
+        // Sprint 10.181: NFD + strip combining marks handles ž/š/č/ć/ä/ö/é, but the Nordic/German ligatures æ ø å ß
+        // are NOT decomposed by NFD, so a Danish "soveværelse"/"badeværelse" or German "Küche/Straße" never matched an
+        // ASCII pattern. Fold them explicitly so the multilingual room/budget rules work in NO/SE/DK/DE.
         return Normalizer.normalize(value.toLowerCase(Locale.ROOT), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
+                .replaceAll("\\p{M}", "")
+                .replace("æ", "ae").replace("ø", "o").replace("å", "a").replace("ß", "ss");
     }
 
     private int clamp(int value, int min, int max) {
