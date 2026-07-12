@@ -783,9 +783,9 @@ public class PlannerService {
         }
 
         String label = switch (mode) {
-            case "stretch" -> "Dovršeniji, ljepši prostor";
-            case "value" -> "Najpametniji izbor";
-            default -> "Najpovoljnija baza";
+            case "stretch" -> "Kompletniji prostor";
+            case "value" -> "Uravnoteženo";
+            default -> "Samo osnovno";
         };
         String name = switch (mode) {
             case "stretch" -> "Ljepša verzija";
@@ -1286,7 +1286,7 @@ public class PlannerService {
         List<String> summary = new ArrayList<>();
         int storeCount = storeTrip == null ? 0 : storeTrip.storeCount();
         if (total <= input.budget()) {
-            summary.add("Ova kombinacija drži budžet i koristi " + storeCount + " " + storesWordAccusative(storeCount) + ".");
+            summary.add("Sve staje u budžet, a kupuješ u " + storeCount + " " + storesWordAccusative(storeCount) + ".");
         } else {
             summary.add("Plan je " + money(total - input.budget()) + " iznad budžeta — pogledaj kako ga spustiti.");
         }
@@ -1450,7 +1450,6 @@ public class PlannerService {
     }
 
     private String buildSummary(String mode, PlannerInputDto input, List<PlanItemDto> items, double total, List<String> retailersUsed) {
-        String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
         String categories = items.stream()
                 .map(item -> categoryLabel(item.product().category()))
                 .distinct()
@@ -1461,9 +1460,9 @@ public class PlannerService {
                 : "prelazi budžet za " + money(total - input.budget());
         String stores = retailersUsed.size() <= 1 ? "iz jedne trgovine" : "iz " + retailersUsed.size() + " " + storesWord(retailersUsed.size());
         return switch (mode) {
-            case "stretch" -> "Za dovršen dojam odmah, bez kompromisa na glavnim komadima. Pokriva " + categories + ", " + budgetText + ", " + stores + ".";
-            case "value" -> "Novac ide tamo gdje se najviše osjeti u " + room + "u. Pokriva " + categories + ", " + budgetText + ", " + stores + ".";
-            default -> "Sigurna baza koja drži budžet. Pokriva " + categories + ", " + budgetText + ", a sitnice ostavlja za kasnije.";
+            case "stretch" -> "Za dovršen dojam odmah, bez kompromisa na glavnim komadima. Pokriva " + categories + " — " + stores + ". " + capitalize(budgetText) + ".";
+            case "value" -> "Novac ide tamo gdje se najviše osjeti. Pokriva " + categories + " — " + stores + ". " + capitalize(budgetText) + ".";
+            default -> "Sigurna baza koja drži budžet. Pokriva " + categories + ". " + capitalize(budgetText) + ", a sitnice ostavlja za kasnije.";
         };
     }
 
@@ -1502,7 +1501,6 @@ public class PlannerService {
     }
 
     private String buildAdvisorNote(String mode, PlannerInputDto input, List<PlanItemDto> items, double total, List<String> retailersUsed) {
-        String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
         String firstItems = items.stream()
                 .filter(item -> "buy-first".equals(priorityForCategory(input.roomType(), item.product().category())))
                 .map(item -> categoryLabel(item.product().category()).toLowerCase(Locale.ROOT))
@@ -1516,8 +1514,8 @@ public class PlannerService {
         String alreadyHaveText = input.alreadyHaveCategories().isEmpty()
                 ? ""
                 : " Ono što već imaš nisam ponovno ubacio, pa budžet ide na ono što stvarno fali.";
-        if (firstItems.isBlank()) firstItems = "glavne komade";
-        return "Za " + room + " najviše smisla imaju " + firstItems + ". " + budgetText + " " + storeText + alreadyHaveText;
+        if (firstItems.isBlank()) firstItems = "glavni komadi";
+        return "U ovom prostoru najviše smisla imaju " + firstItems + ". " + budgetText + " " + storeText + alreadyHaveText;
     }
 
     private String buildNextStep(PlannerInputDto input, List<PlanItemDto> items, double total) {
@@ -1613,15 +1611,14 @@ public class PlannerService {
 
     private String describePlan(String mode, PlannerInputDto input, double total, Set<String> retailersUsed) {
         String storeText = retailersUsed.size() == 1
-                ? "sve iz " + retailersUsed.iterator().next()
-                : "kombinacija: " + String.join(", ", retailersUsed);
-        String room = ROOM_LABELS.getOrDefault(input.roomType(), input.roomType());
+                ? "Sve je iz " + retailersUsed.iterator().next() + "."
+                : "Kupuješ iz više trgovina (" + String.join(", ", retailersUsed) + ").";
         String level = furnishingLevelText(input.furnishingLevel());
 
         return switch (mode) {
-            case "stretch" -> "Ljepši, kompletniji komadi za razinu " + level + ". " + storeText + ".";
-            case "value" -> "Uravnoteženo za " + input.size() + " m²: prvo glavni komadi, pa udobnost, pa detalji ako stanu. " + storeText + ".";
-            default -> "Prvo čuva budžet za " + room + " u " + input.location() + ", pa slaže kupnju po važnosti. " + storeText + ".";
+            case "stretch" -> "Ljepši, kompletniji komadi za razinu " + level + ". " + storeText;
+            case "value" -> "Prvo glavni komadi, pa udobnost, a detalji ako preostane budžeta. " + storeText;
+            default -> "Prvo čuva budžet, pa slaže kupnju po važnosti. " + storeText;
         };
     }
 
