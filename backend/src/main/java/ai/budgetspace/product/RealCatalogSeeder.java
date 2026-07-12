@@ -374,7 +374,18 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // existing IKEA bath wall/ceiling lamp articles (FRIHULT/KABOMBA/FLASKPOST) to /fr/fr/ via the bare-article
             // trick, re-read live (EUR price + og:image). FR bathroom lighting 4->10. (GB stayed 5: its bare-article
             // ports bounced to /cat/ — honest, not forced.)
-            "/catalog/real-ikea-bathroom-lighting-fr-10-178.json"
+            "/catalog/real-ikea-bathroom-lighting-fr-10-178.json",
+            // Sprint 10.180 ("probudi katalog"): cross-market IKEA depth for the thin SECONDARY cells the coverage
+            // map surfaced — rug / lighting / decor / storage(shelving,shoe,sideboard) / dining-table / dining-chair /
+            // textiles across ALL 15 markets, concentrated in the weakest markets (GB/ES/IT/PT/FR/FI/SK) and the
+            // weakest rooms (hallway, dining-room, home-office). Each market's OWN live category listing was harvested
+            // via the global category-id cross-market redirect (/{cc}/{lang}/cat/-{id}/ → localized ItemList; SE nests
+            // it under @graph[].mainEntity), then EACH product page re-read live: JSON-LD price + priceCurrency
+            // (currency-matched to the market: EUR/GBP/NOK/SEK/DKK) + og:image + og:title. Deduped by (market, article)
+            // vs the whole catalog; rule-cleaned (doormats/outdoor/micro-accessory price floors) then a 15-agent
+            // multilingual judge pass pruned cover-only/insert-only cushions + candle-holders + tiny plants across all
+            // 15 languages. Deterministic curl, agent-free prices, no fabrication. Rugs/lamps/mirrors tagged multi-room.
+            "/catalog/real-ikea-catalog-wakeup-10-180.json"
     );
 
     /**
