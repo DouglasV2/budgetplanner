@@ -148,6 +148,15 @@ public class PlannerIntentExtractor {
         // bad, help with the living room" was reclassified to bathroom). Require a German determiner/verb context
         // so the noun still resolves without hijacking English prompts; "badezimmer" still catches the full word.
         if (matches(text, "kupaon|kupatil|bathroom|badezimmer|(?:\\b(?:das|mein|meine|unser|unsere|euer|im|ins|ein)\\s+bad\\b|\\bbad\\s+(?:einricht|renovier|umbau|gestalt))|bagno|salle de bain|badkamer|kupelna|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum")) input = input.withRoomType("bathroom");
+        // Sprint 10.179: utility rooms (garage / pantry / laundry / attic / basement) — furnished from the shared
+        // storage/lighting pool. Checked after the standard rooms; studio (combined room) still wins last. Patterns
+        // are in the NORMALIZED form the text is matched in (ASCII, diacritics stripped: ž→z, š→s, č→c) and stay
+        // precise — \bostava\b / \bostavu\b, so "dostava" (delivery) and "ostaviti" (to leave) never mis-route.
+        if (matches(text, "garaz|radionic|\\bgarage\\b|werkstatt")) input = input.withRoomType("garage");
+        if (matches(text, "spajz|smocnic|pantry|\\bostava\\b|\\bostavu\\b|\\bostavom\\b")) input = input.withRoomType("pantry");
+        if (matches(text, "veseraj|praonic|perionic|laundry|waschkuche|waschraum")) input = input.withRoomType("laundry");
+        if (matches(text, "tavan|potkrovlj|\\battic\\b|dachboden")) input = input.withRoomType("attic");
+        if (matches(text, "podrum|basement|\\bcellar\\b|\\bkeller\\b|suteren")) input = input.withRoomType("basement");
         // Studio / one-room apartment is the COMBINED-room container (bed + seating + dining in one space); checked
         // last so it wins over any single-room word it co-occurs with. Bare "studio" leans studio-flat here (the
         // common furnishing sense); a rare IT/ES "studio/estudio"=home-office is left to the (primary) AI path.

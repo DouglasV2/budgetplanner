@@ -196,6 +196,12 @@ public class ProductImportService {
         }
         entity.setStyleTags(joinCanonicalStyles(dto.styleTags()));
         entity.setRoomTags(joinCanonicalRooms(dto.roomTags()));
+        // Sprint 10.179: a laundry item (basket / hamper, detected by name) also belongs to the `laundry` room.
+        // Additive — it keeps its existing rooms (e.g. bathroom), so no other room loses it; the laundry room can
+        // now surface it (a real basket) instead of only a generic shelf.
+        if (ProductTaxonomy.isLaundryItem(dto.name())) {
+            entity.setRoomTags(withRoomTag(entity.getRoomTags(), "laundry"));
+        }
         if (hasText(dto.imageUrl())) {
             entity.setImageUrl(dto.imageUrl().trim());
             entity.setImage(dto.imageUrl().trim());
@@ -528,6 +534,15 @@ public class ProductImportService {
                 .flatMap(Optional::stream)
                 .distinct()
                 .collect(Collectors.joining(","));
+    }
+
+    // Sprint 10.179: append a room tag to a CSV if not already present (case-insensitive), preserving existing tags.
+    private static String withRoomTag(String csv, String tag) {
+        if (csv == null || csv.isBlank()) return tag;
+        for (String existing : csv.split(",")) {
+            if (existing.trim().equalsIgnoreCase(tag)) return csv;
+        }
+        return csv + "," + tag;
     }
 
     private List<String> parseCsvLine(String line) {

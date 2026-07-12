@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,7 +56,15 @@ public class PlannerService {
             // Sprint 10.121: studio/one-room flat = living + bedroom combined (you sleep AND live here), so the
             // flow carries the essentials of both, sleeping pieces first. Products come from the living-room AND
             // bedroom catalog pools (see ROOM_CATALOG_TAGS / matchesRoom).
-            Map.entry("studio", List.of("bed", "mattress", "sofa", "dining-table", "wardrobe", "table", "storage", "lighting", "tv-unit", "rug", "nightstand", "textiles"))
+            Map.entry("studio", List.of("bed", "mattress", "sofa", "dining-table", "wardrobe", "table", "storage", "lighting", "tv-unit", "rug", "nightstand", "textiles")),
+            // Sprint 10.179: utility rooms — furnished from the shared storage/lighting pool (see ROOM_CATALOG_TAGS).
+            // We have no garage/pantry/laundry-specific stock, so these reuse existing shelving/lighting/desk/textiles
+            // (and, for laundry, real IKEA laundry baskets). Honest partial coverage; ROOM_COVERAGE_NOTE flags the gaps.
+            Map.entry("garage", List.of("storage", "desk", "lighting", "decor")),
+            Map.entry("pantry", List.of("storage", "kitchen-storage", "lighting", "decor")),
+            Map.entry("laundry", List.of("storage", "lighting", "textiles", "decor")),
+            Map.entry("attic", List.of("storage", "lighting", "decor")),
+            Map.entry("basement", List.of("storage", "lighting", "decor"))
     );
 
     // Najvažnije (buy-first) po prostoru.
@@ -68,7 +78,13 @@ public class PlannerService {
             Map.entry("dining-room", Set.of("dining-table", "dining-chair")),
             Map.entry("hallway", Set.of("storage")),
             Map.entry("bathroom", Set.of("toilet", "washbasin", "bath-shower")),
-            Map.entry("studio", Set.of("bed", "mattress", "sofa"))
+            Map.entry("studio", Set.of("bed", "mattress", "sofa")),
+            // Sprint 10.179: utility rooms — shelving is the essential.
+            Map.entry("garage", Set.of("storage")),
+            Map.entry("pantry", Set.of("storage")),
+            Map.entry("laundry", Set.of("storage")),
+            Map.entry("attic", Set.of("storage")),
+            Map.entry("basement", Set.of("storage"))
     );
 
     // Za ugodniji prostor (add-comfort) po prostoru. Sve ostalo u flowu je "može kasnije".
@@ -84,7 +100,13 @@ public class PlannerService {
             // Sprint 10.178: decor promoted from "later" (complete-only) to comfort, so bathroom mirrors and
             // accessories (category `decor`) surface at the default comfort level — a real bathroom shows a mirror.
             Map.entry("bathroom", Set.of("storage", "lighting", "textiles", "decor")),
-            Map.entry("studio", Set.of("dining-table", "wardrobe", "table", "storage", "lighting", "rug", "textiles"))
+            Map.entry("studio", Set.of("dining-table", "wardrobe", "table", "storage", "lighting", "rug", "textiles")),
+            // Sprint 10.179: utility rooms.
+            Map.entry("garage", Set.of("desk", "lighting")),
+            Map.entry("pantry", Set.of("kitchen-storage", "lighting")),
+            Map.entry("laundry", Set.of("lighting", "textiles")),
+            Map.entry("attic", Set.of("lighting")),
+            Map.entry("basement", Set.of("lighting"))
     );
 
     // Sprint 10.109 (Move-In): relative "how much furnishing this room typically needs" weights — they only set
@@ -92,7 +114,10 @@ public class PlannerService {
     private static final Map<String, Double> MOVE_IN_WEIGHTS = Map.ofEntries(
             Map.entry("living-room", 1.4), Map.entry("bedroom", 1.2), Map.entry("kitchen", 1.0),
             Map.entry("dining-room", 1.0), Map.entry("home-office", 0.9), Map.entry("home-gym", 0.9),
-            Map.entry("hallway", 0.5), Map.entry("bathroom", 0.5)
+            Map.entry("hallway", 0.5), Map.entry("bathroom", 0.5),
+            // Sprint 10.179: utility rooms (small share of a whole-apartment budget if selected).
+            Map.entry("garage", 0.5), Map.entry("pantry", 0.4), Map.entry("laundry", 0.4),
+            Map.entry("attic", 0.4), Map.entry("basement", 0.4)
     );
 
     private static final Map<String, String> ROOM_LABELS = Map.ofEntries(
@@ -105,14 +130,33 @@ public class PlannerService {
             Map.entry("dining-room", "blagovaonica"),
             Map.entry("hallway", "hodnik"),
             Map.entry("bathroom", "kupaonica"),
-            Map.entry("studio", "garsonijera")
+            Map.entry("studio", "garsonijera"),
+            // Sprint 10.179: utility rooms.
+            Map.entry("garage", "garaža"),
+            Map.entry("pantry", "ostava"),
+            Map.entry("laundry", "praonica"),
+            Map.entry("attic", "tavan"),
+            Map.entry("basement", "podrum")
     );
 
     // Sprint 10.121: which catalog room-tags a roomType draws products from. Studio is a combined living+bedroom,
     // so it pulls from both pools; every other room maps to itself.
-    private static final Map<String, List<String>> ROOM_CATALOG_TAGS = Map.of(
-            "studio", List.of("living-room", "bedroom", "dining-room")
+    private static final Map<String, List<String>> ROOM_CATALOG_TAGS = Map.ofEntries(
+            Map.entry("studio", List.of("living-room", "bedroom", "dining-room")),
+            // Sprint 10.179: utility rooms have no dedicated catalog tag — they draw from the pools where the shared
+            // storage / shelving / lighting / desk / textiles actually live (like studio). `laundry` also lists the
+            // derived `laundry` tag (real baskets) + bathroom (where they were harvested in 10.177).
+            Map.entry("garage", List.of("hallway", "home-office", "living-room", "bedroom", "kitchen")),
+            Map.entry("pantry", List.of("kitchen", "hallway", "living-room", "bedroom")),
+            Map.entry("laundry", List.of("laundry", "bathroom", "hallway", "kitchen", "bedroom")),
+            Map.entry("attic", List.of("hallway", "living-room", "bedroom", "home-office")),
+            Map.entry("basement", List.of("hallway", "living-room", "bedroom", "home-office"))
     );
+
+    // Sprint 10.179: utility rooms are FUNCTIONAL, not splurge rooms — they skip the value/stretch spend-up target
+    // (which would drop a designer lamp into a garage or a pricey mirror cabinet into a laundry), so they floor to
+    // appropriate, cheaper pieces and a real laundry basket wins its storage slot in every tier.
+    private static final Set<String> UTILITY_ROOMS = Set.of("garage", "pantry", "laundry", "attic", "basement");
 
     private final ProductRepository productRepository;
     // Sprint 10.64: the live, request-time eBay source for "Rabljeno" (used items are never persisted). Nullable
@@ -838,7 +882,12 @@ public class PlannerService {
         double price = product.getPrice().doubleValue();
 
         double priceBias;
-        if (perItemTarget > 0) {
+        if (UTILITY_ROOMS.contains(input.roomType())) {
+            // Sprint 10.179: utility rooms are FUNCTIONAL in every tier — always lean cheap, never spend up (no
+            // designer lamp or €2000 bookcase in a garage), so they don't blow the budget and a real laundry basket
+            // wins its slot. Overrides the target + the stretch pricey-wins bias below for these rooms only.
+            priceBias = Math.max(0, 20 - price / 55);
+        } else if (perItemTarget > 0) {
             // Sprint 10.118/10.119: spend-up. Reward using the per-item budget share (peaks at the target),
             // with a gentle penalty above it so a full room stays complete. This replaces the
             // cheapest-wins bias so the value tier (and a focused/quality request) picks a nicer tier
@@ -870,11 +919,15 @@ public class PlannerService {
         double dataQualityBonus = dataQualityBonus(product);
         double preferenceBonus = colorMaterialBonus(product, input);
         double coherenceBonus = colorCoherenceBonus(product, input, currentColors);
+        // Sprint 10.179: soft, capped room-size fit nudge (0 for the default/medium room, so a no-op there).
+        double fitBonus = roomFitBonus(product, input);
+        // Sprint 10.179: laundry-room-only nudge so a real laundry basket wins the storage slot (0 elsewhere).
+        double laundryBonus = laundryFitBonus(product, input);
 
         return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias
                 + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus
                 + preferredRetailerBonus + requestedBonus + storeCapBonus + dataQualityBonus
-                + preferenceBonus + coherenceBonus;
+                + preferenceBonus + coherenceBonus + fitBonus + laundryBonus;
     }
 
     // Sprint 10.178 (B): colours that read as a clean "neutral base" (bathroom fixtures anchor to these).
@@ -895,6 +948,120 @@ public class PlannerService {
         double neutralAnchor = FIXTURE_CATEGORIES.contains(product.getCategory())
                 && productColors.stream().anyMatch(NEUTRAL_COLORS::contains) ? 8 : 0;
         return coherence + neutralAnchor;
+    }
+
+    // ── Sprint 10.179: size (m²) → piece-fit signal ───────────────────────────────────────────────────────
+    // A soft "does this piece fit the room's size" nudge. We have NO structured dimensions — they live only in
+    // product NAMES ("KIVIK 3-seat", "MALM 160x200", "ÄNGSJÖN 80x48x63") — so this reads a footprint band from the
+    // name and, for an explicitly small/large room, gently biases the pick toward a fitting piece. It is capped
+    // well below styleScore(38)/roomScore(36) → it only breaks ties, never overrides style, room or budget. A
+    // MEDIUM/default room (size 20) or a piece with no size signal contributes 0, so existing plans are unchanged.
+
+    // Only these big pieces get a size band — a rug/lamp/decor's footprint doesn't meaningfully change with room size.
+    private static final Set<String> FOOTPRINT_CATEGORIES = Set.of(
+            "sofa", "bed", "wardrobe", "dining-table", "dresser", "tv-unit", "desk", "storage");
+
+    // A dimension GROUP like "160x200" or "80x48x63": the WIDTH is the first number (IKEA names are W×L or W×D×H).
+    private static final Pattern DIMENSION_GROUP = Pattern.compile("(\\d{2,3})\\s*[x×]\\s*\\d{2,3}(?:\\s*[x×]\\s*\\d{2,3})?");
+    // A standalone "200 cm". Requiring the 'cm' unit (or the 'x' join above) keeps bare model numbers / years from
+    // being mis-read as a size (the "no collisions" guard).
+    private static final Pattern DIMENSION_SINGLE = Pattern.compile("(\\d{2,3})\\s*cm\\b");
+    // Numeric seat counts across the 15 markets: 2-seat / 2-seater / 2-Sitzer / 2 posti / 2 plazas / 2-sits /
+    // 2-personers / 2 places / 2-sjed. The unit word is required so "2 drawers" is not read as 2 seats.
+    private static final Pattern SEAT_COUNT = Pattern.compile(
+            "(\\d)\\s*[- ]?\\s*(?:seater|seat|sitzer|posti|plazas|sits|personers?|places?|plätze|sjed)");
+    // Corner / sectional keywords (multilingual) → always a large piece regardless of a stated seat count.
+    private static final Pattern SECTIONAL = Pattern.compile(
+            "corner|sectional|kutn|sekcij|ecksofa|angolo|rinconera|u-form|l-form|l-shape|u-shape");
+
+    enum RoomBand { SMALL, MEDIUM, LARGE }
+    enum PieceFit { COMPACT, MID, LARGE, NEUTRAL }
+
+    // SMALL ≤ 14 m², LARGE ≥ 26 m², else MEDIUM (neutral). An unset/garbage size (≤ 0) is treated as MEDIUM so it
+    // never applies a bias (input.size() is normalized to a default of 20 before it reaches here anyway).
+    static RoomBand roomBand(int sizeM2) {
+        if (sizeM2 <= 0) return RoomBand.MEDIUM;
+        if (sizeM2 <= 14) return RoomBand.SMALL;
+        if (sizeM2 >= 26) return RoomBand.LARGE;
+        return RoomBand.MEDIUM;
+    }
+
+    // The piece's footprint band, read from its NAME. Only footprint categories get a band; for a sofa without cm
+    // dimensions we fall back to the seat count (1-2 = compact, 3 = normal, 4+/corner = large). No signal → NEUTRAL.
+    static PieceFit pieceFit(Product product) {
+        if (product == null || product.getCategory() == null) return PieceFit.NEUTRAL;
+        String category = product.getCategory().toLowerCase(Locale.ROOT);
+        if (!FOOTPRINT_CATEGORIES.contains(category)) return PieceFit.NEUTRAL;
+        String name = product.getName() == null ? "" : product.getName().toLowerCase(Locale.ROOT);
+
+        OptionalInt width = footprintWidthCm(name);
+        if (width.isPresent()) return bandForWidthCm(width.getAsInt());
+
+        if (category.equals("sofa")) {
+            if (SECTIONAL.matcher(name).find()) return PieceFit.LARGE;
+            OptionalInt seats = seatCount(name);
+            if (seats.isPresent()) return bandForSeats(seats.getAsInt());
+        }
+        return PieceFit.NEUTRAL;
+    }
+
+    private static OptionalInt footprintWidthCm(String name) {
+        int width = -1;
+        Matcher group = DIMENSION_GROUP.matcher(name);
+        while (group.find()) width = Math.max(width, Integer.parseInt(group.group(1)));
+        if (width < 0) {
+            Matcher single = DIMENSION_SINGLE.matcher(name);
+            while (single.find()) width = Math.max(width, Integer.parseInt(single.group(1)));
+        }
+        return width < 0 ? OptionalInt.empty() : OptionalInt.of(width);
+    }
+
+    private static OptionalInt seatCount(String name) {
+        Matcher numeric = SEAT_COUNT.matcher(name);
+        if (numeric.find()) return OptionalInt.of(Integer.parseInt(numeric.group(1)));
+        // Croatian word-forms (dvo = 2, tro = 3, četvero/četvoro = 4) carry the seat count as a prefix, not a digit.
+        if (name.contains("jednosjed") || name.contains("jednosed")) return OptionalInt.of(1);
+        if (name.contains("dvosjed") || name.contains("dvosed")) return OptionalInt.of(2);
+        if (name.contains("trosjed") || name.contains("trosed")) return OptionalInt.of(3);
+        if (name.contains("četverosjed") || name.contains("cetverosjed")
+                || name.contains("četvorosjed") || name.contains("cetvorosjed")) return OptionalInt.of(4);
+        return OptionalInt.empty();
+    }
+
+    private static PieceFit bandForWidthCm(int widthCm) {
+        if (widthCm < 130) return PieceFit.COMPACT;
+        if (widthCm > 190) return PieceFit.LARGE;
+        return PieceFit.MID;
+    }
+
+    private static PieceFit bandForSeats(int seats) {
+        if (seats <= 2) return PieceFit.COMPACT;
+        if (seats == 3) return PieceFit.MID;
+        return PieceFit.LARGE;
+    }
+
+    // Maps the room band × the piece's footprint band to a small, capped score nudge (added in scoreProduct). A
+    // SMALL room rewards a compact piece / penalizes an oversized one; a LARGE room rewards a larger piece / mildly
+    // penalizes a tiny one. A MEDIUM/default room, a MID piece, or a piece with no size signal all contribute 0 —
+    // so the default size (20 m²) and every piece we can't read leave the existing scoring untouched.
+    private double roomFitBonus(Product product, PlannerInputDto input) {
+        RoomBand room = roomBand(input.size());
+        if (room == RoomBand.MEDIUM) return 0;
+        PieceFit piece = pieceFit(product);
+        if (piece == PieceFit.NEUTRAL || piece == PieceFit.MID) return 0;
+        return switch (room) {
+            case SMALL -> piece == PieceFit.COMPACT ? 10 : -10;   // compact fits a small room; a large piece crowds it
+            case LARGE -> piece == PieceFit.LARGE ? 8 : -4;       // a large piece suits a big room; a tiny one looks lost
+            default -> 0;
+        };
+    }
+
+    // Sprint 10.179: in the laundry room ONLY, nudge a real laundry-tagged item (a basket) to win the storage slot
+    // over a generic shelf. Capped and laundry-room-only (0 everywhere else — so bathroom keeps the same basket as
+    // ordinary storage, no regression). Below styleScore(38)/roomScore(36) → it only breaks the storage tie.
+    private double laundryFitBonus(Product product, PlannerInputDto input) {
+        if (!"laundry".equals(input.roomType())) return 0;
+        return splitCsv(product.getRoomTags()).contains("laundry") ? 10 : 0;
     }
 
     // Sprint 10.118: should this plan spend toward the budget on nicer pieces instead of flooring to the

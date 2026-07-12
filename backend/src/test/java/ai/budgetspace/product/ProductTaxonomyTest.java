@@ -27,6 +27,17 @@ class ProductTaxonomyTest {
         assertThat(ProductTaxonomy.deriveColorTags("MATÄLSKARE mikroaaltouuni, musta")).contains("black");
     }
 
+    // Sprint 10.179: the laundry room surfaces real laundry baskets/hampers, detected by NAME (multilingual, like
+    // deriveColorTags). Must NOT fire on a washbasin ("Waschbecken") or a plain shelf.
+    @Test
+    void detectsLaundryItemsByNameWithoutCollisions() {
+        assertThat(ProductTaxonomy.isLaundryItem("TORKIS košara za rublje")).isTrue();       // HR
+        assertThat(ProductTaxonomy.isLaundryItem("BRANÄS Wäschekorb")).isTrue();              // DE (Wäsche → wasche)
+        assertThat(ProductTaxonomy.isLaundryItem("Laundry basket")).isTrue();                 // EN
+        assertThat(ProductTaxonomy.isLaundryItem("KALLAX regal")).isFalse();                  // a plain shelf
+        assertThat(ProductTaxonomy.isLaundryItem("ENHET Waschbeckenschrank")).isFalse();      // washbasin cabinet, not laundry
+    }
+
     @Test
     void doesNotFalselyDeriveColoursFromLookalikeWordsOrRangeNames() {
         // A colour stem must not fire from INSIDE an unrelated word / IKEA range name.

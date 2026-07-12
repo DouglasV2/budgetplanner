@@ -116,6 +116,24 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Kupaonica, treba mi polica.").roomType()).isEqualTo("bathroom");
     }
 
+    // Sprint 10.179: the utility rooms (garage / pantry / laundry / attic / basement). A garage prompt no longer
+    // silently becomes a living-room plan. `terasa` stays unmapped (no outdoor stock) — it must NOT be mis-routed.
+    @Test
+    void recognisesUtilityRooms() {
+        assertThat(parse("Opremi mi garažu do 1000 €.").roomType()).isEqualTo("garage");
+        assertThat(parse("Trebam police za radionicu.").roomType()).isEqualTo("garage");
+        assertThat(parse("Sredi mi ostavu, police i rasvjeta.").roomType()).isEqualTo("pantry");
+        assertThat(parse("Špajz, trebam police.").roomType()).isEqualTo("pantry");
+        assertThat(parse("Uredi praonicu, treba mi košara za rublje.").roomType()).isEqualTo("laundry");
+        assertThat(parse("Veseraj do 500 €.").roomType()).isEqualTo("laundry");
+        assertThat(parse("Tavan, samo police i svjetlo.").roomType()).isEqualTo("attic");
+        assertThat(parse("Podrum, trebam regale.").roomType()).isEqualTo("basement");
+        assertThat(parse("Opremi mi terasu do 1000 €.").roomType())
+                .isNotIn("garage", "pantry", "laundry", "attic", "basement");
+        // "dostava" (delivery) must not be mis-read as "ostava" (pantry).
+        assertThat(parse("Dnevni boravak, važna mi je besplatna dostava.").roomType()).isEqualTo("living-room");
+    }
+
     @Test
     void parsesDiningTableCategory() {
         assertThat(parse("Blagovaonica, treba mi blagovaonski stol.").mustHaveCategories())

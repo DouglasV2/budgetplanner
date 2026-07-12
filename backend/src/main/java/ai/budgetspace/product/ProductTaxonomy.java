@@ -208,7 +208,9 @@ public final class ProductTaxonomy {
             "hallway",
             "bathroom",
             // Sprint 10.121: studio / one-room flat (combined living + bedroom).
-            "studio"
+            "studio",
+            // Sprint 10.179: laundry — the one utility room that gets a PRODUCT tag (baskets/hampers, derived by name).
+            "laundry"
     );
 
     private static final Map<String, String> CATEGORY_ALIASES = categoryAliases();
@@ -406,6 +408,8 @@ public final class ProductTaxonomy {
                 "garconniere", "garçonnière", "yksiö", "yksio", "estudio", "estúdio", "monoambiente", "kitnet",
                 "garsónka", "garsonka", "ettromsleilighet", "etta", "etværelses", "etvaerelses", "studiootje",
                 "eenkamerappartement", "studette");
+        // Sprint 10.179: laundry room (baskets/hampers are also tagged here by the name-based derive at import).
+        alias(aliases, "laundry", "laundry", "praonica", "praonicu", "veseraj", "waschraum", "waschkuche", "buanderie", "lavanderia");
         return Map.copyOf(aliases);
     }
 
@@ -469,6 +473,20 @@ public final class ProductTaxonomy {
     /** Derives canonical material tags from one or more free-text fields (e.g. product name). */
     public static List<String> deriveMaterialTags(String... texts) {
         return deriveTags(MATERIAL_PATTERNS, texts);
+    }
+
+    // Sprint 10.179: is this a laundry item (basket / hamper)? Detected from the NAME, multilingual, using the same
+    // normalize + word-start match as the colour deriver — so a laundry basket can be tagged into the `laundry` room
+    // at import. Kept precise: "wasche" (Wäsche) does NOT match "waschbecken" (washbasin, no trailing 'e').
+    private static final Pattern LAUNDRY_PATTERN = Pattern.compile(
+            "(?<![a-z0-9])(?:rublj|wasche|laundry|bucato|lessive|tvatt)");
+
+    /** True when a product name reads as a laundry basket / hamper (used to tag it into the laundry room). */
+    public static boolean isLaundryItem(String... texts) {
+        String haystack = normalizeText(Arrays.stream(texts)
+                .filter(Objects::nonNull)
+                .reduce("", (a, b) -> a + " " + b));
+        return !haystack.isBlank() && LAUNDRY_PATTERN.matcher(haystack).find();
     }
 
     private static Map<String, Pattern> compilePatterns(Map<String, List<String>> vocabulary) {

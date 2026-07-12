@@ -718,6 +718,185 @@ class PlannerServiceTest {
         assertThat(fixtureColour(plan, "toilet")).as("explicit black toilet").contains("black");
     }
 
+    // ── Sprint 10.179: size (m²) → piece-fit signal ──────────────────────────────────────────────────
+    // We have NO structured dimensions — they live only in product NAMES ("KIVIK 3-seat", "MALM 160x200").
+    // pieceFit() reads a soft footprint band from the name (cm width, or a multilingual seat count for sofas),
+    // but ONLY for footprint categories; every other category, and any name with no signal, is NEUTRAL.
+
+    @Test
+    void pieceFitReadsCmWidthForFootprintCategories() {
+        // Width = the first number of a WxL(xH) group; a standalone "N cm" also counts. Bands: <130 compact,
+        // >190 large, else mid.
+        assertThat(PlannerService.pieceFit(product("bed-single", "MALM 90x200", "IKEA", "bed", 300, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.COMPACT);                       // width 90 < 130
+        assertThat(PlannerService.pieceFit(product("bed-queen", "MALM 160x200", "IKEA", "bed", 400, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.MID);                           // width 160, in 130..190
+        assertThat(PlannerService.pieceFit(product("vanity", "ÄNGSJÖN 80x48x63", "IKEA", "dresser", 250, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.COMPACT);                       // WxDxH → width 80 < 130
+        assertThat(PlannerService.pieceFit(product("shelf", "BILLY polica 200 cm", "IKEA", "storage", 120, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.LARGE);                         // 200 cm > 190
+    }
+
+    @Test
+    void pieceFitReadsMultilingualSeatCountForSofasWithoutDimensions() {
+        assertThat(PlannerService.pieceFit(product("s1", "KIVIK 2-seat", "IKEA", "sofa", 400, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.COMPACT);
+        assertThat(PlannerService.pieceFit(product("s2", "KIVIK 3-seat", "IKEA", "sofa", 400, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.MID);
+        assertThat(PlannerService.pieceFit(product("s3", "VIMLE 2-Sitzer", "IKEA", "sofa", 400, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.COMPACT);                       // German
+        assertThat(PlannerService.pieceFit(product("s4", "Kauč dvosjed", "JYSK", "sofa", 400, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.COMPACT);                       // Croatian word (dvo = 2)
+        assertThat(PlannerService.pieceFit(product("s5", "Divano 3 posti", "IKEA", "sofa", 400, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.MID);                           // Italian
+        assertThat(PlannerService.pieceFit(product("s6", "VIMLE kutna sekcija", "IKEA", "sofa", 900, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.LARGE);                         // corner/sectional → large
+        assertThat(PlannerService.pieceFit(product("s7", "EKTORP 4-seat", "IKEA", "sofa", 700, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.LARGE);                         // 4+ seats → large
+    }
+
+    @Test
+    void pieceFitIsNeutralWithoutASignalOrForNonFootprintCategories() {
+        // No dims, no seat token → neutral.
+        assertThat(PlannerService.pieceFit(product("k1", "KALLAX", "IKEA", "storage", 90, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.NEUTRAL);
+        // A model number / year must NOT be read as a dimension (no 'x' join, no 'cm' unit) → no collision.
+        assertThat(PlannerService.pieceFit(product("k2", "IKEA PS 2017", "IKEA", "storage", 90, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.NEUTRAL);
+        // "2 drawers" is not a seat count.
+        assertThat(PlannerService.pieceFit(product("k3", "HEMNES 2 drawers", "IKEA", "dresser", 150, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.NEUTRAL);
+        // Dims present but the category is not a footprint category → neutral (the band is gated to big pieces).
+        assertThat(PlannerService.pieceFit(product("k4", "Zavjesa 140x200", "IKEA", "decor", 30, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.NEUTRAL);
+        // A seat token only means "size" on a sofa; on another footprint category it is ignored.
+        assertThat(PlannerService.pieceFit(product("k5", "Klupa 2-seat", "IKEA", "tv-unit", 100, 4.5)))
+                .isEqualTo(PlannerService.PieceFit.NEUTRAL);
+    }
+
+    @Test
+    void roomBandBucketsBySizeWithSmallAtOrBelow14AndLargeAtOrAbove26() {
+        assertThat(PlannerService.roomBand(12)).isEqualTo(PlannerService.RoomBand.SMALL);
+        assertThat(PlannerService.roomBand(14)).isEqualTo(PlannerService.RoomBand.SMALL);    // boundary ≤ 14
+        assertThat(PlannerService.roomBand(15)).isEqualTo(PlannerService.RoomBand.MEDIUM);
+        assertThat(PlannerService.roomBand(20)).isEqualTo(PlannerService.RoomBand.MEDIUM);   // default size
+        assertThat(PlannerService.roomBand(25)).isEqualTo(PlannerService.RoomBand.MEDIUM);
+        assertThat(PlannerService.roomBand(26)).isEqualTo(PlannerService.RoomBand.LARGE);    // boundary ≥ 26
+        assertThat(PlannerService.roomBand(32)).isEqualTo(PlannerService.RoomBand.LARGE);
+    }
+
+    // End to end: the room size (m²) is a soft "fit" tie-breaker. Ratings are rigged so that WITHOUT the fit signal
+    // the OTHER sofa would win — proving the size signal (not chance) drives each pick. Same price → identical
+    // priceBias in every tier, so rating + roomFit are the only differentiators.
+
+    @Test
+    void smallRoomPrefersACompactSofaOverALargerOne() {
+        // 3-seat is higher-rated → it wins in a medium room; a 12 m² room must flip the pick to the compact 2-seat.
+        PlannerService service = serviceWithProducts(twoSofas(4.5, 4.9));
+        FurnishingPlanDto plan = service.generateResolved(input("Dnevni boravak.").withSize(12)).plans().get(0);
+        assertThat(sofaId(plan)).isEqualTo("sofa-2seat");
+    }
+
+    @Test
+    void largeRoomPrefersALargerSofaOverACompactOne() {
+        // 2-seat is higher-rated → it wins in a medium room; a 32 m² room must flip the pick to the 3-seat.
+        PlannerService service = serviceWithProducts(twoSofas(4.9, 4.5));
+        FurnishingPlanDto plan = service.generateResolved(input("Dnevni boravak.").withSize(32)).plans().get(0);
+        assertThat(sofaId(plan)).isEqualTo("sofa-3seat");
+    }
+
+    @Test
+    void defaultRoomSizeDoesNotChangeTheSofaPick() {
+        // size 20 → MEDIUM → 0 bias → the higher-rated 3-seat wins exactly as before the feature (no regression).
+        PlannerService service = serviceWithProducts(twoSofas(4.5, 4.9));
+        FurnishingPlanDto plan = service.generateResolved(input("Dnevni boravak.").withSize(20)).plans().get(0);
+        assertThat(sofaId(plan)).isEqualTo("sofa-3seat");
+    }
+
+    private List<Product> twoSofas(double rating2seat, double rating3seat) {
+        // Identical except the name (seat count) and rating, and the SAME price so priceBias is identical in every
+        // tier — the only differentiators left are rating and the roomFit bias.
+        return List.of(
+                product("sofa-2seat", "KIVIK 2-seat", "IKEA", "sofa", 400, rating2seat),
+                product("sofa-3seat", "KIVIK 3-seat", "IKEA", "sofa", 400, rating3seat));
+    }
+
+    private String sofaId(FurnishingPlanDto plan) {
+        return plan.items().stream()
+                .filter(item -> "sofa".equals(item.product().category()))
+                .map(item -> item.product().id())
+                .findFirst().orElse(null);
+    }
+
+    // ── Sprint 10.179: utility rooms (garage / pantry / laundry / attic / basement) ──────────────────────
+    // These draw from the shared storage/lighting pool via ROOM_CATALOG_TAGS (like studio), so an unsupported
+    // "garaža" no longer silently becomes a living-room plan (sofa + TV). generateResolved bypasses the prompt
+    // extractor, so the roomType we set is authoritative. Synthetic products carry the default roomTags
+    // (living-room,home-office,bedroom,home-gym), which the new rooms' catalog tags overlap, so they are eligible.
+
+    @Test
+    void garageIsFurnishedWithShelvingAndAWorkbenchNotASofa() {
+        PlannerService service = serviceWithProducts(List.of(
+                product("shelf-1", "Regal BROR", "IKEA", "storage", 120, 4.5),
+                product("desk-1", "Radni stol", "IKEA", "desk", 150, 4.5),
+                product("sofa-1", "Kauč", "IKEA", "sofa", 400, 4.7)));
+        FurnishingPlanDto plan = service.generateResolved(input("Opremi garažu.").withRoomType("garage")).plans().get(0);
+        assertThat(categories(plan)).contains("storage", "desk");
+        assertThat(categories(plan)).doesNotContain("sofa");   // a garage is not a living room
+    }
+
+    @Test
+    void pantryIsFurnishedWithShelving() {
+        PlannerService service = serviceWithProducts(List.of(
+                product("shelf-1", "Polica IVAR", "IKEA", "storage", 90, 4.5),
+                product("sofa-1", "Kauč", "IKEA", "sofa", 400, 4.7)));
+        FurnishingPlanDto plan = service.generateResolved(input("Opremi ostavu.").withRoomType("pantry")).plans().get(0);
+        assertThat(categories(plan)).contains("storage");
+        assertThat(categories(plan)).doesNotContain("sofa");
+    }
+
+    @Test
+    void atticAndBasementAreFurnishedFromTheSharedStoragePool() {
+        PlannerService service = serviceWithProducts(List.of(
+                product("shelf-1", "Regal", "IKEA", "storage", 90, 4.5),
+                product("lamp-1", "Lampa", "IKEA", "lighting", 40, 4.5),
+                product("sofa-1", "Kauč", "IKEA", "sofa", 400, 4.7)));
+        for (String room : List.of("attic", "basement")) {
+            FurnishingPlanDto plan = service.generateResolved(input("x").withRoomType(room)).plans().get(0);
+            assertThat(categories(plan)).as(room + " has shelving").contains("storage");
+            assertThat(categories(plan)).as(room + " is not a living room").doesNotContain("sofa");
+        }
+    }
+
+    @Test
+    void laundryRoomShowsARealBasketInEveryTierNotJustTheCheapest() {
+        // Live, the value/stretch "spend-up" slot picked a pricey bathroom mirror cabinet over the €7 basket — the
+        // laundry room read like a mini-bathroom. Utility rooms are FUNCTIONAL, not splurge rooms, so they skip the
+        // spend-up target and a real laundry basket shows in EVERY tier, not only the cheapest one.
+        Product basket = product("basket-1", "TORKIS košara za rublje", "IKEA", "storage", 8, 4.4);
+        basket.setRoomTags("bathroom,laundry");
+        Product cabinet = product("cabinet-1", "FAXÄLVEN ormarić s ogledalom", "IKEA", "storage", 289, 4.8);
+        cabinet.setRoomTags("bathroom");   // reachable in the laundry pool, pricier + higher-rated
+        PlannerService service = serviceWithProducts(List.of(cabinet, basket));
+        for (FurnishingPlanDto plan : service.generateResolved(input("Opremi praonicu.").withRoomType("laundry")).plans()) {
+            List<String> ids = plan.items().stream().map(item -> item.product().id()).toList();
+            assertThat(ids).as(plan.name() + " shows the basket").contains("basket-1");
+        }
+    }
+
+    @Test
+    void utilityRoomsStayFunctionalAndNeverSplurgeOverBudget() {
+        // Regression: a utility room's "Ljepša verzija" (stretch) tier must not reach for a €2000 designer bookcase
+        // over a functional shelf (which blew a €1000 garage 2× over live). Utility rooms lean functional in EVERY tier.
+        Product shelf = product("shelf-1", "Regal", "IKEA", "storage", 60, 4.5);
+        Product splurge = product("splurge-1", "Biblioteka HERITAGE", "IKEA", "storage", 2000, 4.9);
+        PlannerService service = serviceWithProducts(List.of(shelf, splurge));
+        for (FurnishingPlanDto plan : service.generateResolved(input("Opremi garažu.").withRoomType("garage")).plans()) {
+            List<String> ids = plan.items().stream().map(item -> item.product().id()).toList();
+            assertThat(ids).as(plan.name() + " stays functional").contains("shelf-1").doesNotContain("splurge-1");
+        }
+    }
+
     private List<String> fixtureColour(FurnishingPlanDto plan, String category) {
         return plan.items().stream()
                 .filter(item -> category.equals(item.product().category()))
