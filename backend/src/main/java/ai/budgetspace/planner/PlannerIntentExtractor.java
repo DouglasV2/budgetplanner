@@ -68,7 +68,14 @@ public class PlannerIntentExtractor {
             Map.entry("fridge", Pattern.compile("hladnjak|frizider|kuhlschrank|\\bfridge\\b|refrigerator")),
             Map.entry("freezer", Pattern.compile("zamrziva|\\bskrinj|gefrierschrank|\\bfreezer\\b")),
             Map.entry("dishwasher", Pattern.compile("perilic\\w* posu|perilic\\w* sud|geschirrspul|dishwasher")),
-            Map.entry("microwave", Pattern.compile("mikrovaln|mikrowell|microwave"))
+            Map.entry("microwave", Pattern.compile("mikrovaln|mikrowell|microwave")),
+            // Sprint 10.181: bathroom fixtures. toilet + washbasin are their own categories; a bathtub vs a shower is
+            // told apart (kada -> bathtub, tuš -> shower) so an explicit "želim kadu" / "treba mi tuš" is honored. The
+            // words are multilingual and word-boundary-anchored so "status"/"blokade" never trip them.
+            Map.entry("toilet", Pattern.compile("wc skoljk|\\bwc\\b|skoljk|zahod|monoblok|toalet|klozet|\\btoilet\\b")),
+            Map.entry("washbasin", Pattern.compile("umivaonik|lavabo|\\bsink\\b|washbasin|waschbecken|\\bbasin\\b")),
+            Map.entry("bathtub", Pattern.compile("\\bkad[aeiou]|bathtub|badewanne|\\bvasca\\b|baignoire|kylpyamme|badekar|ligbad")),
+            Map.entry("shower", Pattern.compile("\\btus(?:a|u|em)?\\b|tus kabin|tus kad|tuskabin|\\bshower\\b|dusche|doccia|douche|ducha|suihku|\\bdusj|\\bdusch"))
     );
 
     // Sprint 10.7: colour and material preferences. Keys are the canonical tags shared with
@@ -82,6 +89,10 @@ public class PlannerIntentExtractor {
     private static final Pattern CLAUSE_TRIGGER = Pattern.compile(
             "(vec imam|imam vec|imam doma|imam kod kuce|ne treba mi|ne trebam|ne treba|ne dodavaj|ne dodaj|ne zelim|bez|preskoci|maknuti|makni|imam(?!\\s*\\d))"
                     + "|(treba mi|trebam|treba|fali mi|fali|dodaj|zelim|obavezno|prioritet|najvazniji|najvazni|najvise mi|volio bih|voljela bih)");
+
+    // Sprint 10.181: object-verb (Croatian) reverse triggers — the owned/excluded noun comes BEFORE the verb.
+    private static final Pattern REVERSE_HAVE = Pattern.compile("\\b(?:vec\\s+)?imam\\b(?!\\s*\\d)");
+    private static final Pattern REVERSE_EXCLUDE = Pattern.compile("\\bnecu\\b|\\bne bih\\b|\\bne treba(?:m|ju)?\\b|\\bne zelim\\b");
 
     public PlannerInputDto enrich(PlannerInputDto rawInput) {
         PlannerInputDto input = rawInput == null ? defaults() : rawInput.normalized();
@@ -148,6 +159,10 @@ public class PlannerIntentExtractor {
         // bad, help with the living room" was reclassified to bathroom). Require a German determiner/verb context
         // so the noun still resolves without hijacking English prompts; "badezimmer" still catches the full word.
         if (matches(text, "kupaon|kupatil|bathroom|badezimmer|(?:\\b(?:das|mein|meine|unser|unsere|euer|im|ins|ein)\\s+bad\\b|\\bbad\\s+(?:einricht|renovier|umbau|gestalt))|bagno|salle de bain|badkamer|kupelna|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum")) input = input.withRoomType("bathroom");
+        // Sprint 10.181: a named bathroom FIXTURE implies the bathroom even without the word "kupaonica" (e.g.
+        // "treba mi tuš i umivaonik") — mirrors the appliance→kitchen rule above. Word-boundary-anchored so
+        // "status"/"blokade"/"komad" never mis-route.
+        if (matches(text, "wc skoljk|skoljk|umivaonik|lavabo|washbasin|\\btus(?:a|u|em)?\\b|tus kabin|\\bkad[aeiou]|bathtub|\\bshower\\b|\\btoilet\\b")) input = input.withRoomType("bathroom");
         // Sprint 10.179: utility rooms (garage / pantry / laundry / attic / basement) — furnished from the shared
         // storage/lighting pool. Checked after the standard rooms; studio (combined room) still wins last. Patterns
         // are in the NORMALIZED form the text is matched in (ASCII, diacritics stripped: ž→z, š→s, č→c) and stay
@@ -289,11 +304,46 @@ public class PlannerIntentExtractor {
             }
         }
 
+        // Sprint 10.181: object-verb word order (Croatian) — the noun PRECEDES the verb: "krevet imam" (I have a
+        // bed), "kadu necu" (I don't want a bathtub). The forward clause scan above misses these because it only
+        // reads what comes AFTER a trigger, so scan the short window BEFORE each such verb.
+        reverseClauseCategories(text, REVERSE_HAVE, alreadyHave, false);
+        LinkedHashSet<String> excluded = new LinkedHashSet<>();
+        reverseClauseCategories(text, REVERSE_EXCLUDE, excluded, true);
+        mustHave.removeAll(excluded);        // "kadu necu" wins over a forward mis-capture of "kadu" as a wish
+        alreadyHave.addAll(excluded);        // an excluded fixture is treated as not-to-add (drives excludedFixtureFacet)
+
         // A category the user explicitly asked for wins over an ambiguous "already have".
         // e.g. "već imam TV ... treba mi TV komoda" -> tv-unit stays requested.
         alreadyHave.removeAll(mustHave);
 
         return input.withCategories(new ArrayList<>(mustHave), new ArrayList<>(alreadyHave));
+    }
+
+    // Object-verb order: find each have/exclude verb and read categories from the short window BEFORE it, bounded at
+    // the previous clause boundary (comma/;) so a preceding clause's noun never leaks onto this verb. For an EXCLUDE
+    // ("kadu necu") the negation targets the NEAREST noun only ("tuš, kadu neću" excludes the tub, keeps the shower);
+    // for a HAVE ("krevet i ormar imam") all nouns in the window are owned.
+    private void reverseClauseCategories(String text, Pattern verb, LinkedHashSet<String> target, boolean nearestOnly) {
+        Matcher matcher = verb.matcher(text);
+        while (matcher.find()) {
+            String before = text.substring(Math.max(0, matcher.start() - 28), matcher.start());
+            int boundary = Math.max(before.lastIndexOf(','), before.lastIndexOf(';'));
+            if (boundary >= 0) before = before.substring(boundary + 1);
+            if (!nearestOnly) {
+                target.addAll(categoriesIn(before));
+                continue;
+            }
+            String nearest = null;
+            int bestEnd = -1;
+            for (Map.Entry<String, Pattern> entry : CATEGORY_PATTERNS.entrySet()) {
+                Matcher cm = entry.getValue().matcher(before);
+                int lastEnd = -1;
+                while (cm.find()) lastEnd = cm.end();
+                if (lastEnd > bestEnd) { bestEnd = lastEnd; nearest = entry.getKey(); }
+            }
+            if (nearest != null) target.add(nearest);
+        }
     }
 
     private List<String> categoriesIn(String segment) {

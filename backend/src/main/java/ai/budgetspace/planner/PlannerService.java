@@ -678,7 +678,9 @@ public class PlannerService {
         List<String> allowedRetailers = selectedRetailers(input);
 
         List<Product> pool = marketCatalog(input).stream()
-                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                // Sprint 10.181: for a fixture anchor (bathtub/shower) stay within the SAME fixture family AND facet,
+                // so "find similar" for a bathtub returns other bathtubs, not shower enclosures.
+                .filter(product -> sameFixtureFamilyAndFacet(product, category, anchor.name()))
                 .filter(product -> matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> anchorId == null || !anchorId.equalsIgnoreCase(product.getId()))
@@ -856,7 +858,7 @@ public class PlannerService {
                 : remainingBudget;
 
         return marketCatalog(input).stream()
-                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                .filter(product -> categoryMatchesSlot(product, category, input))
                 // Sprint 10.156: in a FOCUSED plan every category is an item the user explicitly named, so a
                 // cross-room ask ("a bed AND a sofa") must not drop the sofa just because the plan's inferred room
                 // is the bedroom — match any room for those. Whole-room plans keep the strict room filter.
@@ -1172,7 +1174,9 @@ public class PlannerService {
         double stretchLimit = Math.max(remainingBudget, Math.min(input.budget() * 0.45, currentPrice * 1.25));
 
         return marketCatalog(input).stream()
-                .filter(product -> product.getCategory().equalsIgnoreCase(current.category()))
+                // Sprint 10.181: a replacement for a bathtub stays a bathtub (and a shower a shower) — preserve the
+                // fixture subtype unless a future changeType explicitly asks to switch it.
+                .filter(product -> sameFixtureFamilyAndFacet(product, current.category(), current.name()))
                 .filter(product -> matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> !blockedIds.contains(product.getId()))
@@ -1439,7 +1443,7 @@ public class PlannerService {
     private Product cheapestInCategory(String category, PlannerInputDto input, Set<String> excludeIds, double maxPriceExclusive, boolean anyRoom) {
         List<String> allowed = selectedRetailers(input);
         return marketCatalog(input).stream()
-                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                .filter(product -> categoryMatchesSlot(product, category, input))
                 .filter(product -> anyRoom || matchesRoom(product, input.roomType()))
                 .filter(ProductTaxonomy::canEnterPlanner)
                 .filter(product -> allowed.contains(product.getRetailer()))
@@ -1816,10 +1820,90 @@ public class PlannerService {
     }
 
     // In focused mode the plan contains ONLY what the user asked for (minus anything they already have).
+    // Sprint 10.181 — bath-shower subtype (fixture facet). bath-shower / bathtub / shower are ONE fixture family
+    // (a bathroom's wet fixture); the plan keeps a single "bath-shower" slot, and an explicit shower/bathtub
+    // request (or exclusion) filters that slot by the product's derived facet. This keeps the taxonomy backwards
+    // compatible: stored products, saved plans and API consumers all keep using "bath-shower".
+    private enum Facet { BATHTUB, SHOWER }
+
+    private Facet requestedFixtureFacet(PlannerInputDto input) {
+        boolean shower = input.mustHaveCategories().contains("shower");
+        boolean bathtub = input.mustHaveCategories().contains("bathtub");
+        if (shower && !bathtub) return Facet.SHOWER;
+        if (bathtub && !shower) return Facet.BATHTUB;
+        return null; // none, or both -> a generic fixture slot (any bathtub or shower is fine)
+    }
+
+    private Facet excludedFixtureFacet(PlannerInputDto input) {
+        boolean noBathtub = input.alreadyHaveCategories().contains("bathtub");
+        boolean noShower = input.alreadyHaveCategories().contains("shower");
+        if (noBathtub && !noShower) return Facet.BATHTUB;
+        if (noShower && !noBathtub) return Facet.SHOWER;
+        return null;
+    }
+
+    private boolean productHasFacet(Product product, Facet facet) {
+        return facet == Facet.BATHTUB
+                ? ProductTaxonomy.isBathtubFixture(product.getCategory(), product.getName())
+                : ProductTaxonomy.isShowerFixture(product.getCategory(), product.getName());
+    }
+
+    /** Does this product fill the given category SLOT for this request? Fixture slots match the whole fixture
+     *  family and honor an explicit shower/bathtub request + exclusion; everything else is an exact category match. */
+    private boolean categoryMatchesSlot(Product product, String slotCategory, PlannerInputDto input) {
+        String pc = product.getCategory() == null ? "" : product.getCategory();
+        if (ProductTaxonomy.isFixtureCategory(slotCategory)) {
+            if (!ProductTaxonomy.isFixtureCategory(pc)) return false;
+            Facet requested = requestedFixtureFacet(input);
+            if (requested != null && !productHasFacet(product, requested)) return false;
+            Facet excluded = excludedFixtureFacet(input);
+            if (excluded != null && productHasFacet(product, excluded)) return false;
+            return true;
+        }
+        return pc.equalsIgnoreCase(slotCategory);
+    }
+
+    /** The facet to preserve for Similar Items / Replace: a bathtub anchor stays a bathtub, a shower stays a shower;
+     *  a genuine combined shower-bath (ambiguous) is not over-constrained. */
+    private Facet anchorFacet(String category, String name) {
+        if (!ProductTaxonomy.isFixtureCategory(category)) return null;
+        boolean bath = ProductTaxonomy.isBathtubFixture(category, name);
+        boolean shower = ProductTaxonomy.isShowerFixture(category, name);
+        if (bath && !shower) return Facet.BATHTUB;
+        if (shower && !bath) return Facet.SHOWER;
+        return null;
+    }
+
+    /** Same category as the anchor, but for a fixture anchor it stays within the same fixture family AND facet
+     *  (so Similar Items / Replace for a bathtub never return a shower). */
+    private boolean sameFixtureFamilyAndFacet(Product product, String anchorCategory, String anchorName) {
+        if (!ProductTaxonomy.isFixtureCategory(anchorCategory)) {
+            return product.getCategory() != null && product.getCategory().equalsIgnoreCase(anchorCategory);
+        }
+        if (!ProductTaxonomy.isFixtureCategory(product.getCategory())) return false;
+        Facet facet = anchorFacet(anchorCategory, anchorName);
+        return facet == null || productHasFacet(product, facet);
+    }
+
+    /** Collapse an explicit shower/bathtub category into the single "bath-shower" slot (the shower/bathtub
+     *  distinction is applied as a facet filter, not as a separate slot). Preserves order + de-dupes. */
+    private List<String> collapseFixtureSlots(List<String> categories, PlannerInputDto input) {
+        LinkedHashSet<String> out = new LinkedHashSet<>();
+        boolean excludesWholeFixture = input.alreadyHaveCategories().contains("bath-shower")
+                || (input.alreadyHaveCategories().contains("bathtub") && input.alreadyHaveCategories().contains("shower"));
+        for (String c : categories) {
+            String slot = ProductTaxonomy.isFixtureCategory(c) ? "bath-shower" : c;
+            if ("bath-shower".equals(slot) && excludesWholeFixture) continue; // user already has both -> no fixture slot
+            out.add(slot);
+        }
+        return new ArrayList<>(out);
+    }
+
     private List<String> focusedCategories(PlannerInputDto input) {
         LinkedHashSet<String> categories = new LinkedHashSet<>(input.mustHaveCategories());
         input.alreadyHaveCategories().forEach(categories::remove);
-        return categories.stream()
+        List<String> collapsed = collapseFixtureSlots(new ArrayList<>(categories), input);
+        return collapsed.stream()
                 .sorted(Comparator.comparingInt(category -> categoryOrder(input.roomType(), category)))
                 .toList();
     }
@@ -1843,7 +1927,8 @@ public class PlannerService {
 
         categories.addAll(input.mustHaveCategories());
         categories.removeAll(input.alreadyHaveCategories());
-        return categories.stream()
+        List<String> collapsed = collapseFixtureSlots(new ArrayList<>(categories), input);
+        return collapsed.stream()
                 .sorted(Comparator.comparingInt(category -> categoryOrder(input.roomType(), category)))
                 .toList();
     }

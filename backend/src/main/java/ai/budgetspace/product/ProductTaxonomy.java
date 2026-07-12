@@ -182,10 +182,16 @@ public final class ProductTaxonomy {
             // Sprint 10.117: soft furnishings (curtains, cushions, throws).
             "textiles",
             // Sprint 10.169: bathroom fixtures / sanitary ware (Pevex HR) — the pieces a real bathroom is built
-            // around, which IKEA/JYSK don't sell. bath-shower covers both bathtubs and shower enclosures.
+            // around, which IKEA/JYSK don't sell. bath-shower is the legacy UMBRELLA fixture category.
             "toilet",
             "washbasin",
-            "bath-shower"
+            "bath-shower",
+            // Sprint 10.181: bathtub and shower split out as their own canonical fixture categories so an explicit
+            // "želim kadu" / "treba mi tuš" is honored precisely. bath-shower stays valid (existing products,
+            // saved plans, API): the three form one FIXTURE FAMILY and are told apart by fixtureFacet(). A product
+            // may be stored under any of the three; the planner treats a shower request as bath-shower + shower facet.
+            "bathtub",
+            "shower"
     );
 
     public static final Set<String> KNOWN_STYLES = Set.of(
@@ -374,9 +380,22 @@ public final class ProductTaxonomy {
                 "deke", "deka", "dekica", "pledovi", "pled", "prekrivač", "prekrivac", "curtains", "cushions", "throws", "blanket");
         // Sprint 10.169: bathroom fixtures (Pevex HR sanitary ware).
         alias(aliases, "toilet", "toilet", "wc", "wc školjka", "wc skoljka", "školjka", "skoljka", "zahod", "monoblok");
-        alias(aliases, "washbasin", "washbasin", "umivaonik", "lavabo", "sink", "basin");
-        alias(aliases, "bath-shower", "bath-shower", "bath shower", "kada", "bathtub", "tuš", "tus", "tuš kabina",
-                "tus kabina", "tuš kada", "tuš stijena", "tuš vrata", "shower");
+        alias(aliases, "washbasin", "washbasin", "umivaonik", "umivaonici", "lavabo", "sink", "basin", "waschbecken",
+                "lavandino", "lavabo", "lavamanos", "lavatorio", "pesuallas", "handvask", "vask", "tvattstall");
+        // Sprint 10.181: bathtub as its own category (was folded into bath-shower). Multilingual across the 15 markets.
+        alias(aliases, "bathtub", "bathtub", "bath tub", "kada", "kadu", "kade", "kadi", "kadom", "badewanne", "wanne",
+                "vasca", "vasca da bagno", "baignoire", "banera", "banheira", "banera", "kylpyamme", "amme", "badekar",
+                "badekar", "ligbad", "bad kar");
+        // Sprint 10.181: shower as its own category (shower enclosures/cabins/doors/trays). Multilingual.
+        alias(aliases, "shower", "shower", "shower enclosure", "shower cabin", "shower cubicle", "shower door",
+                "shower tray", "tus", "tuš", "tus kabina", "tus kabinu", "tus kada", "tus stijena", "tus vrata",
+                "tuskabina", "dusche", "duschkabine", "doccia", "box doccia", "douche", "cabine de douche",
+                "paroi de douche", "ducha", "mampara", "duche", "suihku", "suihkukaappi", "dusj", "dusjkabinett",
+                "dusch", "duschkabin", "bruser", "brusekabine");
+        // bath-shower stays as the legacy UMBRELLA / genuine combined shower-bath (kept so stored products + saved
+        // plans + API consumers using "bath-shower" keep validating). Explicit "tuš kada"/"shower bath" = combined.
+        alias(aliases, "bath-shower", "bath-shower", "bath shower", "shower bath", "shower-bath", "kada i tus",
+                "tus i kada", "badewanne mit dusche");
         return Map.copyOf(aliases);
     }
 
@@ -487,6 +506,52 @@ public final class ProductTaxonomy {
                 .filter(Objects::nonNull)
                 .reduce("", (a, b) -> a + " " + b));
         return !haystack.isBlank() && LAUNDRY_PATTERN.matcher(haystack).find();
+    }
+
+    // Sprint 10.181 — fixture family + subtype (facet) classification. bath-shower / bathtub / shower are ONE family
+    // (a bathroom's wet fixture). A product stored under the legacy umbrella "bath-shower" is told apart into a
+    // bathtub vs a shower by its NAME (multilingual, word-start matched like the colour deriver). A genuine
+    // shower-bath legitimately reads as BOTH — so it satisfies either a shower or a bathtub request, but is excluded
+    // by "bez kade"/"bez tuša" because it does contain that fixture.
+    public static final Set<String> FIXTURE_FAMILY = Set.of("bath-shower", "bathtub", "shower");
+
+    private static final Pattern BATHTUB_NAME = Pattern.compile("(?<![a-z0-9])(?:"
+            + "kad[aeiou]|bathtub|bath tub|bath(?!room)|badewanne|wanne|vasca|baignoire|banera|banheira|kylpyamme|badekar|ligbad"
+            + ")");
+    private static final Pattern SHOWER_NAME = Pattern.compile("(?<![a-z0-9])(?:"
+            + "tus|shower|dusche|duschkabine|duschkabin|doccia|douche|ducha|duche|suihku|suihkukaappi|dusj|dusch"
+            + "|bruser|brusekabine|mampara|wet room|walk-in"
+            + ")");
+
+    public static boolean isFixtureCategory(String category) {
+        return category != null && FIXTURE_FAMILY.contains(category.trim().toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * Sprint 10.181 — the canonical planner category vocabulary as a stable, sorted list. The LLM system prompt is
+     * built from THIS (see {@code PromptIntelligenceService}) so the AI's allowed-category list can never again
+     * drift out of sync with the taxonomy (which is exactly how the bathroom fixtures + kitchen appliances went
+     * missing from the prompt). A {@code PromptIntelligenceService} test asserts every entry appears in the prompt.
+     */
+    public static List<String> canonicalCategories() {
+        return KNOWN_CATEGORIES.stream().sorted().toList();
+    }
+
+    /** True if this product (category + name) presents a BATHTUB. category "bathtub" always; a bath-shower/shower
+     *  umbrella row counts only when its name reads like a tub. */
+    public static boolean isBathtubFixture(String category, String name) {
+        String cat = category == null ? "" : category.trim().toLowerCase(Locale.ROOT);
+        if ("bathtub".equals(cat)) return true;
+        if (!FIXTURE_FAMILY.contains(cat)) return false;
+        return BATHTUB_NAME.matcher(normalizeText(name)).find();
+    }
+
+    /** True if this product (category + name) presents a SHOWER (enclosure/cabin/door/tray/combined shower-bath). */
+    public static boolean isShowerFixture(String category, String name) {
+        String cat = category == null ? "" : category.trim().toLowerCase(Locale.ROOT);
+        if ("shower".equals(cat)) return true;
+        if (!FIXTURE_FAMILY.contains(cat)) return false;
+        return SHOWER_NAME.matcher(normalizeText(name)).find();
     }
 
     private static Map<String, Pattern> compilePatterns(Map<String, List<String>> vocabulary) {

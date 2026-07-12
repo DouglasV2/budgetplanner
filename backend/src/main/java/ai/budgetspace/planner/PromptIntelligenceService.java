@@ -177,7 +177,9 @@ public class PromptIntelligenceService {
 
     // --- LLM prompt construction ---
 
-    private String systemPrompt() {
+    // Package-visible + static (pure function of the taxonomy) so a test can assert the allowed-category list stays
+    // synchronized with ProductTaxonomy.canonicalCategories() (Phase 12).
+    static String systemPrompt() {
         return "Ti si parser za BudgetSpace AI. Iz korisnikovog opisa opremanja sobe (na BILO KOJEM jeziku — "
                 + "hrvatski, engleski, njemački, francuski, talijanski, nizozemski, španjolski, portugalski, "
                 + "slovački, slovenski, finski, norveški, švedski, danski) izvuci STRUKTURIRANE podatke i vrati "
@@ -204,9 +206,17 @@ public class PromptIntelligenceService {
                 + "NE vraćaj living-room kao zamjenu za drugu spomenutu sobu. Ako soba uopće NIJE spomenuta, "
                 + "koristi living-room kao zadanu.\n"
                 + "style ∈ [bright, warm, modern, minimal, classic, industrial, boho, surprise].\n"
-                + "kategorije ∈ [sofa, tv-unit, table, rug, lighting, storage, decor, bed, mattress, desk, chair, "
-                + "gym-equipment, dining-table, dining-chair, kitchen-storage, kitchen-cart, nightstand, wardrobe, dresser, textiles].\n"
+                // Sprint 10.181: the allowed-category list is GENERATED from the canonical taxonomy so it can never
+                // again drift (bathroom fixtures + kitchen appliances were previously missing here, so the LLM could
+                // not return them). See ProductTaxonomy.canonicalCategories() + PromptIntelligenceServiceTest.
+                + "kategorije ∈ [" + String.join(", ", ProductTaxonomy.canonicalCategories()) + "].\n"
                 + "textiles = zavjese, ukrasni jastuci, deke/pledovi/prekrivači (meki tekstil).\n"
+                + "Kupaonske sanitarije: toilet = WC školjka, washbasin = umivaonik, bathtub = kada, shower = tuš / "
+                + "tuš kabina (bath-shower = kombinirana tuš-kada). Ako korisnik traži TUŠ, koristi shower (NE bathtub); "
+                + "ako traži KADU, koristi bathtub (NE shower); poštuj i isključenja ('bez kade', 'kadu neću').\n"
+                + "Kuhinjski uređaji: oven = pećnica, hob = ploča za kuhanje, cooker-hood = napa, fridge = hladnjak, "
+                + "freezer = zamrzivač, dishwasher = perilica posuđa, microwave = mikrovalna. kitchen-set = kompletna/"
+                + "modularna kuhinja (cijela kuhinja kao jedan proizvod).\n"
                 + "table = NISKI klub/dnevni stolić (coffee/side table — klub stolić, Couchtisch, soffbord, tavolino, "
                 + "mesa de centro). dining-table = stol ZA JELO (Esstisch, matbord, mesa de comedor/jantar, tavolo da "
                 + "pranzo, ruokapöytä, blagovaonski stol, spisebord, eettafel) — ako korisnik traži stol za "

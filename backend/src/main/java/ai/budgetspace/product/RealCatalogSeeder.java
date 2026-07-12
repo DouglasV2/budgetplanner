@@ -392,7 +392,7 @@ public class RealCatalogSeeder implements ApplicationRunner {
      * The catalog resources this seeder imports, exposed (package-private) for build-time guard tests
      * such as the duplicate-{@code productUrl} check — so a future catalog file is covered automatically.
      */
-    static List<String> snapshotResources() {
+    public static List<String> snapshotResources() {
         return SNAPSHOT_RESOURCES;
     }
 
