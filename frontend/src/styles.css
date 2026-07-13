@@ -6199,6 +6199,96 @@ textarea { border-radius: var(--r-md); }
 .step-card h3, .money-card h3 { font-size: 1.05rem; letter-spacing: -0.01em; }
 #how .section-heading h2 { font-size: clamp(1.35rem, 2vw, 1.75rem); }
 
+/* ── Sprint 10.182: "Kako radi" — heading block beside a horizontal colour-tinted step flow (owner mockup).
+      Three icon tints (clay / sage / navy) + copper arrows add warmth so the section no longer reads monotone. ── */
+.how .how-inner {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  gap: 28px 48px;
+  align-items: start;
+}
+.how-heading h2 {
+  margin: 14px 0 12px;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(1.55rem, 2.3vw, 2.15rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.how-heading p {
+  margin: 0;
+  max-width: 32ch;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.how-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.how-step {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.how-step-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  color: var(--accent-strong);
+  margin-bottom: 12px;
+}
+.how-step-icon {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+}
+.how-tint-1 .how-step-icon { background: var(--accent-soft); color: var(--accent-strong); }
+.how-tint-2 .how-step-icon { background: var(--sage-soft); color: var(--sage-strong); }
+.how-tint-3 .how-step-icon { background: rgba(34, 48, 60, 0.10); color: var(--primary); }
+.how-step-body h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.how-step-body p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.how-arrow {
+  flex: none;
+  margin-top: 42px;
+  color: var(--accent);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+@media (max-width: 860px) {
+  .how .how-inner { grid-template-columns: 1fr; gap: 20px; }
+  .how-heading p { max-width: none; }
+}
+@media (max-width: 620px) {
+  .how-steps { flex-direction: column; gap: 20px; }
+  .how-arrow { display: none; }
+  .how-step { flex-direction: row; align-items: flex-start; gap: 14px; }
+  .how-step-num { display: none; }
+  .how-step-icon { margin-bottom: 0; }
+}
+
 /* ── Accessibility floor: honour reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -112,9 +112,9 @@ const DICTIONARY: Record<string, Entry> = {
   'hero.match': { hr: 'Poklapanje', en: 'Match' },
 
   'how.eyebrow': { hr: 'Kako radi', en: 'How it works' },
-  'how.heading': { hr: 'Od ideje do shopping liste u par klikova.', en: 'From idea to shopping list in a few clicks.' },
-  'how.subheading': { hr: 'Ne dobiješ samo lijepu ideju za sobu, nego što kupiti, gdje i koliko ukupno košta.', en: 'You don\'t just get a nice room idea, but what to buy, where, and how much it costs in total.' },
-  'how.step1Title': { hr: 'Opišeš što želiš', en: 'Describe what you want' },
+  'how.heading': { hr: 'Od ideje do popisa za kupnju.', en: 'From idea to shopping list.' },
+  'how.subheading': { hr: 'Jednostavan proces koji ti štedi vrijeme, novac i nedoumice.', en: 'A simple process that saves you time, money and guesswork.' },
+  'how.step1Title': { hr: 'Opišeš prostor i želje', en: 'Describe your space and wishes' },
   'how.step1Text': { hr: 'Napišeš prostoriju, budžet, stil i trgovine koje želiš. Nema dugog ispunjavanja forme.', en: 'Write the room, budget, style and stores you want. No long form to fill in.' },
   'how.step2Title': { hr: 'Dobiješ konkretne proizvode', en: 'Get concrete products' },
   'how.step2Text': { hr: 'Prvo vidiš najvažnije komade, ukupnu cijenu i trgovine. Detalji idu niže.', en: 'You first see the key pieces, the total price and the stores. Details come below.' },

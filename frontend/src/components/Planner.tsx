@@ -745,25 +745,9 @@ export function Planner() {
 
   return (
     <section className="planner-section shell" id="planner">
-      {/* Sprint 10.170 ("Fit-Out Desk"): the old hero collapses into a slim product STATUS STRIP — brand kicker,
-          a compact title + one-line explainer on the left, live account state on the right — so the workspace
-          (prompt → plan) clears the fold instead of sitting under a 3.5rem hero. */}
-      {/* Sprint 10.171: a clean product header — big title + one-line explainer — with the mode navtrack directly
-          below it (per owner mockup). Account state now lives in the left brief console, above "Brzi stil". */}
-      <div className="section-heading left planner-heading-row status-strip">
-        <div className="status-strip-headline">
-          {/* Sprint 10.172c: editorial title (owner mockup) — an eyebrow + copper dash over a crafted SERIF
-              title (Playfair) whose last word is set in brand copper. */}
-          <span className="eyebrow status-eyebrow">{t('planner.spaceKicker')}</span>
-          <h2>{(() => {
-            const title = t('planner.eyebrow');
-            const idx = title.lastIndexOf(' ');
-            return idx < 0 ? title : <>{title.slice(0, idx + 1)}<span className="title-accent">{title.slice(idx + 1)}</span></>;
-          })()}</h2>
-          <p>{t('planner.heading')}</p>
-        </div>
-      </div>
-
+      {/* Sprint 10.182: the product title/explainer now lives in the header hero band (PlannerHero), so the old
+          in-planner status-strip header was redundant and has been removed — the workspace starts at the mode
+          navtrack + form directly under the hero. */}
       {marketNote && <div className="planner-notice market-note">{marketNote}</div>}
 
       {!config.available && <div className="planner-notice market-note">{t('planner.marketComingSoon')}</div>}
