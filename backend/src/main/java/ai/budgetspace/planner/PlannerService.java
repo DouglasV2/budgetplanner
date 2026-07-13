@@ -180,7 +180,14 @@ public class PlannerService {
     public PlanGenerationResponse generate(PlannerInputDto rawInput) {
         // Rule-based path: parse the prompt with the deterministic extractor, then plan. Never focused —
         // the deterministic extractor doesn't classify item-vs-room intent (the AI path does).
-        return buildResponse(intentExtractor.enrich(rawInput == null ? null : rawInput.normalized()), false);
+        return generateSeeded(rawInput, Set.of());
+    }
+
+    // Sprint 10.182: like generate(), but the plan's colour self-coordination starts from a SEED palette instead of
+    // empty. Move-In uses this to carry the apartment's colours from room to room so the whole flat reads as one
+    // coherent set; single-room callers pass an empty seed (Set.of()) and behaviour is unchanged.
+    private PlanGenerationResponse generateSeeded(PlannerInputDto rawInput, Set<String> seedColors) {
+        return buildResponse(intentExtractor.enrich(rawInput == null ? null : rawInput.normalized()), false, seedColors);
     }
 
     /**
@@ -195,7 +202,7 @@ public class PlannerService {
     // Sprint 10.114: the AI-resolved path can flag a specific-item request (specificItemsOnly) → a focused plan
     // (only the named pieces, in the room they belong to) instead of the room's full core kit.
     public PlanGenerationResponse generateResolved(PlannerInputDto resolvedInput, boolean focused) {
-        return buildResponse(resolvedInput == null ? intentExtractor.enrich(null) : resolvedInput.normalized(), focused);
+        return buildResponse(resolvedInput == null ? intentExtractor.enrich(null) : resolvedInput.normalized(), focused, Set.of());
     }
 
     // Sprint 10.109 (Move-In / "Cijeli stan"): split ONE total budget across several rooms, then build a normal
@@ -250,9 +257,14 @@ public class PlannerService {
         // roomType is explicit and the prompt is just the room label, so the room is never mis-parsed.
         PlanGenerationResponse[] responses = new PlanGenerationResponse[rooms.size()];
         double[] spent = new double[rooms.size()];
+        // Sprint 10.182: coordinate the palette across the apartment. Each room is seeded with the colours the
+        // earlier rooms settled on, so a whole flat reads as one coherent set instead of independently-styled rooms.
+        // Soft: reuses the colorCoherenceBonus tie-break (below style/room), so budget/style/room still win.
+        Set<String> apartmentColors = new LinkedHashSet<>();
         for (int i = 0; i < rooms.size(); i++) {
-            responses[i] = generate(moveInRoomInput(base, rooms.get(i), alloc[i]));
+            responses[i] = generateSeeded(moveInRoomInput(base, rooms.get(i), alloc[i]), apartmentColors);
             spent[i] = valueTierTotal(responses[i]);
+            accumulateApartmentColors(apartmentColors, responses[i]);
         }
 
         // Sprint 10.158, second pass: the value tier deliberately spends below its budget, so after the first
@@ -277,7 +289,7 @@ public class PlannerService {
                     double share = leftover * MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) / sumWeights;
                     int boostedBudget = (int) Math.min(Math.floor(spent[i] + share), moveInCap(capacities[i], floors[i]));
                     if (boostedBudget <= alloc[i]) continue;
-                    PlanGenerationResponse boosted = generate(moveInRoomInput(base, rooms.get(i), boostedBudget));
+                    PlanGenerationResponse boosted = generateSeeded(moveInRoomInput(base, rooms.get(i), boostedBudget), apartmentColors);
                     double boostedTotal = valueTierTotal(boosted);
                     if (boostedTotal > spent[i] && boostedTotal <= boostedBudget) {
                         responses[i] = boosted;
@@ -317,6 +329,18 @@ public class PlannerService {
     private double valueTierTotal(PlanGenerationResponse resp) {
         FurnishingPlanDto best = resp.plans().isEmpty() ? null : resp.plans().get(0);
         return best == null ? 0 : best.total().doubleValue();
+    }
+
+    // Sprint 10.182: fold a just-built room's value-tier colours into the running apartment palette, capped so it
+    // stays a cohesive handful — an unbounded palette would overlap almost every product and make the cross-room
+    // coherence bonus non-discriminating.
+    private void accumulateApartmentColors(Set<String> palette, PlanGenerationResponse response) {
+        if (response == null || response.plans().isEmpty()) return;
+        for (PlanItemDto item : response.plans().get(0).items()) {
+            if (palette.size() >= 6) break;
+            List<String> colors = item.product().colorTags();
+            if (colors != null) palette.addAll(colors);
+        }
     }
 
     // Cheapest available core pieces for a room+market — the minimum to give the room a complete core. A core
@@ -454,15 +478,17 @@ public class PlannerService {
         return out;
     }
 
-    private PlanGenerationResponse buildResponse(PlannerInputDto rawInput, boolean focused) {
+    private PlanGenerationResponse buildResponse(PlannerInputDto rawInput, boolean focused, Set<String> seedColors) {
         // Sprint 10.114: focused mode. When the AI flags a specific-item request (not a whole-room description),
         // plan AROUND those pieces — switch to the room they belong to and include only them — instead of
         // forcing the room's full core kit and burying the requested item as a cheap afterthought.
         PlannerInputDto input = focused ? withInferredRoom(rawInput) : rawInput;
+        // Sprint 10.182: seedColors seeds the plan's colour self-coordination (empty for single-room; the apartment
+        // palette for Move-In so rooms coordinate). Passed to every tier so all three read as the same room.
         List<FurnishingPlanDto> plans = List.of(
-                buildPlan(input, "value", focused),
-                buildPlan(input, "budget", focused),
-                buildPlan(input, "stretch", focused)
+                buildPlan(input, "value", focused, seedColors),
+                buildPlan(input, "budget", focused, seedColors),
+                buildPlan(input, "stretch", focused, seedColors)
         );
         // Sprint 10.181 (degraded-capacity): a plan is "partial" for two reasons, both derived from real catalog
         // capacity (never a per-market if). (1) A room-REQUIRED category the market can't supply. (2) A category the
@@ -810,7 +836,7 @@ public class PlannerService {
         );
     }
 
-    private FurnishingPlanDto buildPlan(PlannerInputDto input, String mode, boolean focused) {
+    private FurnishingPlanDto buildPlan(PlannerInputDto input, String mode, boolean focused, Set<String> seedColors) {
         double multiplier = switch (mode) {
             case "stretch" -> 1.12;
             case "value" -> 0.98;
@@ -821,7 +847,9 @@ public class PlannerService {
         Set<String> picked = new LinkedHashSet<>();
         Set<String> currentRetailers = new LinkedHashSet<>();
         // Sprint 10.178 (B): the colours already picked in THIS plan — used to self-coordinate later picks.
-        Set<String> currentColors = new LinkedHashSet<>();
+        // Sprint 10.182: seeded (Move-In apartment palette) so a room also coordinates with the earlier rooms;
+        // empty for single-room plans, so their behaviour is unchanged.
+        Set<String> currentColors = new LinkedHashSet<>(seedColors);
         List<PlanItemDto> items = new ArrayList<>();
         double total = 0;
 

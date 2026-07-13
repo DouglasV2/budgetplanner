@@ -1639,7 +1639,17 @@ needs `OPENAI_API_KEY`, backend env only).
 > webhook shipped (10.69/10.84), **Flyway** owns the prod schema with `ddl-auto=validate` (10.83), and the AI
 > usage ledger is **persisted to the DB** (10.86). Treat MEMORY.md as the source of truth for current state.
 
-### 🆕 Stronger furniture coherence in "cijeli stan" (Move-In) — added 2026-07-13 · PROPOSED, NOT YET SPECCED
+### 🆕 Stronger furniture coherence in "cijeli stan" (Move-In) — added 2026-07-13 · ✅ v1 SHIPPED 10.182
+
+**Shipped (v1, 10.182, commit on `main`):** the cross-room PALETTE seeding is live. `generateMoveIn` now threads an
+accumulating apartment palette (`accumulateApartmentColors`) into each room via a new `generateSeeded` →
+`buildResponse`/`buildPlan(…, seedColors)` path that seeds `currentColors`; so later rooms lean to the earlier
+rooms' colours through the existing `colorCoherenceBonus` (+12, below style/room — soft tie-break only). Single-room
+plans pass an empty seed and are byte-for-byte unchanged. Deterministic test:
+`PlannerServiceTest.moveInCoordinatesColoursAcrossRooms` (a blue living-room flips the bedroom's tie from the
+higher-rated green bed to the blue one; the standalone bedroom keeps green). Backend 859 green. **Still open (v2,
+optional):** the wood-tone / material-family match between big pieces across rooms (below is the original spec).
+
 
 **Problem.** In whole-apartment mode (`PlannerService.generateMoveIn`) each room is built INDEPENDENTLY via
 `generate(moveInRoomInput(...))`. Cross-room consistency today comes ONLY from the shared `style` + the user's

@@ -945,4 +945,48 @@ class PlannerServiceTest {
         product.setSourceType("public-product-page");
         return product;
     }
+
+    // ---- Move-In cross-room colour coherence (Sprint 10.182) ----
+
+    @Test
+    void moveInCoordinatesColoursAcrossRooms() {
+        // Living room: the only sofa is BLUE, so it seeds the apartment palette with "blue".
+        Product blueSofa = product("sofa-blue", "Plavi kauč", "IKEA", "sofa", 500, 4.6);
+        blueSofa.setRoomTags("living-room"); blueSofa.setColorTags("blue");
+        Product tv = product("tv-1", "TV komoda", "IKEA", "tv-unit", 200, 4.6);
+        tv.setRoomTags("living-room");
+        // Bedroom: two otherwise-identical beds. GREEN has the rating edge (wins on its own); the +12 colour
+        // coherence for BLUE, seeded from the living room, must flip the whole-apartment pick to BLUE.
+        Product greenBed = product("bed-green", "Zeleni krevet", "IKEA", "bed", 500, 4.7);
+        greenBed.setRoomTags("bedroom"); greenBed.setColorTags("green");
+        Product blueBed = product("bed-blue", "Plavi krevet", "IKEA", "bed", 500, 4.5);
+        blueBed.setRoomTags("bedroom"); blueBed.setColorTags("blue");
+        Product mattress = product("mattress-1", "Madrac", "IKEA", "mattress", 200, 4.6);
+        mattress.setRoomTags("bedroom");
+
+        PlannerService service = serviceWithProducts(List.of(blueSofa, tv, greenBed, blueBed, mattress));
+
+        // Standalone bedroom (no cross-room seed) → the higher-rated GREEN bed wins. Guards single-room behaviour.
+        FurnishingPlanDto solo = service.generate(bedroomInput()).plans().get(0);
+        assertThat(bedId(solo)).as("standalone bedroom keeps the higher-rated green bed").isEqualTo("bed-green");
+
+        // Whole apartment: the living room settles on blue, so the bedroom coordinates to the BLUE bed.
+        MoveInResponse moveIn = service.generateMoveIn(
+                new MoveInRequestDto(input(""), List.of("living-room", "bedroom"), 4000));
+        FurnishingPlanDto bedroom = moveIn.rooms().stream()
+                .filter(room -> room.roomType().equals("bedroom")).findFirst().orElseThrow()
+                .plans().get(0);
+        assertThat(bedId(bedroom)).as("Move-In bedroom coordinates to the living room's blue").isEqualTo("bed-blue");
+    }
+
+    private PlannerInputDto bedroomInput() {
+        return input("").withRoomType("bedroom");
+    }
+
+    private static String bedId(FurnishingPlanDto plan) {
+        return plan.items().stream()
+                .filter(item -> "bed".equals(item.product().category()))
+                .map(item -> item.product().id())
+                .findFirst().orElse(null);
+    }
 }
