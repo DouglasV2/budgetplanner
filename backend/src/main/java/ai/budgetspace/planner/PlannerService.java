@@ -120,6 +120,45 @@ public class PlannerService {
             Map.entry("attic", 0.4), Map.entry("basement", 0.4)
     );
 
+    // Sprint 10.183 (Move-In QoL): how a room's user priority scales its budget weight. 'now' pulls more of the
+    // discretionary leftover and reserves its essentials first when money is tight; 'later' yields to the
+    // higher-priority rooms. 'soon' (and any unset/unknown room) is neutral = 1.0, so an EMPTY priority map
+    // reproduces the pre-priority split exactly.
+    private static final double PRIORITY_FACTOR_NOW = 1.5;
+    private static final double PRIORITY_FACTOR_SOON = 1.0;
+    private static final double PRIORITY_FACTOR_LATER = 0.6;
+
+    private static double priorityFactor(String level) {
+        if (level == null) return PRIORITY_FACTOR_SOON;
+        return switch (level.trim().toLowerCase(Locale.ROOT)) {
+            case "now" -> PRIORITY_FACTOR_NOW;
+            case "later" -> PRIORITY_FACTOR_LATER;
+            default -> PRIORITY_FACTOR_SOON;
+        };
+    }
+
+    // Per-room priority factors parallel to `rooms`, read from the request's roomType->level map (absent = neutral).
+    private static double[] priorityFactors(List<String> rooms, Map<String, String> roomPriority) {
+        double[] factors = new double[rooms.size()];
+        for (int i = 0; i < rooms.size(); i++) {
+            factors[i] = priorityFactor(roomPriority == null ? null : roomPriority.get(rooms.get(i)));
+        }
+        return factors;
+    }
+
+    private static double[] neutralFactors(int n) {
+        double[] factors = new double[n];
+        Arrays.fill(factors, 1.0);
+        return factors;
+    }
+
+    private static boolean hasPriorities(double[] factors) {
+        for (double factor : factors) {
+            if (Math.abs(factor - 1.0) > 1e-9) return true;
+        }
+        return false;
+    }
+
     private static final Map<String, String> ROOM_LABELS = Map.ofEntries(
             Map.entry("living-room", "dnevni boravak"),
             Map.entry("home-office", "radni kutak"),
@@ -238,7 +277,9 @@ public class PlannerService {
         boolean apartmentPartial = total > 0 && sumFloors > total;
         double shortfall = apartmentPartial ? sumFloors - total : 0;
 
-        int[] alloc = allocateMoveIn(total, rooms, floors, sumFloors, apartmentPartial);
+        // Sprint 10.183: user room priorities scale the split (an empty map is neutral = pre-priority behaviour).
+        double[] factors = priorityFactors(rooms, request.roomPriority());
+        int[] alloc = allocateMoveIn(total, rooms, floors, sumFloors, apartmentPartial, factors);
 
         // Sprint 10.158 (Move-In fill): the weight-only split parked money in rooms whose catalog can't absorb
         // it (a DE kitchen was allocated 1658 and could spend ~110, stranding the difference), so cap every
@@ -249,7 +290,7 @@ public class PlannerService {
             for (int i = 0; i < rooms.size(); i++) {
                 capacities[i] = roomCapacity(moveInRoomInput(base, rooms.get(i), 1));
             }
-            alloc = capAllocationsToCapacity(alloc, rooms, floors, capacities);
+            alloc = capAllocationsToCapacity(alloc, rooms, floors, capacities, factors);
         }
 
         // Use the SAME path as /generate-fast (the rule-based extractor) — its enrichment is what fills the
@@ -282,11 +323,11 @@ public class PlannerService {
                 double sumWeights = 0;
                 for (int i = 0; i < rooms.size(); i++) {
                     absorber[i] = spent[i] >= 0.6 * alloc[i] && capacities[i] > alloc[i] + 1;
-                    if (absorber[i]) sumWeights += MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0);
+                    if (absorber[i]) sumWeights += MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) * factors[i];
                 }
                 for (int i = 0; i < rooms.size() && sumWeights > 0; i++) {
                     if (!absorber[i]) continue;
-                    double share = leftover * MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) / sumWeights;
+                    double share = leftover * MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) * factors[i] / sumWeights;
                     int boostedBudget = (int) Math.min(Math.floor(spent[i] + share), moveInCap(capacities[i], floors[i]));
                     if (boostedBudget <= alloc[i]) continue;
                     PlanGenerationResponse boosted = generateSeeded(moveInRoomInput(base, rooms.get(i), boostedBudget), apartmentColors);
@@ -405,6 +446,13 @@ public class PlannerService {
     // can't absorb the budget, and honesty beats inflating picks. Pure math, package-private for
     // MoveInAllocationTest.
     static int[] capAllocationsToCapacity(int[] alloc, List<String> rooms, double[] floors, double[] capacities) {
+        return capAllocationsToCapacity(alloc, rooms, floors, capacities, neutralFactors(alloc.length));
+    }
+
+    // Sprint 10.183: priority-weighted re-share — a higher-priority room with headroom absorbs more of a thin
+    // room's stranded budget. All-neutral factors reproduce the pre-priority behaviour exactly.
+    static int[] capAllocationsToCapacity(int[] alloc, List<String> rooms, double[] floors, double[] capacities,
+                                          double[] priorityFactors) {
         int n = alloc.length;
         int[] out = alloc.clone();
         boolean[] capped = new boolean[n];
@@ -422,14 +470,14 @@ public class PlannerService {
             if (excess == 0) break;
             double sumWeights = 0;
             for (int i = 0; i < n; i++) {
-                if (!capped[i]) sumWeights += MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0);
+                if (!capped[i]) sumWeights += MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) * priorityFactors[i];
             }
             if (sumWeights <= 0) break;
             long distributed = 0;
             int last = -1;
             for (int i = 0; i < n; i++) {
                 if (capped[i]) continue;
-                int add = (int) Math.floor(excess * MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) / sumWeights);
+                int add = (int) Math.floor(excess * (MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) * priorityFactors[i]) / sumWeights);
                 out[i] += add;
                 distributed += add;
                 last = i;
@@ -443,17 +491,46 @@ public class PlannerService {
     // Infeasible (floors can't all be met): split proportional to floors so every room still moves toward core.
     // Package-private + static so it can be unit-tested without a catalog (MoveInAllocationTest).
     static int[] allocateMoveIn(int total, List<String> rooms, double[] floors, double sumFloors, boolean infeasible) {
+        return allocateMoveIn(total, rooms, floors, sumFloors, infeasible, neutralFactors(rooms.size()));
+    }
+
+    // Sprint 10.183 (Move-In QoL): the same split, weighted by per-room priority factors (now 1.5 / soon 1.0 /
+    // later 0.6). Feasible: every room still reserves its core floor, then the leftover is shared by weight×factor,
+    // so a 'now' room gets more of the discretionary budget while 'soon'/'later' still get a usable plan. Infeasible
+    // WITH priorities: essentials are reserved greedily in priority order (factor desc, weight as tie-break) until
+    // the budget runs out — a 'now' room never loses its core to a 'later' room; the lower-priority rooms take the
+    // shortfall and come back honestly partial. All-neutral factors reproduce the pre-priority allocator exactly.
+    static int[] allocateMoveIn(int total, List<String> rooms, double[] floors, double sumFloors, boolean infeasible,
+                                double[] priorityFactors) {
         int n = rooms.size();
         double[] ideal = new double[n];
         double[] weights = new double[n];
         double sumWeights = 0;
         for (int i = 0; i < n; i++) {
-            weights[i] = MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0);
+            weights[i] = MOVE_IN_WEIGHTS.getOrDefault(rooms.get(i), 1.0) * priorityFactors[i];
             sumWeights += weights[i];
         }
         if (sumWeights <= 0) sumWeights = n;
 
-        if (infeasible && sumFloors > 0) {
+        if (infeasible && sumFloors > 0 && hasPriorities(priorityFactors)) {
+            // Reserve each room's core floor in priority order until the budget is exhausted; lower-priority
+            // rooms take the shortfall (and come back partial). Tie-break by room weight, then input order.
+            Integer[] priorityOrder = new Integer[n];
+            for (int i = 0; i < n; i++) priorityOrder[i] = i;
+            Arrays.sort(priorityOrder, (a, b) -> {
+                int byFactor = Double.compare(priorityFactors[b], priorityFactors[a]);
+                if (byFactor != 0) return byFactor;
+                int byWeight = Double.compare(MOVE_IN_WEIGHTS.getOrDefault(rooms.get(b), 1.0),
+                        MOVE_IN_WEIGHTS.getOrDefault(rooms.get(a), 1.0));
+                return byWeight != 0 ? byWeight : Integer.compare(a, b);
+            });
+            double remaining = total;
+            for (int idx : priorityOrder) {
+                double give = Math.max(0, Math.min(floors[idx], remaining));
+                ideal[idx] = give;
+                remaining -= give;
+            }
+        } else if (infeasible && sumFloors > 0) {
             for (int i = 0; i < n; i++) ideal[i] = total * floors[i] / sumFloors;
         } else if (sumFloors > 0 && sumFloors <= total) {
             double leftover = total - sumFloors;

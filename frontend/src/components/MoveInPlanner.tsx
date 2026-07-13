@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import type { FurnishingPlan, PlannerInput, Product, RoomType, SavedPlanResponse } from '../types';
+import type { FurnishingPlan, PlannerInput, Product, RoomPriority, RoomType, SavedPlanResponse } from '../types';
 import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
+import { hydrateSession, serializeSession, type RoomPlanResult } from '../utils/moveInPlan';
 import { useLocale } from '../LocaleContext';
 import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon } from './icons';
 import { openPlanPdf } from '../utils/planPdf';
@@ -22,7 +23,17 @@ function productPhoto(product: Product): string | null {
 const qtyOf = (item: { quantity?: number }) => (item.quantity && item.quantity > 1 ? item.quantity : 1);
 
 // Sprint 10.138: localStorage draft so the room picks + budget survive a reload (only numbers/room ids — no PII).
+// Sprint 10.183: the same key now holds the richer MoveInSession (adds priorities/retained/purchased/results);
+// hydrateSession migrates the old {rooms,budget} shape transparently.
 const MOVE_IN_DRAFT_KEY = 'budgetspace.moveInDraft';
+
+function readMoveInDraft(): unknown {
+  try {
+    return JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
+  } catch {
+    return null;
+  }
+}
 
 // Sprint 10.138: "what to buy where" — roll every item across all rooms up by retailer (count + total), so a
 // multi-room shop is actually plannable ("at IKEA grab 9 pieces for 1.240 €").
@@ -69,15 +80,14 @@ const MOVE_IN_ROOMS: Array<{ value: RoomType; labelKey: string }> = [
   { value: 'bathroom', labelKey: 'form.roomBathroomLabel' }
 ];
 
-interface RoomPlanResult {
-  roomType: RoomType;
-  labelKey: string;
-  allocatedBudget: number;
-  plan: FurnishingPlan;
-  input: PlannerInput;
-  hasItems: boolean;
-  partial: boolean;
-}
+// Sprint 10.183: the RoomPlanResult shape now lives in utils/moveInPlan.ts (imported above) so the pure session
+// helpers and this component agree on it. The 3 priority levels map to their (human, hand-written) i18n labels.
+const PRIORITY_LEVELS: RoomPriority[] = ['now', 'soon', 'later'];
+const PRIORITY_LABEL_KEYS: Record<RoomPriority, string> = {
+  now: 'moveIn.priorityNow',
+  soon: 'moveIn.prioritySoon',
+  later: 'moveIn.priorityLater',
+};
 
 // The 3 tiers come back with stable ids budget/value/stretch (plan.name is a Croatian display string).
 // Sprint 10.155: match on the stable id, not the HR name, so a reworded plan.name can't silently break the
@@ -89,22 +99,14 @@ function pickBestPlan(plans: FurnishingPlan[]): FurnishingPlan | null {
 
 export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, seed }: MoveInPlannerProps) {
   const { t } = useLocale();
-  // Sprint 10.138: hydrate the room picks + budget from the last session (localStorage draft) so a reload or a
-  // return visit doesn't reset the form. Falls back to sensible defaults.
-  const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(() => {
-    try {
-      const draft = JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
-      if (draft && Array.isArray(draft.rooms) && draft.rooms.length) return draft.rooms as RoomType[];
-    } catch { /* ignore */ }
-    return ['living-room', 'bedroom'];
-  });
-  const [totalBudget, setTotalBudget] = useState<number>(() => {
-    try {
-      const draft = JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
-      if (draft && typeof draft.budget === 'number' && draft.budget > 0) return draft.budget;
-    } catch { /* ignore */ }
-    return 5000;
-  });
+  const market = baseInput.market ?? 'HR';
+  // Sprint 10.183: hydrate the whole-apartment session (rooms/budget/priorities today; retained/purchased/results
+  // join it in later increments) from localStorage so a reload or return visit keeps the user's place.
+  // hydrateSession migrates the old {rooms,budget} draft and drops market-specific state from another market.
+  const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(() => hydrateSession(readMoveInDraft(), market).rooms);
+  const [totalBudget, setTotalBudget] = useState<number>(() => hydrateSession(readMoveInDraft(), market).budget);
+  const [priorities, setPriorities] = useState<Partial<Record<RoomType, RoomPriority>>>(
+    () => hydrateSession(readMoveInDraft(), market).priorities);
   const [swapping, setSwapping] = useState<string | null>(null);
   const [results, setResults] = useState<RoomPlanResult[] | null>(null);
   const [apartmentPartial, setApartmentPartial] = useState(false);
@@ -121,15 +123,25 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
     }
   }, [seed]);
 
-  // Sprint 10.138: persist the room picks + budget (draft) so the next visit starts where the user left off.
+  // Sprint 10.183: persist the whole-apartment session so the next visit starts where the user left off — room
+  // ids, numbers and priority levels only, no PII. (retained/purchased/results join this in later increments.)
   useEffect(() => {
     try {
-      localStorage.setItem(MOVE_IN_DRAFT_KEY, JSON.stringify({ rooms: selectedRooms, budget: totalBudget }));
+      localStorage.setItem(MOVE_IN_DRAFT_KEY, serializeSession({
+        market, rooms: selectedRooms, budget: totalBudget, priorities,
+        retainedRooms: [], results: null, purchasedIds: [], lockedByRoom: {},
+      }));
     } catch { /* ignore quota/private-mode */ }
-  }, [selectedRooms, totalBudget]);
+  }, [market, selectedRooms, totalBudget, priorities]);
 
   function toggleRoom(room: RoomType) {
     setSelectedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));
+  }
+
+  const priorityOf = (room: RoomType): RoomPriority => priorities[room] ?? 'soon';
+
+  function setPriority(room: RoomType, level: RoomPriority) {
+    setPriorities((current) => ({ ...current, [room]: level }));
   }
 
   function buildRoomInput(roomType: RoomType, budget: number): PlannerInput {
@@ -165,7 +177,11 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
     try {
       // Keep a stable top-down order (by the picker list), independent of click order.
       const orderedRooms = MOVE_IN_ROOMS.filter((room) => selectedRooms.includes(room.value)).map((room) => room.value);
-      const response = await generateMoveInPlan(baseInput, orderedRooms, totalBudget);
+      // Sprint 10.183: send each selected room's priority (default 'soon' = neutral) so the split favours what
+      // the user needs first.
+      const roomPriority: Partial<Record<RoomType, RoomPriority>> = {};
+      for (const room of orderedRooms) roomPriority[room] = priorityOf(room);
+      const response = await generateMoveInPlan(baseInput, orderedRooms, totalBudget, roomPriority);
 
       const mapped: RoomPlanResult[] = response.rooms
         .map((room) => {
@@ -347,6 +363,36 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             ))}
           </div>
         </div>
+
+        {/* Sprint 10.183: "what do you need first?" — a priority per selected room that steers the budget split. */}
+        {selectedRooms.length > 0 && (
+          <div className="control-block move-in-priorities">
+            <span className="friendly-label">{t('moveIn.priorityHeading')} <small>{t('moveIn.priorityHelp')}</small></span>
+            <ul className="move-in-priority-list">
+              {MOVE_IN_ROOMS.filter((room) => selectedRooms.includes(room.value)).map((room) => (
+                <li key={room.value} className="move-in-priority-row">
+                  <span className="move-in-priority-room">
+                    <span className="move-in-priority-roomicon" aria-hidden="true"><RoomIcon room={room.value} size={16} /></span>
+                    {t(room.labelKey)}
+                  </span>
+                  <span className="move-in-priority-options" role="group" aria-label={t(room.labelKey)}>
+                    {PRIORITY_LEVELS.map((level) => (
+                      <button
+                        type="button"
+                        key={level}
+                        className={priorityOf(room.value) === level ? 'priority-opt active' : 'priority-opt'}
+                        aria-pressed={priorityOf(room.value) === level}
+                        onClick={() => setPriority(room.value, level)}
+                      >
+                        {t(PRIORITY_LABEL_KEYS[level])}
+                      </button>
+                    ))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <button type="button" className="generate-button" disabled={isLoading} onClick={() => void runMoveIn()}>
           {isLoading ? t('moveIn.generating') : t('moveIn.generate')}

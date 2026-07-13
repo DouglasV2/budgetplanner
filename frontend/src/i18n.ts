@@ -255,6 +255,15 @@ const DICTIONARY: Record<string, Entry> = {
   'moveIn.whichRoomsLabel': { hr: 'Koje sobe?', en: 'Which rooms?' },
   'moveIn.whichRoomsHint': { hr: 'odaberi više', en: 'pick several' },
   'moveIn.roomsSelected': { hr: '{count} odabrano', en: '{count} selected' },
+  // Sprint 10.183 (Move-In QoL): room priorities — steer the budget to what the user needs first.
+  'moveIn.priorityHeading': { hr: 'Što ti treba prvo?', en: 'What do you need first?' },
+  'moveIn.priorityHelp': {
+    hr: 'Odaberi koje prostorije želiš riješiti prve. Tamo ćemo prvo usmjeriti budžet.',
+    en: 'Choose which rooms to sort out first — that\'s where the budget goes first.'
+  },
+  'moveIn.priorityNow': { hr: 'Treba odmah', en: 'Need it now' },
+  'moveIn.prioritySoon': { hr: 'Želim uskoro', en: 'Want it soon' },
+  'moveIn.priorityLater': { hr: 'Nije hitno', en: 'Not urgent' },
   'moveIn.generate': { hr: 'Složi plan za stan', en: 'Build the apartment plan' },
   'moveIn.generating': { hr: 'Slažem plan za stan…', en: 'Building the apartment plan…' },
   'moveIn.needRooms': { hr: 'Odaberi barem jednu sobu.', en: 'Pick at least one room.' },

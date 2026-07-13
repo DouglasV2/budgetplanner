@@ -5433,6 +5433,51 @@ a.google-signin-button.google-signin-link:hover {
   margin: 12px 0 0;
 }
 
+/* Sprint 10.183: "Što ti treba prvo?" — one compact priority row per selected room. Restrained: a labelled
+   pill segmented control with the same navy selected state as .choice.active; no cards-in-cards. */
+.move-in-priorities { display: grid; gap: 8px; }
+.move-in-priority-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.move-in-priority-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.move-in-priority-room {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+}
+.move-in-priority-roomicon { display: inline-flex; color: var(--clay); }
+.move-in-priority-options { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.priority-opt {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.priority-opt:hover { border-color: var(--border-strong); color: var(--ink); }
+.priority-opt.active {
+  color: var(--ink);
+  border-color: rgba(37, 55, 70, 0.4);
+  background: rgba(37, 55, 70, 0.12);
+}
+.priority-opt:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+@media (max-width: 560px) {
+  .move-in-priority-row { align-items: flex-start; }
+  .move-in-priority-options { width: 100%; }
+  .priority-opt { flex: 1 1 auto; text-align: center; }
+}
+
 /* The apartment form as two columns on wide screens: the budget + room controls
    fill the main (left) column and rise to the top, while the heading + intro sit
    as a slim right-hand aside instead of eating a full-width heading row. Narrow
