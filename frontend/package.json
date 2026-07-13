@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "check:movein": "node scripts/check-move-in.mjs"
+    "check:movein": "node scripts/check-move-in.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "check": "node scripts/check-i18n.mjs && node scripts/check-move-in.mjs"
   },
   "dependencies": {
     "@types/pdfmake": "^0.3.3",
