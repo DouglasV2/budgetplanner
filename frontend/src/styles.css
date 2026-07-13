@@ -7036,12 +7036,35 @@ textarea { border-radius: var(--r-md); }
   background: var(--bg-soft);
   border-bottom: 1px solid var(--border);
 }
+/* Sprint 10.183: full-bleed banner variant — banner.png is the section background (set inline for Vite hashing);
+   a restrained warm wash keeps the layered text readable without muddying the image. */
+.planner-hero.has-banner {
+  position: relative;
+  isolation: isolate;
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+}
+.planner-hero.has-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(178deg, rgba(250, 246, 240, 0.64) 0%, rgba(250, 246, 240, 0.3) 46%, rgba(250, 246, 240, 0.1) 100%);
+}
 .planner-hero-inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
   align-items: center;
   gap: 34px;
   padding: 38px 16px 42px;
+}
+.planner-hero.has-banner .planner-hero-inner {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: minmax(0, 640px);
+  min-height: 300px;
+  align-content: center;
 }
 .planner-hero-copy {
   display: flex;
@@ -7121,34 +7144,8 @@ textarea { border-radius: var(--r-md); }
   border: 1px solid var(--border-strong);
 }
 .planner-hero-btn.ghost:hover { border-color: var(--ink-soft); transform: translateY(-2px); }
-.planner-hero-visual {
-  position: relative;
-  height: 216px;
-  border-radius: 26px;
-  overflow: hidden;
-  border: 1px solid var(--border-soft);
-  background:
-    radial-gradient(circle, rgba(165, 98, 63, 0.14) 1.4px, transparent 1.6px) 0 0 / 15px 15px,
-    linear-gradient(135deg, var(--accent-soft), var(--bg-soft));
-}
-.planner-hero-photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-.planner-hero-photo.is-loaded { opacity: 1; }
-.planner-hero-placeholder {
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  transform: translate(-50%, -50%);
-  width: min(72%, 232px);
-  height: auto;
-}
+/* Sprint 10.183: the separate .planner-hero-visual image card was removed — banner.png is now the band's
+   full-bleed background (see .planner-hero.has-banner above). */
 
 /* Header quick-link to favorites / saved plans (mockup's ♡ Favoriti). */
 .header-fav {
@@ -7165,13 +7162,19 @@ textarea { border-radius: var(--r-md); }
 
 @media (max-width: 860px) {
   .planner-hero-inner { grid-template-columns: 1fr; gap: 22px; padding: 30px 16px 34px; }
-  .planner-hero-visual { height: 180px; }
+  .planner-hero.has-banner .planner-hero-inner { min-height: 260px; }
 }
 @media (max-width: 680px) {
   .planner-hero-copy { gap: 13px; }
   .planner-hero-badge { width: 42px; height: 42px; border-radius: 12px; margin-top: 4px; }
-  .planner-hero-visual { display: none; }
   .planner-hero-inner { padding: 24px 16px 26px; }
+  /* Mobile banner: a shorter band, the focal point shifted up so the furniture isn't behind the text, and a
+     slightly stronger warm wash for legibility. Buttons stay fully visible; no horizontal scroll. */
+  .planner-hero.has-banner { background-position: center 20%; }
+  .planner-hero.has-banner .planner-hero-inner { min-height: 210px; }
+  .planner-hero.has-banner::before {
+    background: linear-gradient(180deg, rgba(250, 246, 240, 0.8) 0%, rgba(250, 246, 240, 0.52) 58%, rgba(250, 246, 240, 0.3) 100%);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
