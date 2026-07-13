@@ -205,7 +205,12 @@ public class PlannerIntentExtractor {
     private PlannerInputDto applyOptimizationGoal(String text, PlannerInputDto input) {
         if (matches(text, "najjeftin|sto jeftin|low cost|jeftino|budget")) input = input.withOptimizationGoal("lowest-price");
         if (matches(text, "best value|omjer|balans|vrijednost")) input = input.withOptimizationGoal("best-value");
-        if (matches(text, "najljep|estetsk|ljepsa verzij|sto ljepse")) input = input.withOptimizationGoal("style-match");
+        // Sprint 10.183: recognise the EVERYDAY way people ask for a good-looking room — "da bude lijepo", "lijepa
+        // soba", "neka bude ljepše", "dopadljivo" — not just the formal "najljepše/estetski/što ljepše/ljepša
+        // verzija". Text is accent-stripped (ž/š/č→z/s/c), so "ljepše"→"ljepse", "lijepu"→"lijepu". These map to
+        // style-match, which flips the plan to spend-up (prefersQuality) and prefers better-rated, style-coherent
+        // pieces instead of flooring to the cheapest — what a "dnevni boravak 2000, da bude lijepo" prompt wants.
+        if (matches(text, "najljep|estetsk|ljepsa verzij|sto ljepse|lijep|ljeps|dopadljiv")) input = input.withOptimizationGoal("style-match");
         return input;
     }
 

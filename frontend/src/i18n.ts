@@ -680,6 +680,10 @@ const DICTIONARY: Record<string, Entry> = {
   'results.replacementMenuLabel': { hr: 'Odaberi što želiš promijeniti', en: 'Choose what you want to change' },
   'results.findCheaper': { hr: 'Nađi jeftinije', en: 'Find cheaper' },
   'results.findNicer': { hr: 'Nađi ljepše', en: 'Find nicer' },
+  // Sprint 10.183: honest note when a swap finds nothing (before, the button silently did nothing).
+  'results.noNicerFound': { hr: 'Za ovaj komad zasad nema ljepše opcije u tvom budžetu.', en: 'No nicer option for this piece within your budget yet.' },
+  'results.noCheaperFound': { hr: 'Za ovaj komad nema jeftinije opcije u tvom budžetu.', en: 'No cheaper option for this piece within your budget.' },
+  'results.noOtherFound': { hr: 'Za ovaj komad nema druge opcije u tvom budžetu.', en: 'No other option for this piece within your budget.' },
   'results.dontLikeIt': { hr: 'Ne sviđa mi se', en: 'I don\'t like it' },
   'results.dontNeedThis': { hr: 'Ne treba mi ovo', en: 'I don\'t need this' },
   'results.whatsWrong': { hr: 'Što ne odgovara?', en: 'What\'s wrong?' },

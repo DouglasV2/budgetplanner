@@ -507,16 +507,24 @@ export function Planner() {
     }
   }
 
-  async function handleReplace(planId: string, productId: string, changeType: ReplacementChoice = 'similar') {
+  // Sprint 10.183: returns whether the plan actually CHANGED. A "find nicer/cheaper/different" swap that finds
+  // nothing comes back UNCHANGED (the same product id is still present), so the caller (PlanResults) can show an
+  // honest "no nicer option" note instead of the button silently doing nothing. On error it returns true so the
+  // caller doesn't ALSO stack a no-option note on top of the error banner.
+  async function handleReplace(planId: string, productId: string, changeType: ReplacementChoice = 'similar'): Promise<boolean> {
     const plan = plans.find((currentPlan) => currentPlan.id === planId);
-    if (!plan) return;
+    if (!plan) return false;
 
     try {
       const updatedPlan = await replaceProduct(plan, input, productId, changeType);
       setPlans((currentPlans) => currentPlans.map((currentPlan) => (currentPlan.id === planId ? updatedPlan : currentPlan)));
+      // A successful swap yields a NEW product id; a remove drops the id — either way the old id is gone. Only a
+      // no-op swap leaves the same product id in the plan.
+      return !updatedPlan.items.some((item) => item.product.id === productId);
     } catch {
       // Localised error only — never surface a raw thrown/backend string to the user.
       setError(t('planner.errorReplace'));
+      return true;
     }
   }
 

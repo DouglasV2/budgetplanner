@@ -126,6 +126,64 @@ class PlannerServiceTest {
         assertThat(replaced.items().get(0).product().price()).isLessThan(BigDecimal.valueOf(900));
     }
 
+    // Sprint 10.183: the strict "nicer" band collapses toward ~1.25x the current price once the budget is mostly
+    // spent, so for a sparse category (a rug) a genuinely nicer, pricier piece just above that ceiling was never
+    // found and the swap silently did nothing (the owner's "Nađi ljepše za tepih nije ga htio zamijeniti"). The
+    // widened fallback must return that real step up.
+    @Test
+    void nicerReplacementWidensBeyondTheTightBandForSparseCategories() {
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 1400, 4.5);
+        Product rugAnchor = product("rug-anchor", "Tepih obični", "JYSK", "rug", 120, 4.0);
+        Product rugNicer = product("rug-nicer", "Tepih ljepši", "JYSK", "rug", 220, 4.7);
+        PlannerService service = serviceWithProducts(List.of(sofa, rugAnchor, rugNicer));
+        PlannerInputDto input = input("Imam 1500 € za dnevni boravak.");
+        // sofa 1400 leaves only ~100 headroom, so the strict nicer ceiling collapses below the 220€ rug.
+        FurnishingPlanDto plan = planWith(sofa, rugAnchor);
+
+        FurnishingPlanDto replaced = service.replaceProduct(new ReplaceProductRequest(plan, input, "rug-anchor", "nicer"));
+
+        assertThat(replaced.items()).extracting(item -> item.product().id())
+                .contains("rug-nicer")
+                .doesNotContain("rug-anchor");
+    }
+
+    // A "nicer" swap must stay honest: when the current piece is already the nicest/priciest one available, the
+    // plan comes back UNCHANGED (so the UI can tell the user there's no nicer option) — it must never swap DOWN to
+    // a cheaper, worse-rated piece just to return "something".
+    @Test
+    void nicerReplacementStaysHonestWhenNothingIsGenuinelyNicer() {
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 1300, 4.5);
+        Product rugAnchor = product("rug-anchor", "Tepih vrhunski", "JYSK", "rug", 200, 4.8);
+        Product rugWorse = product("rug-worse", "Tepih slabiji", "JYSK", "rug", 80, 4.0);
+        PlannerService service = serviceWithProducts(List.of(sofa, rugAnchor, rugWorse));
+        PlannerInputDto input = input("Imam 1500 € za dnevni boravak.");
+        FurnishingPlanDto plan = planWith(sofa, rugAnchor);
+
+        FurnishingPlanDto replaced = service.replaceProduct(new ReplaceProductRequest(plan, input, "rug-anchor", "nicer"));
+
+        assertThat(replaced.items()).extracting(item -> item.product().id())
+                .contains("rug-anchor")
+                .doesNotContain("rug-worse");
+    }
+
+    // A candidate can sit INSIDE the price band yet not be a genuine step up (a touch cheaper AND lower rated).
+    // "Find nicer" must not swap to it — that would replace the piece with a plainly worse one and call it nicer.
+    @Test
+    void nicerReplacementDoesNotSwapToASlightlyCheaperLowerRatedPiece() {
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 1300, 4.5);
+        Product rugAnchor = product("rug-anchor", "Tepih vrhunski", "JYSK", "rug", 200, 4.8);
+        Product rugSidegrade = product("rug-side", "Tepih sličan", "JYSK", "rug", 190, 4.2); // 0.95x, lower rated
+        PlannerService service = serviceWithProducts(List.of(sofa, rugAnchor, rugSidegrade));
+        PlannerInputDto input = input("Imam 1500 € za dnevni boravak.");
+        FurnishingPlanDto plan = planWith(sofa, rugAnchor);
+
+        FurnishingPlanDto replaced = service.replaceProduct(new ReplaceProductRequest(plan, input, "rug-anchor", "nicer"));
+
+        assertThat(replaced.items()).extracting(item -> item.product().id())
+                .contains("rug-anchor")
+                .doesNotContain("rug-side");
+    }
+
     // Sprint 10.173 (P0 — similar-item + budget discovery).
     @Test
     void findSimilarReturnsThreeDistinctBucketsWithinCap() {
@@ -673,6 +731,23 @@ class PlannerServiceTest {
 
     private List<String> categories(FurnishingPlanDto plan) {
         return plan.items().stream().map(item -> item.product().category()).toList();
+    }
+
+    // Sprint 10.183: a minimal plan holding the given products, for replaceProduct tests. The total is derived so
+    // replaceProduct's own remainingBudget (budget − everything-but-the-replaced-item) is realistic; the other
+    // metadata fields are placeholders the replace path doesn't read.
+    private FurnishingPlanDto planWith(Product... products) {
+        List<PlanItemDto> items = new ArrayList<>();
+        double total = 0;
+        for (Product p : products) {
+            items.add(new PlanItemDto(ProductDto.from(p), "Komad", "buy-first", "Opis", "1. Najvažnije za početak"));
+            total += p.getPrice().doubleValue();
+        }
+        return new FurnishingPlanDto(
+                "value", "Najbolji izbor", "Najbolji omjer", "Opis", "", "", "", "", "", "",
+                List.of(), List.of(), items,
+                BigDecimal.valueOf(total), BigDecimal.valueOf(Math.max(0, 1500 - total)), 80, "Low", 80,
+                List.of("IKEA", "JYSK"), null, null, null, null, null);
     }
 
     private List<Product> defaultProducts() {

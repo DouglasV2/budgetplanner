@@ -86,6 +86,20 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Spavaća soba do 500 €, samo osnovno.").furnishingLevel()).isEqualTo("basic");
     }
 
+    // Sprint 10.183: the everyday way to ask for a good-looking room — "da bude lijepo", "lijepa soba",
+    // "neka bude ljepše", "dopadljivo" — must set the aesthetic goal so the planner spends up on nicer,
+    // better-rated, style-coherent pieces. Previously ONLY "najljepše/estetski/što ljepše/ljepša verzija"
+    // did, so the most natural phrasing silently fell back to the default best-value (cheapest-leaning) tier.
+    @Test
+    void plainNicePhrasingSignalsAestheticPriority() {
+        assertThat(parse("Dnevni boravak 2000 €, da bude lijepo.").optimizationGoal()).isEqualTo("style-match");
+        assertThat(parse("Uredi mi lijepu dnevnu sobu.").optimizationGoal()).isEqualTo("style-match");
+        assertThat(parse("Dnevni boravak, neka bude ljepše.").optimizationGoal()).isEqualTo("style-match");
+        assertThat(parse("Spavaća soba, želim nešto dopadljivo.").optimizationGoal()).isEqualTo("style-match");
+        // Regression: a plain value/budget prompt stays the default best-value tier, not style-match.
+        assertThat(parse("Dnevni boravak do 1500 €, treba mi kauč.").optimizationGoal()).isEqualTo("best-value");
+    }
+
     @Test
     void gymPromptNoLongerMapsToHomeGym() {
         // Sprint 10.79: home-gym is de-scoped (no verified gym products), so a gym prompt must NOT yield it.

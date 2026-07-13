@@ -57,7 +57,8 @@ export type QuickPlanAction = 'cheaper' | 'nicer' | 'single-store' | 'least-stor
 interface PlanResultsProps {
   plans: FurnishingPlan[];
   input: PlannerInput;
-  onReplace: (planId: string, productId: string, changeType?: ReplacementChoice) => void;
+  // Sprint 10.183: resolves to whether the plan CHANGED, so a no-op "find nicer/cheaper" can show an honest note.
+  onReplace: (planId: string, productId: string, changeType?: ReplacementChoice) => Promise<boolean>;
   onToggleLock: (productId: string) => void;
   lockedProductIds: string[];
   onQuickAction: (action: QuickPlanAction, plan?: FurnishingPlan) => void;
@@ -1039,6 +1040,10 @@ export function PlanResults({
   const [watchStatus, setWatchStatus] = useState<{ id: string; type: 'ok' | 'error'; message: string } | null>(null);
   // Sprint 10.173 (P0): the row whose "Slično ispod budžeta" discovery panel is open (one at a time).
   const [similarProductId, setSimilarProductId] = useState<string | null>(null);
+  // Sprint 10.183: the row where the last replace found nothing (so we show an honest inline note there), plus the
+  // matching message key ("no nicer/cheaper/other option"). Cleared on any new swap attempt and on a new plan set.
+  const [noSwapProductId, setNoSwapProductId] = useState<string | null>(null);
+  const [noSwapMessageKey, setNoSwapMessageKey] = useState<string>('results.noNicerFound');
 
   // Sprint 10.62: a genuinely new plan SET (fresh generation / opened plan) is identified by its plan ids; an
   // in-place product replace keeps the same ids. We key the per-row disclosure reset on the ids so the
@@ -1069,7 +1074,23 @@ export function PlanResults({
     setWatchProductId(null);
     setWatchStatus(null);
     setSimilarProductId(null);
+    setNoSwapProductId(null);
   }, [planIdsKey, selectedPlanId, input.optimizationGoal, input.furnishingLevel]);
+
+  // Sprint 10.183: run a replace and, when it finds nothing (the plan comes back UNCHANGED), show an honest inline
+  // note on that row instead of the button appearing dead. 'remove' always changes the plan, so it never gets here.
+  async function requestReplace(planId: string, productId: string, changeType: ReplacementChoice) {
+    setNoSwapProductId(null);
+    const changed = await onReplace(planId, productId, changeType);
+    if (changed === false) {
+      setNoSwapMessageKey(
+        changeType === 'cheaper' ? 'results.noCheaperFound'
+          : changeType === 'nicer' ? 'results.noNicerFound'
+            : 'results.noOtherFound'
+      );
+      setNoSwapProductId(productId);
+    }
+  }
 
   function openWatchForm(productId: string) {
     setWatchProductId(watchProductId === productId ? null : productId);
@@ -1610,18 +1631,21 @@ export function PlanResults({
                         )}
                         {actionsOpen && expanded && !locked && (
                           <div className="replacement-menu" aria-label={t('results.replacementMenuLabel')}>
-                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>{t('results.findCheaper')}</button>
-                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>{t('results.findNicer')}</button>
+                            <button type="button" onClick={() => void requestReplace(selectedPlan.id, product.id, 'cheaper')}>{t('results.findCheaper')}</button>
+                            <button type="button" onClick={() => void requestReplace(selectedPlan.id, product.id, 'nicer')}>{t('results.findNicer')}</button>
                             <button type="button" aria-expanded={dislikeProductId === product.id} onClick={() => setDislikeProductId(dislikeProductId === product.id ? null : product.id)}>{t('results.dontLikeIt')}</button>
-                            <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>{t('results.dontNeedThis')}</button>
+                            <button type="button" onClick={() => void onReplace(selectedPlan.id, product.id, 'remove')}>{t('results.dontNeedThis')}</button>
                             {dislikeProductId === product.id && (
                               <div className="dislike-reasons">
                                 <span>{t('results.whatsWrong')}</span>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'cheaper')}>{t('results.tooExpensive')}</button>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'nicer')}>{t('results.wantNicerStyle')}</button>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'different')}>{t('results.showAnother')}</button>
-                                <button type="button" onClick={() => onReplace(selectedPlan.id, product.id, 'remove')}>{t('results.dontNeedThatItem')}</button>
+                                <button type="button" onClick={() => void requestReplace(selectedPlan.id, product.id, 'cheaper')}>{t('results.tooExpensive')}</button>
+                                <button type="button" onClick={() => void requestReplace(selectedPlan.id, product.id, 'nicer')}>{t('results.wantNicerStyle')}</button>
+                                <button type="button" onClick={() => void requestReplace(selectedPlan.id, product.id, 'different')}>{t('results.showAnother')}</button>
+                                <button type="button" onClick={() => void onReplace(selectedPlan.id, product.id, 'remove')}>{t('results.dontNeedThatItem')}</button>
                               </div>
+                            )}
+                            {noSwapProductId === product.id && (
+                              <p className="replacement-empty" role="status">{t(noSwapMessageKey)}</p>
                             )}
                           </div>
                         )}

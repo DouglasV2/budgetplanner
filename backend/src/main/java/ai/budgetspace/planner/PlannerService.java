@@ -1283,6 +1283,35 @@ public class PlannerService {
         double safeLimit = Math.max(remainingBudget, currentPrice);
         double stretchLimit = Math.max(remainingBudget, Math.min(input.budget() * 0.45, currentPrice * 1.25));
 
+        Product best = bestReplacement(input, current, changeType, blockedIds, allowedRetailers, mode, currentRetailers,
+                currentPrice, safeLimit, stretchLimit);
+
+        // Sprint 10.183: an explicit "find nicer" on a SPARSE category (a rug, a lamp) often found nothing, because
+        // the strict ceiling collapses toward 1.25x the current price once the budget is mostly spent — yet a
+        // genuinely nicer, pricier piece exists just above it. Retry once with a widened ceiling so the swap almost
+        // always returns a real step up; the price floor (>= 0.92x current) still keeps it from going cheaper.
+        if (best == null && "nicer".equals(changeType)) {
+            double widenedStretch = Math.max(stretchLimit, Math.min(input.budget() * 0.6, currentPrice * 2.2));
+            best = bestReplacement(input, current, changeType, blockedIds, allowedRetailers, mode, currentRetailers,
+                    currentPrice, safeLimit, widenedStretch);
+        }
+
+        // Sprint 10.183: keep "nicer" honest. If the best in-band candidate is not a genuine step up (no better
+        // rating AND no higher price than the current piece), return nothing so the caller leaves the plan
+        // unchanged and the UI can say there's no nicer option — never swap DOWN to a plainly worse piece.
+        if (best != null && "nicer".equals(changeType)
+                && best.getRating() <= current.rating() && best.getPrice().doubleValue() <= currentPrice) {
+            return null;
+        }
+        return best;
+    }
+
+    // Sprint 10.183: the catalog scan for a single replacement, extracted so "find nicer" can retry it with a
+    // widened price ceiling (see pickReplacement). Same filters as before: same category/fixture-facet, same room,
+    // planner-eligible, not already in the plan, an allowed retailer, and inside the change-type's price band.
+    private Product bestReplacement(PlannerInputDto input, ProductDto current, String changeType, Set<String> blockedIds,
+                                    List<String> allowedRetailers, String mode, Set<String> currentRetailers,
+                                    double currentPrice, double safeLimit, double stretchLimit) {
         return marketCatalog(input).stream()
                 // Sprint 10.181: a replacement for a bathtub stays a bathtub (and a shower a shower) — preserve the
                 // fixture subtype unless a future changeType explicitly asks to switch it.
