@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FurnishingPlan, PlannerInput, Product, RoomPriority, RoomType, SavedPlanResponse } from '../types';
-import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
+import { generateMoveInPlan, adjustMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
 import { hydrateSession, serializeSession, clearForeignMarketRetained, retainedExceedsBudget, type RoomPlanResult } from '../utils/moveInPlan';
 import { useLocale } from '../LocaleContext';
@@ -89,6 +89,14 @@ const PRIORITY_LABEL_KEYS: Record<RoomPriority, string> = {
   later: 'moveIn.priorityLater',
 };
 
+// Sprint 10.183: the honest-note CODES the adjust endpoint returns → their localized i18n keys.
+const ADJUST_MESSAGE_KEYS: Record<string, string> = {
+  'reduce-unreachable': 'moveIn.adjustReduceUnreachable',
+  'fewer-stores-noop': 'moveIn.adjustFewerStoresNoop',
+  'use-remaining-done': 'moveIn.adjustUseRemainingDone',
+  'use-remaining-none': 'moveIn.adjustUseRemainingNone',
+};
+
 // The 3 tiers come back with stable ids budget/value/stretch (plan.name is a Croatian display string).
 // Sprint 10.155: match on the stable id, not the HR name, so a reworded plan.name can't silently break the
 // default pick. For the apartment overview we default to the balanced "value" tier per room.
@@ -117,6 +125,11 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  // Sprint 10.183 — adjust apartment: which action is in flight, the last honest note code, and the reduce-total
+  // target (prefilled to the current plan total).
+  const [adjusting, setAdjusting] = useState<string | null>(null);
+  const [adjustNotice, setAdjustNotice] = useState<string | null>(null);
+  const [reduceTarget, setReduceTarget] = useState<number>(0);
 
   // Sprint 10.116: apply a seed (from the multi-room nudge) — pre-select the detected rooms + typed budget.
   useEffect(() => {
@@ -186,6 +199,44 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   // Sprint 10.183: honest guard — if the items the user chose to keep already cost more than the budget, say so
   // (near the budget field) instead of silently dropping them or letting the plan run over.
   const keepExceedsBudget = retainedExceedsBudget(results, retainedRooms, totalBudget);
+
+  // Sprint 10.183: prefill the reduce-total target with the current plan total whenever a fresh plan lands.
+  useEffect(() => {
+    if (results) setReduceTarget(Math.round(results.reduce((sum, room) => sum + room.plan.total, 0)));
+  }, [results]);
+
+  // Sprint 10.183 — adjust the whole apartment: send the current rooms (+ their retained/kept state) and an
+  // action to the backend, then splice the returned rooms back in. Kept rooms/products come back untouched.
+  async function runAdjust(action: string, targetTotal: number | null) {
+    if (!results || adjusting) return;
+    setAdjusting(action);
+    setAdjustNotice(null);
+    try {
+      const payloadRooms = results.map((room) => ({
+        roomType: room.roomType,
+        plan: room.plan,
+        retained: retainedRooms.includes(room.roomType),
+        lockedProductIds: room.input.lockedProductIds,
+      }));
+      const roomPriority: Partial<Record<RoomType, RoomPriority>> = {};
+      for (const room of results) roomPriority[room.roomType] = priorityOf(room.roomType);
+      const response = await adjustMoveInPlan(baseInput, payloadRooms, totalBudget, action, targetTotal, roomPriority);
+      const byRoom = new Map(response.rooms.map((room) => [room.roomType, room] as const));
+      setResults((prev) => prev && prev.map((room) => {
+        const updated = byRoom.get(room.roomType);
+        const plan = updated ? pickBestPlan(updated.plans) : null;
+        if (!plan) return room;
+        // The backend response carries each room's kept-product ids back on the plan's items only, so keep the
+        // client-side lockedProductIds authoritative (they are what the next adjust/keep toggle reads).
+        return { ...room, plan, hasItems: plan.items.length > 0 };
+      }));
+      if (response.changed === false || response.message) setAdjustNotice(response.message ?? 'no-change');
+    } catch {
+      onNotice(t('moveIn.error'));
+    } finally {
+      setAdjusting(null);
+    }
+  }
 
   function buildRoomInput(roomType: RoomType, budget: number): PlannerInput {
     const roomName = t(MOVE_IN_ROOMS.find((room) => room.value === roomType)?.labelKey ?? '');
@@ -493,6 +544,38 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                 itemsCount: (count) => t('moveIn.itemsCount', { count }),
               },
             })}>{t('print.downloadPdf')}</button>
+          </div>
+
+          {/* Sprint 10.183: adjust the whole apartment — reduce total / fewer stores / use remaining. */}
+          <div className="move-in-adjust no-print">
+            <span className="move-in-adjust-title">{t('moveIn.adjustHeading')}</span>
+            <p className="move-in-adjust-hint">{t('moveIn.adjustHint')}</p>
+            <div className="move-in-adjust-actions">
+              <div className="move-in-adjust-reduce">
+                <label className="move-in-adjust-target">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    step="50"
+                    aria-label={t('moveIn.adjustReduce')}
+                    value={reduceTarget || ''}
+                    onChange={(event) => setReduceTarget(Math.max(0, Math.floor(Number(event.target.value) || 0)))}
+                  />
+                  <span>€</span>
+                </label>
+                <button type="button" className="move-in-adjust-btn" disabled={!!adjusting}
+                  onClick={() => void runAdjust('reduce-total', reduceTarget)}>{t('moveIn.adjustReduce')}</button>
+              </div>
+              <button type="button" className="move-in-adjust-btn" disabled={!!adjusting}
+                onClick={() => void runAdjust('fewer-stores', null)}>{t('moveIn.adjustFewerStores')}</button>
+              <button type="button" className="move-in-adjust-btn" disabled={!!adjusting}
+                onClick={() => void runAdjust('use-remaining', null)}>{t('moveIn.adjustUseRemaining')}</button>
+            </div>
+            {adjusting && <p className="move-in-adjust-status" role="status">{t('moveIn.adjusting')}</p>}
+            {adjustNotice && !adjusting && (
+              <p className="move-in-adjust-note" role="status">{t(ADJUST_MESSAGE_KEYS[adjustNotice] ?? 'moveIn.adjustNoChange')}</p>
+            )}
           </div>
 
           <div className="move-in-room-cards">

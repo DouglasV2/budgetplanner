@@ -352,6 +352,178 @@ public class PlannerService {
         return new MoveInResponse(roomDtos, grandTotal, total, apartmentPartial, BigDecimal.valueOf(Math.round(shortfall)));
     }
 
+    // Sprint 10.183 (Move-In QoL): message CODES an adjust action can return; the frontend maps them to the
+    // localized honest note. null = the action worked and there was nothing worth saying.
+    static final String ADJUST_REDUCE_UNREACHABLE = "reduce-unreachable";
+    static final String ADJUST_FEWER_STORES_NOOP = "fewer-stores-noop";
+    static final String ADJUST_USE_REMAINING_DONE = "use-remaining-done";
+    static final String ADJUST_USE_REMAINING_NONE = "use-remaining-none";
+
+    // Sprint 10.183: adjust an EXISTING whole-apartment plan in place — reduce the total, consolidate stores, or
+    // spend the remaining budget — touching ONLY the rooms/products the user has NOT kept, reusing the single-room
+    // replacement engine (replaceProduct) / generator (generateSeeded). Never regenerates a retained room, never
+    // unpins a kept product, never crosses market or fixture subtype (the engine already guards those), never
+    // exceeds the budget. Honest: changed=false + a message code when there was nothing useful to do.
+    public MoveInResponse adjustMoveIn(MoveInAdjustRequest request) {
+        int total = request == null ? 0 : Math.max(0, request.totalBudget());
+        if (request == null || request.rooms() == null || request.rooms().isEmpty()) {
+            return new MoveInResponse(List.of(), BigDecimal.ZERO, total, false, BigDecimal.ZERO, false, null);
+        }
+        PlannerInputDto base = (request.base() == null
+                ? new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi", null, "best-value",
+                        "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0)
+                : request.base()).normalized();
+        String action = request.action() == null ? "" : request.action().trim().toLowerCase(Locale.ROOT);
+
+        List<AdjustRoomDto> reqRooms = request.rooms();
+        int n = reqRooms.size();
+        FurnishingPlanDto[] plans = new FurnishingPlanDto[n];
+        PlannerInputDto[] inputs = new PlannerInputDto[n];
+        String[] roomTypes = new String[n];
+        boolean[] retained = new boolean[n];
+        for (int i = 0; i < n; i++) {
+            AdjustRoomDto room = reqRooms.get(i);
+            plans[i] = room.plan();
+            retained[i] = room.retained();
+            roomTypes[i] = room.roomType() == null ? "" : room.roomType().trim().toLowerCase(Locale.ROOT);
+            int roomBudget = (plans[i] == null || plans[i].total() == null) ? 1 : Math.max(1, plans[i].total().intValue());
+            inputs[i] = moveInRoomInput(base, roomTypes[i], roomBudget).withLockedProductIds(room.lockedProductIds());
+        }
+
+        boolean changed = false;
+        String message = null;
+        switch (action) {
+            case "reduce-total" -> {
+                int target = request.targetTotal() == null
+                        ? (int) Math.round(currentGrand(plans) * 0.85)
+                        : Math.max(0, Math.min(total, request.targetTotal()));
+                changed = reduceTotalAdjust(plans, inputs, retained, target);
+                if (currentGrand(plans) > target + 0.5) message = ADJUST_REDUCE_UNREACHABLE;
+            }
+            case "fewer-stores" -> {
+                changed = fewerStoresAdjust(plans, inputs, roomTypes, retained, base, total);
+                if (!changed) message = ADJUST_FEWER_STORES_NOOP;
+            }
+            case "use-remaining" -> {
+                double remaining = total - currentGrand(plans);
+                if (remaining < Math.max(50, total * 0.03)) {
+                    message = ADJUST_USE_REMAINING_NONE;
+                } else {
+                    changed = useRemainingAdjust(plans, inputs, retained, remaining, total);
+                    message = changed ? ADJUST_USE_REMAINING_DONE : ADJUST_USE_REMAINING_NONE;
+                }
+            }
+            default -> { /* unknown action → no-op */ }
+        }
+
+        List<MoveInRoomDto> roomDtos = new ArrayList<>();
+        BigDecimal grand = BigDecimal.ZERO;
+        for (int i = 0; i < n; i++) {
+            FurnishingPlanDto plan = plans[i];
+            grand = grand.add(plan == null || plan.total() == null ? BigDecimal.ZERO : plan.total());
+            roomDtos.add(new MoveInRoomDto(roomTypes[i], inputs[i].budget(),
+                    plan == null ? List.of() : List.of(plan), plan != null && plan.items().isEmpty()));
+        }
+        return new MoveInResponse(roomDtos, grand, total, false, BigDecimal.ZERO, changed, message);
+    }
+
+    private double currentGrand(FurnishingPlanDto[] plans) {
+        double grand = 0;
+        for (FurnishingPlanDto plan : plans) if (plan != null && plan.total() != null) grand += plan.total().doubleValue();
+        return grand;
+    }
+
+    private int distinctRetailers(FurnishingPlanDto[] plans) {
+        Set<String> retailers = new LinkedHashSet<>();
+        for (FurnishingPlanDto plan : plans) {
+            if (plan == null) continue;
+            for (PlanItemDto item : plan.items()) retailers.add(item.product().retailer());
+        }
+        return retailers.size();
+    }
+
+    // reduce-total: swap the priciest NON-KEPT items to a cheaper alternative one at a time (fewest useful
+    // replacements) until the grand total is at or below the target, or nothing cheaper remains (honest).
+    private boolean reduceTotalAdjust(FurnishingPlanDto[] plans, PlannerInputDto[] inputs, boolean[] retained, double target) {
+        record Cand(int room, String id, double line) { }
+        List<Cand> candidates = new ArrayList<>();
+        for (int i = 0; i < plans.length; i++) {
+            if (retained[i] || plans[i] == null) continue;
+            Set<String> locked = new LinkedHashSet<>(inputs[i].lockedProductIds());
+            for (PlanItemDto item : plans[i].items()) {
+                if (locked.contains(item.product().id())) continue;
+                candidates.add(new Cand(i, item.product().id(), item.product().price().doubleValue() * Math.max(1, item.quantity())));
+            }
+        }
+        candidates.sort((a, b) -> Double.compare(b.line(), a.line()));
+        boolean changed = false;
+        for (Cand cand : candidates) {
+            if (currentGrand(plans) <= target) break;
+            FurnishingPlanDto before = plans[cand.room()];
+            FurnishingPlanDto after = replaceProduct(new ReplaceProductRequest(before, inputs[cand.room()], cand.id(), "cheaper"));
+            if (after != null && after.total() != null && before.total() != null
+                    && after.total().doubleValue() < before.total().doubleValue()) {
+                plans[cand.room()] = after;
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
+    // use-remaining: upgrade NON-KEPT items to a nicer piece where the price step fits inside the remaining
+    // budget — practical upgrades first, never exceeding the budget.
+    private boolean useRemainingAdjust(FurnishingPlanDto[] plans, PlannerInputDto[] inputs, boolean[] retained, double remaining, int total) {
+        boolean changed = false;
+        for (int i = 0; i < plans.length; i++) {
+            if (retained[i] || plans[i] == null) continue;
+            Set<String> locked = new LinkedHashSet<>(inputs[i].lockedProductIds());
+            // Open the price band to the whole apartment budget so a "nicer" step-up is findable; the real ceiling
+            // is enforced below (only apply a swap whose price step fits inside the remaining budget).
+            PlannerInputDto upgradeInput = inputs[i].withBudget(total);
+            List<String> ids = plans[i].items().stream()
+                    .map(item -> item.product().id())
+                    .filter(id -> !locked.contains(id))
+                    .toList();
+            for (String id : ids) {
+                if (remaining <= 0.5) break;
+                FurnishingPlanDto before = plans[i];
+                FurnishingPlanDto after = replaceProduct(new ReplaceProductRequest(before, upgradeInput, id, "nicer"));
+                if (after == null || after.total() == null || before.total() == null) continue;
+                double delta = after.total().doubleValue() - before.total().doubleValue();
+                if (delta > 0 && delta <= remaining) {
+                    plans[i] = after;
+                    remaining -= delta;
+                    changed = true;
+                }
+            }
+        }
+        return changed;
+    }
+
+    // fewer-stores: regenerate each NON-KEPT room preferring a single store (kept products stay pinned, which may
+    // keep a room at 2 stores — honest). Commit only if the apartment's distinct-retailer count actually drops
+    // AND the plan stays within budget; otherwise leave everything untouched (honest no-op).
+    private boolean fewerStoresAdjust(FurnishingPlanDto[] plans, PlannerInputDto[] inputs, String[] roomTypes, boolean[] retained, PlannerInputDto base, int total) {
+        if (distinctRetailers(plans) <= 1) return false;
+        FurnishingPlanDto[] trial = plans.clone();
+        PlannerInputDto singleBase = base.withRetailers("single", base.selectedRetailers());
+        for (int i = 0; i < plans.length; i++) {
+            if (retained[i] || plans[i] == null) continue;
+            int roomBudget = plans[i].total() == null ? 1 : Math.max(1, plans[i].total().intValue());
+            PlannerInputDto roomInput = moveInRoomInput(singleBase, roomTypes[i], roomBudget).withLockedProductIds(inputs[i].lockedProductIds());
+            PlanGenerationResponse resp = generateSeeded(roomInput, Set.of());
+            FurnishingPlanDto candidate = resp.plans().isEmpty() ? null : resp.plans().get(0);
+            if (candidate != null && candidate.total() != null) trial[i] = candidate;
+        }
+        double trialGrand = 0;
+        for (FurnishingPlanDto plan : trial) if (plan != null && plan.total() != null) trialGrand += plan.total().doubleValue();
+        if (distinctRetailers(trial) < distinctRetailers(plans) && trialGrand <= total + 0.5) {
+            System.arraycopy(trial, 0, plans, 0, plans.length);
+            return true;
+        }
+        return false;
+    }
+
     // One room's planner input inside a Move-In request — the room label as the prompt, the room's slice of the
     // budget, everything else inherited from the base request. Sprint 10.161: propagate alreadyHaveCategories to
     // every room (was hardcoded empty), so a whole-apartment shopper who already owns e.g. a bed/sofa is not

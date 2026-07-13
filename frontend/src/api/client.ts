@@ -125,6 +125,23 @@ export function generateMoveInPlan(base: PlannerInput, rooms: RoomType[], totalB
   });
 }
 
+// Sprint 10.183 (Move-In QoL): adjust an existing whole-apartment plan — reduce total / fewer stores / use
+// remaining — touching only rooms/products the user hasn't kept. Returns the adjusted plan + changed/message.
+export interface AdjustRoomPayload {
+  roomType: RoomType;
+  plan: FurnishingPlan;
+  retained: boolean;
+  lockedProductIds: string[];
+}
+export function adjustMoveInPlan(base: PlannerInput, rooms: AdjustRoomPayload[], totalBudget: number,
+  action: string, targetTotal: number | null, roomPriority?: Partial<Record<RoomType, RoomPriority>>) {
+  return request<MoveInApiResponse>('/api/plans/adjust-move-in', {
+    method: 'POST',
+    headers: { 'X-BudgetSpace-Session': sessionId() },
+    body: JSON.stringify({ base, rooms, totalBudget, action, targetTotal, roomPriority: roomPriority ?? {} })
+  });
+}
+
 // Sprint 10.42: geo-IP market hint. Reads the visitor's country (2-letter ISO) that a CDN/proxy injected
 // as a request header; null when none is present (local/no-CDN). Best-effort — never throws.
 export async function fetchGeoCountry(): Promise<string | null> {

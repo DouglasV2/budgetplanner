@@ -286,6 +286,36 @@ const DICTIONARY: Record<string, Entry> = {
     hr: 'Promijenio si državu pa smo maknuli zadržane proizvode iz prethodnog tržišta.',
     en: 'You changed country, so we cleared kept products from the previous market.'
   },
+  // Sprint 10.183: adjust the whole apartment.
+  'moveIn.adjustHeading': { hr: 'Što želiš promijeniti?', en: 'What do you want to change?' },
+  'moveIn.adjustHint': {
+    hr: 'Promijenit ćemo samo ono što nisi zadržao.',
+    en: 'We\'ll only change what you haven\'t kept.'
+  },
+  'moveIn.adjustReduce': { hr: 'Smanji ukupnu cijenu', en: 'Lower the total price' },
+  'moveIn.adjustFewerStores': { hr: 'Kupuj u manje trgovina', en: 'Shop in fewer stores' },
+  'moveIn.adjustUseRemaining': { hr: 'Iskoristi ostatak budžeta', en: 'Use the rest of the budget' },
+  'moveIn.adjusting': { hr: 'Prilagođavam…', en: 'Adjusting…' },
+  'moveIn.adjustReduceUnreachable': {
+    hr: 'Zadržane stavke i osnovne potrebe već koštaju više od te cijene. Ukloni nešto ili podigni cilj.',
+    en: 'The kept items and essentials already cost more than that. Remove something or raise the target.'
+  },
+  'moveIn.adjustFewerStoresNoop': {
+    hr: 'Ovaj plan već koristi najmanji realan broj trgovina za odabrani budžet.',
+    en: 'This plan already uses the smallest realistic number of stores for this budget.'
+  },
+  'moveIn.adjustUseRemainingDone': {
+    hr: 'Iskoristili smo dio preostalog budžeta tamo gdje donosi najveću razliku.',
+    en: 'We used part of the remaining budget where it makes the biggest difference.'
+  },
+  'moveIn.adjustUseRemainingNone': {
+    hr: 'Nema značajnog ostatka budžeta za korisnu nadogradnju.',
+    en: 'There\'s no meaningful budget left for a useful upgrade.'
+  },
+  'moveIn.adjustNoChange': {
+    hr: 'Nismo našli bolju kombinaciju bez diranja onoga što si zadržao.',
+    en: 'We couldn\'t find a better combination without touching what you kept.'
+  },
   'moveIn.generate': { hr: 'Složi plan za stan', en: 'Build the apartment plan' },
   'moveIn.generating': { hr: 'Slažem plan za stan…', en: 'Building the apartment plan…' },
   'moveIn.needRooms': { hr: 'Odaberi barem jednu sobu.', en: 'Pick at least one room.' },

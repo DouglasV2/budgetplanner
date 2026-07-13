@@ -4,6 +4,7 @@ import ai.budgetspace.dto.DesignAssistantResponse;
 import ai.budgetspace.dto.FurnishingPlanDto;
 import ai.budgetspace.auth.AuthService;
 import ai.budgetspace.config.ClientIp;
+import ai.budgetspace.dto.MoveInAdjustRequest;
 import ai.budgetspace.dto.MoveInRequestDto;
 import ai.budgetspace.dto.MoveInResponse;
 import ai.budgetspace.dto.PlanGenerationResponse;
@@ -76,6 +77,14 @@ public class PlanController {
     @PostMapping("/api/plans/generate-move-in")
     public MoveInResponse generateMoveIn(@RequestBody MoveInRequestDto request) {
         return plannerService.generateMoveIn(request);
+    }
+
+    // Sprint 10.183 (Move-In QoL): adjust an existing whole-apartment plan in place — reduce the total, shop in
+    // fewer stores, or use the remaining budget — touching only rooms/products the user hasn't kept. Rule-based,
+    // no AI/auth (like generate-move-in); reuses the replacement engine, never exceeds the budget.
+    @PostMapping("/api/plans/adjust-move-in")
+    public MoveInResponse adjustMoveIn(@RequestBody MoveInAdjustRequest request) {
+        return plannerService.adjustMoveIn(request);
     }
 
     @PostMapping("/api/plans/replace")

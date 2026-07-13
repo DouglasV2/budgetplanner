@@ -312,6 +312,10 @@ export interface MoveInApiResponse {
   totalBudget: number;
   apartmentPartial: boolean;
   shortfall: number;
+  // Sprint 10.183 (adjust apartment): false when an adjust action found nothing useful to do; `message` is a
+  // stable CODE the frontend maps to localized honest copy. Absent on a fresh generation.
+  changed?: boolean;
+  message?: string | null;
 }
 
 export type PlanFeedback = 'useful' | 'too-expensive' | 'wrong-style' | 'too-many-stores';

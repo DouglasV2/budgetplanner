@@ -5507,6 +5507,60 @@ a.google-signin-button.google-signin-link:hover {
 .move-in-keep-room:focus-visible,
 .move-in-item-keep:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
 
+/* Sprint 10.183: "Što želiš promijeniti?" — a restrained whole-plan action row (navy actions), the reduce-total
+   target input, and honest inline notes. Sits above the room cards; not a dashboard. */
+.move-in-adjust {
+  display: grid;
+  gap: 8px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 4px 0 8px;
+}
+.move-in-adjust-title { font-weight: 700; color: var(--ink); }
+.move-in-adjust-hint { margin: 0; color: var(--muted); font-size: 0.88rem; }
+.move-in-adjust-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.move-in-adjust-reduce { display: inline-flex; align-items: center; gap: 6px; }
+.move-in-adjust-target {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: var(--surface);
+}
+.move-in-adjust-target input {
+  width: 5.5rem;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: right;
+}
+.move-in-adjust-target input:focus { outline: none; }
+.move-in-adjust-btn {
+  border: 1px solid rgba(37, 55, 70, 0.4);
+  background: rgba(37, 55, 70, 0.12);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.move-in-adjust-btn:hover:not(:disabled) { background: rgba(37, 55, 70, 0.2); }
+.move-in-adjust-btn:disabled { opacity: 0.5; cursor: default; }
+.move-in-adjust-btn:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+.move-in-adjust-status { margin: 0; color: var(--muted); font-size: 0.86rem; }
+.move-in-adjust-note { margin: 0; color: var(--accent-strong); font-size: 0.88rem; line-height: 1.4; }
+@media (max-width: 560px) {
+  .move-in-adjust-actions { flex-direction: column; align-items: stretch; }
+  .move-in-adjust-reduce { justify-content: space-between; }
+  .move-in-adjust-btn { text-align: center; }
+}
+
 /* The apartment form as two columns on wide screens: the budget + room controls
    fill the main (left) column and rise to the top, while the heading + intro sit
    as a slim right-hand aside instead of eating a full-width heading row. Narrow
