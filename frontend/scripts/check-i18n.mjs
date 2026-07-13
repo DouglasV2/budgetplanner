@@ -34,6 +34,9 @@ const ALLOW_MISSING = new Set([
   'pricing.waitlistEmail', 'pricing.waitlistCta', 'pricing.joined', 'pricing.upgradeCta', 'pricing.signInForPlus',
   'pricing.redirecting', 'pricing.checkoutError', 'pricing.welcome', 'pricing.proName', 'pricing.proPrice',
   'pricing.notifyCta', 'pricing.proNotified',
+  // Sprint 10.183 "honest replace" (owner WIP, landed alongside the Move-In QoL sprint): these fall back to
+  // English in non-EN markets until translated. Remove from this list once the owner adds their overlays.
+  'results.noNicerFound', 'results.noCheaperFound', 'results.noOtherFound',
 ]);
 
 const messagesDir = join(frontend, 'src', 'messages');
