@@ -5561,6 +5561,86 @@ a.google-signin-button.google-signin-link:hover {
   .move-in-adjust-btn { text-align: center; }
 }
 
+/* Sprint 10.183: apartment status (inside the total card) + the shopping checklist. Honest + compact; the only
+   number is total ÷ budget (the existing fill bar) — no invented readiness score. */
+.move-in-status-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.move-in-status-cell.within { color: var(--sage-strong); font-weight: 600; }
+.move-in-status-line { margin: 6px 0 0; font-size: 0.88rem; color: var(--ink); }
+.move-in-status-tag { font-weight: 700; }
+.move-in-status-tag.warn { color: var(--accent-strong); }
+.move-in-status-tag.ok { color: var(--sage-strong); }
+.move-in-missing { margin-top: 8px; }
+.move-in-missing-toggle {
+  border: none;
+  background: none;
+  color: var(--accent-strong);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.move-in-missing-toggle:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+.move-in-missing-groups { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.move-in-missing-groups li { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.88rem; }
+.move-in-missing-label { font-weight: 700; color: var(--ink); }
+.move-in-missing-label.nf { color: var(--accent-strong); }
+
+.move-in-checklist { margin-top: 8px; display: grid; gap: 12px; }
+.move-in-checklist-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.move-in-checklist-title { font-weight: 700; font-size: 1.05rem; color: var(--ink); }
+.move-in-checklist-totals { display: inline-flex; gap: 14px; font-size: 0.9rem; }
+.move-in-checklist-totals .bought { color: var(--sage-strong); font-weight: 600; }
+.move-in-checklist-totals .remaining { color: var(--ink); font-weight: 600; }
+.move-in-checklist-store { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.move-in-checklist-store-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  font-weight: 700;
+}
+.move-in-checklist-store-meta { color: var(--muted); font-weight: 600; font-size: 0.88rem; }
+.move-in-checklist-items { list-style: none; margin: 0; padding: 0; }
+.move-in-check-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-soft);
+}
+.move-in-check-item.bought { background: var(--sage-soft); }
+.move-in-check-item.bought .move-in-check-name { text-decoration: line-through; color: var(--muted); }
+.move-in-check-label { display: inline-flex; align-items: center; gap: 8px; min-width: 0; cursor: pointer; }
+.move-in-check-label input { width: 16px; height: 16px; accent-color: var(--sage); flex: none; }
+.move-in-check-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.move-in-check-room { color: var(--muted); font-size: 0.84rem; white-space: nowrap; }
+.move-in-check-price { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.move-in-check-open { display: inline-flex; color: var(--accent-strong); }
+.move-in-check-open-empty { display: inline-block; width: 15px; }
+@media (max-width: 560px) {
+  .move-in-check-item { grid-template-columns: 1fr auto auto; }
+  .move-in-check-label { grid-column: 1 / -1; }
+  .move-in-check-price { text-align: right; }
+}
+
 /* The apartment form as two columns on wide screens: the budget + room controls
    fill the main (left) column and rise to the top, while the heading + intro sit
    as a slim right-hand aside instead of eating a full-width heading row. Narrow

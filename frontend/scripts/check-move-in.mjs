@@ -13,10 +13,11 @@ const check = (cond, msg) => { assertions += 1; assert.ok(cond, msg); };
 const m = await import(pathToFileURL(join(here, '..', 'src', 'utils', 'moveInPlan.ts')).href);
 
 // Fixtures ---------------------------------------------------------------------------------------------------
-const item = (id, price, market = 'HR', quantity = 1) => ({ product: { id, price, market }, quantity, reason: '' });
+const item = (id, price, market = 'HR', quantity = 1, retailer = 'IKEA') =>
+  ({ product: { id, price, market, retailer, name: id, category: 'sofa' }, quantity, reason: '' });
 const room = (roomType, total, items, locked = []) => ({
   roomType, labelKey: '', allocatedBudget: total, hasItems: items.length > 0, partial: false,
-  plan: { total, items, retailersUsed: [] }, input: { lockedProductIds: locked },
+  plan: { id: 'value', total, items, retailersUsed: [] }, input: { lockedProductIds: locked },
 });
 
 // --- hydrateSession: garbage / empty -> defaults ---
@@ -101,6 +102,50 @@ const room = (roomType, total, items, locked = []) => ({
   const results = [room('bedroom', 300, [item('p1', 100, 'HR')], ['p1'])];
   const out = m.clearForeignMarketRetained(results, 'HR');
   check(out.cleared === 0 && out.results === results, 'no foreign locks -> same array back (no churn)');
+}
+
+// --- apartmentStatus: totals, covered/attention rooms, aggregated missing buckets ---
+{
+  const results = [
+    { ...room('living-room', 500, [item('a', 300), item('b', 200)]), hasItems: true, partial: false,
+      missingEssential: ['rug'], niceToHave: ['decor'], unavailableInMarket: [] },
+    { ...room('bedroom', 400, [item('c', 400, 'HR', 1, 'JYSK')]), hasItems: true, partial: true,
+      missingEssential: [], niceToHave: [], unavailableInMarket: ['wardrobe'] },
+  ];
+  const s = m.apartmentStatus(results, 1000);
+  check(s.total === 900, 'status total = 900');
+  check(s.remaining === 100, 'status remaining = budget - total');
+  check(s.over === 0, 'status not over budget');
+  check(s.roomCount === 2, 'status room count');
+  check(s.retailerCount === 2, 'status distinct retailers (IKEA + JYSK)');
+  assert.deepEqual(s.coveredRooms, ['living-room'], 'covered = has items & not partial');
+  assert.deepEqual(s.attentionRooms, ['bedroom'], 'attention = partial/empty rooms');
+  assert.deepEqual(s.missing.moveIn, ['rug'], 'aggregated essential-missing');
+  assert.deepEqual(s.missing.niceToHave, ['decor'], 'aggregated nice-to-have');
+  assert.deepEqual(s.missing.notFound, ['wardrobe'], 'aggregated market-unavailable');
+}
+{
+  const s = m.apartmentStatus([{ ...room('living-room', 1200, [item('a', 1200)]), hasItems: true }], 1000);
+  check(s.over === 200, 'over-budget = total - budget');
+  check(s.remaining === -200, 'remaining goes negative when over');
+}
+
+// --- checklist: group by retailer, richest first; totals by purchased id ---
+{
+  const results = [
+    room('living-room', 700, [item('a', 300, 'HR', 1, 'IKEA'), item('b', 200, 'HR', 2, 'IKEA')]),
+    room('bedroom', 150, [item('c', 150, 'HR', 1, 'JYSK')]),
+  ];
+  const groups = m.checklist(results);
+  check(groups.length === 2, 'two retailer groups');
+  check(groups[0].retailer === 'IKEA', 'richest store first (IKEA 700)');
+  check(groups[0].count === 3, 'IKEA count = 1 + 2 (quantity)');
+  check(groups[0].total === 700, 'IKEA total = 300 + 400');
+  check(groups[1].retailer === 'JYSK', 'second store JYSK');
+
+  const totals = m.checklistTotals(results, ['a']);
+  check(totals.bought === 300, 'bought = line total of purchased id a');
+  check(totals.remaining === 550, 'remaining = 400 (b) + 150 (c)');
 }
 
 console.log(`check-move-in: OK (${assertions} assertions + deepEqual checks)`);

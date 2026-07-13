@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { FurnishingPlan, PlannerInput, Product, RoomPriority, RoomType, SavedPlanResponse } from '../types';
 import { generateMoveInPlan, adjustMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
-import { hydrateSession, serializeSession, clearForeignMarketRetained, retainedExceedsBudget, type RoomPlanResult } from '../utils/moveInPlan';
+import { hydrateSession, serializeSession, clearForeignMarketRetained, retainedExceedsBudget, apartmentStatus, checklist, checklistTotals, type RoomPlanResult } from '../utils/moveInPlan';
 import { useLocale } from '../LocaleContext';
-import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon, LockIcon } from './icons';
+import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon, LockIcon, ExternalLinkIcon } from './icons';
 import { openPlanPdf } from '../utils/planPdf';
 
 // Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
@@ -130,6 +130,12 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   const [adjusting, setAdjusting] = useState<string | null>(null);
   const [adjustNotice, setAdjustNotice] = useState<string | null>(null);
   const [reduceTarget, setReduceTarget] = useState<number>(0);
+  // Sprint 10.183 — shopping checklist: product ids the user has ticked as bought (shopping progress, NOT
+  // "already owned"). Persisted with the session so it survives a reload; market-scoped like the plan.
+  const [purchasedIds, setPurchasedIds] = useState<string[]>(() => hydrateSession(readMoveInDraft(), market).purchasedIds);
+  const togglePurchased = (productId: string) => setPurchasedIds((current) =>
+    current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId]);
+  const [showMissing, setShowMissing] = useState(false);
 
   // Sprint 10.116: apply a seed (from the multi-room nudge) — pre-select the detected rooms + typed budget.
   useEffect(() => {
@@ -146,10 +152,10 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   useEffect(() => {
     try {
       localStorage.setItem(MOVE_IN_DRAFT_KEY, serializeSession({
-        market, rooms: selectedRooms, budget: totalBudget, priorities, retainedRooms, results, purchasedIds: [],
+        market, rooms: selectedRooms, budget: totalBudget, priorities, retainedRooms, results, purchasedIds,
       }));
     } catch { /* ignore quota/private-mode */ }
-  }, [market, selectedRooms, totalBudget, priorities, retainedRooms, results]);
+  }, [market, selectedRooms, totalBudget, priorities, retainedRooms, results, purchasedIds]);
 
   function toggleRoom(room: RoomType) {
     setSelectedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));
@@ -227,8 +233,12 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
         const plan = updated ? pickBestPlan(updated.plans) : null;
         if (!plan) return room;
         // The backend response carries each room's kept-product ids back on the plan's items only, so keep the
-        // client-side lockedProductIds authoritative (they are what the next adjust/keep toggle reads).
-        return { ...room, plan, hasItems: plan.items.length > 0 };
+        // client-side lockedProductIds authoritative (they are what the next adjust/keep toggle reads). Refresh
+        // the honest missing-item buckets from the adjusted response.
+        return {
+          ...room, plan, hasItems: plan.items.length > 0,
+          missingEssential: updated?.missingEssential, niceToHave: updated?.niceToHave, unavailableInMarket: updated?.unavailableInMarket,
+        };
       }));
       if (response.changed === false || response.message) setAdjustNotice(response.message ?? 'no-change');
     } catch {
@@ -288,7 +298,10 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             plan,
             input: buildRoomInput(room.roomType, room.allocatedBudget),
             hasItems: plan.items.length > 0,
-            partial: room.partial
+            partial: room.partial,
+            missingEssential: room.missingEssential,
+            niceToHave: room.niceToHave,
+            unavailableInMarket: room.unavailableInMarket
           } as RoomPlanResult;
         })
         .filter((result): result is RoomPlanResult => result !== null);
@@ -392,6 +405,16 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   const total = results ? results.reduce((sum, result) => sum + result.plan.total, 0) : 0;
   const over = total - totalBudget;
   const storeRollup = results ? aggregateByStore(results) : [];
+  // Sprint 10.183: whole-apartment status + shopping checklist (all honest, derived from the real plan).
+  const status = apartmentStatus(results, totalBudget);
+  const checkGroups = checklist(results);
+  const checkTotals = checklistTotals(results, purchasedIds);
+  const hasMissing = status.missing.moveIn.length + status.missing.niceToHave.length + status.missing.notFound.length > 0;
+  const roomLabel = (room: RoomType) => t(MOVE_IN_ROOMS.find((entry) => entry.value === room)?.labelKey ?? '');
+  const categoryLabels = (categories: string[]) => categories.map((category) => {
+    const label = t(`cat.${category}`);
+    return label.startsWith('cat.') ? category : label;
+  }).join(', ');
   // Sprint 10.168: a clean whole-apartment shopping-list PDF — grouped by room, matching the single-room PDF.
   const printSections = (results ?? []).filter((result) => result.hasItems).map((result) => ({
     title: t(result.labelKey),
@@ -524,6 +547,43 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             <div className="move-in-fillbar move-in-fillbar-lg" aria-hidden="true">
               <span className={over > 0 ? 'over' : ''} style={{ width: `${Math.min(100, Math.round((total / Math.max(1, totalBudget)) * 100))}%` }} />
             </div>
+
+            {/* Sprint 10.183: honest apartment status — rooms, stores, remaining, and what still needs attention. */}
+            <div className="move-in-status-grid">
+              <span className="move-in-status-cell">{t('moveIn.statusRooms', { count: status.roomCount })}</span>
+              <span className="move-in-status-cell">{t('moveIn.storesCount', { count: status.retailerCount })}</span>
+              {over <= 0 && <span className="move-in-status-cell within">{t('moveIn.statusRemaining', { amount: formatCurrency(status.remaining) })}</span>}
+            </div>
+            {status.attentionRooms.length > 0 && (
+              <p className="move-in-status-line">
+                <span className="move-in-status-tag warn">{t('moveIn.stillToSolve')}</span> {status.attentionRooms.map(roomLabel).join(', ')}
+              </p>
+            )}
+            {status.coveredRooms.length > 0 && (
+              <p className="move-in-status-line">
+                <span className="move-in-status-tag ok">{t('moveIn.roomsCovered')}</span> {status.coveredRooms.map(roomLabel).join(', ')}
+              </p>
+            )}
+            {hasMissing && (
+              <div className="move-in-missing">
+                <button type="button" className="move-in-missing-toggle" aria-expanded={showMissing} onClick={() => setShowMissing((value) => !value)}>
+                  {t('moveIn.showMissing')}
+                </button>
+                {showMissing && (
+                  <ul className="move-in-missing-groups">
+                    {status.missing.moveIn.length > 0 && (
+                      <li><span className="move-in-missing-label">{t('moveIn.missingMoveIn')}</span><span>{categoryLabels(status.missing.moveIn)}</span></li>
+                    )}
+                    {status.missing.niceToHave.length > 0 && (
+                      <li><span className="move-in-missing-label">{t('moveIn.missingNiceToHave')}</span><span>{categoryLabels(status.missing.niceToHave)}</span></li>
+                    )}
+                    {status.missing.notFound.length > 0 && (
+                      <li><span className="move-in-missing-label nf">{t('moveIn.missingNotFound')}</span><span>{categoryLabels(status.missing.notFound)}</span></li>
+                    )}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sprint 10.138: take the list with you — copy as text (paste into Notes / a message) or print it. */}
@@ -705,18 +765,54 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             ))}
           </div>
 
-          {/* Sprint 10.138: "what to buy where" — every piece rolled up by store so a multi-room shop is plannable. */}
-          {storeRollup.length > 0 && (
-            <div className="move-in-by-store">
-              <span className="move-in-by-store-title">{t('moveIn.byStore')}</span>
-              <ul>
-                {storeRollup.map((store) => (
-                  <li key={store.retailer}>
-                    <span className="move-in-store-name">{store.retailer}</span>
-                    <span className="move-in-store-meta">{t('moveIn.itemsCount', { count: store.count })} · {formatCurrency(store.total)}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* Sprint 10.183: "Popis za kupnju" — an interactive shopping checklist grouped by retailer. Ticking a
+              box marks a piece as bought (shopping progress) without removing it from the plan. */}
+          {checkGroups.length > 0 && (
+            <div className="move-in-checklist">
+              <div className="move-in-checklist-head">
+                <span className="move-in-checklist-title">{t('moveIn.shoppingListHeading')}</span>
+                <span className="move-in-checklist-totals">
+                  <span className="bought">{t('moveIn.bought')}: {formatCurrency(checkTotals.bought)}</span>
+                  <span className="remaining">{t('moveIn.stillToBuy')}: {formatCurrency(checkTotals.remaining)}</span>
+                </span>
+              </div>
+              {checkGroups.map((group) => (
+                <div className="move-in-checklist-store" key={group.retailer}>
+                  <div className="move-in-checklist-store-head">
+                    <span className="move-in-checklist-store-name">{group.retailer}</span>
+                    <span className="move-in-checklist-store-meta">{t('moveIn.itemsCount', { count: group.count })} · {formatCurrency(group.total)}</span>
+                  </div>
+                  <ul className="move-in-checklist-items">
+                    {group.items.map((entry) => {
+                      const openUrl = storeUrl(entry.product);
+                      const bought = purchasedIds.includes(entry.productId);
+                      return (
+                        <li key={entry.productId} className={bought ? 'move-in-check-item bought' : 'move-in-check-item'}>
+                          <label className="move-in-check-label">
+                            <input type="checkbox" checked={bought} onChange={() => togglePurchased(entry.productId)} aria-label={entry.name} />
+                            <span className="move-in-check-name">{entry.name}</span>
+                          </label>
+                          <span className="move-in-check-room">{roomLabel(entry.roomType)}</span>
+                          <span className="move-in-check-price">{formatCurrency(entry.lineTotal)}</span>
+                          {openUrl ? (
+                            <a
+                              className="move-in-check-open"
+                              href={openUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t('results.openInStore')}
+                              aria-label={t('results.openInStore')}
+                              onClick={() => trackProductClick(entry.planId, entry.product)}
+                            >
+                              <ExternalLinkIcon />
+                            </a>
+                          ) : <span className="move-in-check-open-empty" aria-hidden="true" />}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
             </div>
           )}
 

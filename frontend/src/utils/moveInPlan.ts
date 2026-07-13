@@ -1,7 +1,7 @@
 // Sprint 10.183 (Move-In QoL): pure helpers for the whole-apartment ("Cijeli stan") planner — session
 // (de)serialization, retained/keep math, apartment status, and the shopping checklist. Kept free of React
 // so it can be unit-checked by a plain node script (scripts/check-move-in.mjs, transpiled via esbuild).
-import type { RoomType, RoomPriority, FurnishingPlan, PlannerInput } from '../types';
+import type { RoomType, RoomPriority, FurnishingPlan, PlannerInput, Product } from '../types';
 
 // One furnished room in the apartment result. Each room owns its picked plan tier + the PlannerInput used to
 // build it (so a per-room swap/adjust can reuse the single-room /replace + /adjust engine). Retained ("kept")
@@ -14,6 +14,10 @@ export interface RoomPlanResult {
   input: PlannerInput;
   hasItems: boolean;
   partial: boolean;
+  // Sprint 10.183: honest missing-item buckets from the backend (category keys). Undefined on old sessions.
+  missingEssential?: string[];
+  niceToHave?: string[];
+  unavailableInMarket?: string[];
 }
 
 // The persisted whole-apartment session (localStorage). Split by market-sensitivity:
@@ -143,4 +147,113 @@ export function clearForeignMarketRetained(
   });
   // Nothing foreign -> hand back the SAME array so callers can skip a state update.
   return { results: cleared === 0 ? results : next, cleared };
+}
+
+// --- Apartment status --------------------------------------------------------------------------------------
+
+export interface ApartmentStatus {
+  total: number;
+  remaining: number; // budget - total (negative when over)
+  over: number; // max(0, total - budget)
+  roomCount: number;
+  retailerCount: number;
+  coveredRooms: RoomType[];
+  attentionRooms: RoomType[];
+  missing: { moveIn: string[]; niceToHave: string[]; notFound: string[] };
+}
+
+// A compact, HONEST snapshot of the whole apartment — real totals + the missing-item buckets the backend
+// computed. No invented "readiness %"; the only ratio the UI shows is total ÷ budget.
+export function apartmentStatus(results: RoomPlanResult[] | null, budget: number): ApartmentStatus {
+  if (!results || !results.length) {
+    return { total: 0, remaining: budget, over: 0, roomCount: 0, retailerCount: 0, coveredRooms: [], attentionRooms: [], missing: { moveIn: [], niceToHave: [], notFound: [] } };
+  }
+  let total = 0;
+  const retailers = new Set<string>();
+  const covered: RoomType[] = [];
+  const attention: RoomType[] = [];
+  const moveIn = new Set<string>();
+  const nice = new Set<string>();
+  const notFound = new Set<string>();
+  for (const room of results) {
+    total += room.plan.total;
+    for (const item of room.plan.items) retailers.add(item.product.retailer);
+    if (room.hasItems && !room.partial) covered.push(room.roomType);
+    else attention.push(room.roomType);
+    (room.missingEssential ?? []).forEach((category) => moveIn.add(category));
+    (room.niceToHave ?? []).forEach((category) => nice.add(category));
+    (room.unavailableInMarket ?? []).forEach((category) => notFound.add(category));
+  }
+  return {
+    total,
+    remaining: budget - total,
+    over: Math.max(0, total - budget),
+    roomCount: results.length,
+    retailerCount: retailers.size,
+    coveredRooms: covered,
+    attentionRooms: attention,
+    missing: { moveIn: [...moveIn], niceToHave: [...nice], notFound: [...notFound] },
+  };
+}
+
+// --- Shopping checklist ------------------------------------------------------------------------------------
+
+export interface ChecklistItem {
+  productId: string;
+  name: string;
+  roomType: RoomType;
+  lineTotal: number;
+  planId: string;
+  product: Product;
+}
+
+export interface RetailerGroup {
+  retailer: string;
+  count: number;
+  total: number;
+  items: ChecklistItem[];
+}
+
+function qtyLabel(quantity: number, name: string): string {
+  return quantity > 1 ? `${quantity} × ${name}` : name;
+}
+
+// Every plan item across all rooms, grouped by retailer (richest store first) — the "Popis za kupnju".
+export function checklist(results: RoomPlanResult[] | null): RetailerGroup[] {
+  const byRetailer = new Map<string, RetailerGroup>();
+  for (const room of results ?? []) {
+    for (const item of room.plan.items) {
+      const quantity = item.quantity && item.quantity > 1 ? item.quantity : 1;
+      const group = byRetailer.get(item.product.retailer)
+        ?? { retailer: item.product.retailer, count: 0, total: 0, items: [] };
+      group.count += quantity;
+      group.total += item.product.price * quantity;
+      group.items.push({
+        productId: item.product.id,
+        name: qtyLabel(quantity, item.product.name),
+        roomType: room.roomType,
+        lineTotal: item.product.price * quantity,
+        planId: room.plan.id,
+        product: item.product,
+      });
+      byRetailer.set(item.product.retailer, group);
+    }
+  }
+  return [...byRetailer.values()].sort((a, b) => b.total - a.total);
+}
+
+// Bought vs still-to-buy euro totals, keyed by product id. "Bought" is shopping progress, NOT "already owned".
+export function checklistTotals(results: RoomPlanResult[] | null, purchasedIds: string[]): { bought: number; remaining: number } {
+  const purchased = new Set(purchasedIds);
+  let bought = 0;
+  let remaining = 0;
+  for (const room of results ?? []) {
+    for (const item of room.plan.items) {
+      const quantity = item.quantity && item.quantity > 1 ? item.quantity : 1;
+      const line = item.product.price * quantity;
+      if (purchased.has(item.product.id)) bought += line;
+      else remaining += line;
+    }
+  }
+  return { bought, remaining };
 }

@@ -347,7 +347,8 @@ public class PlannerService {
             PlanGenerationResponse resp = responses[i];
             FurnishingPlanDto best = resp.plans().isEmpty() ? null : resp.plans().get(0);
             grandTotal = grandTotal.add(best == null ? BigDecimal.ZERO : best.total());
-            roomDtos.add(new MoveInRoomDto(rooms.get(i), alloc[i], resp.plans(), resp.partialPlan()));
+            roomDtos.add(moveInRoomDto(rooms.get(i), alloc[i], resp.plans(), resp.partialPlan(),
+                    moveInRoomInput(base, rooms.get(i), alloc[i])));
         }
         return new MoveInResponse(roomDtos, grandTotal, total, apartmentPartial, BigDecimal.valueOf(Math.round(shortfall)));
     }
@@ -421,8 +422,8 @@ public class PlannerService {
         for (int i = 0; i < n; i++) {
             FurnishingPlanDto plan = plans[i];
             grand = grand.add(plan == null || plan.total() == null ? BigDecimal.ZERO : plan.total());
-            roomDtos.add(new MoveInRoomDto(roomTypes[i], inputs[i].budget(),
-                    plan == null ? List.of() : List.of(plan), plan != null && plan.items().isEmpty()));
+            roomDtos.add(moveInRoomDto(roomTypes[i], inputs[i].budget(),
+                    plan == null ? List.of() : List.of(plan), plan != null && plan.items().isEmpty(), inputs[i]));
         }
         return new MoveInResponse(roomDtos, grand, total, false, BigDecimal.ZERO, changed, message);
     }
@@ -537,6 +538,42 @@ public class PlannerService {
                 base.preferredRetailers(), base.excludedRetailers(), base.maxStores(),
                 base.colorPreferences(), base.materialPreferences(), base.market()
         ).normalized();
+    }
+
+    // Sprint 10.183 (Move-In QoL — apartment status): build a MoveInRoomDto with the three honest missing-item
+    // buckets, all derived from real catalog capacity (never invented, never a per-market hardcode):
+    //  - unavailableInMarket = REQUIRED categories the market genuinely can't supply (= missingImportantCategories);
+    //  - missingEssential = REQUIRED categories not in the plan but that the market DOES stock (add budget/store);
+    //  - niceToHave = OPTIONAL desired categories absent from the plan but available in the market.
+    private MoveInRoomDto moveInRoomDto(String roomType, int budget, List<FurnishingPlanDto> plans, boolean partial,
+                                        PlannerInputDto roomInput) {
+        FurnishingPlanDto best = plans.isEmpty() ? null : plans.get(0);
+        if (best == null) return new MoveInRoomDto(roomType, budget, plans, partial, List.of(), List.of(), List.of());
+
+        Set<String> present = best.items().stream()
+                .map(item -> item.product().category() == null ? "" : item.product().category().toLowerCase(Locale.ROOT))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<String> usable = marketCatalog(roomInput).stream()
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> matchesRoom(product, roomInput.roomType()))
+                .map(product -> product.getCategory() == null ? "" : product.getCategory().toLowerCase(Locale.ROOT))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<String> alreadyHave = new LinkedHashSet<>(roomInput.alreadyHaveCategories());
+        Set<String> required = PlannerReadiness.requiredCategories(roomInput.roomType()).stream()
+                .filter(category -> !alreadyHave.contains(category))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        List<String> unavailableInMarket = required.stream().filter(category -> !usable.contains(category)).toList();
+        List<String> missingEssential = required.stream()
+                .filter(category -> !present.contains(category))
+                .filter(usable::contains)
+                .toList();
+        List<String> niceToHave = desiredCategories(roomInput).stream()
+                .filter(category -> !required.contains(category))
+                .filter(category -> !present.contains(category))
+                .filter(usable::contains)
+                .toList();
+        return new MoveInRoomDto(roomType, budget, plans, partial, missingEssential, niceToHave, unavailableInMarket);
     }
 
     private double valueTierTotal(PlanGenerationResponse resp) {

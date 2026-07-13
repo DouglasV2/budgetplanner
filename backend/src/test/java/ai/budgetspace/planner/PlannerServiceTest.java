@@ -765,6 +765,20 @@ class PlannerServiceTest {
         assertThat(resp.grandTotal().intValue()).as("never over budget").isLessThanOrEqualTo(3000);
     }
 
+    @Test
+    void moveInRoomSurfacesAMarketUnavailableRequiredCategory() {
+        // Living room needs a sofa, but the catalog has none -> honest "Nije pronađeno za tvoje tržište" bucket.
+        Product tv = product("tv-1", "TV", "IKEA", "tv-unit", 200, 4.3);
+        Product table = product("table-1", "Stolić", "IKEA", "table", 90, 4.2);
+        PlannerService service = serviceWithProducts(List.of(tv, table));
+
+        MoveInResponse resp = service.generateMoveIn(new MoveInRequestDto(baseHR(), List.of("living-room"), 3000));
+
+        assertThat(resp.rooms().get(0).unavailableInMarket())
+                .as("sofa is required for a living room but the market stocks none")
+                .contains("sofa");
+    }
+
     private PlannerInputDto baseHR() {
         return new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi",
                 List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina"),

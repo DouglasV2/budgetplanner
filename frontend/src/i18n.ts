@@ -316,6 +316,20 @@ const DICTIONARY: Record<string, Entry> = {
     hr: 'Nismo našli bolju kombinaciju bez diranja onoga što si zadržao.',
     en: 'We couldn\'t find a better combination without touching what you kept.'
   },
+  // Sprint 10.183: apartment status overview.
+  'moveIn.statusRooms': { hr: 'Sobe: {count}', en: 'Rooms: {count}' },
+  'moveIn.storesCount': { hr: 'Trgovine: {count}', en: 'Stores: {count}' },
+  'moveIn.statusRemaining': { hr: 'Ostaje u budžetu: {amount}', en: 'Remaining: {amount}' },
+  'moveIn.stillToSolve': { hr: 'Još treba riješiti', en: 'Still to sort out' },
+  'moveIn.roomsCovered': { hr: 'Ove sobe su pokrivene', en: 'These rooms are covered' },
+  'moveIn.showMissing': { hr: 'Pokaži što još nedostaje', en: 'Show what\'s still missing' },
+  'moveIn.missingMoveIn': { hr: 'Treba za useljenje', en: 'Needed to move in' },
+  'moveIn.missingNiceToHave': { hr: 'Dobro je dodati', en: 'Nice to add' },
+  'moveIn.missingNotFound': { hr: 'Nije pronađeno za tvoje tržište', en: 'Not available for your market' },
+  // Sprint 10.183: shopping checklist.
+  'moveIn.shoppingListHeading': { hr: 'Popis za kupnju', en: 'Shopping list' },
+  'moveIn.bought': { hr: 'Kupljeno', en: 'Bought' },
+  'moveIn.stillToBuy': { hr: 'Još za kupiti', en: 'Still to buy' },
   'moveIn.generate': { hr: 'Složi plan za stan', en: 'Build the apartment plan' },
   'moveIn.generating': { hr: 'Slažem plan za stan…', en: 'Building the apartment plan…' },
   'moveIn.needRooms': { hr: 'Odaberi barem jednu sobu.', en: 'Pick at least one room.' },
