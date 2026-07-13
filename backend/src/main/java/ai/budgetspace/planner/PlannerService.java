@@ -1555,9 +1555,9 @@ public class PlannerService {
             String first = categoryLabel(input.mustHaveCategories().get(0));
             summary.add(capitalize(first) + " je ostao prioritet jer si ga posebno tražio.");
         }
-        if (storeCount > 1 && storeTrip.mainRetailer() != null) {
-            summary.add("Većinu kupuješ u " + storeTrip.mainRetailer() + ".");
-        }
+        // Sprint 10.182: dropped the "Većinu kupuješ u <store>" line — the Trgovine (stores) breakdown below the
+        // plan already shows where most of the buying happens, so this was redundant. (storeCount kept for the
+        // "Sve staje u budžet, a kupuješ u N trgovina" line above.)
         return summary.stream().limit(4).toList();
     }
 
@@ -1584,9 +1584,11 @@ public class PlannerService {
                 .findFirst()
                 .ifPresent(tips::add);
 
-        tips.add(total > budget
-                ? "Kreni s najvažnijim stvarima, a ostalo dodaj kad ostane budžeta."
-                : "Možeš sve uzeti odmah, ali kreni od najvažnijih stvari.");
+        // Sprint 10.182: only the actionable OVER-budget nudge remains. The under-budget "Možeš sve uzeti odmah…"
+        // line said nothing useful (the plan already fits), so it was dropped.
+        if (total > budget) {
+            tips.add("Kreni s najvažnijim stvarima, a ostalo dodaj kad ostane budžeta.");
+        }
         return tips.stream().distinct().limit(3).toList();
     }
 

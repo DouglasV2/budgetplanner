@@ -163,7 +163,7 @@
   "form.describeHeading": "Mitä haluat sisustaa?",
   "form.describeIntro": "Kirjoita luonnollisesti, kuin viestittäisit kaverille. Sinun ei tarvitse osata mitään teknisiä termejä.",
   "form.easiestChip": "Helpoin",
-  "form.promptLabel": "Kirjoita omin sanoin — huone, budjetti ja mitä tarvitset — ja klikkaa sitten ”Tee suunnitelmani”.",
+  "form.promptLabel": "Kerro vain mitä haluat sisustaa ja budjettisi, ja napsauta sitten Luo suunnitelma.",
   "form.promptAriaLabel": "Tilan ja toiveiden kuvaus",
   "form.promptPlaceholder": "Esim. olohuone, noin 1500 €, tarvitsen sohvan, maton ja lampun.",
   "form.promptRequired": "Kuvaile ensin mitä haluat sisustaa.",
