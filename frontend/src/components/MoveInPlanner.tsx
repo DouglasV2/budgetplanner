@@ -298,10 +298,16 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
 
   return (
     <div className="move-in">
-      <div className="form-step move-in-form">
-        <h3>{t('moveIn.heading')}</h3>
-        <p>{t('moveIn.intro')}</p>
+      <div className="form-step move-in-form move-in-form-split">
+        {/* Heading + intro sit as a right-hand aside on wide screens so the budget
+            + room controls rise to the top instead of a full-width heading row
+            eating vertical space; on narrow screens it stacks (heading first). */}
+        <div className="move-in-form-aside">
+          <h3>{t('moveIn.heading')}</h3>
+          <p>{t('moveIn.intro')}</p>
+        </div>
 
+        <div className="move-in-form-main">
         <div className="control-block budget-block">
           <span className="friendly-label">{t('moveIn.totalBudgetLabel')}</span>
           {/* value={totalBudget || ''} shows empty (not a stuck "0") when cleared — a plain value={number}
@@ -347,6 +353,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
         </button>
         {error && <p className="planner-notice" role="alert">{error}</p>}
         {!results && !error && <p className="move-in-empty-hint">{t('moveIn.emptyHint')}</p>}
+        </div>
       </div>
 
       {results && (

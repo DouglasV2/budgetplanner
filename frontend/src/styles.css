@@ -5433,6 +5433,43 @@ a.google-signin-button.google-signin-link:hover {
   margin: 12px 0 0;
 }
 
+/* The apartment form as two columns on wide screens: the budget + room controls
+   fill the main (left) column and rise to the top, while the heading + intro sit
+   as a slim right-hand aside instead of eating a full-width heading row. Narrow
+   screens keep the original stacked order (heading first, then controls). */
+.move-in-form-main {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  min-width: 0;
+}
+.move-in-form-aside {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.move-in-form-aside h3,
+.move-in-form-aside p {
+  margin: 0;
+}
+
+@media (min-width: 820px) {
+  .move-in-form-split {
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
+    gap: 20px 34px;
+  }
+  .move-in-form-split .move-in-form-main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .move-in-form-split .move-in-form-aside {
+    grid-column: 2;
+    grid-row: 1;
+    padding-left: 24px;
+    border-left: 1px solid var(--line);
+  }
+}
+
 .move-in-results {
   margin-top: 22px;
 }
