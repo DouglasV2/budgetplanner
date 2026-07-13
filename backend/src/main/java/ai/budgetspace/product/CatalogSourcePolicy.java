@@ -80,6 +80,25 @@ public final class CatalogSourcePolicy {
         // Offer price (GBP) + og:image (category listings SSR the product links too) → directly sourceable. GB toilets
         // + baths/showers, the fixtures IKEA doesn't sell (GB is IKEA-only, so this is its only WC/bath source).
         map.put("Victorian Plumbing", SourcingStatus.MANUAL_VERIFIED_ONLY);
+        // Sprint 10.181: per-market sanitary-ware specialists for bathroom fixtures (toilets/bathtubs/showers). Each
+        // was discovered + web-verified to SSR a static price (JSON-LD / itemprop / Shopify .json) + og:image on its
+        // product pages; MANUAL_VERIFIED_ONLY so the web-verified rows are planner-eligible (like Pevex/VVS). Blocked
+        // alternatives documented in the sprint notes (Reuter/Hornbach DE = 403/WAF, Leroy Merlin FR/ES = anti-bot).
+        map.put("Calmwaters", SourcingStatus.MANUAL_VERIFIED_ONLY);            // DE
+        map.put("Batinea", SourcingStatus.MANUAL_VERIFIED_ONLY);              // FR
+        map.put("Cuarto de Baño", SourcingStatus.MANUAL_VERIFIED_ONLY);       // ES
+        map.put("Bagnolandia", SourcingStatus.MANUAL_VERIFIED_ONLY);          // IT
+        map.put("BERNSTEIN Badshop", SourcingStatus.MANUAL_VERIFIED_ONLY);    // AT
+        // Saniweb (NL): product pages SSR clean JSON-LD, but its category listings + sitemap bot-gate the harvester
+        // (HTTP 403) so only a thin, hand-verified NL set could be sourced; treat as manual-verified, feed-required
+        // for full NL coverage.
+        map.put("Saniweb", SourcingStatus.MANUAL_VERIFIED_ONLY);             // NL (partial)
+        map.put("Kopalnica Online", SourcingStatus.MANUAL_VERIFIED_ONLY);     // SI
+        map.put("Kúpelne-online", SourcingStatus.MANUAL_VERIFIED_ONLY);       // SK
+        map.put("Bernstein Sanitários", SourcingStatus.MANUAL_VERIFIED_ONLY); // PT
+        map.put("Kärkkäinen", SourcingStatus.MANUAL_VERIFIED_ONLY);           // FI
+        map.put("Bygghjemme", SourcingStatus.MANUAL_VERIFIED_ONLY);           // NO
+        map.put("Bygghemma", SourcingStatus.MANUAL_VERIFIED_ONLY);            // SE
         map.put("Lesnina", SourcingStatus.OFFICIAL_FEED_REQUIRED);
         // Sprint 10.16: reachable + hand-verified (link-out; have products in the catalog).
         map.put("Harvey Norman", SourcingStatus.MANUAL_VERIFIED_ONLY);

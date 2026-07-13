@@ -385,7 +385,18 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // vs the whole catalog; rule-cleaned (doormats/outdoor/micro-accessory price floors) then a 15-agent
             // multilingual judge pass pruned cover-only/insert-only cushions + candle-holders + tiny plants across all
             // 15 languages. Deterministic curl, agent-free prices, no fabrication. Rugs/lamps/mirrors tagged multi-room.
-            "/catalog/real-ikea-catalog-wakeup-10-180.json"
+            "/catalog/real-ikea-catalog-wakeup-10-180.json",
+            // Sprint 10.181 (Phase 2 — bathroom fixtures for the EU markets): real toilets / bathtubs / showers from a
+            // local sanitary-ware specialist per market (Calmwaters DE, Batinea FR, Cuarto de Baño ES, Bagnolandia IT,
+            // BERNSTEIN Badshop AT, Saniweb NL, Kopalnica Online SI, Kúpelne-online SK, Bernstein Sanitários PT,
+            // Kärkkäinen FI, Bygghjemme NO, Bygghemma SE) — the fixtures IKEA/JYSK don't sell, previously present only
+            // in HR/DK/GB. Each retailer was discovered + verified to SSR a static price (JSON-LD / itemprop / Shopify
+            // .json) + og:image, then EVERY product page was re-read live (price INDEPENDENTLY re-parsed — agent prices
+            // discarded), currency-matched to the market, accessory-guarded (flush plates/seats/mixers/frames dropped)
+            // and micro-price-floored. 7 markets meet the full 6 toilet / 4 bathtub / 4 shower target; FR/ES/AT/FI are
+            // partial (accessory-heavy or small toilet catalogs) and NL is thin (Saniweb bot-gates listings) — the
+            // shortfalls + blocked alternatives (Reuter/Hornbach/Leroy Merlin = 403/WAF) are documented in the sprint.
+            "/catalog/real-eu-bathroom-fixtures-10-181.json"
     );
 
     /**

@@ -47,6 +47,20 @@ public final class ProductTaxonomy {
             // pages SSR og:title + JSON-LD Offer price (GBP) + og:image, so its toilets/baths/showers are web-verifiable.
             "Victorian Plumbing",
             "Pevex",
+            // Sprint 10.181: local sanitary-ware / bathroom specialists per market (toilets, bathtubs, showers —
+            // fixtures IKEA/JYSK don't sell). Each has SSR product pages with a static price + og:image, web-verified.
+            "Calmwaters",            // DE
+            "Batinea",               // FR
+            "Cuarto de Baño",        // ES
+            "Bagnolandia",           // IT
+            "BERNSTEIN Badshop",     // AT
+            "Saniweb",               // NL
+            "Kopalnica Online",      // SI
+            "Kúpelne-online",        // SK
+            "Bernstein Sanitários",  // PT
+            "Kärkkäinen",            // FI
+            "Bygghjemme",            // NO
+            "Bygghemma",             // SE
             "Emmezeta",
             "Decathlon",
             "Lesnina",

@@ -1867,6 +1867,12 @@ public class PlannerService {
      *  a genuine combined shower-bath (ambiguous) is not over-constrained. */
     private Facet anchorFacet(String category, String name) {
         if (!ProductTaxonomy.isFixtureCategory(category)) return null;
+        // An explicit stored category is authoritative — a product filed under "shower"/"bathtub" keeps that subtype
+        // even if its marketing name also mentions the other fixture (a combined shower-bath). Only the legacy
+        // "bath-shower" umbrella is disambiguated from the name.
+        String cat = category.trim().toLowerCase(Locale.ROOT);
+        if ("bathtub".equals(cat)) return Facet.BATHTUB;
+        if ("shower".equals(cat)) return Facet.SHOWER;
         boolean bath = ProductTaxonomy.isBathtubFixture(category, name);
         boolean shower = ProductTaxonomy.isShowerFixture(category, name);
         if (bath && !shower) return Facet.BATHTUB;
