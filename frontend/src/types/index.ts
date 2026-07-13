@@ -75,6 +75,10 @@ export type FurnishingLevel = 'basic' | 'comfort' | 'complete';
 
 export type ShoppingPriority = 'buy-first' | 'add-comfort' | 'later';
 
+// Sprint 10.183 (Move-In QoL): how soon the user needs a room done. Drives the whole-apartment budget split
+// (see backend MoveInRequestDto.roomPriority) — not a decorative label. 'soon' is the neutral default.
+export type RoomPriority = 'now' | 'soon' | 'later';
+
 export type ReplacementChoice = 'cheaper' | 'nicer' | 'different' | 'remove' | 'similar';
 
 export type AvailabilityStatus = 'in-stock' | 'limited' | 'unavailable' | 'check-store' | 'unknown';
@@ -295,6 +299,11 @@ export interface MoveInRoomPlan {
   allocatedBudget: number;
   plans: FurnishingPlan[];
   partial: boolean;
+  // Sprint 10.183: optional honesty buckets for the apartment status overview (category keys; may be absent
+  // on plans generated before this field existed — treat undefined as empty).
+  missingEssential?: string[];
+  niceToHave?: string[];
+  unavailableInMarket?: string[];
 }
 
 export interface MoveInApiResponse {
