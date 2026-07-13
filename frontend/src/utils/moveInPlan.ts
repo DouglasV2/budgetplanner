@@ -4,7 +4,8 @@
 import type { RoomType, RoomPriority, FurnishingPlan, PlannerInput } from '../types';
 
 // One furnished room in the apartment result. Each room owns its picked plan tier + the PlannerInput used to
-// build it (so a per-room swap/adjust can reuse the single-room /replace + /adjust engine).
+// build it (so a per-room swap/adjust can reuse the single-room /replace + /adjust engine). Retained ("kept")
+// products live in input.lockedProductIds — the existing backend-honoured seam.
 export interface RoomPlanResult {
   roomType: RoomType;
   labelKey: string;
@@ -17,8 +18,9 @@ export interface RoomPlanResult {
 
 // The persisted whole-apartment session (localStorage). Split by market-sensitivity:
 //  - market-agnostic (rooms/budget/priorities/retainedRooms) always restores;
-//  - market-specific (results/purchasedIds/lockedByRoom, all tied to market products) is dropped when the
-//    active market differs, so a HR plan never leaks foreign-market products/prices into a DE session.
+//  - market-specific (results/purchasedIds, tied to a market's products) is dropped when the active market
+//    differs, so a HR plan never leaks foreign-market products/prices into a DE session. Retained PRODUCTS ride
+//    inside results[].input.lockedProductIds, so persisting results carries them too.
 export interface MoveInSession {
   market: string;
   rooms: RoomType[];
@@ -27,7 +29,6 @@ export interface MoveInSession {
   retainedRooms: RoomType[];
   results: RoomPlanResult[] | null;
   purchasedIds: string[];
-  lockedByRoom: Partial<Record<RoomType, string[]>>;
 }
 
 export const MOVE_IN_DEFAULT_ROOMS: RoomType[] = ['living-room', 'bedroom'];
@@ -42,6 +43,10 @@ function asStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
 }
 
+function qtyOf(item: { quantity?: number }): number {
+  return item.quantity && item.quantity > 1 ? item.quantity : 1;
+}
+
 export function emptySession(market: string): MoveInSession {
   return {
     market,
@@ -51,7 +56,6 @@ export function emptySession(market: string): MoveInSession {
     retainedRooms: [],
     results: null,
     purchasedIds: [],
-    lockedByRoom: {},
   };
 }
 
@@ -62,16 +66,6 @@ function readPriorities(value: unknown): Partial<Record<RoomType, RoomPriority>>
     if (typeof level === 'string' && (PRIORITY_VALUES as readonly string[]).includes(level)) {
       out[room as RoomType] = level as RoomPriority;
     }
-  }
-  return out;
-}
-
-function readLockedByRoom(value: unknown): Partial<Record<RoomType, string[]>> {
-  const out: Partial<Record<RoomType, string[]>> = {};
-  if (!isObject(value)) return out;
-  for (const [room, ids] of Object.entries(value)) {
-    const list = asStringArray(ids);
-    if (list.length) out[room as RoomType] = list;
   }
   return out;
 }
@@ -93,11 +87,60 @@ export function hydrateSession(raw: unknown, market: string): MoveInSession {
   if (sameMarket) {
     base.results = Array.isArray(raw.results) ? (raw.results as RoomPlanResult[]) : null;
     base.purchasedIds = asStringArray(raw.purchasedIds);
-    base.lockedByRoom = readLockedByRoom(raw.lockedByRoom);
   }
   return base;
 }
 
 export function serializeSession(session: MoveInSession): string {
   return JSON.stringify(session);
+}
+
+// --- Retained ("keep") math -------------------------------------------------------------------------------
+
+// The euro cost of everything the user asked to keep: a kept ROOM counts in full; in other rooms only the kept
+// (locked) PRODUCTS count. Used to guard a newly-entered budget against the retained items.
+export function retainedTotal(results: RoomPlanResult[] | null, retainedRooms: RoomType[]): number {
+  if (!results) return 0;
+  const keptRooms = new Set(retainedRooms);
+  let sum = 0;
+  for (const room of results) {
+    if (keptRooms.has(room.roomType)) {
+      sum += room.plan.total;
+      continue;
+    }
+    const locked = new Set(room.input.lockedProductIds);
+    for (const item of room.plan.items) {
+      if (locked.has(item.product.id)) sum += item.product.price * qtyOf(item);
+    }
+  }
+  return sum;
+}
+
+export function retainedExceedsBudget(results: RoomPlanResult[] | null, retainedRooms: RoomType[], budget: number): boolean {
+  return retainedTotal(results, retainedRooms) > budget;
+}
+
+// On a market switch the kept PRODUCTS point at the old market's SKUs. Strip any locked id whose product is
+// tagged with a different market, so we never carry a foreign-market product into the new market. Returns the
+// cleaned results (a shallow copy of touched rooms) + how many locks were dropped.
+export function clearForeignMarketRetained(
+  results: RoomPlanResult[] | null,
+  market: string,
+): { results: RoomPlanResult[] | null; cleared: number } {
+  if (!results) return { results, cleared: 0 };
+  let cleared = 0;
+  const next = results.map((room) => {
+    const productById = new Map(room.plan.items.map((item) => [item.product.id, item.product] as const));
+    const kept = room.input.lockedProductIds.filter((id) => {
+      const product = productById.get(id);
+      const foreign = !!product && !!product.market && product.market !== market;
+      if (foreign) cleared += 1;
+      return !foreign;
+    });
+    return kept.length === room.input.lockedProductIds.length
+      ? room
+      : { ...room, input: { ...room.input, lockedProductIds: kept } };
+  });
+  // Nothing foreign -> hand back the SAME array so callers can skip a state update.
+  return { results: cleared === 0 ? results : next, cleared };
 }

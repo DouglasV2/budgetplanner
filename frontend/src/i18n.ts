@@ -264,6 +264,28 @@ const DICTIONARY: Record<string, Entry> = {
   'moveIn.priorityNow': { hr: 'Treba odmah', en: 'Need it now' },
   'moveIn.prioritySoon': { hr: 'Želim uskoro', en: 'Want it soon' },
   'moveIn.priorityLater': { hr: 'Nije hitno', en: 'Not urgent' },
+  // Sprint 10.183: keep a room / product (retained state protected from whole-plan adjustments).
+  'moveIn.keepRoom': { hr: 'Zadrži ovu sobu', en: 'Keep this room' },
+  'moveIn.keepRoomHint': {
+    hr: 'Ostatak stana možeš mijenjati bez promjena u ovoj sobi.',
+    en: 'You can change the rest of the apartment without touching this room.'
+  },
+  'moveIn.unlockRoom': { hr: 'Opet mijenjaj ovu sobu', en: 'Edit this room again' },
+  'moveIn.keepProduct': { hr: 'Zadrži ovaj proizvod', en: 'Keep this product' },
+  'moveIn.keepProductHint': {
+    hr: 'Nećemo ga zamijeniti kad prilagođavaš ostatak plana.',
+    en: 'We won\'t swap it when you adjust the rest of the plan.'
+  },
+  'moveIn.unlockProduct': { hr: 'Opet mijenjaj proizvod', en: 'Edit this product again' },
+  'moveIn.keptSwapOff': { hr: 'Zadržano — otključaj da zamijeniš.', en: 'Kept — unlock to swap.' },
+  'moveIn.retainedExceedsBudget': {
+    hr: 'Stavke koje želiš zadržati već prelaze novi budžet. Ukloni neku od njih ili povećaj budžet.',
+    en: 'The items you want to keep already exceed the new budget. Remove one or raise the budget.'
+  },
+  'moveIn.retainedMarketCleared': {
+    hr: 'Promijenio si državu pa smo maknuli zadržane proizvode iz prethodnog tržišta.',
+    en: 'You changed country, so we cleared kept products from the previous market.'
+  },
   'moveIn.generate': { hr: 'Složi plan za stan', en: 'Build the apartment plan' },
   'moveIn.generating': { hr: 'Slažem plan za stan…', en: 'Building the apartment plan…' },
   'moveIn.needRooms': { hr: 'Odaberi barem jednu sobu.', en: 'Pick at least one room.' },

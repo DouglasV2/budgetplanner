@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FurnishingPlan, PlannerInput, Product, RoomPriority, RoomType, SavedPlanResponse } from '../types';
 import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
-import { hydrateSession, serializeSession, type RoomPlanResult } from '../utils/moveInPlan';
+import { hydrateSession, serializeSession, clearForeignMarketRetained, retainedExceedsBudget, type RoomPlanResult } from '../utils/moveInPlan';
 import { useLocale } from '../LocaleContext';
-import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon } from './icons';
+import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon, LockIcon } from './icons';
 import { openPlanPdf } from '../utils/planPdf';
 
 // Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
@@ -108,7 +108,10 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   const [priorities, setPriorities] = useState<Partial<Record<RoomType, RoomPriority>>>(
     () => hydrateSession(readMoveInDraft(), market).priorities);
   const [swapping, setSwapping] = useState<string | null>(null);
-  const [results, setResults] = useState<RoomPlanResult[] | null>(null);
+  // Sprint 10.183: restore the last generated plan + the kept-room set from the session so a reload keeps the
+  // whole apartment (kept PRODUCTS ride inside each room's input.lockedProductIds, restored with results).
+  const [results, setResults] = useState<RoomPlanResult[] | null>(() => hydrateSession(readMoveInDraft(), market).results);
+  const [retainedRooms, setRetainedRooms] = useState<RoomType[]>(() => hydrateSession(readMoveInDraft(), market).retainedRooms);
   const [apartmentPartial, setApartmentPartial] = useState(false);
   const [shortfall, setShortfall] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -124,15 +127,16 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   }, [seed]);
 
   // Sprint 10.183: persist the whole-apartment session so the next visit starts where the user left off — room
-  // ids, numbers and priority levels only, no PII. (retained/purchased/results join this in later increments.)
+  // ids, numbers, priority levels, the kept-room set and the generated plan (which carries the kept-product ids
+  // inside each room's input.lockedProductIds). No PII. Market-specific parts are dropped on load when the
+  // market differs (hydrateSession). purchasedIds join this in the checklist increment.
   useEffect(() => {
     try {
       localStorage.setItem(MOVE_IN_DRAFT_KEY, serializeSession({
-        market, rooms: selectedRooms, budget: totalBudget, priorities,
-        retainedRooms: [], results: null, purchasedIds: [], lockedByRoom: {},
+        market, rooms: selectedRooms, budget: totalBudget, priorities, retainedRooms, results, purchasedIds: [],
       }));
     } catch { /* ignore quota/private-mode */ }
-  }, [market, selectedRooms, totalBudget, priorities]);
+  }, [market, selectedRooms, totalBudget, priorities, retainedRooms, results]);
 
   function toggleRoom(room: RoomType) {
     setSelectedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));
@@ -143,6 +147,45 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   function setPriority(room: RoomType, level: RoomPriority) {
     setPriorities((current) => ({ ...current, [room]: level }));
   }
+
+  // Sprint 10.183 — keep a room: a preference that shields the room from whole-plan adjustments (Feature 3).
+  const isRoomRetained = (room: RoomType) => retainedRooms.includes(room);
+  function toggleRetainedRoom(room: RoomType) {
+    setRetainedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));
+  }
+
+  // Sprint 10.183 — keep a product: reuse the backend-honoured lockedProductIds seam, per room. A kept product
+  // is pinned (won't be swapped by adjustments) but can still be explicitly removed or un-kept by the user.
+  function isProductKept(roomType: RoomType, productId: string): boolean {
+    const room = results?.find((result) => result.roomType === roomType);
+    return !!room?.input.lockedProductIds.includes(productId);
+  }
+  function toggleKeepProduct(roomType: RoomType, productId: string) {
+    setResults((prev) => prev && prev.map((room) => {
+      if (room.roomType !== roomType) return room;
+      const locked = room.input.lockedProductIds.includes(productId)
+        ? room.input.lockedProductIds.filter((id) => id !== productId)
+        : [...room.input.lockedProductIds, productId];
+      return { ...room, input: { ...room.input, lockedProductIds: locked } };
+    }));
+  }
+
+  // Sprint 10.183: on an ACTUAL market change, strip kept PRODUCTS that belong to the old market (never carry a
+  // foreign-market SKU into the new market) and say so. Kept ROOMS are a market-agnostic preference and survive.
+  const marketRef = useRef(market);
+  useEffect(() => {
+    if (marketRef.current === market) return;
+    marketRef.current = market;
+    setResults((prev) => {
+      const { results: cleaned, cleared } = clearForeignMarketRetained(prev, market);
+      if (cleared > 0) onNotice(t('moveIn.retainedMarketCleared'));
+      return cleaned;
+    });
+  }, [market, onNotice, t]);
+
+  // Sprint 10.183: honest guard — if the items the user chose to keep already cost more than the budget, say so
+  // (near the budget field) instead of silently dropping them or letting the plan run over.
+  const keepExceedsBudget = retainedExceedsBudget(results, retainedRooms, totalBudget);
 
   function buildRoomInput(roomType: RoomType, budget: number): PlannerInput {
     const roomName = t(MOVE_IN_ROOMS.find((room) => room.value === roomType)?.labelKey ?? '');
@@ -341,6 +384,9 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             />
             <span>€</span>
           </label>
+          {keepExceedsBudget && (
+            <p className="move-in-keep-warning" role="status">{t('moveIn.retainedExceedsBudget')}</p>
+          )}
         </div>
 
         <div className="control-block">
@@ -451,15 +497,29 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
 
           <div className="move-in-room-cards">
             {results.map((result) => (
-              <article className="move-in-room-card" key={result.roomType}>
+              <article className={isRoomRetained(result.roomType) ? 'move-in-room-card retained' : 'move-in-room-card'} key={result.roomType}>
                 <div className="move-in-room-head">
                   <span className="move-in-room-title">
                     <span className="move-in-room-roomicon" aria-hidden="true"><RoomIcon room={result.roomType} size={17} /></span>
                     <strong>{t(result.labelKey)}</strong>
                   </span>
-                  {result.hasItems && (
-                    <span className="move-in-room-count">{t('moveIn.itemsCount', { count: result.plan.items.length })}</span>
-                  )}
+                  <span className="move-in-room-headmeta">
+                    {result.hasItems && (
+                      <span className="move-in-room-count">{t('moveIn.itemsCount', { count: result.plan.items.length })}</span>
+                    )}
+                    {result.hasItems && (
+                      <button
+                        type="button"
+                        className={isRoomRetained(result.roomType) ? 'move-in-keep-room kept' : 'move-in-keep-room'}
+                        aria-pressed={isRoomRetained(result.roomType)}
+                        title={t('moveIn.keepRoomHint')}
+                        onClick={() => toggleRetainedRoom(result.roomType)}
+                      >
+                        <LockIcon size={13} />
+                        {isRoomRetained(result.roomType) ? t('moveIn.unlockRoom') : t('moveIn.keepRoom')}
+                      </button>
+                    )}
+                  </span>
                 </div>
                 {result.hasItems ? (
                   <>
@@ -487,6 +547,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                         const lineTotal = item.product.price * qty;
                         const openUrl = storeUrl(item.product);
                         const photo = productPhoto(item.product);
+                        const kept = isProductKept(result.roomType, item.product.id);
                         const thumb = (
                           <span className="move-in-thumb" aria-hidden="true">
                             {photo
@@ -495,7 +556,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                           </span>
                         );
                         return (
-                          <li key={item.product.id} className="move-in-item">
+                          <li key={item.product.id} className={kept ? 'move-in-item kept' : 'move-in-item'}>
                             {openUrl ? (
                               <a
                                 className="move-in-item-row move-in-item-link"
@@ -516,14 +577,24 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                                 <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
                               </div>
                             )}
-                            {/* Sprint 10.138: swap for a similar piece / drop it — not buttons inside the <a> (invalid). */}
+                            {/* Sprint 10.138: swap / drop; 10.183: keep — not buttons inside the <a> (invalid). */}
                             <span className="move-in-item-actions no-print">
                               <button
                                 type="button"
+                                className={kept ? 'move-in-item-act move-in-item-keep kept' : 'move-in-item-act move-in-item-keep'}
+                                aria-pressed={kept}
+                                title={kept ? t('moveIn.unlockProduct') : t('moveIn.keepProductHint')}
+                                aria-label={kept ? t('moveIn.unlockProduct') : t('moveIn.keepProduct')}
+                                onClick={() => toggleKeepProduct(result.roomType, item.product.id)}
+                              >
+                                <LockIcon size={14} />
+                              </button>
+                              <button
+                                type="button"
                                 className="move-in-item-act"
-                                title={t('moveIn.swapItem')}
+                                title={kept ? t('moveIn.keptSwapOff') : t('moveIn.swapItem')}
                                 aria-label={t('moveIn.swapItem')}
-                                disabled={swapping === item.product.id}
+                                disabled={kept || swapping === item.product.id}
                                 onClick={() => void swapItem(result.roomType, item.product.id)}
                               >
                                 {swapping === item.product.id ? '…' : <SwapIcon />}
