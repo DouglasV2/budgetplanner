@@ -1639,6 +1639,39 @@ needs `OPENAI_API_KEY`, backend env only).
 > webhook shipped (10.69/10.84), **Flyway** owns the prod schema with `ddl-auto=validate` (10.83), and the AI
 > usage ledger is **persisted to the DB** (10.86). Treat MEMORY.md as the source of truth for current state.
 
+### 🆕 Stronger furniture coherence in "cijeli stan" (Move-In) — added 2026-07-13 · PROPOSED, NOT YET SPECCED
+
+**Problem.** In whole-apartment mode (`PlannerService.generateMoveIn`) each room is built INDEPENDENTLY via
+`generate(moveInRoomInput(...))`. Cross-room consistency today comes ONLY from the shared `style` + the user's
+stated `colorPreferences`/`materialPreferences` (propagated to every room in `moveInRoomInput`). The automatic
+colour self-coordination (`colorCoherenceBonus`'s `currentColors`, Sprint 10.178) is per-plan, so it RESETS each
+room — the exact palette of the living room does not carry into the bedroom, and there is no wood-tone / material
+matching between the big pieces across rooms. Net: a whole flat reads as "same style" but not as a coordinated set.
+
+**Idea (owner wants to explore — direction only, NOT yet approved/specced; raised 2026-07-13).**
+- Carry a shared palette across the apartment: derive a whole-apartment palette up front (from the base style +
+  any stated prefs, or seed it from the first room's picks) and use it to seed each room's `currentColors`, so
+  later rooms lean toward the same neutrals/accents instead of re-rolling a palette per room.
+- Optional soft wood-tone / material-family match between the big footprint pieces across rooms (e.g. a bedroom
+  wardrobe leans to the same wood family as the living-room TV unit), reusing the `materialTags` already on products.
+- Keep it a SOFT, capped bias (like the 10.178 colour-coherence + 10.179 size-fit nudges) — below styleScore(38)/
+  roomScore(36), only breaks ties, never overrides budget/style/room. Single-room mode stays byte-for-byte unchanged.
+
+**Where.** `PlannerService.generateMoveIn` (thread an apartment-level palette into each room's scoring) +
+`scoreProduct`/`colorCoherenceBonus` (accept a seeded palette param). Copy the `currentColors` wiring pattern
+(Sprint 10.178, commit `c9a45eb`) + the size-fit soft-bias pattern (Sprint 10.179).
+
+**Tests (TDD).** Move-In over the real catalog: two rooms in ONE whole-apartment plan share overlapping colour
+tags more than two INDEPENDENT single-room plans would (soft/statistical assertion); single-room plans + the full
+backend suite stay green (no-regression guard). Then a live Move-In smoke.
+
+**Out of scope (for now).** True per-item "designer pairing" (this exact sofa ↔ this exact rug), proportion
+matching, a trained visual model. This is a heuristic coherence nudge, not a stylist.
+
+**Context to read first:** the coherence discussion in this session (2026-07-13); `MEMORY.md` → *move-in-feature*
++ *sprint-10-178-catalog-expansion* (the `currentColors`/`scoreProduct`/`pickBest` bias pattern to copy). The
+whole-apartment engine is `generateMoveIn` — one budget split across rooms, each built by the single-room engine.
+
 ### 🆕 `size` (m²) → piece-fit signal — added 2026-07-11 · DESIGN APPROVED, NOT YET IMPLEMENTED
 
 **Problem.** `PlannerInputDto.size` (room m² — frontend size presets 12/20/32 or a custom 0–1000) is captured but

@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
+// Owner-supplied hero visual (bundled + hashed by Vite). The illustrated placeholder below stays as a fallback.
+import kaucImg from '../kauc.png';
 
 // Sprint 10.182: the header hero band (owner mockup). Replaces the slim "Planer za kupnju" subnav strip with a
 // two-column hero: a cart badge + three-beat headline ("Tvoj prostor. Tvoj budžet. Gotov plan." — the payoff
 // clause in clay) + subtitle + two actions (a new plan / my plans), and a visual on the right. The BETA badge is
-// preserved. The visual is a drop-in slot: put an image at /hero.jpg (frontend/public/hero.jpg) and it appears;
-// until then an on-brand illustrated placeholder shows, so the empty state still reads as finished.
+// preserved. The visual is the owner-supplied kauc.png (bundled by Vite); the illustrated SVG placeholder stays
+// behind it as a graceful fallback if the asset ever fails to load.
 export function PlannerHero() {
   const { t } = useLocale();
   const { betaMode } = useAuth();
@@ -42,7 +44,7 @@ export function PlannerHero() {
           {heroImage !== 'failed' && (
             <img
               className={heroImage === 'ok' ? 'planner-hero-photo is-loaded' : 'planner-hero-photo'}
-              src="/hero.jpg"
+              src={kaucImg}
               alt=""
               onLoad={() => setHeroImage('ok')}
               onError={() => setHeroImage('failed')}
