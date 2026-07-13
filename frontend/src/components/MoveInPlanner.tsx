@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import type { FurnishingPlan, PlannerInput, Product, RoomType, SavedPlanResponse } from '../types';
-import { generateMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
+import { useEffect, useRef, useState } from 'react';
+import type { FurnishingPlan, PlannerInput, Product, RoomPriority, RoomType, SavedPlanResponse } from '../types';
+import { generateMoveInPlan, adjustMoveInPlan, replaceProduct, savePlan, trackProductClick } from '../api/client';
 import { formatCurrency } from '../utils/planner';
+import { hydrateSession, serializeSession, clearForeignMarketRetained, retainedExceedsBudget, apartmentStatus, checklist, checklistTotals, type RoomPlanResult } from '../utils/moveInPlan';
 import { useLocale } from '../LocaleContext';
-import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon } from './icons';
+import { RoomIcon, CategoryIcon, SwapIcon, CloseIcon, LockIcon, ExternalLinkIcon } from './icons';
 import { openPlanPdf } from '../utils/planPdf';
 
 // Sprint 10.137: open each item on the retailer's product page (same as the single-room plan). A whole-apartment
@@ -22,7 +23,17 @@ function productPhoto(product: Product): string | null {
 const qtyOf = (item: { quantity?: number }) => (item.quantity && item.quantity > 1 ? item.quantity : 1);
 
 // Sprint 10.138: localStorage draft so the room picks + budget survive a reload (only numbers/room ids — no PII).
+// Sprint 10.183: the same key now holds the richer MoveInSession (adds priorities/retained/purchased/results);
+// hydrateSession migrates the old {rooms,budget} shape transparently.
 const MOVE_IN_DRAFT_KEY = 'budgetspace.moveInDraft';
+
+function readMoveInDraft(): unknown {
+  try {
+    return JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
+  } catch {
+    return null;
+  }
+}
 
 // Sprint 10.138: "what to buy where" — roll every item across all rooms up by retailer (count + total), so a
 // multi-room shop is actually plannable ("at IKEA grab 9 pieces for 1.240 €").
@@ -69,15 +80,22 @@ const MOVE_IN_ROOMS: Array<{ value: RoomType; labelKey: string }> = [
   { value: 'bathroom', labelKey: 'form.roomBathroomLabel' }
 ];
 
-interface RoomPlanResult {
-  roomType: RoomType;
-  labelKey: string;
-  allocatedBudget: number;
-  plan: FurnishingPlan;
-  input: PlannerInput;
-  hasItems: boolean;
-  partial: boolean;
-}
+// Sprint 10.183: the RoomPlanResult shape now lives in utils/moveInPlan.ts (imported above) so the pure session
+// helpers and this component agree on it. The 3 priority levels map to their (human, hand-written) i18n labels.
+const PRIORITY_LEVELS: RoomPriority[] = ['now', 'soon', 'later'];
+const PRIORITY_LABEL_KEYS: Record<RoomPriority, string> = {
+  now: 'moveIn.priorityNow',
+  soon: 'moveIn.prioritySoon',
+  later: 'moveIn.priorityLater',
+};
+
+// Sprint 10.183: the honest-note CODES the adjust endpoint returns → their localized i18n keys.
+const ADJUST_MESSAGE_KEYS: Record<string, string> = {
+  'reduce-unreachable': 'moveIn.adjustReduceUnreachable',
+  'fewer-stores-noop': 'moveIn.adjustFewerStoresNoop',
+  'use-remaining-done': 'moveIn.adjustUseRemainingDone',
+  'use-remaining-none': 'moveIn.adjustUseRemainingNone',
+};
 
 // The 3 tiers come back with stable ids budget/value/stretch (plan.name is a Croatian display string).
 // Sprint 10.155: match on the stable id, not the HR name, so a reworded plan.name can't silently break the
@@ -89,29 +107,35 @@ function pickBestPlan(plans: FurnishingPlan[]): FurnishingPlan | null {
 
 export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, seed }: MoveInPlannerProps) {
   const { t } = useLocale();
-  // Sprint 10.138: hydrate the room picks + budget from the last session (localStorage draft) so a reload or a
-  // return visit doesn't reset the form. Falls back to sensible defaults.
-  const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(() => {
-    try {
-      const draft = JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
-      if (draft && Array.isArray(draft.rooms) && draft.rooms.length) return draft.rooms as RoomType[];
-    } catch { /* ignore */ }
-    return ['living-room', 'bedroom'];
-  });
-  const [totalBudget, setTotalBudget] = useState<number>(() => {
-    try {
-      const draft = JSON.parse(localStorage.getItem(MOVE_IN_DRAFT_KEY) || 'null');
-      if (draft && typeof draft.budget === 'number' && draft.budget > 0) return draft.budget;
-    } catch { /* ignore */ }
-    return 5000;
-  });
+  const market = baseInput.market ?? 'HR';
+  // Sprint 10.183: hydrate the whole-apartment session (rooms/budget/priorities today; retained/purchased/results
+  // join it in later increments) from localStorage so a reload or return visit keeps the user's place.
+  // hydrateSession migrates the old {rooms,budget} draft and drops market-specific state from another market.
+  const [selectedRooms, setSelectedRooms] = useState<RoomType[]>(() => hydrateSession(readMoveInDraft(), market).rooms);
+  const [totalBudget, setTotalBudget] = useState<number>(() => hydrateSession(readMoveInDraft(), market).budget);
+  const [priorities, setPriorities] = useState<Partial<Record<RoomType, RoomPriority>>>(
+    () => hydrateSession(readMoveInDraft(), market).priorities);
   const [swapping, setSwapping] = useState<string | null>(null);
-  const [results, setResults] = useState<RoomPlanResult[] | null>(null);
+  // Sprint 10.183: restore the last generated plan + the kept-room set from the session so a reload keeps the
+  // whole apartment (kept PRODUCTS ride inside each room's input.lockedProductIds, restored with results).
+  const [results, setResults] = useState<RoomPlanResult[] | null>(() => hydrateSession(readMoveInDraft(), market).results);
+  const [retainedRooms, setRetainedRooms] = useState<RoomType[]>(() => hydrateSession(readMoveInDraft(), market).retainedRooms);
   const [apartmentPartial, setApartmentPartial] = useState(false);
   const [shortfall, setShortfall] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  // Sprint 10.183 — adjust apartment: which action is in flight, the last honest note code, and the reduce-total
+  // target (prefilled to the current plan total).
+  const [adjusting, setAdjusting] = useState<string | null>(null);
+  const [adjustNotice, setAdjustNotice] = useState<string | null>(null);
+  const [reduceTarget, setReduceTarget] = useState<number>(0);
+  // Sprint 10.183 — shopping checklist: product ids the user has ticked as bought (shopping progress, NOT
+  // "already owned"). Persisted with the session so it survives a reload; market-scoped like the plan.
+  const [purchasedIds, setPurchasedIds] = useState<string[]>(() => hydrateSession(readMoveInDraft(), market).purchasedIds);
+  const togglePurchased = (productId: string) => setPurchasedIds((current) =>
+    current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId]);
+  const [showMissing, setShowMissing] = useState(false);
 
   // Sprint 10.116: apply a seed (from the multi-room nudge) — pre-select the detected rooms + typed budget.
   useEffect(() => {
@@ -121,15 +145,107 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
     }
   }, [seed]);
 
-  // Sprint 10.138: persist the room picks + budget (draft) so the next visit starts where the user left off.
+  // Sprint 10.183: persist the whole-apartment session so the next visit starts where the user left off — room
+  // ids, numbers, priority levels, the kept-room set and the generated plan (which carries the kept-product ids
+  // inside each room's input.lockedProductIds). No PII. Market-specific parts are dropped on load when the
+  // market differs (hydrateSession). purchasedIds join this in the checklist increment.
   useEffect(() => {
     try {
-      localStorage.setItem(MOVE_IN_DRAFT_KEY, JSON.stringify({ rooms: selectedRooms, budget: totalBudget }));
+      localStorage.setItem(MOVE_IN_DRAFT_KEY, serializeSession({
+        market, rooms: selectedRooms, budget: totalBudget, priorities, retainedRooms, results, purchasedIds,
+      }));
     } catch { /* ignore quota/private-mode */ }
-  }, [selectedRooms, totalBudget]);
+  }, [market, selectedRooms, totalBudget, priorities, retainedRooms, results, purchasedIds]);
 
   function toggleRoom(room: RoomType) {
     setSelectedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));
+  }
+
+  const priorityOf = (room: RoomType): RoomPriority => priorities[room] ?? 'soon';
+
+  function setPriority(room: RoomType, level: RoomPriority) {
+    setPriorities((current) => ({ ...current, [room]: level }));
+  }
+
+  // Sprint 10.183 — keep a room: a preference that shields the room from whole-plan adjustments (Feature 3).
+  const isRoomRetained = (room: RoomType) => retainedRooms.includes(room);
+  function toggleRetainedRoom(room: RoomType) {
+    setRetainedRooms((current) => (current.includes(room) ? current.filter((value) => value !== room) : [...current, room]));
+  }
+
+  // Sprint 10.183 — keep a product: reuse the backend-honoured lockedProductIds seam, per room. A kept product
+  // is pinned (won't be swapped by adjustments) but can still be explicitly removed or un-kept by the user.
+  function isProductKept(roomType: RoomType, productId: string): boolean {
+    const room = results?.find((result) => result.roomType === roomType);
+    return !!room?.input.lockedProductIds.includes(productId);
+  }
+  function toggleKeepProduct(roomType: RoomType, productId: string) {
+    setResults((prev) => prev && prev.map((room) => {
+      if (room.roomType !== roomType) return room;
+      const locked = room.input.lockedProductIds.includes(productId)
+        ? room.input.lockedProductIds.filter((id) => id !== productId)
+        : [...room.input.lockedProductIds, productId];
+      return { ...room, input: { ...room.input, lockedProductIds: locked } };
+    }));
+  }
+
+  // Sprint 10.183: on an ACTUAL market change, strip kept PRODUCTS that belong to the old market (never carry a
+  // foreign-market SKU into the new market) and say so. Kept ROOMS are a market-agnostic preference and survive.
+  const marketRef = useRef(market);
+  useEffect(() => {
+    if (marketRef.current === market) return;
+    marketRef.current = market;
+    setResults((prev) => {
+      const { results: cleaned, cleared } = clearForeignMarketRetained(prev, market);
+      if (cleared > 0) onNotice(t('moveIn.retainedMarketCleared'));
+      return cleaned;
+    });
+  }, [market, onNotice, t]);
+
+  // Sprint 10.183: honest guard — if the items the user chose to keep already cost more than the budget, say so
+  // (near the budget field) instead of silently dropping them or letting the plan run over.
+  const keepExceedsBudget = retainedExceedsBudget(results, retainedRooms, totalBudget);
+
+  // Sprint 10.183: prefill the reduce-total target with the current plan total whenever a fresh plan lands.
+  useEffect(() => {
+    if (results) setReduceTarget(Math.round(results.reduce((sum, room) => sum + room.plan.total, 0)));
+  }, [results]);
+
+  // Sprint 10.183 — adjust the whole apartment: send the current rooms (+ their retained/kept state) and an
+  // action to the backend, then splice the returned rooms back in. Kept rooms/products come back untouched.
+  async function runAdjust(action: string, targetTotal: number | null) {
+    if (!results || adjusting) return;
+    setAdjusting(action);
+    setAdjustNotice(null);
+    try {
+      const payloadRooms = results.map((room) => ({
+        roomType: room.roomType,
+        plan: room.plan,
+        retained: retainedRooms.includes(room.roomType),
+        lockedProductIds: room.input.lockedProductIds,
+      }));
+      const roomPriority: Partial<Record<RoomType, RoomPriority>> = {};
+      for (const room of results) roomPriority[room.roomType] = priorityOf(room.roomType);
+      const response = await adjustMoveInPlan(baseInput, payloadRooms, totalBudget, action, targetTotal, roomPriority);
+      const byRoom = new Map(response.rooms.map((room) => [room.roomType, room] as const));
+      setResults((prev) => prev && prev.map((room) => {
+        const updated = byRoom.get(room.roomType);
+        const plan = updated ? pickBestPlan(updated.plans) : null;
+        if (!plan) return room;
+        // The backend response carries each room's kept-product ids back on the plan's items only, so keep the
+        // client-side lockedProductIds authoritative (they are what the next adjust/keep toggle reads). Refresh
+        // the honest missing-item buckets from the adjusted response.
+        return {
+          ...room, plan, hasItems: plan.items.length > 0,
+          missingEssential: updated?.missingEssential, niceToHave: updated?.niceToHave, unavailableInMarket: updated?.unavailableInMarket,
+        };
+      }));
+      if (response.changed === false || response.message) setAdjustNotice(response.message ?? 'no-change');
+    } catch {
+      onNotice(t('moveIn.error'));
+    } finally {
+      setAdjusting(null);
+    }
   }
 
   function buildRoomInput(roomType: RoomType, budget: number): PlannerInput {
@@ -165,7 +281,11 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
     try {
       // Keep a stable top-down order (by the picker list), independent of click order.
       const orderedRooms = MOVE_IN_ROOMS.filter((room) => selectedRooms.includes(room.value)).map((room) => room.value);
-      const response = await generateMoveInPlan(baseInput, orderedRooms, totalBudget);
+      // Sprint 10.183: send each selected room's priority (default 'soon' = neutral) so the split favours what
+      // the user needs first.
+      const roomPriority: Partial<Record<RoomType, RoomPriority>> = {};
+      for (const room of orderedRooms) roomPriority[room] = priorityOf(room);
+      const response = await generateMoveInPlan(baseInput, orderedRooms, totalBudget, roomPriority);
 
       const mapped: RoomPlanResult[] = response.rooms
         .map((room) => {
@@ -178,7 +298,10 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             plan,
             input: buildRoomInput(room.roomType, room.allocatedBudget),
             hasItems: plan.items.length > 0,
-            partial: room.partial
+            partial: room.partial,
+            missingEssential: room.missingEssential,
+            niceToHave: room.niceToHave,
+            unavailableInMarket: room.unavailableInMarket
           } as RoomPlanResult;
         })
         .filter((result): result is RoomPlanResult => result !== null);
@@ -282,6 +405,16 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   const total = results ? results.reduce((sum, result) => sum + result.plan.total, 0) : 0;
   const over = total - totalBudget;
   const storeRollup = results ? aggregateByStore(results) : [];
+  // Sprint 10.183: whole-apartment status + shopping checklist (all honest, derived from the real plan).
+  const status = apartmentStatus(results, totalBudget);
+  const checkGroups = checklist(results);
+  const checkTotals = checklistTotals(results, purchasedIds);
+  const hasMissing = status.missing.moveIn.length + status.missing.niceToHave.length + status.missing.notFound.length > 0;
+  const roomLabel = (room: RoomType) => t(MOVE_IN_ROOMS.find((entry) => entry.value === room)?.labelKey ?? '');
+  const categoryLabels = (categories: string[]) => categories.map((category) => {
+    const label = t(`cat.${category}`);
+    return label.startsWith('cat.') ? category : label;
+  }).join(', ');
   // Sprint 10.168: a clean whole-apartment shopping-list PDF — grouped by room, matching the single-room PDF.
   const printSections = (results ?? []).filter((result) => result.hasItems).map((result) => ({
     title: t(result.labelKey),
@@ -325,6 +458,9 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             />
             <span>€</span>
           </label>
+          {keepExceedsBudget && (
+            <p className="move-in-keep-warning" role="status">{t('moveIn.retainedExceedsBudget')}</p>
+          )}
         </div>
 
         <div className="control-block">
@@ -347,6 +483,36 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             ))}
           </div>
         </div>
+
+        {/* Sprint 10.183: "what do you need first?" — a priority per selected room that steers the budget split. */}
+        {selectedRooms.length > 0 && (
+          <div className="control-block move-in-priorities">
+            <span className="friendly-label">{t('moveIn.priorityHeading')} <small>{t('moveIn.priorityHelp')}</small></span>
+            <ul className="move-in-priority-list">
+              {MOVE_IN_ROOMS.filter((room) => selectedRooms.includes(room.value)).map((room) => (
+                <li key={room.value} className="move-in-priority-row">
+                  <span className="move-in-priority-room">
+                    <span className="move-in-priority-roomicon" aria-hidden="true"><RoomIcon room={room.value} size={16} /></span>
+                    {t(room.labelKey)}
+                  </span>
+                  <span className="move-in-priority-options" role="group" aria-label={t(room.labelKey)}>
+                    {PRIORITY_LEVELS.map((level) => (
+                      <button
+                        type="button"
+                        key={level}
+                        className={priorityOf(room.value) === level ? 'priority-opt active' : 'priority-opt'}
+                        aria-pressed={priorityOf(room.value) === level}
+                        onClick={() => setPriority(room.value, level)}
+                      >
+                        {t(PRIORITY_LABEL_KEYS[level])}
+                      </button>
+                    ))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <button type="button" className="generate-button" disabled={isLoading} onClick={() => void runMoveIn()}>
           {isLoading ? t('moveIn.generating') : t('moveIn.generate')}
@@ -381,6 +547,43 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             <div className="move-in-fillbar move-in-fillbar-lg" aria-hidden="true">
               <span className={over > 0 ? 'over' : ''} style={{ width: `${Math.min(100, Math.round((total / Math.max(1, totalBudget)) * 100))}%` }} />
             </div>
+
+            {/* Sprint 10.183: honest apartment status — rooms, stores, remaining, and what still needs attention. */}
+            <div className="move-in-status-grid">
+              <span className="move-in-status-cell">{t('moveIn.statusRooms', { count: status.roomCount })}</span>
+              <span className="move-in-status-cell">{t('moveIn.storesCount', { count: status.retailerCount })}</span>
+              {over <= 0 && <span className="move-in-status-cell within">{t('moveIn.statusRemaining', { amount: formatCurrency(status.remaining) })}</span>}
+            </div>
+            {status.attentionRooms.length > 0 && (
+              <p className="move-in-status-line">
+                <span className="move-in-status-tag warn">{t('moveIn.stillToSolve')}</span> {status.attentionRooms.map(roomLabel).join(', ')}
+              </p>
+            )}
+            {status.coveredRooms.length > 0 && (
+              <p className="move-in-status-line">
+                <span className="move-in-status-tag ok">{t('moveIn.roomsCovered')}</span> {status.coveredRooms.map(roomLabel).join(', ')}
+              </p>
+            )}
+            {hasMissing && (
+              <div className="move-in-missing">
+                <button type="button" className="move-in-missing-toggle" aria-expanded={showMissing} onClick={() => setShowMissing((value) => !value)}>
+                  {t('moveIn.showMissing')}
+                </button>
+                {showMissing && (
+                  <ul className="move-in-missing-groups">
+                    {status.missing.moveIn.length > 0 && (
+                      <li><span className="move-in-missing-label">{t('moveIn.missingMoveIn')}</span><span>{categoryLabels(status.missing.moveIn)}</span></li>
+                    )}
+                    {status.missing.niceToHave.length > 0 && (
+                      <li><span className="move-in-missing-label">{t('moveIn.missingNiceToHave')}</span><span>{categoryLabels(status.missing.niceToHave)}</span></li>
+                    )}
+                    {status.missing.notFound.length > 0 && (
+                      <li><span className="move-in-missing-label nf">{t('moveIn.missingNotFound')}</span><span>{categoryLabels(status.missing.notFound)}</span></li>
+                    )}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sprint 10.138: take the list with you — copy as text (paste into Notes / a message) or print it. */}
@@ -403,17 +606,63 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             })}>{t('print.downloadPdf')}</button>
           </div>
 
+          {/* Sprint 10.183: adjust the whole apartment — reduce total / fewer stores / use remaining. */}
+          <div className="move-in-adjust no-print">
+            <span className="move-in-adjust-title">{t('moveIn.adjustHeading')}</span>
+            <p className="move-in-adjust-hint">{t('moveIn.adjustHint')}</p>
+            <div className="move-in-adjust-actions">
+              <div className="move-in-adjust-reduce">
+                <label className="move-in-adjust-target">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    step="50"
+                    aria-label={t('moveIn.adjustReduce')}
+                    value={reduceTarget || ''}
+                    onChange={(event) => setReduceTarget(Math.max(0, Math.floor(Number(event.target.value) || 0)))}
+                  />
+                  <span>€</span>
+                </label>
+                <button type="button" className="move-in-adjust-btn" disabled={!!adjusting}
+                  onClick={() => void runAdjust('reduce-total', reduceTarget)}>{t('moveIn.adjustReduce')}</button>
+              </div>
+              <button type="button" className="move-in-adjust-btn" disabled={!!adjusting}
+                onClick={() => void runAdjust('fewer-stores', null)}>{t('moveIn.adjustFewerStores')}</button>
+              <button type="button" className="move-in-adjust-btn" disabled={!!adjusting}
+                onClick={() => void runAdjust('use-remaining', null)}>{t('moveIn.adjustUseRemaining')}</button>
+            </div>
+            {adjusting && <p className="move-in-adjust-status" role="status">{t('moveIn.adjusting')}</p>}
+            {adjustNotice && !adjusting && (
+              <p className="move-in-adjust-note" role="status">{t(ADJUST_MESSAGE_KEYS[adjustNotice] ?? 'moveIn.adjustNoChange')}</p>
+            )}
+          </div>
+
           <div className="move-in-room-cards">
             {results.map((result) => (
-              <article className="move-in-room-card" key={result.roomType}>
+              <article className={isRoomRetained(result.roomType) ? 'move-in-room-card retained' : 'move-in-room-card'} key={result.roomType}>
                 <div className="move-in-room-head">
                   <span className="move-in-room-title">
                     <span className="move-in-room-roomicon" aria-hidden="true"><RoomIcon room={result.roomType} size={17} /></span>
                     <strong>{t(result.labelKey)}</strong>
                   </span>
-                  {result.hasItems && (
-                    <span className="move-in-room-count">{t('moveIn.itemsCount', { count: result.plan.items.length })}</span>
-                  )}
+                  <span className="move-in-room-headmeta">
+                    {result.hasItems && (
+                      <span className="move-in-room-count">{t('moveIn.itemsCount', { count: result.plan.items.length })}</span>
+                    )}
+                    {result.hasItems && (
+                      <button
+                        type="button"
+                        className={isRoomRetained(result.roomType) ? 'move-in-keep-room kept' : 'move-in-keep-room'}
+                        aria-pressed={isRoomRetained(result.roomType)}
+                        title={t('moveIn.keepRoomHint')}
+                        onClick={() => toggleRetainedRoom(result.roomType)}
+                      >
+                        <LockIcon size={13} />
+                        {isRoomRetained(result.roomType) ? t('moveIn.unlockRoom') : t('moveIn.keepRoom')}
+                      </button>
+                    )}
+                  </span>
                 </div>
                 {result.hasItems ? (
                   <>
@@ -441,6 +690,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                         const lineTotal = item.product.price * qty;
                         const openUrl = storeUrl(item.product);
                         const photo = productPhoto(item.product);
+                        const kept = isProductKept(result.roomType, item.product.id);
                         const thumb = (
                           <span className="move-in-thumb" aria-hidden="true">
                             {photo
@@ -449,7 +699,7 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                           </span>
                         );
                         return (
-                          <li key={item.product.id} className="move-in-item">
+                          <li key={item.product.id} className={kept ? 'move-in-item kept' : 'move-in-item'}>
                             {openUrl ? (
                               <a
                                 className="move-in-item-row move-in-item-link"
@@ -470,14 +720,24 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
                                 <span className="move-in-item-price">{formatCurrency(lineTotal)}</span>
                               </div>
                             )}
-                            {/* Sprint 10.138: swap for a similar piece / drop it — not buttons inside the <a> (invalid). */}
+                            {/* Sprint 10.138: swap / drop; 10.183: keep — not buttons inside the <a> (invalid). */}
                             <span className="move-in-item-actions no-print">
                               <button
                                 type="button"
+                                className={kept ? 'move-in-item-act move-in-item-keep kept' : 'move-in-item-act move-in-item-keep'}
+                                aria-pressed={kept}
+                                title={kept ? t('moveIn.unlockProduct') : t('moveIn.keepProductHint')}
+                                aria-label={kept ? t('moveIn.unlockProduct') : t('moveIn.keepProduct')}
+                                onClick={() => toggleKeepProduct(result.roomType, item.product.id)}
+                              >
+                                <LockIcon size={14} />
+                              </button>
+                              <button
+                                type="button"
                                 className="move-in-item-act"
-                                title={t('moveIn.swapItem')}
+                                title={kept ? t('moveIn.keptSwapOff') : t('moveIn.swapItem')}
                                 aria-label={t('moveIn.swapItem')}
-                                disabled={swapping === item.product.id}
+                                disabled={kept || swapping === item.product.id}
                                 onClick={() => void swapItem(result.roomType, item.product.id)}
                               >
                                 {swapping === item.product.id ? '…' : <SwapIcon />}
@@ -505,18 +765,54 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
             ))}
           </div>
 
-          {/* Sprint 10.138: "what to buy where" — every piece rolled up by store so a multi-room shop is plannable. */}
-          {storeRollup.length > 0 && (
-            <div className="move-in-by-store">
-              <span className="move-in-by-store-title">{t('moveIn.byStore')}</span>
-              <ul>
-                {storeRollup.map((store) => (
-                  <li key={store.retailer}>
-                    <span className="move-in-store-name">{store.retailer}</span>
-                    <span className="move-in-store-meta">{t('moveIn.itemsCount', { count: store.count })} · {formatCurrency(store.total)}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* Sprint 10.183: "Popis za kupnju" — an interactive shopping checklist grouped by retailer. Ticking a
+              box marks a piece as bought (shopping progress) without removing it from the plan. */}
+          {checkGroups.length > 0 && (
+            <div className="move-in-checklist">
+              <div className="move-in-checklist-head">
+                <span className="move-in-checklist-title">{t('moveIn.shoppingListHeading')}</span>
+                <span className="move-in-checklist-totals">
+                  <span className="bought">{t('moveIn.bought')}: {formatCurrency(checkTotals.bought)}</span>
+                  <span className="remaining">{t('moveIn.stillToBuy')}: {formatCurrency(checkTotals.remaining)}</span>
+                </span>
+              </div>
+              {checkGroups.map((group) => (
+                <div className="move-in-checklist-store" key={group.retailer}>
+                  <div className="move-in-checklist-store-head">
+                    <span className="move-in-checklist-store-name">{group.retailer}</span>
+                    <span className="move-in-checklist-store-meta">{t('moveIn.itemsCount', { count: group.count })} · {formatCurrency(group.total)}</span>
+                  </div>
+                  <ul className="move-in-checklist-items">
+                    {group.items.map((entry) => {
+                      const openUrl = storeUrl(entry.product);
+                      const bought = purchasedIds.includes(entry.productId);
+                      return (
+                        <li key={entry.productId} className={bought ? 'move-in-check-item bought' : 'move-in-check-item'}>
+                          <label className="move-in-check-label">
+                            <input type="checkbox" checked={bought} onChange={() => togglePurchased(entry.productId)} aria-label={entry.name} />
+                            <span className="move-in-check-name">{entry.name}</span>
+                          </label>
+                          <span className="move-in-check-room">{roomLabel(entry.roomType)}</span>
+                          <span className="move-in-check-price">{formatCurrency(entry.lineTotal)}</span>
+                          {openUrl ? (
+                            <a
+                              className="move-in-check-open"
+                              href={openUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t('results.openInStore')}
+                              aria-label={t('results.openInStore')}
+                              onClick={() => trackProductClick(entry.planId, entry.product)}
+                            >
+                              <ExternalLinkIcon />
+                            </a>
+                          ) : <span className="move-in-check-open-empty" aria-hidden="true" />}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
             </div>
           )}
 

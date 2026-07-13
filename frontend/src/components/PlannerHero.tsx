@@ -1,21 +1,24 @@
-import { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
-// Owner-supplied hero visual (bundled + hashed by Vite). The illustrated placeholder below stays as a fallback.
-import kaucImg from '../kauc.png';
+// Owner-supplied hero visual — a full-bleed warm interior. Bundled + hashed by Vite.
+import bannerImg from '../banner.png';
 
-// Sprint 10.182: the header hero band (owner mockup). Replaces the slim "Planer za kupnju" subnav strip with a
-// two-column hero: a cart badge + three-beat headline ("Tvoj prostor. Tvoj budžet. Gotov plan." — the payoff
-// clause in clay) + subtitle + two actions (a new plan / my plans), and a visual on the right. The BETA badge is
-// preserved. The visual is the owner-supplied kauc.png (bundled by Vite); the illustrated SVG placeholder stays
-// behind it as a graceful fallback if the asset ever fails to load.
+// Sprint 10.182: the header hero band (owner mockup) — a cart badge + three-beat headline ("Tvoj prostor. Tvoj
+// budžet. Gotov plan." — the payoff clause in clay) + subtitle + two actions.
+// Sprint 10.183: banner.png is now the full-bleed BACKGROUND of the whole band (was a separate kauc.png image
+// card on the right). The content layers over the image's open centre; a restrained warm overlay (in CSS) keeps
+// the text readable without muddying the picture. The BETA badge is preserved.
 export function PlannerHero() {
   const { t } = useLocale();
   const { betaMode } = useAuth();
-  const [heroImage, setHeroImage] = useState<'loading' | 'ok' | 'failed'>('loading');
 
   return (
-    <section className="planner-hero" id="top" aria-label={t('planner.eyebrow')}>
+    <section
+      className="planner-hero has-banner"
+      id="top"
+      aria-label={t('planner.eyebrow')}
+      style={{ backgroundImage: `url(${bannerImg})` }}
+    >
       <div className="planner-hero-inner shell">
         <div className="planner-hero-copy">
           <span className="planner-hero-badge" aria-hidden="true">
@@ -38,33 +41,6 @@ export function PlannerHero() {
               <a className="planner-hero-btn ghost" href="#saved">{t('saved.title')}</a>
             </div>
           </div>
-        </div>
-
-        <div className="planner-hero-visual" aria-hidden="true">
-          {heroImage !== 'failed' && (
-            <img
-              className={heroImage === 'ok' ? 'planner-hero-photo is-loaded' : 'planner-hero-photo'}
-              src={kaucImg}
-              alt=""
-              onLoad={() => setHeroImage('ok')}
-              onError={() => setHeroImage('failed')}
-            />
-          )}
-          {/* On-brand placeholder shown until /hero.jpg is added — a settee on a floor line, echoing the brand mark. */}
-          <svg className="planner-hero-placeholder" viewBox="0 0 220 150" fill="none" aria-hidden="true" focusable="false">
-            <path d="M28 118 H192" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" opacity="0.35" />
-            <g stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" opacity="0.85">
-              <path d="M58 96 L52 116" />
-              <path d="M92 96 L89 116" />
-              <path d="M128 96 L131 116" />
-              <path d="M162 96 L168 116" />
-            </g>
-            <rect x="54" y="44" width="112" height="30" rx="12" fill="var(--accent)" opacity="0.9" />
-            <rect x="54" y="70" width="112" height="28" rx="11" fill="var(--accent)" />
-            <rect x="40" y="58" width="18" height="40" rx="9" fill="var(--accent)" />
-            <rect x="162" y="58" width="18" height="40" rx="9" fill="var(--accent)" />
-            <rect x="150" y="52" width="20" height="20" rx="6" fill="var(--sage)" opacity="0.9" transform="rotate(8 160 62)" />
-          </svg>
         </div>
       </div>
     </section>

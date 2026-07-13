@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -105,5 +106,46 @@ class MoveInAllocationTest {
         int[] out = PlannerService.capAllocationsToCapacity(alloc, rooms, new double[]{400, 300}, new double[]{5000, 4000});
         assertEquals(2100, out[0]);
         assertEquals(1900, out[1]);
+    }
+
+    // Sprint 10.183 (Move-In QoL): room priorities steer the split. now=1.5 / soon=1.0 / later=0.6.
+
+    @Test
+    void priorityShiftsLeftoverTowardTheNowRoom() {
+        // Two equal-weight rooms (kitchen & dining-room, both weight 1.0), same floor — priority alone decides.
+        List<String> rooms = List.of("kitchen", "dining-room");
+        double[] floors = {200, 200};
+        int[] alloc = PlannerService.allocateMoveIn(3000, rooms, floors, 400, false, new double[]{1.5, 0.6});
+
+        assertEquals(3000, alloc[0] + alloc[1], "still sums to the total exactly");
+        assertTrue(alloc[0] >= 200 && alloc[1] >= 200, "both rooms still keep their core floor when the budget allows");
+        assertTrue(alloc[0] > alloc[1], "the 'now' kitchen gets more of the discretionary leftover than the 'later' dining room");
+    }
+
+    @Test
+    void infeasibleBudgetReservesTheNowRoomsEssentialsFirst() {
+        // Budget can't cover both floors (600 + 800 > 1000). The 'now' living room must fully fund its floor
+        // first; the 'later' bedroom takes the shortfall and comes back under its floor (honest partial).
+        List<String> rooms = List.of("living-room", "bedroom");
+        double[] floors = {600, 800};
+        int[] alloc = PlannerService.allocateMoveIn(1000, rooms, floors, 1400, true, new double[]{1.5, 0.6});
+
+        assertEquals(1000, alloc[0] + alloc[1], "the whole budget is still allocated");
+        assertEquals(600, alloc[0], "the 'now' living room keeps its full core floor");
+        assertTrue(alloc[1] < 800, "the 'later' bedroom loses essentials to the higher priority, not the reverse");
+    }
+
+    @Test
+    void noPriorityMatchesLegacyAllocation() {
+        // All-1.0 factors must reproduce the pre-priority split exactly — feasible AND infeasible.
+        List<String> feas = List.of("living-room", "bedroom", "hallway");
+        assertArrayEquals(
+                PlannerService.allocateMoveIn(3000, feas, new double[]{400, 300, 80}, 780, false),
+                PlannerService.allocateMoveIn(3000, feas, new double[]{400, 300, 80}, 780, false, new double[]{1, 1, 1}));
+
+        List<String> infeas = List.of("living-room", "bedroom");
+        assertArrayEquals(
+                PlannerService.allocateMoveIn(1000, infeas, new double[]{2000, 1500}, 3500, true),
+                PlannerService.allocateMoveIn(1000, infeas, new double[]{2000, 1500}, 3500, true, new double[]{1, 1}));
     }
 }

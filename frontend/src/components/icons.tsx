@@ -363,3 +363,14 @@ export function ExternalLinkIcon({ size = 15, className }: IconProps) {
     </Svg>
   );
 }
+
+// Sprint 10.183 (Move-In QoL): a padlock for the "keep this product/room" affordance — a kept piece is pinned
+// against whole-plan adjustments (matches the single-room lock semantics).
+export function LockIcon({ size = 16, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </Svg>
+  );
+}

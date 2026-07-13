@@ -1,7 +1,9 @@
 package ai.budgetspace.planner;
 
+import ai.budgetspace.dto.AdjustRoomDto;
 import ai.budgetspace.dto.CompleteKitchenDto;
 import ai.budgetspace.dto.FurnishingPlanDto;
+import ai.budgetspace.dto.MoveInAdjustRequest;
 import ai.budgetspace.dto.MoveInRequestDto;
 import ai.budgetspace.dto.MoveInResponse;
 import ai.budgetspace.dto.MoveInRoomDto;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -700,6 +703,156 @@ class PlannerServiceTest {
         List<String> cats = categories(response.rooms().get(0).plans().get(0));
         assertThat(cats).as("an already-owned sofa must not be re-recommended in Move-In").doesNotContain("sofa");
         assertThat(cats).as("the rest of the room is still planned").contains("tv-unit");
+    }
+
+    // ---- Move-In adjust: reduce total / fewer stores / use remaining (Sprint 10.183) ----
+
+    @Test
+    void adjustReduceTotalSwapsThePriciestNonKeptItemAndLeavesTheKeptRoomUntouched() {
+        Product sofaPrem = product("sofa-prem", "Kauč lux", "IKEA", "sofa", 900, 4.6);
+        Product sofaBasic = product("sofa-basic", "Kauč osnovni", "IKEA", "sofa", 300, 4.0);
+        Product tv = product("tv-1", "TV komoda", "IKEA", "tv-unit", 200, 4.3);
+        Product bed = product("bed-1", "Krevet", "IKEA", "bed", 500, 4.4);
+        PlannerService service = serviceWithProducts(List.of(sofaPrem, sofaBasic, tv, bed));
+
+        FurnishingPlanDto living = planOf("value", ProductDto.from(sofaPrem), ProductDto.from(tv)); // 1100
+        FurnishingPlanDto bedroom = planOf("value", ProductDto.from(bed));                          // 500 (kept)
+
+        MoveInResponse resp = service.adjustMoveIn(new MoveInAdjustRequest(baseHR(),
+                List.of(new AdjustRoomDto("living-room", living, false, List.of()),
+                        new AdjustRoomDto("bedroom", bedroom, true, List.of())),
+                3000, "reduce-total", 1100, Map.of()));
+
+        assertThat(resp.changed()).isTrue();
+        assertThat(resp.grandTotal().intValue()).as("hits the target (kept bedroom 500 + reduced living 500)").isLessThanOrEqualTo(1100);
+        List<String> livingIds = resp.rooms().get(0).plans().get(0).items().stream().map(i -> i.product().id()).toList();
+        assertThat(livingIds).as("priciest sofa swapped down, tv untouched").contains("sofa-basic", "tv-1").doesNotContain("sofa-prem");
+        assertThat(resp.rooms().get(1).plans().get(0).total()).as("kept room untouched").isEqualByComparingTo(BigDecimal.valueOf(500));
+        assertThat(resp.rooms().get(1).plans().get(0).items().get(0).product().id()).isEqualTo("bed-1");
+    }
+
+    @Test
+    void adjustReduceTotalNeverSwapsAKeptProduct() {
+        Product sofaPrem = product("sofa-prem", "Kauč lux", "IKEA", "sofa", 900, 4.6);
+        Product tvPrem = product("tv-prem", "TV lux", "IKEA", "tv-unit", 400, 4.5);
+        Product tvBasic = product("tv-basic", "TV osnovni", "IKEA", "tv-unit", 150, 4.0);
+        PlannerService service = serviceWithProducts(List.of(sofaPrem, tvPrem, tvBasic));
+
+        FurnishingPlanDto living = planOf("value", ProductDto.from(sofaPrem), ProductDto.from(tvPrem)); // 1300
+
+        MoveInResponse resp = service.adjustMoveIn(new MoveInAdjustRequest(baseHR(),
+                List.of(new AdjustRoomDto("living-room", living, false, List.of("sofa-prem"))),
+                3000, "reduce-total", 1100, Map.of()));
+
+        List<String> ids = resp.rooms().get(0).plans().get(0).items().stream().map(i -> i.product().id()).toList();
+        assertThat(ids).as("kept sofa stays; the tv is swapped down instead").contains("sofa-prem", "tv-basic").doesNotContain("tv-prem");
+        assertThat(resp.grandTotal().intValue()).isLessThanOrEqualTo(1100);
+    }
+
+    @Test
+    void adjustReduceTotalIsHonestWhenKeptItemsAlreadyCostMoreThanTheTarget() {
+        Product sofaBasic = product("sofa-basic", "Kauč osnovni", "IKEA", "sofa", 300, 4.0);
+        Product bed = product("bed-1", "Krevet", "IKEA", "bed", 800, 4.4);
+        PlannerService service = serviceWithProducts(List.of(sofaBasic, bed));
+
+        FurnishingPlanDto living = planOf("value", ProductDto.from(sofaBasic)); // 300, adjustable but already cheapest
+        FurnishingPlanDto bedroom = planOf("value", ProductDto.from(bed));      // 800, kept
+
+        MoveInResponse resp = service.adjustMoveIn(new MoveInAdjustRequest(baseHR(),
+                List.of(new AdjustRoomDto("living-room", living, false, List.of()),
+                        new AdjustRoomDto("bedroom", bedroom, true, List.of())),
+                3000, "reduce-total", 500, Map.of()));
+
+        assertThat(resp.message()).as("honest: target below the kept items is unreachable").isEqualTo("reduce-unreachable");
+        assertThat(resp.grandTotal().intValue()).as("never drops the kept bed").isGreaterThanOrEqualTo(800);
+        assertThat(resp.rooms().get(1).plans().get(0).items().get(0).product().id()).isEqualTo("bed-1");
+    }
+
+    @Test
+    void adjustFewerStoresConsolidatesIntoOneStoreWithinBudget() {
+        Product sofaJysk = product("sofa-jysk", "Kauč", "JYSK", "sofa", 400, 4.5);
+        Product sofaIkea = product("sofa-ikea", "Kauč", "IKEA", "sofa", 380, 4.7);
+        Product tvIkea = product("tv-ikea", "TV", "IKEA", "tv-unit", 200, 4.4);
+        PlannerService service = serviceWithProducts(List.of(sofaJysk, sofaIkea, tvIkea));
+
+        FurnishingPlanDto living = planOf("value", ProductDto.from(sofaJysk), ProductDto.from(tvIkea)); // JYSK + IKEA
+
+        MoveInResponse resp = service.adjustMoveIn(new MoveInAdjustRequest(baseHR(),
+                List.of(new AdjustRoomDto("living-room", living, false, List.of())),
+                3000, "fewer-stores", null, Map.of()));
+
+        List<String> retailers = resp.rooms().get(0).plans().get(0).items().stream().map(i -> i.product().retailer()).distinct().toList();
+        assertThat(resp.changed()).isTrue();
+        assertThat(retailers).as("consolidated to a single store").hasSize(1);
+        assertThat(resp.grandTotal().intValue()).isLessThanOrEqualTo(3000);
+    }
+
+    @Test
+    void adjustFewerStoresIsHonestWhenAlreadyOneStore() {
+        Product sofa = product("sofa-1", "Kauč", "IKEA", "sofa", 400, 4.5);
+        Product tv = product("tv-1", "TV", "IKEA", "tv-unit", 200, 4.4);
+        PlannerService service = serviceWithProducts(List.of(sofa, tv));
+
+        FurnishingPlanDto living = planOf("value", ProductDto.from(sofa), ProductDto.from(tv)); // IKEA only
+
+        MoveInResponse resp = service.adjustMoveIn(new MoveInAdjustRequest(baseHR(),
+                List.of(new AdjustRoomDto("living-room", living, false, List.of())),
+                3000, "fewer-stores", null, Map.of()));
+
+        assertThat(resp.changed()).isFalse();
+        assertThat(resp.message()).isEqualTo("fewer-stores-noop");
+    }
+
+    @Test
+    void adjustUseRemainingUpgradesAnItemWithoutExceedingTheBudget() {
+        Product sofaBasic = product("sofa-basic", "Kauč", "IKEA", "sofa", 300, 4.0);
+        Product sofaNice = product("sofa-nice", "Kauč bolji", "IKEA", "sofa", 450, 4.7);
+        Product tv = product("tv-1", "TV", "IKEA", "tv-unit", 200, 4.3);
+        PlannerService service = serviceWithProducts(List.of(sofaBasic, sofaNice, tv));
+
+        FurnishingPlanDto living = planOf("value", ProductDto.from(sofaBasic), ProductDto.from(tv)); // 500
+
+        MoveInResponse resp = service.adjustMoveIn(new MoveInAdjustRequest(baseHR(),
+                List.of(new AdjustRoomDto("living-room", living, false, List.of())),
+                3000, "use-remaining", null, Map.of()));
+
+        assertThat(resp.changed()).isTrue();
+        assertThat(resp.message()).isEqualTo("use-remaining-done");
+        List<String> ids = resp.rooms().get(0).plans().get(0).items().stream().map(i -> i.product().id()).toList();
+        assertThat(ids).as("basic sofa upgraded to the nicer one").contains("sofa-nice");
+        assertThat(resp.grandTotal().intValue()).as("never over budget").isLessThanOrEqualTo(3000);
+    }
+
+    @Test
+    void moveInRoomSurfacesAMarketUnavailableRequiredCategory() {
+        // Living room needs a sofa, but the catalog has none -> honest "Nije pronađeno za tvoje tržište" bucket.
+        Product tv = product("tv-1", "TV", "IKEA", "tv-unit", 200, 4.3);
+        Product table = product("table-1", "Stolić", "IKEA", "table", 90, 4.2);
+        PlannerService service = serviceWithProducts(List.of(tv, table));
+
+        MoveInResponse resp = service.generateMoveIn(new MoveInRequestDto(baseHR(), List.of("living-room"), 3000));
+
+        assertThat(resp.rooms().get(0).unavailableInMarket())
+                .as("sofa is required for a living room but the market stocks none")
+                .contains("sofa");
+    }
+
+    private PlannerInputDto baseHR() {
+        return new PlannerInputDto("", 1500, "living-room", "bright", "Zagreb", 20, "multi",
+                List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina"),
+                "best-value", "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0);
+    }
+
+    private FurnishingPlanDto planOf(String id, ProductDto... products) {
+        List<PlanItemDto> items = new ArrayList<>();
+        for (ProductDto product : products) items.add(new PlanItemDto(product, "", "buy-first", "", "", 1));
+        BigDecimal total = items.stream()
+                .map(item -> item.product().price().multiply(BigDecimal.valueOf(Math.max(1, item.quantity()))))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<String> retailers = items.stream().map(item -> item.product().retailer()).distinct().toList();
+        return new FurnishingPlanDto(id, "Plan", "", "", "", "", "", "", "", "",
+                List.of(), List.of(), items, total, BigDecimal.ZERO, 80, "Low", 80, retailers,
+                null, null, null, null, null);
     }
 
     private PlannerService serviceWithProducts(List<Product> products) {
