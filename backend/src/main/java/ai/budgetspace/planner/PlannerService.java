@@ -464,9 +464,19 @@ public class PlannerService {
                 buildPlan(input, "budget", focused),
                 buildPlan(input, "stretch", focused)
         );
-        List<String> missingImportant = missingImportantCategories(input);
+        // Sprint 10.181 (degraded-capacity): a plan is "partial" for two reasons, both derived from real catalog
+        // capacity (never a per-market if). (1) A room-REQUIRED category the market can't supply. (2) A category the
+        // user EXPLICITLY requested (must-have) that the market can't supply — e.g. an NL toilet/bathtub. The second
+        // is what stops the planner from silently dropping the requested piece, passing the plan off as complete, or
+        // reaching into another market/currency to fill it. Explicit unmet requests lead the list (they're what the
+        // user actually asked for); thin room-required gaps follow.
+        List<String> missingRequired = missingImportantCategories(input);
+        List<String> unavailableRequested = unavailableRequestedCategories(input);
+        LinkedHashSet<String> missingSet = new LinkedHashSet<>(unavailableRequested);
+        missingSet.addAll(missingRequired);
+        List<String> missingImportant = new ArrayList<>(missingSet);
         boolean partial = !missingImportant.isEmpty();
-        String catalogWarning = partial ? buildCatalogWarning(missingImportant) : null;
+        String catalogWarning = partial ? buildCatalogWarning(input, unavailableRequested, missingRequired) : null;
         List<ProductDto> secondHand = secondHandSuggestions(input);
         logPlanSummary(input, plans, missingImportant);
         PlanGenerationResponse response = new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning, secondHand);
@@ -585,13 +595,85 @@ public class PlannerService {
                 .toList();
     }
 
-    private String buildCatalogWarning(List<String> missingImportant) {
-        String base = "Nemamo još dovoljno proizvoda za kompletan plan, ali ovo je najbolja dostupna kombinacija.";
-        if (missingImportant.isEmpty()) return base;
-        String labels = missingImportant.stream()
-                .map(PlannerReadiness::categoryLabel)
-                .collect(Collectors.joining(", "));
-        return base + " Još nedostaje dobar izbor za: " + labels + ".";
+    // Sprint 10.181 (degraded-capacity): the categories the user EXPLICITLY requested (must-have) that the selected
+    // MARKET's catalog cannot supply at all. Derived from the SAME pool + filters the planner actually shops from
+    // (market-scoped catalog, planner-eligible, room-matched) and at the SAME fixture-facet granularity pickBest
+    // uses — so "available" here means genuinely pickable, and there is no per-market special-casing. A bathtub is
+    // unavailable when the market has no bathtub even if it stocks a shower (and vice-versa): we never quietly swap
+    // one fixture for the other, invent one, or borrow another market's. The planner still builds the best plan from
+    // what IS available; this list is what makes the response honestly partial and names the gap.
+    private List<String> unavailableRequestedCategories(PlannerInputDto input) {
+        List<String> requested = input.mustHaveCategories();
+        if (requested == null || requested.isEmpty()) return List.of();
+        Set<String> alreadyHave = new LinkedHashSet<>(input.alreadyHaveCategories());
+        // Only categories this room actually plans for (its flow) can be a real market limitation. A category that
+        // isn't part of the room — e.g. a bathroom fixture still sitting in the request after the user switched to a
+        // bedroom — is NOT "unavailable in this market", it simply isn't planned for this room, so it must never be
+        // reported as a limitation (that would be a false alarm from a stale cross-room must-have). Fixture subtypes
+        // (bathtub/shower) map to the single "bath-shower" flow slot.
+        Set<String> roomSlots = new LinkedHashSet<>(CATEGORY_FLOW_BY_ROOM.getOrDefault(
+                input.roomType(), CATEGORY_FLOW_BY_ROOM.getOrDefault("living-room", List.of())));
+        List<Product> pool = marketCatalog(input).stream()
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .filter(product -> matchesRoom(product, input.roomType()))
+                .toList();
+        LinkedHashSet<String> unavailable = new LinkedHashSet<>();
+        for (String raw : requested) {
+            if (raw == null || raw.isBlank()) continue;
+            String category = raw.trim().toLowerCase(Locale.ROOT);
+            if (alreadyHave.contains(category)) continue;
+            String slot = ProductTaxonomy.isFixtureCategory(category) ? "bath-shower" : category;
+            if (!roomSlots.contains(slot)) continue; // not a category this room plans for → not a market limitation
+            boolean available = pool.stream().anyMatch(product -> requestedCategoryPresent(product, category));
+            if (!available) unavailable.add(category);
+        }
+        return new ArrayList<>(unavailable);
+    }
+
+    // Capacity test for ONE explicitly-requested category, at the fixture-facet granularity the user asked for: an
+    // explicit "bathtub" is met only by a real bathtub, a "shower" only by a shower, the legacy "bath-shower"
+    // umbrella by any wet fixture, and everything else by an exact category match. Mirrors categoryMatchesSlot /
+    // pickBest so this answer is the true, market-scoped capacity for that specific request.
+    private boolean requestedCategoryPresent(Product product, String category) {
+        return switch (category) {
+            case "bathtub" -> ProductTaxonomy.isBathtubFixture(product.getCategory(), product.getName());
+            case "shower" -> ProductTaxonomy.isShowerFixture(product.getCategory(), product.getName());
+            case "bath-shower" -> ProductTaxonomy.isFixtureCategory(product.getCategory());
+            default -> category.equalsIgnoreCase(product.getCategory());
+        };
+    }
+
+    // Sprint 10.181 (degraded-capacity): honest, human copy (Croatian — the app's narrative language). Two buckets,
+    // kept distinct: (1) categories the user explicitly asked for that this market simply doesn't carry — named with
+    // the market so the message is specific and true; (2) room-required categories that are merely thin. The old
+    // generic sentence is preserved for (2) so existing consumers/tests keep working.
+    private String buildCatalogWarning(PlannerInputDto input, List<String> unavailableRequested, List<String> missingRequired) {
+        StringBuilder warning = new StringBuilder();
+        if (unavailableRequested != null && !unavailableRequested.isEmpty()) {
+            String labels = unavailableRequested.stream()
+                    .map(PlannerReadiness::categoryLabel)
+                    .collect(Collectors.joining(", "));
+            warning.append("Za odabrano tržište (").append(Markets.normalize(input.market()))
+                    .append(") trenutačno nemamo u ponudi: ").append(labels)
+                    .append(". Taj dio nismo mogli uvrstiti u plan; ostalo smo složili od provjerenih artikala dostupnih na tom tržištu.");
+        }
+        List<String> thin = missingRequired == null ? List.of()
+                : missingRequired.stream()
+                        .filter(category -> unavailableRequested == null || !unavailableRequested.contains(category))
+                        .toList();
+        if (!thin.isEmpty()) {
+            if (warning.length() > 0) warning.append(" ");
+            warning.append("Nemamo još dovoljno proizvoda za kompletan plan, ali ovo je najbolja dostupna kombinacija.");
+            String labels = thin.stream()
+                    .map(PlannerReadiness::categoryLabel)
+                    .collect(Collectors.joining(", "));
+            warning.append(" Još nedostaje dobar izbor za: ").append(labels).append(".");
+        }
+        // Defensive: partial with neither bucket populated — keep the historical generic sentence.
+        if (warning.length() == 0) {
+            return "Nemamo još dovoljno proizvoda za kompletan plan, ali ovo je najbolja dostupna kombinacija.";
+        }
+        return warning.toString();
     }
 
     public FurnishingPlanDto replaceProduct(ReplaceProductRequest request) {

@@ -79,6 +79,14 @@ public final class PlannerReadiness {
             case "nightstand" -> "noćni ormarić";
             case "wardrobe" -> "ormar za odjeću";
             case "dresser" -> "komoda s ladicama";
+            // Sprint 10.181: bathroom fixtures — used by the degraded-capacity warning when the selected
+            // market can't supply an explicitly requested fixture (e.g. NL has no toilet/bathtub).
+            case "toilet" -> "WC školjka";
+            case "washbasin" -> "umivaonik";
+            case "bathtub" -> "kada";
+            case "shower" -> "tuš";
+            case "bath-shower" -> "kada ili tuš";
+            case "textiles" -> "tekstil";
             default -> category;
         };
     }
