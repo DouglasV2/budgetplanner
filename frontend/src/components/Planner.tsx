@@ -143,7 +143,7 @@ function SavedPlansInbox({
   }
 
   return (
-    <details className="saved-plans-inbox" open>
+    <details className="saved-plans-inbox" id="saved" open>
       <summary>
         <div>
           <span>{t('saved.title')}</span>

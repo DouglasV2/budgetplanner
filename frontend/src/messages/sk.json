@@ -641,5 +641,10 @@
   "kitchen.shapeLShaped": "do L",
   "kitchen.shapeUShaped": "do U",
   "kitchen.shapeGalley": "dvojradová",
-  "kitchen.shapeIsland": "s ostrovom"
+  "kitchen.shapeIsland": "s ostrovom",
+  "nav.favorites": "Obľúbené",
+  "planner.heroLead": "Tvoj priestor. Tvoj rozpočet.",
+  "planner.heroAccent": "Hotový plán.",
+  "planner.heroSub": "Opíš, čo chceš, nastav rozpočet a získaj konkrétny zoznam produktov pre svoj priestor.",
+  "planner.newPlan": "Nový plán"
 }

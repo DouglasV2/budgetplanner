@@ -35,6 +35,7 @@ const DICTIONARY: Record<string, Entry> = {
   'nav.how': { hr: 'Kako radi', en: 'How it works' },
   'nav.planner': { hr: 'Planer', en: 'Planner' },
   'nav.cta': { hr: 'Složi prostor', en: 'Plan a room' },
+  'nav.favorites': { hr: 'Favoriti', en: 'Favorites' },
   'header.market': { hr: 'Država', en: 'Country' },
   'header.language': { hr: 'Jezik', en: 'Language' },
   'header.menu': { hr: 'Izbornik', en: 'Menu' },
@@ -42,6 +43,14 @@ const DICTIONARY: Record<string, Entry> = {
   'header.readNative': { hr: 'Vrati na jezik države', en: 'Back to your country’s language' },
 
   'planner.eyebrow': { hr: 'Planer za kupnju', en: 'Shopping planner' },
+  // Sprint 10.182: header hero band. Three-beat headline; the payoff clause (heroAccent) renders in clay.
+  'planner.heroLead': { hr: 'Tvoj prostor. Tvoj budžet.', en: 'Your space. Your budget.' },
+  'planner.heroAccent': { hr: 'Gotov plan.', en: 'A ready plan.' },
+  'planner.heroSub': {
+    hr: 'Opiši što želiš, odredi budžet i dobij konkretan popis proizvoda za svoj prostor.',
+    en: 'Describe what you want, set a budget and get a concrete product list for your space.'
+  },
+  'planner.newPlan': { hr: 'Novi plan', en: 'New plan' },
   'planner.heading': { hr: 'Prvo napišeš želju. Desno dobiješ gotov plan.', en: 'Describe what you want. Get a ready plan.' },
   'planner.subheading': {
     hr: 'Nema komplicirane forme. Opiši prostor svojim riječima, a zatim po potrebi dotjeraj budžet, trgovine ili stvari koje već imaš.',

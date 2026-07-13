@@ -6730,33 +6730,42 @@ textarea { border-radius: var(--r-md); }
 .nav a.active::after { transform: scaleY(1); }
 
 /* Slim product-context strip under the header. */
-.planner-subnav {
+/* ── Sprint 10.182: header hero band (owner mockup) — replaces the slim planner-subnav strip. Two columns:
+      a cart badge + three-beat headline (payoff clause in clay) + subtitle + actions on the left; a drop-in
+      visual on the right (owner's /hero.jpg, with an on-brand illustrated placeholder until it's added). ── */
+.planner-hero {
   width: 100%;
   background: var(--bg-soft);
   border-bottom: 1px solid var(--border);
 }
-.planner-subnav-inner {
-  display: flex;
+.planner-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
   align-items: center;
-  gap: var(--space-3);
-  min-height: 42px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  gap: 34px;
+  padding: 38px 16px 42px;
 }
-.planner-subnav-label { display: inline-flex; align-items: center; gap: var(--space-2); flex: none; }
-.planner-subnav-icon { color: var(--accent); flex: none; }
-.planner-subnav-label strong { font-size: 0.9rem; font-weight: 650; color: var(--text); white-space: nowrap; }
-.planner-subnav-sep { width: 1px; height: 16px; background: var(--border); flex: none; }
-.planner-subnav-tagline {
-  font-size: 0.86rem;
-  color: var(--text-muted);
+.planner-hero-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-.planner-subnav-beta {
+.planner-hero-badge {
   flex: none;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  margin-top: 6px;
+}
+.planner-hero-text { min-width: 0; }
+.planner-hero-beta {
+  display: inline-block;
+  margin-bottom: 12px;
   background: var(--surface);
   color: var(--accent-strong);
   border: 1px solid var(--accent-soft);
@@ -6764,13 +6773,107 @@ textarea { border-radius: var(--r-md); }
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: var(--r-xs);
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+}
+.planner-hero-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.85rem, 3.4vw, 2.85rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.planner-hero-title-accent { color: var(--accent-strong); }
+.planner-hero-sub {
+  margin: 13px 0 0;
+  max-width: 48ch;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+.planner-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+.planner-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: var(--r-md);
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.planner-hero-btn.primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(34, 48, 60, 0.18);
+}
+.planner-hero-btn.primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.planner-hero-btn.ghost {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-strong);
+}
+.planner-hero-btn.ghost:hover { border-color: var(--ink-soft); transform: translateY(-2px); }
+.planner-hero-visual {
+  position: relative;
+  height: 216px;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  background:
+    radial-gradient(circle, rgba(165, 98, 63, 0.14) 1.4px, transparent 1.6px) 0 0 / 15px 15px,
+    linear-gradient(135deg, var(--accent-soft), var(--bg-soft));
+}
+.planner-hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.planner-hero-photo.is-loaded { opacity: 1; }
+.planner-hero-placeholder {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  width: min(72%, 232px);
+  height: auto;
+}
+
+/* Header quick-link to favorites / saved plans (mockup's ♡ Favoriti). */
+.header-fav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: color 0.18s ease;
+}
+.header-fav:hover { color: var(--accent-strong); }
+.header-fav svg { flex: none; }
+
+@media (max-width: 860px) {
+  .planner-hero-inner { grid-template-columns: 1fr; gap: 22px; padding: 30px 16px 34px; }
+  .planner-hero-visual { height: 180px; }
 }
 @media (max-width: 680px) {
-  .planner-subnav-inner { min-height: 38px; gap: var(--space-2); }
-  .planner-subnav-sep,
-  .planner-subnav-tagline { display: none; }
+  .planner-hero-copy { gap: 13px; }
+  .planner-hero-badge { width: 42px; height: 42px; border-radius: 12px; margin-top: 4px; }
+  .planner-hero-visual { display: none; }
+  .planner-hero-inner { padding: 24px 16px 26px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════

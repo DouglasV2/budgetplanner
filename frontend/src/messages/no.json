@@ -641,5 +641,10 @@
   "kitchen.shapeLShaped": "L-formet",
   "kitchen.shapeUShaped": "U-formet",
   "kitchen.shapeGalley": "parallelt",
-  "kitchen.shapeIsland": "med kjøkkenøy"
+  "kitchen.shapeIsland": "med kjøkkenøy",
+  "nav.favorites": "Favoritter",
+  "planner.heroLead": "Ditt rom. Ditt budsjett.",
+  "planner.heroAccent": "Ferdig plan.",
+  "planner.heroSub": "Beskriv hva du vil ha, sett et budsjett og få en konkret produktliste for rommet ditt.",
+  "planner.newPlan": "Ny plan"
 }

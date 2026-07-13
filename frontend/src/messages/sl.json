@@ -641,5 +641,10 @@
   "kitchen.shapeLShaped": "L-oblika",
   "kitchen.shapeUShaped": "U-oblika",
   "kitchen.shapeGalley": "dvoredna",
-  "kitchen.shapeIsland": "z otokom"
+  "kitchen.shapeIsland": "z otokom",
+  "nav.favorites": "Priljubljene",
+  "planner.heroLead": "Tvoj prostor. Tvoj proračun.",
+  "planner.heroAccent": "Gotov načrt.",
+  "planner.heroSub": "Opiši, kaj želiš, določi proračun in dobi konkreten seznam izdelkov za svoj prostor.",
+  "planner.newPlan": "Nov načrt"
 }

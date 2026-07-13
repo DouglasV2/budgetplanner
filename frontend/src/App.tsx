@@ -2,7 +2,7 @@ import { AuthGate } from './components/AuthGate';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { HowItWorks } from './components/HowItWorks';
-import { PlannerSubnav } from './components/PlannerSubnav';
+import { PlannerHero } from './components/PlannerHero';
 import { Planner } from './components/Planner';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LocaleProvider } from './LocaleContext';
@@ -29,9 +29,9 @@ function AppShell() {
   return (
     <main>
       <Header />
-      {/* Sprint 10.172: slim product-context strip under the header (clipboard + "Planer za kupnju" + tagline +
-          BETA badge). Replaces the old full-width BetaNotice bar; beta state is read inside the component. */}
-      <PlannerSubnav />
+      {/* Sprint 10.182: header hero band (owner mockup) — three-beat headline + subtitle + new-plan / my-plans
+          actions + a drop-in visual. Replaces the slim PlannerSubnav strip; beta state is read inside. */}
+      <PlannerHero />
       <Planner />
       <HowItWorks />
       <Footer />

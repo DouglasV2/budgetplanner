@@ -641,5 +641,10 @@
   "kitchen.shapeLShaped": "em L",
   "kitchen.shapeUShaped": "em U",
   "kitchen.shapeGalley": "em corredor",
-  "kitchen.shapeIsland": "com ilha"
+  "kitchen.shapeIsland": "com ilha",
+  "nav.favorites": "Favoritos",
+  "planner.heroLead": "O teu espaço. O teu orçamento.",
+  "planner.heroAccent": "Plano pronto.",
+  "planner.heroSub": "Descreve o que queres, define um orçamento e recebe uma lista concreta de produtos para o teu espaço.",
+  "planner.newPlan": "Novo plano"
 }

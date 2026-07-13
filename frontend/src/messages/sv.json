@@ -641,5 +641,10 @@
   "kitchen.shapeLShaped": "L-format",
   "kitchen.shapeUShaped": "U-format",
   "kitchen.shapeGalley": "parallellkök",
-  "kitchen.shapeIsland": "med köksö"
+  "kitchen.shapeIsland": "med köksö",
+  "nav.favorites": "Favoriter",
+  "planner.heroLead": "Ditt utrymme. Din budget.",
+  "planner.heroAccent": "Färdig plan.",
+  "planner.heroSub": "Beskriv vad du vill ha, sätt en budget och få en konkret produktlista för ditt utrymme.",
+  "planner.newPlan": "Ny plan"
 }

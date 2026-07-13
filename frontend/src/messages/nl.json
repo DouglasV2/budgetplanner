@@ -641,5 +641,10 @@
   "cat.fridge": "Koelkast",
   "cat.freezer": "Vriezer",
   "cat.dishwasher": "Vaatwasser",
-  "cat.microwave": "Magnetron"
+  "cat.microwave": "Magnetron",
+  "nav.favorites": "Favorieten",
+  "planner.heroLead": "Jouw ruimte. Jouw budget.",
+  "planner.heroAccent": "Plan klaar.",
+  "planner.heroSub": "Beschrijf wat je wilt, stel een budget in en krijg een concrete productlijst voor je ruimte.",
+  "planner.newPlan": "Nieuw plan"
 }

@@ -641,5 +641,10 @@
   "kitchen.shapeLShaped": "L-mallinen",
   "kitchen.shapeUShaped": "U-mallinen",
   "kitchen.shapeGalley": "käytävämallinen",
-  "kitchen.shapeIsland": "saarekkeella"
+  "kitchen.shapeIsland": "saarekkeella",
+  "nav.favorites": "Suosikit",
+  "planner.heroLead": "Oma tila. Oma budjetti.",
+  "planner.heroAccent": "Valmis suunnitelma.",
+  "planner.heroSub": "Kuvaile mitä haluat, aseta budjetti ja saat konkreettisen tuotelistan tilaasi varten.",
+  "planner.newPlan": "Uusi suunnitelma"
 }

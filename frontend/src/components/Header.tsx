@@ -135,6 +135,13 @@ export function Header() {
             )}
           </div>
           <div className="header-primary">
+            {/* Sprint 10.182: quick link to the saved-plans / favorites area (lives in the planner below). */}
+            <a className="header-fav" href="#saved" onClick={() => setMenuOpen(false)}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 20.5 4.5 13a4.7 4.7 0 0 1 6.6-6.6l.9.9.9-.9a4.7 4.7 0 0 1 6.6 6.6z" />
+              </svg>
+              <span>{t('nav.favorites')}</span>
+            </a>
             {user ? (
               <div className="header-user">
                 {user.pictureUrl
