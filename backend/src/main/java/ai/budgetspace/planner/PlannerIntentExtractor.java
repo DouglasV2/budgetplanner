@@ -224,6 +224,11 @@ public class PlannerIntentExtractor {
                 input.excludedRetailers() == null ? List.of() : input.excludedRetailers());
         List<String> mentioned = new ArrayList<>();
 
+        // Sprint 10.186: fold common IKEA misspellings / Croatian declensions to the canonical stem so "ikee"
+        // (typo), "iz ikee" (genitive), "ikeu"/"ikeom" are still recognised as IKEA. (JYSK declensions "jyska",
+        // "jysku", "jyskom" already contain the "jysk" stem, so the substring match catches them as-is.)
+        text = text.replaceAll("\\bike(?:a|ee|e|u|i|om|ja|je|ju)\\b", "ikea");
+
         for (Map.Entry<String, String> entry : RETAILER_STEMS.entrySet()) {
             String retailer = entry.getKey();
             String stem = entry.getValue();
@@ -245,6 +250,9 @@ public class PlannerIntentExtractor {
             int cut = cComma < 0 ? cSemi : (cSemi < 0 ? cComma : Math.min(cComma, cSemi));
             if (cut >= 0) after = after.substring(0, cut);
             boolean excludeBefore = matches(before, "\\bbez\\b|izbjegni|izbaci|ne zelim|ne trebam|ne treba|\\bosim\\b|preskoci"
+                    // Sprint 10.186: Croatian "neću/nećemo" (won't) + "ništa iz/od" (nothing from) — the common way
+                    // users decline a store ("neću ništa iz JYSKa") that the earlier list missed.
+                    + "|necu|necemo|\\bnece\\b|nista iz|nista od|ne bih|ne bi\\b"
                     + "|brez|keine|\\bkein\\b|sans|senza|\\bsin\\b|utan|\\buden\\b|\\buten\\b|ilman|zonder|\\bgeen\\b|\\bno\\b|\\bnie\\b|niente");
             boolean excludeAfter = matches(after, "\\bnemoj\\b|ne treba|ne zelim|izbaci|izbjegni|preskoci");
             boolean preferBefore = matches(before, "najvise|radije|preferiram|ako moze|po mogucnosti|volio bih|voljela bih|prvenstveno|preferira"
@@ -306,6 +314,17 @@ public class PlannerIntentExtractor {
         }
 
         return input.withRetailerIntent(retailerMode, selected, new ArrayList<>(preferred), new ArrayList<>(excluded), maxStores);
+    }
+
+    /**
+     * Sprint 10.186: apply ONLY the retailer intent (exclude / only / prefer / store-count) parsed from a raw
+     * prompt onto a seed input. The AI path needs this because the LLM schema exposes only a soft
+     * {@code preferredRetailers} — so "ne želim IKEA" / "samo JYSK" would otherwise be lost. Runs the same
+     * normalization + rules as the rule-based path, seeded with whatever retailer intent the caller already has.
+     */
+    public PlannerInputDto applyRetailerIntentFromPrompt(String rawPrompt, PlannerInputDto seed) {
+        if (rawPrompt == null || rawPrompt.isBlank() || seed == null) return seed;
+        return applyRetailerIntent(normalize(rawPrompt), seed);
     }
 
     private PlannerInputDto applyCategories(String text, PlannerInputDto input) {

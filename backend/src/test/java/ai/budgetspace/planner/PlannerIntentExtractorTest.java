@@ -37,6 +37,30 @@ class PlannerIntentExtractorTest {
     }
 
     @Test
+    void retailerIntentFromPromptHardExcludesWithMisspellingsAndDeclensions() {
+        // Sprint 10.186: the AI path routes the raw prompt through this. "ne želim IKEA" must be a HARD exclude, and
+        // a typo/declension ("IKEE", "iz JYSKa", "neću ništa iz…") must still be recognised as the store.
+        assertThat(retailerIntent("Dnevni boravak 1500e, ne želim IKEA").excludedRetailers()).contains("IKEA");
+        assertThat(retailerIntent("Living room 1500, no IKEA please").excludedRetailers()).contains("IKEA");
+        assertThat(retailerIntent("dnevni boravak, bez IKEE").excludedRetailers()).contains("IKEA"); // typo/genitive
+        assertThat(retailerIntent("Spavaća 1200e, neću ništa iz JYSKa").excludedRetailers()).contains("JYSK");
+    }
+
+    @Test
+    void retailerIntentFromPromptOnlyOneStoreRestricts() {
+        PlannerInputDto only = retailerIntent("spavaća soba 1500e, samo JYSK");
+        assertThat(only.selectedRetailers()).containsExactly("JYSK");
+        assertThat(only.retailerMode()).isEqualTo("single");
+    }
+
+    private PlannerInputDto retailerIntent(String prompt) {
+        return extractor.applyRetailerIntentFromPrompt(prompt, new PlannerInputDto(
+                "", 1500, "living-room", "modern", "Zagreb", 20, "multi",
+                List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina"),
+                "best-value", "comfort", List.of(), List.of(), List.of(), List.of(), List.of(), 0));
+    }
+
+    @Test
     void chairIsNotMappedAsTableAndStolIsNotChair() {
         assertThat(parse("Radni kutak, treba mi stolica.").mustHaveCategories())
                 .contains("chair")

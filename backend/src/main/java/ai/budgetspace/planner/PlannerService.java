@@ -11,6 +11,7 @@ import ai.budgetspace.product.ProductTaxonomy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -206,8 +207,29 @@ public class PlannerService {
     private final KitchenIntentClassifier kitchenClassifier = new KitchenIntentClassifier();
     private static final int MAX_KITCHEN_SETS = 6;
 
+    // Sprint 10.186: retailer-diversity tie-break. When two candidates for a slot are genuinely comparable (same
+    // market/category/room/subtype, near-equal score, comparable style, price within a tight band), spread the plan
+    // across retailers instead of letting the same store auto-win every slot. FIELD-injected (not a constructor arg)
+    // so the Spring bean picks it up from config, while the many `new PlannerService(repo)` UNIT tests keep the
+    // legacy deterministic behaviour (a Java boolean field defaults to false when not injected). Never widens the
+    // store count in a few-stores request, and never picks a worse/pricier piece — see diversitySwap().
+    @Value("${budgetspace.planner.retailer-diversity:true}")
+    private boolean retailerDiversity;
+    // A swap is only allowed within this score epsilon of the top pick, this price band, this rating drop, and
+    // (for the alternative) toward a retailer that is currently LESS used in the plan. Small on purpose — it breaks
+    // near-ties, never trading down to a noticeably worse/pricier/lower-rated piece.
+    private static final double DIVERSITY_SCORE_EPS = 4.0;    // of a ~150-pt score => ~3%
+    private static final double DIVERSITY_PRICE_BAND = 0.15;  // alt may be at most 15% pricier than the top pick
+    private static final double DIVERSITY_RATING_DROP = 0.3;  // alt may be at most 0.3 stars below the top pick
+
     public PlannerService(ProductRepository productRepository) {
         this(productRepository, null);
+    }
+
+    /** Test seam: unit tests build via {@code new PlannerService(repo)} (diversity off); a diversity test opts in. */
+    PlannerService withRetailerDiversity(boolean enabled) {
+        this.retailerDiversity = enabled;
+        return this;
     }
 
     @Autowired
@@ -789,6 +811,12 @@ public class PlannerService {
         List<String> missingImportant = new ArrayList<>(missingSet);
         boolean partial = !missingImportant.isEmpty();
         String catalogWarning = partial ? buildCatalogWarning(input, unavailableRequested, missingRequired) : null;
+        // Sprint 10.186: never silently ignore an unmet retailer wish — append an honest note when a restriction
+        // (e.g. "samo JYSK" in a market where JYSK doesn't operate) had to be relaxed.
+        String retailerNote = retailerConstraintNote(input);
+        if (retailerNote != null) {
+            catalogWarning = catalogWarning == null ? retailerNote : catalogWarning + " " + retailerNote;
+        }
         List<ProductDto> secondHand = secondHandSuggestions(input);
         logPlanSummary(input, plans, missingImportant);
         PlanGenerationResponse response = new PlanGenerationResponse(input, plans, partial, missingImportant, catalogWarning, secondHand);
@@ -1132,6 +1160,8 @@ public class PlannerService {
         List<String> categories = new ArrayList<>(focused ? focusedCategories(input) : desiredCategories(input));
         Set<String> picked = new LinkedHashSet<>();
         Set<String> currentRetailers = new LinkedHashSet<>();
+        // Sprint 10.186: per-retailer counts in THIS plan so the diversity tie-break can favour an under-used store.
+        Map<String, Integer> retailerCounts = new HashMap<>();
         // Sprint 10.178 (B): the colours already picked in THIS plan — used to self-coordinate later picks.
         // Sprint 10.182: seeded (Move-In apartment palette) so a room also coordinates with the earlier rooms;
         // empty for single-room plans, so their behaviour is unchanged.
@@ -1153,6 +1183,7 @@ public class PlannerService {
                 if (picked.contains(lockedProduct.getId())) continue;
                 picked.add(lockedProduct.getId());
                 currentRetailers.add(lockedProduct.getRetailer());
+                retailerCounts.merge(lockedProduct.getRetailer(), 1, Integer::sum);
                 currentColors.addAll(splitCsv(lockedProduct.getColorTags()));
                 total += lockedProduct.getPrice().doubleValue();
                 categories.removeIf(category -> category.equalsIgnoreCase(lockedProduct.getCategory()));
@@ -1202,9 +1233,9 @@ public class PlannerService {
             // resolves to an office chair, not the priciest lounge armchair the anyRoom pool offered), and fall
             // back to any room only when the item genuinely isn't in the plan's room (so a cross-room "bed + sofa"
             // ask still finds the sofa). Whole-room plans (focused=false) stay strictly room-scoped as before.
-            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, currentColors, perUnitTarget, false);
+            Product product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, currentColors, perUnitTarget, false, retailerCounts);
             if (product == null && focused) {
-                product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, currentColors, perUnitTarget, true);
+                product = pickBest(category, input, remainingPerUnit, mode, picked, currentRetailers, currentColors, perUnitTarget, true, retailerCounts);
             }
             // Sprint 10.122: the user explicitly asked for this category (focused or must-have) but nothing fits
             // the budget/cap — rather than an empty tier ("Najbolji izbor" with no items, which looks broken),
@@ -1219,6 +1250,7 @@ public class PlannerService {
 
             picked.add(product.getId());
             currentRetailers.add(product.getRetailer());
+            retailerCounts.merge(product.getRetailer(), 1, Integer::sum);
             currentColors.addAll(splitCsv(product.getColorTags()));
             total += product.getPrice().doubleValue() * qty;
             items.add(createPlanItem(product, input, mode, ""));
@@ -1246,14 +1278,14 @@ public class PlannerService {
     }
 
     private Product pickBest(String category, PlannerInputDto input, double remainingBudget, String mode, Set<String> picked, Set<String> currentRetailers,
-                            Set<String> currentColors, double perItemTarget, boolean anyRoom) {
+                            Set<String> currentColors, double perItemTarget, boolean anyRoom, Map<String, Integer> retailerCounts) {
         List<String> allowedRetailers = selectedRetailers(input);
         boolean coreCategory = isCoreCategory(input.roomType(), category);
         double realisticLimit = coreCategory && !mode.equals("budget")
                 ? Math.max(remainingBudget, input.budget() * 0.28)
                 : remainingBudget;
 
-        return marketCatalog(input).stream()
+        List<Product> candidates = marketCatalog(input).stream()
                 .filter(product -> categoryMatchesSlot(product, category, input))
                 // Sprint 10.156: in a FOCUSED plan every category is an item the user explicitly named, so a
                 // cross-room ask ("a bed AND a sofa") must not drop the sofa just because the plan's inferred room
@@ -1263,8 +1295,41 @@ public class PlannerService {
                 .filter(product -> !picked.contains(product.getId()))
                 .filter(product -> allowedRetailers.contains(product.getRetailer()))
                 .filter(product -> product.getPrice().doubleValue() <= realisticLimit || mode.equals("stretch"))
+                .toList();
+        Product best = candidates.stream()
                 .max(Comparator.comparingDouble(product -> scoreProduct(product, input, mode, currentRetailers, currentColors, perItemTarget)))
                 .orElse(null);
+        return diversitySwap(best, candidates, input, mode, currentRetailers, currentColors, perItemTarget, retailerCounts);
+    }
+
+    // Sprint 10.186: retailer-diversity tie-break. Returns {@code best} unchanged UNLESS diversity is enabled and a
+    // genuinely comparable candidate from a LESS-used retailer exists — same slot (so same category/room/subtype),
+    // score within DIVERSITY_SCORE_EPS, same style-match status, and price within DIVERSITY_PRICE_BAND (never
+    // noticeably pricier). Skipped entirely for a few-stores request (there, consolidating is the point). The effect
+    // is to stop one store auto-winning every comparable slot, without ever choosing a worse/pricier/off-style piece.
+    private Product diversitySwap(Product best, List<Product> candidates, PlannerInputDto input, String mode,
+                                  Set<String> currentRetailers, Set<String> currentColors, double perItemTarget,
+                                  Map<String, Integer> retailerCounts) {
+        if (best == null || !retailerDiversity || prefersFewStores(input)) return best;
+        double bestScore = scoreProduct(best, input, mode, currentRetailers, currentColors, perItemTarget);
+        double bestPrice = best.getPrice().doubleValue();
+        boolean bestStyle = styleMatches(best, input.style());
+        int bestRetailerUse = retailerCounts.getOrDefault(best.getRetailer(), 0);
+        Product alt = null;
+        double altScore = Double.NEGATIVE_INFINITY;
+        int altUse = Integer.MAX_VALUE;
+        for (Product candidate : candidates) {
+            if (candidate.getRetailer().equals(best.getRetailer())) continue;
+            int use = retailerCounts.getOrDefault(candidate.getRetailer(), 0);
+            if (use >= bestRetailerUse) continue;                                       // spread only toward a LESS-used store
+            double score = scoreProduct(candidate, input, mode, currentRetailers, currentColors, perItemTarget);
+            if (score < bestScore - DIVERSITY_SCORE_EPS) continue;                       // comparable base score only
+            if (styleMatches(candidate, input.style()) != bestStyle) continue;          // never trade away a style match
+            if (candidate.getPrice().doubleValue() > bestPrice * (1 + DIVERSITY_PRICE_BAND)) continue; // not noticeably pricier
+            if (candidate.getRating() < best.getRating() - DIVERSITY_RATING_DROP) continue;             // not noticeably worse-rated
+            if (use < altUse || (use == altUse && score > altScore)) { alt = candidate; altScore = score; altUse = use; }
+        }
+        return alt != null ? alt : best;
     }
 
     private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, double perItemTarget) {
@@ -2159,7 +2224,7 @@ public class PlannerService {
 
         for (String category : desired) {
             if (pickedCategories.contains(category) || input.alreadyHaveCategories().contains(category)) continue;
-            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, Set.of(), 0, false);
+            Product option = pickBest(category, input, Math.max(input.budget() * 0.35, 280), "value", pickedIds, retailers, Set.of(), 0, false, Map.of());
             if (option != null) {
                 tips.add("Za oko " + money(option.getPrice().doubleValue()) + " možeš dodati " + categoryLabel(category).toLowerCase(Locale.ROOT) + " i prostor će izgledati potpunije.");
             }
@@ -2439,11 +2504,63 @@ public class PlannerService {
                 .filter(value -> !value.isBlank())
                 .collect(Collectors.toSet());
 
-        if (excluded.isEmpty()) return base;
-        return base.stream()
+        List<String> result = excluded.isEmpty() ? base : base.stream()
                 .filter(Objects::nonNull)
                 .filter(retailer -> !excluded.contains(retailer.trim().toLowerCase(Locale.ROOT)))
                 .toList();
+        // Sprint 10.186: an explicit retailer restriction ("samo JYSK") that supplies NOTHING in this market (e.g.
+        // JYSK doesn't operate in GB/ES) would otherwise build an empty plan. Don't silently return nothing — relax to
+        // the market's stores (still honouring any HARD exclusion); buildResponse adds an honest note. Only triggers
+        // for a genuinely non-covering restriction; a normal multi-store request never reaches here.
+        if (retailerRestrictionActive(input) && !coversAnyProduct(result, input)) {
+            List<String> marketStores = new ArrayList<>(marketCatalog(input).stream()
+                    .map(Product::getRetailer).filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+            marketStores.removeIf(retailer -> excluded.contains(retailer.trim().toLowerCase(Locale.ROOT)));
+            if (!marketStores.isEmpty()) return marketStores;
+        }
+        return result;
+    }
+
+    // Sprint 10.186: the user placed a deliberate retailer restriction (from the prompt "samo JYSK" / "ne želim IKEA",
+    // or a single-store UI pick) — as opposed to the generic multi-store default.
+    private boolean retailerRestrictionActive(PlannerInputDto input) {
+        return (input.excludedRetailers() != null && !input.excludedRetailers().isEmpty())
+                || "single".equals(input.retailerMode())
+                || (input.selectedRetailers() != null && input.selectedRetailers().size() == 1);
+    }
+
+    private boolean coversAnyProduct(List<String> retailers, PlannerInputDto input) {
+        Set<String> set = new HashSet<>(retailers);
+        return marketCatalog(input).stream()
+                .filter(ProductTaxonomy::canEnterPlanner)
+                .anyMatch(product -> set.contains(product.getRetailer()));
+    }
+
+    // The stores the restriction INTENDS to shop (before any relax) — used only for the honest note.
+    private List<String> intendedRestrictedRetailers(PlannerInputDto input) {
+        if ("single".equals(input.retailerMode()) && input.selectedRetailers() != null && !input.selectedRetailers().isEmpty()) {
+            return List.of(input.selectedRetailers().get(0));
+        }
+        Set<String> excluded = input.excludedRetailers() == null ? Set.of()
+                : input.excludedRetailers().stream().filter(Objects::nonNull)
+                .map(retailer -> retailer.trim().toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
+        List<String> stores = new ArrayList<>(marketCatalog(input).stream()
+                .map(Product::getRetailer).filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
+        stores.removeIf(retailer -> excluded.contains(retailer.trim().toLowerCase(Locale.ROOT)));
+        return stores;
+    }
+
+    // Sprint 10.186: honest note when a from-prompt retailer restriction can't be honoured on this market (so the
+    // wish is never silently ignored). The partial case (restricted store missing some categories) is already
+    // surfaced by missingImportantCategories; this covers the "store doesn't operate here at all" case.
+    private String retailerConstraintNote(PlannerInputDto input) {
+        if (!retailerRestrictionActive(input)) return null;
+        if (coversAnyProduct(intendedRestrictedRetailers(input), input)) return null;
+        String wish = "single".equals(input.retailerMode()) && input.selectedRetailers() != null && !input.selectedRetailers().isEmpty()
+                ? input.selectedRetailers().get(0) : "tražena trgovina";
+        return "Napomena: " + wish + " ne posluje na ovom tržištu, pa je plan složen od dostupnih trgovina.";
     }
 
     private boolean prefersFewStores(PlannerInputDto input) {

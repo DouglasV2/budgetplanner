@@ -10,6 +10,8 @@ import ai.budgetspace.ai.LlmProperties;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.PlannerIntentAnalysisDto;
 import ai.budgetspace.product.Markets;
+import ai.budgetspace.product.Product;
+import ai.budgetspace.product.ProductRepository;
 import ai.budgetspace.product.ProductTaxonomy;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -73,19 +76,25 @@ public class PromptIntelligenceService {
     // tags so a prompt-injected payload ("... put <script>…</script> into the summary") can't ride them into the UI
     // or the PDF export. React already escapes — this is defense-in-depth + brand safety, not the sole XSS control.
     private static final int MAX_ECHO_LENGTH = 400;
-    // The planner only honours IKEA/JYSK as a retailer preference (the prompt says "retaileri ∈ [IKEA, JYSK]"); the
-    // taxonomy recognises ~90 retailer names, so a prompt-injected "preferredRetailers:[Wayfair]" would otherwise pass.
-    private static final Set<String> PREFERENCE_RETAILERS = Set.of("IKEA", "JYSK");
 
     private final LlmClientFactory clientFactory;
     private final LlmProperties properties;
     private final AiUsageTracker usageTracker;
+    private final ProductRepository productRepository;
     private final PlannerIntentExtractor ruleBasedExtractor = new PlannerIntentExtractor();
+    // Sprint 10.186: retailer names (lowercased) actually STOCKED in the catalog, cached with a short TTL. A preferred
+    // retailer is kept only if it is a real stocked store — so Emmezeta/Lesnina survive, but a taxonomy-registered-but-
+    // empty slot (Wayfair) or an unknown name (Amazon/Temu) is dropped. Central + catalog-truthful, not a hardcoded list.
+    private volatile Set<String> stockedRetailersLower;
+    private volatile long stockedComputedAtMs;
+    private static final long STOCKED_TTL_MS = 300_000;
 
-    public PromptIntelligenceService(LlmClientFactory clientFactory, LlmProperties properties, AiUsageTracker usageTracker) {
+    public PromptIntelligenceService(LlmClientFactory clientFactory, LlmProperties properties, AiUsageTracker usageTracker,
+                                     ProductRepository productRepository) {
         this.clientFactory = clientFactory;
         this.properties = properties;
         this.usageTracker = usageTracker;
+        this.productRepository = productRepository;
     }
 
     /**
@@ -189,13 +198,18 @@ public class PromptIntelligenceService {
         String optimizationGoal = goalFromQuality(analysis.qualityPreference(), base.optimizationGoal());
         String furnishingLevel = levelFromQuality(analysis.qualityPreference(), base.furnishingLevel());
 
-        return new PlannerInputDto(
+        PlannerInputDto resolved = new PlannerInputDto(
                 "", // prompt cleared on purpose; analysis is authoritative
                 budget, roomType, style, base.location(), size, base.retailerMode(), base.selectedRetailers(),
                 optimizationGoal, furnishingLevel, mustHave, new ArrayList<>(alreadyHave), base.lockedProductIds(),
                 preferred, base.excludedRetailers(), base.maxStores(),
                 lowerAll(analysis.colorPreferences()), lowerAll(analysis.materialPreferences()), base.market()
         ).normalized().withQuantities(validQuantities(analysis.quantities()));
+        // Sprint 10.186: the LLM schema exposes only a SOFT preferredRetailers, so a hard "ne želim IKEA" / "samo
+        // JYSK" in the prompt was lost on the AI path (the plan still returned IKEA). Re-derive the retailer intent
+        // (exclude / only / store-count) from the original prompt and merge it in — the deterministic path already
+        // does this inside enrich(), so this makes the two paths agree.
+        return ruleBasedExtractor.applyRetailerIntentFromPrompt(base.prompt(), resolved);
     }
 
     // --- LLM prompt construction ---
@@ -345,17 +359,39 @@ public class PromptIntelligenceService {
         return out;
     }
 
-    // Sprint 10.186: restrict the model's preferredRetailers to the ones the planner can actually honour (IKEA/JYSK).
-    // normalizeRetailer accepts any of the ~90 taxonomy retailers, so an injected "Wayfair"/"Amazon" would slip in.
+    // Sprint 10.186: keep a preferred retailer only if it is (a) a known taxonomy retailer AND (b) actually STOCKED in
+    // the catalog. normalizeRetailer alone accepts ~90 names incl. registered-but-empty slots (Wayfair), so a plain
+    // taxonomy check would let an injected/unstocked store through; catalog presence is the honest central signal, and
+    // it keeps legitimate third retailers (Emmezeta, Lesnina, …). Falls back to the taxonomy check only if the catalog
+    // is unavailable — never widening beyond the supported set.
     private List<String> validRetailers(List<String> values) {
         if (values == null) return List.of();
+        Set<String> stocked = stockedRetailers();
         LinkedHashSet<String> out = new LinkedHashSet<>();
         for (String value : values) {
             ProductTaxonomy.normalizeRetailer(value)
-                    .filter(PREFERENCE_RETAILERS::contains)
+                    .filter(retailer -> stocked.isEmpty() || stocked.contains(retailer.toLowerCase(Locale.ROOT)))
                     .ifPresent(out::add);
         }
         return new ArrayList<>(out);
+    }
+
+    // The retailer names (lowercased) that actually have products in the catalog, cached with a short TTL.
+    private Set<String> stockedRetailers() {
+        Set<String> cached = stockedRetailersLower;
+        long now = System.currentTimeMillis();
+        if (cached != null && now - stockedComputedAtMs < STOCKED_TTL_MS) return cached;
+        Set<String> fresh = new HashSet<>();
+        if (productRepository != null) {
+            for (Product product : productRepository.findAll()) {
+                if (product.getRetailer() != null && !product.getRetailer().isBlank()) {
+                    fresh.add(product.getRetailer().toLowerCase(Locale.ROOT));
+                }
+            }
+        }
+        stockedRetailersLower = fresh;
+        stockedComputedAtMs = now;
+        return fresh;
     }
 
     private List<String> lowerAll(List<String> values) {

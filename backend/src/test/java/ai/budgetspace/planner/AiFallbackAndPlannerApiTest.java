@@ -315,7 +315,14 @@ class AiFallbackAndPlannerApiTest {
     // ---------- fake LLM plumbing (no live AI) ----------
 
     private PromptIntelligenceService service(LlmProperties props, AiUsageTracker tracker, LlmClient... clients) {
-        return new PromptIntelligenceService(new LlmClientFactory(props, List.of(clients)), props, tracker);
+        // Sprint 10.186: the retailer sanitizer now validates preferredRetailers against actually-stocked retailers,
+        // so supply a small stocked catalog (IKEA/JYSK/Emmezeta) — unknown/unsupported names are still dropped.
+        ProductRepository repository = mock(ProductRepository.class);
+        Product ikea = new Product(); ikea.setRetailer("IKEA"); ikea.setCategory("sofa");
+        Product jysk = new Product(); jysk.setRetailer("JYSK"); jysk.setCategory("sofa");
+        Product emmezeta = new Product(); emmezeta.setRetailer("Emmezeta"); emmezeta.setCategory("sofa");
+        when(repository.findAll()).thenReturn(List.of(ikea, jysk, emmezeta));
+        return new PromptIntelligenceService(new LlmClientFactory(props, List.of(clients)), props, tracker, repository);
     }
 
     private LlmProperties enabledOpenAi(String key) {

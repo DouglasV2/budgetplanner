@@ -855,6 +855,131 @@ class PlannerServiceTest {
                 null, null, null, null, null);
     }
 
+    @Test
+    void retailerDiversitySpreadsAcrossComparablePiecesWhenEnabled() {
+        // Sprint 10.186: with comparable IKEA+JYSK for each slot, the legacy planner picks IKEA every time; the
+        // diversity tie-break spreads the plan across retailers (without a forced percentage).
+        List<Product> catalog = new ArrayList<>();
+        for (String category : List.of("sofa", "rug", "table", "lighting", "storage")) {
+            int price = "sofa".equals(category) ? 500 : 120;
+            catalog.add(product(category + "-ikea", "IKEA " + category, "IKEA", category, price, 4.6));
+            catalog.add(product(category + "-jysk", "JYSK " + category, "JYSK", category, price, 4.5)); // same price, ~same rating
+        }
+        FurnishingPlanDto legacy = serviceWithProducts(catalog).generate(input("dnevni boravak")).plans().get(0);
+        long legacyJysk = legacy.items().stream().filter(item -> "JYSK".equals(item.product().retailer())).count();
+        FurnishingPlanDto diverse = serviceWithProducts(catalog).withRetailerDiversity(true)
+                .generate(input("dnevni boravak")).plans().get(0);
+        long diverseJysk = diverse.items().stream().filter(item -> "JYSK".equals(item.product().retailer())).count();
+
+        assertThat(diverse.items().size()).isGreaterThanOrEqualTo(4);
+        assertThat(diverseJysk).as("diversity spreads to comparable JYSK vs the IKEA-dominant legacy").isGreaterThan(legacyJysk);
+    }
+
+    @Test
+    void retailerDiversityNeverPicksAPricierOrWorsePiece() {
+        // The budget tier picks cheapest, so IKEA is the deterministic best here; the JYSK alternatives are a much
+        // pricier one and a much worse-rated one — the diversity guards (price band + rating drop) must reject both.
+        List<Product> catalog = List.of(
+                product("sofa-ikea", "IKEA sofa", "IKEA", "sofa", 500, 4.6),
+                product("sofa-jysk", "JYSK sofa pricier", "JYSK", "sofa", 750, 4.6),   // +50% > 15% band
+                product("rug-ikea", "IKEA rug", "IKEA", "rug", 120, 4.6),
+                product("rug-jysk", "JYSK rug worse", "JYSK", "rug", 120, 3.0));        // same price, far worse rating
+        FurnishingPlanDto budget = serviceWithProducts(catalog).withRetailerDiversity(true)
+                .generate(input("dnevni boravak")).plans().get(1);
+
+        assertThat(retailerOf(budget, "sofa")).as("a much pricier JYSK is never chosen").isEqualTo("IKEA");
+        assertThat(retailerOf(budget, "rug")).as("a much worse-rated JYSK is never chosen").isEqualTo("IKEA");
+    }
+
+    @Test
+    void retailerDiversityStaysConsolidatedWhenUserWantsFewerStores() {
+        List<Product> catalog = new ArrayList<>();
+        for (String category : List.of("sofa", "rug", "table")) {
+            int price = "sofa".equals(category) ? 500 : 120;
+            catalog.add(product(category + "-ikea", "IKEA " + category, "IKEA", category, price, 4.6));
+            catalog.add(product(category + "-jysk", "JYSK " + category, "JYSK", category, price, 4.6));
+        }
+        // "samo jedna trgovina" => maxStores=1 => prefersFewStores => the diversity tie-break is disabled.
+        PlannerInputDto fewStores = input("dnevni boravak, samo jedna trgovina");
+        long legacyStores = serviceWithProducts(catalog).generate(fewStores).plans().get(0)
+                .items().stream().map(item -> item.product().retailer()).distinct().count();
+        long diverseStores = serviceWithProducts(catalog).withRetailerDiversity(true).generate(fewStores).plans().get(0)
+                .items().stream().map(item -> item.product().retailer()).distinct().count();
+
+        assertThat(diverseStores).as("diversity must NOT widen the store count in a fewer-stores request")
+                .isLessThanOrEqualTo(legacyStores);
+    }
+
+    @Test
+    void onlyJyskInAMarketWithoutJyskRelaxesWithAnHonestNote() {
+        // GB has no JYSK; "samo JYSK" must not yield an empty plan — relax to the available stores + an honest note.
+        List<Product> catalog = List.of(
+                gbProduct("sofa-ikea", "IKEA sofa", "sofa", 500),
+                gbProduct("rug-ikea", "IKEA rug", "rug", 120));
+        PlannerInputDto onlyJysk = input("dnevni boravak").withMarket("GB")
+                .withRetailerIntent("single", List.of("JYSK"), List.of(), List.of(), 0);
+
+        PlanGenerationResponse response = serviceWithProducts(catalog).generate(onlyJysk);
+
+        assertThat(response.plans().get(0).items()).as("the plan is not left empty").isNotEmpty();
+        assertThat(response.catalogWarning()).as("an honest note that the store wish couldn't be met here").isNotNull();
+    }
+
+    private String retailerOf(FurnishingPlanDto plan, String category) {
+        return plan.items().stream()
+                .filter(item -> category.equals(item.product().category()))
+                .map(item -> item.product().retailer()).findFirst().orElse("");
+    }
+
+    private Product gbProduct(String id, String name, String category, int price) {
+        Product product = product(id, name, "IKEA", category, price, 4.5);
+        product.setMarket("GB");
+        return product;
+    }
+
+    @Test
+    void representativePlannerMatrixWithDiversityStaysHealthyAndSpreads() {
+        // Sprint 10.186: run the NEW selection path across a representative room x budget matrix with diversity ON,
+        // asserting the invariants the owner cares about — coverage kept, nothing over budget, and JYSK spread where a
+        // comparable alternative exists (so the tie-break really fires across scenarios, not just in one unit case).
+        List<Product> catalog = new ArrayList<>();
+        String[] categories = {"sofa", "tv-unit", "table", "rug", "lighting", "storage", "bed", "mattress",
+                "nightstand", "wardrobe", "dresser", "desk", "dining-table", "dining-chair", "chair"};
+        for (String category : categories) {
+            int price = List.of("sofa", "bed", "wardrobe", "dining-table").contains(category) ? 500 : 130;
+            catalog.add(fullRoomProduct(category + "-ikea", "IKEA " + category, "IKEA", category, price, 4.6));
+            catalog.add(fullRoomProduct(category + "-jysk", "JYSK " + category, "JYSK", category, price, 4.5));
+        }
+        PlannerService legacy = serviceWithProducts(catalog);                                  // diversity OFF
+        PlannerService diverse = serviceWithProducts(catalog).withRetailerDiversity(true);      // diversity ON
+
+        long jyskTotal = 0;
+        for (String room : List.of("living-room", "bedroom", "dining-room", "home-office")) {
+            for (int budget : new int[]{1000, 1500, 2500}) {
+                FurnishingPlanDto leg = legacy.generate(structuredInput(room, budget)).plans().get(0);
+                FurnishingPlanDto div = diverse.generate(structuredInput(room, budget)).plans().get(0);
+                // Coverage never drops, and the plan is never made pricier (so no NEW over-budget) by diversity —
+                // comparable swaps here are price-neutral, so the diverse total must not exceed the legacy total.
+                assertThat(div.items().size()).as(room + "@" + budget + " keeps coverage").isGreaterThanOrEqualTo(leg.items().size());
+                assertThat(div.total()).as(room + "@" + budget + " not pricier than legacy").isLessThanOrEqualTo(leg.total());
+                jyskTotal += div.items().stream().filter(item -> "JYSK".equals(item.product().retailer())).count();
+            }
+        }
+        assertThat(jyskTotal).as("diversity spread JYSK across the matrix, not IKEA-only everywhere").isGreaterThan(0);
+    }
+
+    private PlannerInputDto structuredInput(String room, int budget) {
+        return new PlannerInputDto("", budget, room, "modern", "Zagreb", 20, "multi",
+                List.of("IKEA", "JYSK", "Pevex", "Emmezeta", "Decathlon", "Lesnina"), "best-value", "comfort",
+                List.of(), List.of(), List.of(), List.of(), List.of(), 0);
+    }
+
+    private Product fullRoomProduct(String id, String name, String retailer, String category, int price, double rating) {
+        Product product = product(id, name, retailer, category, price, rating);
+        product.setRoomTags("living-room,home-office,bedroom,dining-room,kitchen,hallway");
+        return product;
+    }
+
     private PlannerService serviceWithProducts(List<Product> products) {
         ProductRepository repository = mock(ProductRepository.class);
         when(repository.findAll()).thenReturn(products);

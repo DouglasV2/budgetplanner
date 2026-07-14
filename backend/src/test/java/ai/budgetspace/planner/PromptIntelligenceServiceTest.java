@@ -9,6 +9,8 @@ import ai.budgetspace.ai.LlmProperties;
 import ai.budgetspace.ai.LlmProvider;
 import ai.budgetspace.dto.PlannerInputDto;
 import ai.budgetspace.dto.PlannerIntentAnalysisDto;
+import ai.budgetspace.product.Product;
+import ai.budgetspace.product.ProductRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PromptIntelligenceServiceTest {
 
@@ -262,15 +266,18 @@ class PromptIntelligenceServiceTest {
     }
 
     @Test
-    void preferredRetailersRestrictedToIkeaAndJysk() {
-        // Sprint 10.186: an injected preferredRetailers list with a taxonomy-known-but-unstocked retailer
-        // (Wayfair) previously survived; the planner only honours IKEA/JYSK.
-        String json = "{\"roomType\":\"living-room\",\"budget\":1500,\"preferredRetailers\":[\"JYSK\",\"Wayfair\",\"Amazon\"]}";
+    void preferredRetailersKeepStockedThirdRetailersButDropUnsupported() {
+        // Sprint 10.186: validate preferredRetailers against actually-STOCKED retailers (central/catalog-truthful),
+        // NOT a hardcoded {IKEA, JYSK}. A legitimate third retailer present in the catalog (Emmezeta) is kept; a
+        // taxonomy-registered-but-unstocked slot (Wayfair) and unknown names (Amazon/Temu) are dropped.
+        String json = "{\"roomType\":\"living-room\",\"budget\":1500,"
+                + "\"preferredRetailers\":[\"JYSK\",\"Emmezeta\",\"Wayfair\",\"Amazon\",\"Temu\"]}";
         PromptIntelligenceService service = service(enabledOpenAi("key"), defaultTracker(), fixedClient(json));
 
         PlannerIntentAnalysisDto a = service.analyze(input("dnevni boravak, radije JYSK"), "s1", "FREE");
 
-        assertThat(a.preferredRetailers()).containsExactly("JYSK");
+        assertThat(a.preferredRetailers()).contains("JYSK", "Emmezeta");
+        assertThat(a.preferredRetailers()).doesNotContain("Wayfair", "Amazon", "Temu");
     }
 
     @Test
@@ -288,10 +295,38 @@ class PromptIntelligenceServiceTest {
         assertThat(a.normalizedPrompt()).doesNotContain("<").doesNotContain(">");
     }
 
+    @Test
+    void aiPathHonorsHardRetailerExclusionFromPrompt() {
+        // Sprint 10.186: the LLM schema exposes no exclude/only field, so a hard "ne želim IKEA" in the prompt was
+        // lost on the AI path (the plan still returned IKEA). toPlannerInput now re-derives the retailer intent
+        // from the original prompt, so exclusion becomes a real filter, matching the deterministic path.
+        PromptIntelligenceService service = service(disabled(), defaultTracker());
+        PlannerIntentAnalysisDto analysis = service.analyze(input("Dnevni boravak 1500e"), "s1", "FREE");
+        PlannerInputDto resolved = service.toPlannerInput(analysis, input("Dnevni boravak 1500e, ne želim IKEA"));
+
+        assertThat(resolved.excludedRetailers()).contains("IKEA");
+        assertThat(resolved.selectedRetailers()).doesNotContain("IKEA");
+    }
+
     // --- helpers ---
 
     private PromptIntelligenceService service(LlmProperties props, AiUsageTracker tracker, LlmClient... clients) {
-        return new PromptIntelligenceService(new LlmClientFactory(props, List.of(clients)), props, tracker);
+        return new PromptIntelligenceService(new LlmClientFactory(props, List.of(clients)), props, tracker, stockedRepo());
+    }
+
+    // A small catalog of really-stocked retailers so the preferred-retailer sanitizer validates against real stores.
+    private ProductRepository stockedRepo() {
+        ProductRepository repository = mock(ProductRepository.class);
+        when(repository.findAll()).thenReturn(List.of(
+                stockedProduct("IKEA"), stockedProduct("JYSK"), stockedProduct("Emmezeta"), stockedProduct("Lesnina")));
+        return repository;
+    }
+
+    private Product stockedProduct(String retailer) {
+        Product product = new Product();
+        product.setRetailer(retailer);
+        product.setCategory("sofa");
+        return product;
     }
 
     private LlmProperties enabledOpenAi(String key) {
