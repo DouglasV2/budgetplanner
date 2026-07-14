@@ -338,8 +338,12 @@ export function PlannerForm({ input, onChange, onGenerate, isLoading = false }: 
         </label>
         <div className={input.prompt.length > 1000 ? 'prompt-counter over' : 'prompt-counter'} aria-hidden="true">{input.prompt.length} / 1000</div>
         {promptError && <p className="prompt-required-note" role="alert">{t('form.promptRequired')}</p>}
-        {/* Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the typed text. */}
-        <small className="field-help ai-interaction-notice">{t('planner.aiInteractionNotice')}</small>
+        {/* Sprint 10.163 / 10.185 (EU AI Act Art.50 + privacy): a point-of-interaction notice that AI may
+            interpret the typed description, with a subtle caution against entering sensitive personal data. */}
+        <small className="field-help ai-interaction-notice">
+          {t('planner.aiInteractionNotice')}{' '}
+          <span className="ai-sensitive-note">{t('planner.aiSensitiveNotice')}</span>
+        </small>
         <button className="generate-button" type="submit" disabled={isLoading}>
           <span className="generate-button-label"><PlanIcon />{isLoading ? t('planner.generating') : t('planner.generate')}</span>
           <span className="generate-button-hint">{t('form.generateHint')}</span>

@@ -7513,3 +7513,168 @@ textarea { border-radius: var(--r-md); }
 @media (max-width: 720px) {
   .complete-kitchen-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Sprint 10.185: analytics-consent banner ──────────────────────────────────────────────────────────
+   Non-modal bar pinned to the bottom. Odbij and Prihvati are the SAME size/shape (no dark pattern); accept
+   is the brand navy fill, decline an equally-visible bordered button. Sits above the auth gate (z 50) and the
+   sticky generate bar (z 3); the sticky bar is lifted by --consent-banner-h so nothing is covered on mobile. */
+.consent-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  /* let taps pass through the outer padding to the app; the card itself captures them */
+  pointer-events: none;
+}
+
+.consent-banner-inner {
+  pointer-events: auto;
+  position: relative;
+  width: min(1180px, calc(100% - 8px));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+  padding: 16px 20px;
+  background: var(--surface, #faf8f4);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 18px 46px rgba(29, 26, 22, 0.22);
+}
+
+.consent-copy {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.consent-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.consent-desc {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.consent-learn-more {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--accent-strong);
+  font-weight: 640;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.consent-learn-more:hover {
+  color: var(--primary);
+}
+
+.consent-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+/* Both buttons share identical geometry — equal prominence by construction. */
+.consent-btn {
+  min-width: 116px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-weight: 640;
+  font-size: 0.92rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.consent-reject {
+  background: var(--surface, #fff);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.consent-reject:hover {
+  background: rgba(29, 26, 22, 0.05);
+  border-color: var(--ink-soft);
+}
+
+.consent-accept {
+  background: var(--primary);
+  color: #fff;
+}
+
+.consent-accept:hover {
+  background: var(--primary-hover);
+}
+
+.consent-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: 0;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+
+.consent-close:hover {
+  color: var(--ink);
+  background: rgba(29, 26, 22, 0.06);
+}
+
+.consent-banner :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Lift the sticky generate bar above the banner so its CTA is never covered while the banner is open. */
+.sticky-generate-bar {
+  bottom: var(--consent-banner-h, 0);
+}
+
+@media (max-width: 640px) {
+  .consent-banner-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 15px 16px 16px;
+  }
+  /* In the column layout the desktop `flex: 1 1 320px` basis would apply to HEIGHT (forcing a ~320px-tall
+     copy block whose grid rows stretch); reset it so the copy is content-height. */
+  .consent-copy {
+    flex: 0 0 auto;
+  }
+  .consent-actions {
+    /* keep the two buttons side by side and equal, filling the width */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .consent-btn {
+    min-width: 0;
+    width: 100%;
+  }
+  .consent-close {
+    top: 8px;
+    right: 8px;
+  }
+}
+

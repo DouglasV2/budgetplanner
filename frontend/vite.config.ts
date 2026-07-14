@@ -1,8 +1,17 @@
-import { defineConfig } from 'vite';
+/// <reference types="vitest/config" />
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  // Sprint 10.185 (privacy/consent hardening): unit + integration tests for the analytics-consent layer
+  // (consent gating, GA cookie cleanup, legal/analytics guards). jsdom gives document/localStorage/cookies.
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    globals: true,
+    restoreMocks: true
+  },
   server: {
     port: 5173,
     host: true
