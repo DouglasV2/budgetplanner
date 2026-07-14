@@ -396,7 +396,21 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // and micro-price-floored. 7 markets meet the full 6 toilet / 4 bathtub / 4 shower target; FR/ES/AT/FI are
             // partial (accessory-heavy or small toilet catalogs) and NL is thin (Saniweb bot-gates listings) — the
             // shortfalls + blocked alternatives (Reuter/Hornbach/Leroy Merlin = 403/WAF) are documented in the sprint.
-            "/catalog/real-eu-bathroom-fixtures-10-181.json"
+            "/catalog/real-eu-bathroom-fixtures-10-181.json",
+            // Sprint 10.184 ("na bar 15000 — iskopaj kolko mozes svega"): the big cross-market IKEA expansion —
+            // 7471 web-verified products across ALL 15 markets and 20 planner categories, taking the catalog past
+            // 18,700. Harvested from each market's OWN live category listing via the global category-id redirect
+            // (/{cc}/{lang}/cat/-{id}/): every product card embeds the localized name + real /p/ URL + product image
+            // (JSON-LD ItemList; SE nests each item under `.item`) AND the price + currency (data-price/data-currency
+            // on the plp card), so each row is read live off ikea.com/<cc> in a single fetch — no per-product refetch,
+            // no fabrication. Currency-matched per market (EUR/GBP/NOK/SEK/DKK); component/cover/bulb rows pruned by a
+            // BANNED-token filter + per-category micro-price floor; then a 24-agent multilingual judge pass dropped
+            // 38 mis-categorized/non-standalone ranges across all 15 languages (cabinet doors, bare table tops, LED
+            // drivers/strips, towel rails/hooks, shower-curtain rods, floor-protector mats, a chest-of-drawers mis-
+            // tagged as a chair, ...). Balanced with a per-(market, category) cap (30) + per-range cap (3) for price
+            // and range-name diversity. A 30-row live spot-check (2/market) re-confirmed 200 pages / matching JSON-LD
+            // prices / loading images. Deterministic curl, agent-free prices. Re-check before production.
+            "/catalog/real-ikea-catalog-15k-10-184.json"
     );
 
     /**
