@@ -5,6 +5,7 @@ import { formatCurrency, retailersForMarket, roomLabels, styleLabels } from '../
 import { detectOutOfScope } from '../utils/outOfScope';
 import { detectDimensionConstraint } from '../utils/dimensions';
 import { detectMultiRoom } from '../utils/multiRoom';
+import { isPlanStaleForMarket } from '../utils/planReset';
 import type { PlanGenerationResponse } from '../api/client';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
@@ -298,6 +299,9 @@ export function Planner() {
   // Sprint 10.166: when the shown plan is an OPENED SAVED plan, remember when it was saved so we can surface a
   // "prices captured N days ago — refresh" note. Null for a freshly generated plan (its prices are current).
   const [openedSavedAt, setOpenedSavedAt] = useState<string | null>(null);
+  // Sprint 10.186 (QoL): the market the currently-shown plan was built for. Set whenever a plan is generated or
+  // opened; used to clear a now-stale plan when the user switches country (see the effect below).
+  const [planMarket, setPlanMarket] = useState<string | null>(null);
 
   async function refreshSavedPlans() {
     try {
@@ -332,6 +336,28 @@ export function Planner() {
     });
   }, [market]);
 
+  // Sprint 10.186 (QoL): switching country makes a shown plan stale — different catalog, currency and language —
+  // so clear it (just the results, not the typed prompt/form) when the market moves AWAY from the market the plan
+  // was built for. `planMarket` is only set on generate/open, so a fresh visit (no plan) and the market switches
+  // that ACCOMPANY a plan — a prompt-detected country during generation, or opening a saved/shared plan in its own
+  // market — all set planMarket to the same value and never trip this.
+  useEffect(() => {
+    if (!isPlanStaleForMarket(market, planMarket, plans.length > 0)) return;
+    setPlans([]);
+    setPlanMarket(null);
+    setAnalysis(null);
+    setSecondHand([]);
+    setCompleteKitchen(null);
+    setSubmittedPrompt('');
+    setPartialNotice(null);
+    setNotice(null);
+    setError(null);
+    setMarketNote(null);
+    setOpenedSavedAt(null);
+    // Only react to a market change; plans/planMarket are read fresh from the render that the change triggered.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [market]);
+
   // Re-seed the localised example prompt when the active language's overlay loads or the market changes.
   // Keep the ref update OUTSIDE the state updater — StrictMode double-invokes the updater in dev, and a ref
   // mutation inside it would make the second pass bail. Only replace while the textarea still holds the seed.
@@ -361,6 +387,7 @@ export function Planner() {
       .then((savedPlan) => {
         setInput(savedPlan.input);
         setPlans([savedPlan.plan]);
+        setPlanMarket(savedPlan.input.market ?? null);
         setSecondHand([]);
         setCompleteKitchen(null);
         setOpenedSavedAt(savedPlan.createdAt);
@@ -466,6 +493,7 @@ export function Planner() {
     // (roomInferred=true) stays overridable by the next prompt, while an explicit pick (false) stays honored.
     setInput({ ...response.input, prompt: effectiveInput.prompt, market: response.input.market ?? effectiveInput.market, lockedProductIds: response.input.lockedProductIds ?? effectiveInput.lockedProductIds ?? [], roomInferred: effectiveInput.roomInferred ?? true });
     setPlans(response.plans);
+    setPlanMarket(response.input.market ?? effectiveInput.market ?? market);
     setAnalysis(response.intentAnalysis ?? null);
     setSecondHand(response.secondHandSuggestions ?? []);
     setCompleteKitchen(response.completeKitchen ?? null);
@@ -650,6 +678,7 @@ export function Planner() {
   function openSavedPlan(savedPlan: SavedPlanResponse) {
     setInput(savedPlan.input);
     setPlans([savedPlan.plan]);
+    setPlanMarket(savedPlan.input.market ?? null);
     setSecondHand([]);
     setOpenedSavedAt(savedPlan.createdAt);
     // Sprint 10.167: a saved plan opened from another market renders in ITS market — currency AND labels align to
