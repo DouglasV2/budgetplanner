@@ -51,6 +51,9 @@ class PlannerIntentExtractorTest {
         PlannerInputDto only = retailerIntent("spavaća soba 1500e, samo JYSK");
         assertThat(only.selectedRetailers()).containsExactly("JYSK");
         assertThat(only.retailerMode()).isEqualTo("single");
+        // Sprint 10.186: "only"/"nur" restrict too — the app is multilingual (the live audit caught English leaking).
+        assertThat(retailerIntent("bedroom 1500, only JYSK").selectedRetailers()).containsExactly("JYSK");
+        assertThat(retailerIntent("Schlafzimmer 1500, nur JYSK").selectedRetailers()).containsExactly("JYSK");
     }
 
     private PlannerInputDto retailerIntent(String prompt) {

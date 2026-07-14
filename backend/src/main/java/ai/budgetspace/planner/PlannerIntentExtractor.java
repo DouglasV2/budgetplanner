@@ -288,7 +288,11 @@ public class PlannerIntentExtractor {
         String retailerMode = input.retailerMode();
         List<String> selected = new ArrayList<>(baseSelected);
 
-        boolean explicitSingle = mentioned.size() == 1 && matches(text, "samo|iskljucivo|sve iz|jedino");
+        // Sprint 10.186: "only X" restricts to one store. Multilingual (the app serves 14 locales), not Croatian-only —
+        // the live audit caught English "only JYSK" leaking IKEA because "only" was missing here.
+        boolean explicitSingle = mentioned.size() == 1 && matches(text,
+                "samo|iskljucivo|sve iz|jedino|\\bonly\\b|exclusively|solely|\\bnur\\b|uniquement|seulement"
+                + "|\\bsolo\\b|solamente|\\bapenas\\b|\\balleen\\b|edino|\\bvain\\b|ainoastaan|endast|\\bbara\\b|\\bbare\\b|\\bkun\\b");
         if (explicitSingle) {
             String only = mentioned.get(0);
             if (!excluded.contains(only)) {

@@ -219,8 +219,8 @@ public class PlannerService {
     // (for the alternative) toward a retailer that is currently LESS used in the plan. Small on purpose — it breaks
     // near-ties, never trading down to a noticeably worse/pricier/lower-rated piece.
     private static final double DIVERSITY_SCORE_EPS = 4.0;    // of a ~150-pt score => ~3%
-    private static final double DIVERSITY_PRICE_BAND = 0.15;  // alt may be at most 15% pricier than the top pick
     private static final double DIVERSITY_RATING_DROP = 0.3;  // alt may be at most 0.3 stars below the top pick
+    // (No price band: a diversity swap must be CHEAPER-OR-EQUAL, so it can never raise a slot's price.)
 
     public PlannerService(ProductRepository productRepository) {
         this(productRepository, null);
@@ -1304,9 +1304,10 @@ public class PlannerService {
 
     // Sprint 10.186: retailer-diversity tie-break. Returns {@code best} unchanged UNLESS diversity is enabled and a
     // genuinely comparable candidate from a LESS-used retailer exists — same slot (so same category/room/subtype),
-    // score within DIVERSITY_SCORE_EPS, same style-match status, and price within DIVERSITY_PRICE_BAND (never
-    // noticeably pricier). Skipped entirely for a few-stores request (there, consolidating is the point). The effect
-    // is to stop one store auto-winning every comparable slot, without ever choosing a worse/pricier/off-style piece.
+    // score within DIVERSITY_SCORE_EPS, same style-match status, rating within DIVERSITY_RATING_DROP, and CHEAPER-OR-
+    // EQUAL price (so a swap never raises the slot's price). Skipped entirely for a few-stores request (there,
+    // consolidating is the point). The effect: stop one store auto-winning every comparable slot, without ever
+    // choosing a worse/pricier/off-style piece.
     private Product diversitySwap(Product best, List<Product> candidates, PlannerInputDto input, String mode,
                                   Set<String> currentRetailers, Set<String> currentColors, double perItemTarget,
                                   Map<String, Integer> retailerCounts) {
@@ -1325,7 +1326,7 @@ public class PlannerService {
             double score = scoreProduct(candidate, input, mode, currentRetailers, currentColors, perItemTarget);
             if (score < bestScore - DIVERSITY_SCORE_EPS) continue;                       // comparable base score only
             if (styleMatches(candidate, input.style()) != bestStyle) continue;          // never trade away a style match
-            if (candidate.getPrice().doubleValue() > bestPrice * (1 + DIVERSITY_PRICE_BAND)) continue; // not noticeably pricier
+            if (candidate.getPrice().doubleValue() > bestPrice) continue;               // CHEAPER-OR-EQUAL only — diversity never raises the price
             if (candidate.getRating() < best.getRating() - DIVERSITY_RATING_DROP) continue;             // not noticeably worse-rated
             if (use < altUse || (use == altUse && score > altScore)) { alt = candidate; altScore = score; altUse = use; }
         }
