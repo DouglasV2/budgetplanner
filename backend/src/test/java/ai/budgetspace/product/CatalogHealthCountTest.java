@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,7 +31,9 @@ import static org.mockito.Mockito.when;
  */
 class CatalogHealthCountTest {
 
-    private static final int EXPECTED_TOTAL = 11_233;
+    // Sprint 10.184: +7471 cross-market IKEA products (real-ikea-catalog-15k-10-184.json) took the shipped catalog
+    // from 11_233 past the 15k target to 18_704 (distinct externalIds across every snapshot the seeder imports).
+    private static final int EXPECTED_TOTAL = 18_704;
 
     @Test
     void shippedCatalogHasTheExpectedProductCount() throws Exception {
@@ -52,13 +57,16 @@ class CatalogHealthCountTest {
     }
 
     private static List<Product> importWholeCatalog() throws Exception {
+        // externalId -> product, mirroring the real repository's unique-index lookup so importing the whole
+        // (now 18k-row) catalog stays O(n), not the O(n^2) a linear list scan would cost at this size.
+        Map<String, Product> byExternalId = new HashMap<>();
         List<Product> saved = new ArrayList<>();
         ProductRepository repository = mock(ProductRepository.class);
-        when(repository.findByExternalId(anyString())).thenAnswer(inv -> saved.stream()
-                .filter(p -> p.getExternalId().equals(inv.getArgument(0))).findFirst());
+        when(repository.findByExternalId(anyString()))
+                .thenAnswer(inv -> Optional.ofNullable(byExternalId.get((String) inv.getArgument(0))));
         when(repository.save(any(Product.class))).thenAnswer(inv -> {
             Product p = inv.getArgument(0);
-            if (!saved.contains(p)) saved.add(p);
+            if (byExternalId.put(p.getExternalId(), p) == null) saved.add(p);
             return p;
         });
         RetailerSnapshotImportService importer = new RetailerSnapshotImportService(
