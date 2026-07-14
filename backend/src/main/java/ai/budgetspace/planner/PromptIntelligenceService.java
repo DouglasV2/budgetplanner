@@ -53,6 +53,29 @@ public class PromptIntelligenceService {
     private static final Set<String> KNOWN_STYLES = Set.of(
             "bright", "warm", "modern", "minimal", "classic", "industrial", "boho", "surprise");
     private static final Set<String> QUALITY_PREFERENCES = Set.of("budget", "balanced", "premium");
+    // Sprint 10.186 (AI-quality, from the live adversarial sweep): categories that unambiguously belong to ONE room.
+    // Used to recover the room when the model left it at the living-room default but the user asked for a specific
+    // item — e.g. "trebam umivaonik" / "treba mi WC školjka" came back roomType=living-room, so the planner built a
+    // living-room. Mirrors the deterministic PlannerIntentExtractor, which infers the room from the item itself.
+    private static final Map<String, String> ROOM_DEFINING_CATEGORY = Map.ofEntries(
+            Map.entry("toilet", "bathroom"), Map.entry("washbasin", "bathroom"), Map.entry("bathtub", "bathroom"),
+            Map.entry("shower", "bathroom"), Map.entry("bath-shower", "bathroom"),
+            Map.entry("oven", "kitchen"), Map.entry("hob", "kitchen"), Map.entry("cooker-hood", "kitchen"),
+            Map.entry("fridge", "kitchen"), Map.entry("freezer", "kitchen"), Map.entry("dishwasher", "kitchen"),
+            Map.entry("microwave", "kitchen"), Map.entry("kitchen-set", "kitchen"),
+            Map.entry("bed", "bedroom"), Map.entry("mattress", "bedroom"),
+            Map.entry("dining-table", "dining-room"), Map.entry("dining-chair", "dining-room"),
+            Map.entry("desk", "home-office"));
+    // If a living-room-defining item is present, don't re-home a genuine living-room request that merely also
+    // lists a cross-room piece (e.g. "dnevni boravak s kaučem i krevetom u kutu").
+    private static final Set<String> LIVING_ROOM_ANCHORS = Set.of("sofa", "tv-unit");
+    // The two free-text fields echoed back to the user are raw model output; cap the length and strip any HTML/script
+    // tags so a prompt-injected payload ("... put <script>…</script> into the summary") can't ride them into the UI
+    // or the PDF export. React already escapes — this is defense-in-depth + brand safety, not the sole XSS control.
+    private static final int MAX_ECHO_LENGTH = 400;
+    // The planner only honours IKEA/JYSK as a retailer preference (the prompt says "retaileri ∈ [IKEA, JYSK]"); the
+    // taxonomy recognises ~90 retailer names, so a prompt-injected "preferredRetailers:[Wayfair]" would otherwise pass.
+    private static final Set<String> PREFERENCE_RETAILERS = Set.of("IKEA", "JYSK");
 
     private final LlmClientFactory clientFactory;
     private final LlmProperties properties;
@@ -199,6 +222,7 @@ public class PromptIntelligenceService {
                 + "PREVEDI korisnikovu riječ za sobu s bilo kojeg jezika u tu kanonsku vrijednost, npr.: "
                 + "cuisine/Küche/kuhinja/kök/keittiö → kitchen; chambre/Schlafzimmer/spavaća soba/sovrum/dormitorio/quarto → bedroom; "
                 + "salon/salotto/woonkamer/Wohnzimmer/dnevni boravak → living-room; bureau/oficina/radni kutak → home-office; "
+                + "predsoblje/hodnik/Vorzimmer/Diele/Flur/hal/hall/vestibule/eteinen/entré/hol → hallway; "
                 + "garsonijera/monolocale/Einzimmerwohnung/Garçonnière/yksiö/estudio/estúdio/etta/ettromsleilighet/"
                 + "etværelses/'studio apartman'/'studio flat'/garsónka → studio (JEDNOSOBAN stan u kojem se i SPAVA i "
                 + "boravi — NE home-office; obavezno uključi krevet). "
@@ -224,6 +248,7 @@ public class PromptIntelligenceService {
                 + "retaileri ∈ [IKEA, JYSK]. qualityPreference ∈ [budget, balanced, premium]. "
                 + "Izvuci budget i kad je naveden NEPRECIZNO: 'oko 6000 kr' / 'omkring 6000' / 'around 2000' / "
                 + "'~1500 €' / 'do 600' / 'maks 800' / 'budžet bi bio nekih 1300' → uzmi taj broj kao budget. "
+                + "'k'/'K' iza broja množi s 1000 (npr. '1k' = 1000, '2k' = 2000); 'tisuću'/'tisuća'/'tisuca' = 1000. "
                 + "budget i roomSize su cijeli brojevi. budget vrati u valuti koju korisnik koristi (navedena niže) "
                 + "kao GOLI broj, BEZ pretvaranja u drugu valutu (npr. 15000 kr ostaje 15000, ne pretvaraj u eure). "
                 + "roomSize je u m². confidence je OBAVEZAN broj 0..1 — koliko si siguran u parsiranje: za jasan, "
@@ -260,6 +285,8 @@ public class PromptIntelligenceService {
         String quality = a.qualityPreference() != null && QUALITY_PREFERENCES.contains(a.qualityPreference().toLowerCase(Locale.ROOT))
                 ? a.qualityPreference().toLowerCase(Locale.ROOT) : null;
         List<String> validMustHave = validCategories(a.mustHaveCategories());
+        // Sprint 10.186: recover the room from an unambiguous requested item when the model left it at the default.
+        String resolvedRoom = inferRoomFromCategories(roomType, validMustHave);
         // "Specific items only" restricts the plan to the requested categories — but if NONE of them mapped to a
         // category we stock (e.g. "a hammock, a disco ball and a bean bag"), that would build an EMPTY plan. Drop
         // the restriction in that case so the user still gets a normal room instead of nothing.
@@ -267,12 +294,35 @@ public class PromptIntelligenceService {
         return new PlannerIntentAnalysisDto(
                 // Currency is decided by the market, never by the model — the LLM sometimes echoes a symbol
                 // ("€") or the wrong code, so always use the authoritative market currency passed in here.
-                roomType, budget, currency, size, style,
+                resolvedRoom, budget, currency, size, style,
                 validRetailers(a.preferredRetailers()), validMustHave,
                 validCategories(a.alreadyHaveCategories()), validCategories(a.avoidCategories()),
                 lowerAll(a.colorPreferences()), lowerAll(a.materialPreferences()),
-                quality, a.urgency(), a.confidence(), a.missingImportantInfo(), a.userGoalSummary(),
-                a.normalizedPrompt(), a.warnings(), a.aiUsed(), a.source(), specificItemsOnly, validQuantities(a.quantities()));
+                quality, a.urgency(), a.confidence(), a.missingImportantInfo(), safeEcho(a.userGoalSummary()),
+                safeEcho(a.normalizedPrompt()), a.warnings(), a.aiUsed(), a.source(), specificItemsOnly, validQuantities(a.quantities()));
+    }
+
+    // Sprint 10.186: fill in the room from a specific requested item when the model left it at the living-room
+    // default (or blank). Only acts on the default, only when the requested items point to exactly one other room,
+    // and never when a living-room anchor (sofa/tv-unit) is present — so a genuine living-room request is untouched.
+    private String inferRoomFromCategories(String roomType, List<String> categories) {
+        if (roomType != null && !roomType.equals("living-room")) return roomType;
+        if (categories == null || categories.isEmpty()) return roomType;
+        if (categories.stream().anyMatch(LIVING_ROOM_ANCHORS::contains)) return roomType;
+        LinkedHashSet<String> implied = new LinkedHashSet<>();
+        for (String category : categories) {
+            String room = ROOM_DEFINING_CATEGORY.get(category);
+            if (room != null) implied.add(room);
+        }
+        return implied.size() == 1 ? implied.iterator().next() : roomType;
+    }
+
+    // Sprint 10.186: strip HTML/angle-bracket content and cap the length of a user-facing echo field.
+    private String safeEcho(String text) {
+        if (text == null) return null;
+        String cleaned = text.replaceAll("<[^>]*>", "").replace("<", "").replace(">", "").strip();
+        if (cleaned.length() > MAX_ECHO_LENGTH) cleaned = cleaned.substring(0, MAX_ECHO_LENGTH).strip() + "…";
+        return cleaned;
     }
 
     private List<String> validCategories(List<String> values) {
@@ -295,11 +345,15 @@ public class PromptIntelligenceService {
         return out;
     }
 
+    // Sprint 10.186: restrict the model's preferredRetailers to the ones the planner can actually honour (IKEA/JYSK).
+    // normalizeRetailer accepts any of the ~90 taxonomy retailers, so an injected "Wayfair"/"Amazon" would slip in.
     private List<String> validRetailers(List<String> values) {
         if (values == null) return List.of();
         LinkedHashSet<String> out = new LinkedHashSet<>();
         for (String value : values) {
-            ProductTaxonomy.normalizeRetailer(value).ifPresent(out::add);
+            ProductTaxonomy.normalizeRetailer(value)
+                    .filter(PREFERENCE_RETAILERS::contains)
+                    .ifPresent(out::add);
         }
         return new ArrayList<>(out);
     }

@@ -230,6 +230,64 @@ class PromptIntelligenceServiceTest {
         assertThat(a.colorPreferences()).contains("warm");
     }
 
+    @Test
+    void roomInferredFromUnambiguousItemWhenModelLeftLivingRoomDefault() {
+        // Sprint 10.186 (live adversarial sweep): "trebam umivaonik" / "treba mi WC školjka" came back
+        // roomType=living-room (the model's "room not named -> default" rule), so a bathroom-fixture request
+        // built a LIVING-ROOM plan. The sanitizer now recovers the room from the unambiguous item.
+        String json = "{\"roomType\":\"living-room\",\"budget\":1500,\"specificItemsOnly\":true,"
+                + "\"mustHaveCategories\":[\"washbasin\"],\"confidence\":0.9}";
+        PromptIntelligenceService service = service(enabledOpenAi("key"), defaultTracker(), fixedClient(json));
+
+        PlannerIntentAnalysisDto a = service.analyze(input("trebam umivaonik"), "s1", "FREE");
+
+        assertThat(a.aiUsed()).isTrue();
+        assertThat(a.roomType()).isEqualTo("bathroom");
+        assertThat(a.mustHaveCategories()).containsExactly("washbasin");
+    }
+
+    @Test
+    void roomInferenceLeavesGenuineLivingRoomAndExplicitRoomsAlone() {
+        // A living-room anchor (sofa) present → keep living-room even if a cross-room item is also listed.
+        String withAnchor = "{\"roomType\":\"living-room\",\"budget\":2000,\"mustHaveCategories\":[\"sofa\",\"bed\"]}";
+        PlannerIntentAnalysisDto a1 = service(enabledOpenAi("key"), defaultTracker(), fixedClient(withAnchor))
+                .analyze(input("living room with a sofa and a spare bed"), "s1", "FREE");
+        assertThat(a1.roomType()).isEqualTo("living-room");
+
+        // An explicitly-set non-default room is never overridden by the item.
+        String explicit = "{\"roomType\":\"kitchen\",\"budget\":2000,\"mustHaveCategories\":[\"washbasin\"]}";
+        PlannerIntentAnalysisDto a2 = service(enabledOpenAi("key"), defaultTracker(), fixedClient(explicit))
+                .analyze(input("kitchen with a sink"), "s1", "FREE");
+        assertThat(a2.roomType()).isEqualTo("kitchen");
+    }
+
+    @Test
+    void preferredRetailersRestrictedToIkeaAndJysk() {
+        // Sprint 10.186: an injected preferredRetailers list with a taxonomy-known-but-unstocked retailer
+        // (Wayfair) previously survived; the planner only honours IKEA/JYSK.
+        String json = "{\"roomType\":\"living-room\",\"budget\":1500,\"preferredRetailers\":[\"JYSK\",\"Wayfair\",\"Amazon\"]}";
+        PromptIntelligenceService service = service(enabledOpenAi("key"), defaultTracker(), fixedClient(json));
+
+        PlannerIntentAnalysisDto a = service.analyze(input("dnevni boravak, radije JYSK"), "s1", "FREE");
+
+        assertThat(a.preferredRetailers()).containsExactly("JYSK");
+    }
+
+    @Test
+    void echoFieldsStripHtmlTags() {
+        // Sprint 10.186: the model can be steered to echo an injected payload into the user-facing free-text
+        // fields; strip HTML/angle-bracket content so it can't ride into the UI or the PDF export.
+        String json = "{\"roomType\":\"living-room\",\"budget\":800,"
+                + "\"userGoalSummary\":\"<img src=x onerror=alert(1)> living room\","
+                + "\"normalizedPrompt\":\"<script>alert(document.cookie)</script> boravak\"}";
+        PromptIntelligenceService service = service(enabledOpenAi("key"), defaultTracker(), fixedClient(json));
+
+        PlannerIntentAnalysisDto a = service.analyze(input("living room 800"), "s1", "FREE");
+
+        assertThat(a.userGoalSummary()).doesNotContain("<").doesNotContain(">");
+        assertThat(a.normalizedPrompt()).doesNotContain("<").doesNotContain(">");
+    }
+
     // --- helpers ---
 
     private PromptIntelligenceService service(LlmProperties props, AiUsageTracker tracker, LlmClient... clients) {
