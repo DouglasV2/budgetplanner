@@ -136,6 +136,14 @@ const DICTIONARY: Record<string, Entry> = {
   'legal.terms': { hr: 'Uvjeti', en: 'Terms' },
   'legal.impressum': { hr: 'Impressum', en: 'Impressum' },
   'legal.close': { hr: 'Zatvori', en: 'Close' },
+  // Sprint 10.185 (analytics consent): banner + the footer action that reopens it. Google Analytics never loads
+  // before "Prihvati"; "Odbij" keeps it off with no loss of functionality.
+  'consent.title': { hr: 'Pomozi nam poboljšati BudgetSpace', en: 'Help us improve BudgetSpace' },
+  'consent.body': { hr: 'Google Analytics koristimo samo ako pristaneš. Pomaže nam razumjeti kako se aplikacija koristi i što trebamo popraviti.', en: 'We use Google Analytics only if you agree. It helps us understand how the app is used and what we need to fix.' },
+  'consent.reject': { hr: 'Odbij', en: 'Decline' },
+  'consent.accept': { hr: 'Prihvati', en: 'Accept' },
+  'consent.learnMore': { hr: 'Saznaj više', en: 'Learn more' },
+  'consent.settings': { hr: 'Postavke privatnosti', en: 'Privacy settings' },
   'account.delete': { hr: 'Obriši račun', en: 'Delete account' },
   'account.deleteTitle': { hr: 'Obrisati račun?', en: 'Delete account?' },
   'account.deleteWarning': {
@@ -241,7 +249,11 @@ const DICTIONARY: Record<string, Entry> = {
   // Sprint 10.163 (reliance / UCPD): a muted caveat under the AI insight card, shown only when AI was actually used.
   'planner.aiNotAdvice': { hr: 'AI prijedlog — cijene i pristajanje su procjene, nisu stručni savjet. Provjeri kod trgovca prije kupnje.', en: 'AI-generated suggestion — prices and fit are estimates, not professional advice. Check with the retailer before buying.' },
   // Sprint 10.163 (EU AI Act Art.50): a point-of-interaction notice that an AI processes the free-text prompt.
-  'planner.aiInteractionNotice': { hr: 'Tvoj tekst obrađuje AI asistent.', en: 'Your text is processed by an AI assistant.' },
+  // Sprint 10.185 (AI transparency, EU AI Act Art.50): a plain point-of-interaction notice that AI may interpret
+  // the typed description, plus a subtle privacy caution. Deterministic fallback runs when AI is off, so this
+  // says "may" — not "is".
+  'planner.aiInteractionNotice': { hr: 'Tvoj opis može protumačiti AI. Prije kupnje provjeri cijenu, dimenzije i dostupnost kod trgovca.', en: 'Your description may be interpreted by AI. Before buying, check the price, dimensions and availability with the retailer.' },
+  'planner.aiSensitiveNotice': { hr: 'Nemoj unositi osjetljive osobne podatke.', en: 'Don’t enter sensitive personal information.' },
   // Sprint 10.166: freshness note shown when an older SAVED plan is opened — its prices are a snapshot from save time.
   'results.savedPlanFreshnessNote': { hr: 'Cijene su zabilježene {date} (prije {days} d.). Provjeri ih u trgovini ili osvježi plan.', en: 'Prices were captured on {date} ({days}d ago). Check in-store or refresh the plan.' },
   'results.savedPlanRefresh': { hr: 'Osvježi cijene', en: 'Refresh prices' },

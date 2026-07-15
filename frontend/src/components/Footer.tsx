@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useLocale } from '../LocaleContext';
+import { useConsent } from '../ConsentContext';
 import type { LegalKey } from '../legal';
 
 // Sprint 10.76 (perf): the legal docs (legal.ts ~8KB) and the modals only ever render on a footer click, so
@@ -11,6 +12,7 @@ const DeleteAccountDialog = lazy(() => import('./DeleteAccountDialog').then((m) 
 export function Footer() {
   const { t } = useLocale();
   const { user } = useAuth();
+  const { configured: analyticsConfigured, openSettings } = useConsent();
   const [legal, setLegal] = useState<LegalKey | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -26,6 +28,11 @@ export function Footer() {
         <button type="button" onClick={() => setLegal('privacy')}>{t('legal.privacy')}</button>
         <button type="button" onClick={() => setLegal('terms')}>{t('legal.terms')}</button>
         <button type="button" onClick={() => setLegal('impressum')}>{t('legal.impressum')}</button>
+        {/* Sprint 10.185: reopen the analytics-consent panel. Only shown when GA is actually configured, so
+            there is always a real choice to change. */}
+        {analyticsConfigured && (
+          <button type="button" onClick={openSettings}>{t('consent.settings')}</button>
+        )}
         {/* Sprint 10.72: GDPR self-service deletion, only for signed-in accounts (a guest has nothing to delete). */}
         {user && (
           <button type="button" className="footer-delete" onClick={() => setDeleting(true)}>{t('account.delete')}</button>

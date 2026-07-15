@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { AuthGate } from './components/AuthGate';
+import { ConsentBanner } from './components/ConsentBanner';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { HowItWorks } from './components/HowItWorks';
 import { PlannerHero } from './components/PlannerHero';
 import { Planner } from './components/Planner';
 import { AuthProvider, useAuth } from './AuthContext';
+import { ConsentProvider } from './ConsentContext';
 import { LocaleProvider } from './LocaleContext';
 
 // A shared plan link (/plan/<id>) must open without a sign-in wall — that recipient may be a logged-out
@@ -44,6 +46,9 @@ function AppShell() {
       <HowItWorks />
       <Footer />
       {showGate && <AuthGate />}
+      {/* Sprint 10.185: analytics-consent banner. Non-modal; only appears when a GA id is configured and no
+          valid decision exists (or the user reopened it from the footer). Never blocks the app. */}
+      <ConsentBanner />
     </main>
   );
 }
@@ -52,7 +57,9 @@ export default function App() {
   return (
     <LocaleProvider>
       <AuthProvider>
-        <AppShell />
+        <ConsentProvider>
+          <AppShell />
+        </ConsentProvider>
       </AuthProvider>
     </LocaleProvider>
   );
