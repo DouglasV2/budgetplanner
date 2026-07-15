@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { AuthGate } from './components/AuthGate';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
@@ -16,6 +17,13 @@ function isSharedPlanLink() {
 function AppShell() {
   const { user, loading, guestContinued } = useAuth();
   const shared = isSharedPlanLink();
+  // SEO sprint: shared plans stay reachable by anyone with the link but must not be indexed. The authoritative
+  // control is the nginx `X-Robots-Tag: noindex` header on /plan/:id; this flips the document's robots meta to
+  // noindex as a client-side defence for a JS-rendering crawler. The homepage keeps index,follow from index.html.
+  useEffect(() => {
+    if (!shared) return;
+    document.querySelector('meta[name="robots"]')?.setAttribute('content', 'noindex, nofollow');
+  }, [shared]);
   // Returning guests and shared-link recipients are decided synchronously (sessionStorage / pathname), so they
   // render immediately. Only a truly-undecided first visit waits for the /me round-trip — showing a neutral
   // splash rather than flashing the whole app and then slamming the front door over it.

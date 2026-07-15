@@ -13,6 +13,7 @@ import { PlannerForm } from './PlannerForm';
 import { PlanResults, type QuickPlanAction } from './PlanResults';
 import { MoveInPlanner } from './MoveInPlanner';
 import { trackEvent } from '../utils/analytics';
+import { readLandingPreset } from '../utils/landingPreset';
 
 const initialInput: PlannerInput = {
   prompt:
@@ -235,11 +236,16 @@ export function Planner() {
   // The example prompt is localised: Croatian for HR, English for the other markets. We seed it once from
   // the active market's language (the user can then edit freely).
   const exampleSeed = t('planner.examplePrompt');
+  // SEO sprint: an optional preset from a landing-page CTA (e.g. /?mode=single&room=living-room&budget=1000).
+  // Read ONCE at mount. It's null for a shared /plan/:id link (those ignore the preset entirely) or when no
+  // recognised mode is present, so the app's default behaviour is unchanged. For the fields it explicitly sets
+  // it takes precedence over the restored localStorage draft; every other draft field survives.
+  const landingPreset = useMemo(() => readLandingPreset(), []);
   // Sprint 10.138: hydrate the last EDITED prompt + budget from localStorage (a returning user picks up where
   // they left off). A fresh user (no draft) still gets the localised example.
   const [input, setInput] = useState<PlannerInput>(() => {
     const draft = readPlannerDraft();
-    return {
+    const seeded: PlannerInput = {
       ...initialInput,
       // Sprint 10.156: ignore a stored draft that STARTS with a blank line — that's the signature of the old
       // quick-action leak ("\n\n<suffix>"); a real typed prompt never begins with an empty line. This also
@@ -250,6 +256,16 @@ export function Planner() {
       budget: draft?.budget && draft.budget > 0 ? draft.budget : initialInput.budget,
       market
     };
+    // A single-room landing preset sets the room (explicitly — so roomInferred=false, a new prompt won't
+    // silently re-derive it) and/or the budget, overriding the draft only for those fields.
+    if (landingPreset?.scope === 'single') {
+      if (landingPreset.room) {
+        seeded.roomType = landingPreset.room;
+        seeded.roomInferred = false;
+      }
+      if (landingPreset.budget !== undefined) seeded.budget = landingPreset.budget;
+    }
+    return seeded;
   });
   // The example prompt is seeded from t() at mount, but a non-HR market's translations are lazy-loaded, so the
   // first seed can be the English fallback. Re-seed it once the language overlay arrives (t() identity changes
@@ -292,9 +308,16 @@ export function Planner() {
   const [marketNote, setMarketNote] = useState<string | null>(null);
   // Sprint 10.109: planner scope. 'single' = the existing one-room flow (default, unchanged); 'apartment' =
   // the Move-In multi-room mode. Purely additive — the single-room path below is untouched when scope='single'.
-  const [scope, setScope] = useState<'single' | 'apartment'>('single');
+  // SEO sprint: a mode=move-in landing preset opens the apartment scope on first load.
+  const [scope, setScope] = useState<'single' | 'apartment'>(() => landingPreset?.scope ?? 'single');
   // Sprint 10.116: when a free-text prompt names several rooms, this seeds the Move-In mode the nudge switches to.
-  const [moveInSeed, setMoveInSeed] = useState<{ rooms: RoomType[]; budget: number } | null>(null);
+  // SEO sprint: a mode=move-in landing preset seeds the initial rooms (may be empty — never invented) + budget,
+  // which MoveInPlanner applies over its own saved draft on mount.
+  const [moveInSeed, setMoveInSeed] = useState<{ rooms: RoomType[]; budget: number } | null>(() =>
+    landingPreset?.scope === 'apartment'
+      ? { rooms: landingPreset.rooms ?? [], budget: landingPreset.budget ?? 0 }
+      : null
+  );
   // Sprint 10.166: when the shown plan is an OPENED SAVED plan, remember when it was saved so we can surface a
   // "prices captured N days ago — refresh" note. Null for a freshly generated plan (its prices are current).
   const [openedSavedAt, setOpenedSavedAt] = useState<string | null>(null);

@@ -138,11 +138,14 @@ export function MoveInPlanner({ baseInput, activeSpace, onSavedPlan, onNotice, s
   const [showMissing, setShowMissing] = useState(false);
 
   // Sprint 10.116: apply a seed (from the multi-room nudge) — pre-select the detected rooms + typed budget.
+  // SEO sprint: a mode=move-in landing preset may carry a budget without rooms (open the apartment scope but
+  // don't invent a selection), so apply each part independently. Both parts override the hydrated draft — a URL
+  // preset wins over a saved draft for the fields it set. The multi-room nudge always carries rooms + a budget,
+  // so its behaviour is unchanged.
   useEffect(() => {
-    if (seed && seed.rooms.length) {
-      setSelectedRooms(seed.rooms);
-      if (seed.budget > 0) setTotalBudget(seed.budget);
-    }
+    if (!seed) return;
+    if (seed.rooms.length) setSelectedRooms(seed.rooms);
+    if (seed.budget > 0) setTotalBudget(seed.budget);
   }, [seed]);
 
   // Sprint 10.183: persist the whole-apartment session so the next visit starts where the user left off — room
