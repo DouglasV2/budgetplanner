@@ -7106,11 +7106,13 @@ textarea { border-radius: var(--r-md); }
 }
 .planner-hero-title-accent { color: var(--accent-strong); }
 .planner-hero-sub {
-  margin: 13px 0 0;
-  max-width: 48ch;
-  color: var(--ink-soft);
-  font-size: 1.02rem;
-  line-height: 1.5;
+  margin: 14px 0 0;
+  max-width: 46ch;
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 500;
+  line-height: 1.55;
+  text-shadow: 0 1px 2px rgba(250, 246, 240, 0.9);
 }
 .planner-hero-actions {
   display: flex;
