@@ -171,17 +171,14 @@ a {
   color: var(--clay);
 }
 
+/* SEO sprint 2026-07-15: the mark is now the owner's logo image (BrandMark renders an <img>). Scale by height so
+   the landscape 127×86 logo keeps its aspect ratio; the logo carries its own warm background (≈ the header tone),
+   so no tile/fill here — just a small radius to tidy the corners. */
 .brand-mark {
-  width: 36px;
   height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  color: var(--white);
-  background: var(--primary);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.15rem;
+  width: auto;
+  display: block;
+  border-radius: 7px;
   box-shadow: none;
 }
 

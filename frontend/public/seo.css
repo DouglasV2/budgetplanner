@@ -105,9 +105,10 @@ strong { font-weight: 600; }
 }
 
 .brand img {
-  width: 34px;
   height: 34px;
+  width: auto;
   display: block;
+  border-radius: 6px;
 }
 
 .brand-word {
