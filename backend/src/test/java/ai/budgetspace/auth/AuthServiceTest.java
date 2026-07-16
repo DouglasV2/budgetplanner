@@ -3,7 +3,6 @@ package ai.budgetspace.auth;
 import ai.budgetspace.ai.AiUsageRecordRepository;
 import ai.budgetspace.ai.AiUsageTracker;
 import ai.budgetspace.auth.GoogleTokenVerifier.GoogleIdentity;
-import ai.budgetspace.pricewatch.PriceWatchRepository;
 import ai.budgetspace.saved.SavedPlanRepository;
 import ai.budgetspace.tracking.PlusInterestRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,6 @@ class AuthServiceTest {
     private AppUserRepository userRepository;
     private AuthSessionRepository sessionRepository;
     private SavedPlanRepository savedPlanRepository;
-    private PriceWatchRepository priceWatchRepository;
     private PlusInterestRepository plusInterestRepository;
     private AiUsageRecordRepository aiUsageRecordRepository;
     private AiUsageTracker aiUsageTracker;
@@ -46,14 +44,13 @@ class AuthServiceTest {
         userRepository = mock(AppUserRepository.class);
         sessionRepository = mock(AuthSessionRepository.class);
         savedPlanRepository = mock(SavedPlanRepository.class);
-        priceWatchRepository = mock(PriceWatchRepository.class);
         plusInterestRepository = mock(PlusInterestRepository.class);
         aiUsageRecordRepository = mock(AiUsageRecordRepository.class);
         aiUsageTracker = mock(AiUsageTracker.class);
         when(userRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(sessionRepository.save(any(AuthSession.class))).thenAnswer(invocation -> invocation.getArgument(0));
         service = new AuthService(verifier, userRepository, sessionRepository, savedPlanRepository,
-                priceWatchRepository, plusInterestRepository, aiUsageRecordRepository, aiUsageTracker,
+                plusInterestRepository, aiUsageRecordRepository, aiUsageTracker,
                 new AuthProperties("client-123", "", "", "/", 30, 7, false, "Lax"));
     }
 
@@ -203,8 +200,7 @@ class AuthServiceTest {
         // ...the AI-usage ledger rows (durable) + this owner's transient in-memory counters, keyed by owner key.
         verify(aiUsageRecordRepository).deleteByOwnerKey("user:u9");
         verify(aiUsageTracker).forgetOwner("user:u9");
-        // ...and the email PII that lives outside the account row: price-drop watches + the Plus waitlist.
-        verify(priceWatchRepository).deleteByEmailIgnoreCase("e@example.com");
+        // ...and the email PII that lives outside the account row: the Plus waitlist.
         verify(plusInterestRepository).deleteByEmailIgnoreCase("e@example.com");
         verify(userRepository).delete(user);
     }
@@ -217,7 +213,6 @@ class AuthServiceTest {
 
         service.deleteAccount(user);
 
-        verify(priceWatchRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(plusInterestRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(userRepository).delete(user);
     }
@@ -230,7 +225,6 @@ class AuthServiceTest {
         verify(sessionRepository, never()).deleteByUserId(any());
         verify(aiUsageRecordRepository, never()).deleteByOwnerKey(anyString());
         verify(aiUsageTracker, never()).forgetOwner(anyString());
-        verify(priceWatchRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(plusInterestRepository, never()).deleteByEmailIgnoreCase(anyString());
         verify(userRepository, never()).delete(any());
     }

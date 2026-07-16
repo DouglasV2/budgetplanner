@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-// @EnableScheduling drives the Sprint 10.34 price-watch re-check (PriceWatchRecheckService), which is a
-// no-op unless budgetspace.price-watch.recheck-enabled=true, so nothing fetches by surprise in dev/prod.
+// @EnableScheduling drives the background crons (retention cleanup, catalog freshness re-check, catalog audit,
+// billing reconciliation). Each is off-by-default or dormant unless configured, so nothing runs by surprise.
 @SpringBootApplication
 @EnableScheduling
 public class BudgetspaceApplication {

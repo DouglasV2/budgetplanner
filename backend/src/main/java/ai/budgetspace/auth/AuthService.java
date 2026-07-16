@@ -3,7 +3,6 @@ package ai.budgetspace.auth;
 import ai.budgetspace.ai.AiUsageRecordRepository;
 import ai.budgetspace.ai.AiUsageTracker;
 import ai.budgetspace.auth.GoogleTokenVerifier.GoogleIdentity;
-import ai.budgetspace.pricewatch.PriceWatchRepository;
 import ai.budgetspace.saved.SavedPlanRepository;
 import ai.budgetspace.tracking.PlusInterestRepository;
 import org.slf4j.Logger;
@@ -49,7 +48,6 @@ public class AuthService {
     private final AppUserRepository userRepository;
     private final AuthSessionRepository sessionRepository;
     private final SavedPlanRepository savedPlanRepository;
-    private final PriceWatchRepository priceWatchRepository;
     private final PlusInterestRepository plusInterestRepository;
     private final AiUsageRecordRepository aiUsageRecordRepository;
     private final AiUsageTracker aiUsageTracker;
@@ -60,7 +58,6 @@ public class AuthService {
                        AppUserRepository userRepository,
                        AuthSessionRepository sessionRepository,
                        SavedPlanRepository savedPlanRepository,
-                       PriceWatchRepository priceWatchRepository,
                        PlusInterestRepository plusInterestRepository,
                        AiUsageRecordRepository aiUsageRecordRepository,
                        AiUsageTracker aiUsageTracker,
@@ -69,7 +66,6 @@ public class AuthService {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.savedPlanRepository = savedPlanRepository;
-        this.priceWatchRepository = priceWatchRepository;
         this.plusInterestRepository = plusInterestRepository;
         this.aiUsageRecordRepository = aiUsageRecordRepository;
         this.aiUsageTracker = aiUsageTracker;
@@ -223,18 +219,16 @@ public class AuthService {
         // metadata survives the erasure, matching the "everything tied to this account" promise.
         int aiUsage = aiUsageRecordRepository.deleteByOwnerKey(user.ownerKey());
         aiUsageTracker.forgetOwner(user.ownerKey());
-        // GDPR Art. 17: the account's email also lives in price-drop watches and the Plus waitlist — erase those
-        // by email too, else the subscriber's only PII outlives the account they just deleted.
-        int watches = 0;
+        // GDPR Art. 17: the account's email also lives in the Plus waitlist — erase that by email too, else the
+        // subscriber's only PII outlives the account they just deleted.
         int interests = 0;
         String email = user.getEmail();
         if (email != null && !email.isBlank()) {
-            watches = priceWatchRepository.deleteByEmailIgnoreCase(email);
             interests = plusInterestRepository.deleteByEmailIgnoreCase(email);
         }
         userRepository.delete(user);
-        log.info("Account deleted (GDPR erasure): user={}, priceWatches={}, plusInterest={}, aiUsageEvents={}.",
-                user.getId(), watches, interests, aiUsage);
+        log.info("Account deleted (GDPR erasure): user={}, plusInterest={}, aiUsageEvents={}.",
+                user.getId(), interests, aiUsage);
     }
 
     private String newId() {

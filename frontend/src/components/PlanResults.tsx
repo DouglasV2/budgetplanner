@@ -27,7 +27,7 @@ import {
 } from '../utils/planner';
 import { useLocale } from '../LocaleContext';
 import { useAuth } from '../AuthContext';
-import { watchProduct, fetchSimilarItems, type SimilarItemsResult } from '../api/client';
+import { fetchSimilarItems, type SimilarItemsResult } from '../api/client';
 import { trackEvent } from '../utils/analytics';
 import { marketConfig } from '../markets';
 
@@ -1029,15 +1029,9 @@ export function PlanResults({
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const [dislikeProductId, setDislikeProductId] = useState<string | null>(null);
-  // Sprint 10.62: per-product secondary actions (change / keep / watch / reviews) hide behind one toggle so a
-  // row shows just the price, the reason and "open in store" by default. Only one row's actions open at a time.
+  // Sprint 10.62: per-product secondary actions (change / keep / replace) hide behind one toggle so a row
+  // shows just the price, the reason and "open in store" by default. Only one row's actions open at a time.
   const [actionsProductId, setActionsProductId] = useState<string | null>(null);
-  // Sprint 10.34: opt-in price-drop watch (one inline form open at a time).
-  const [watchProductId, setWatchProductId] = useState<string | null>(null);
-  const [watchEmail, setWatchEmail] = useState('');
-  const [watchConsent, setWatchConsent] = useState(false);
-  const [watchSubmitting, setWatchSubmitting] = useState(false);
-  const [watchStatus, setWatchStatus] = useState<{ id: string; type: 'ok' | 'error'; message: string } | null>(null);
   // Sprint 10.173 (P0): the row whose "Slično ispod budžeta" discovery panel is open (one at a time).
   const [similarProductId, setSimilarProductId] = useState<string | null>(null);
   // Sprint 10.183: the row where the last replace found nothing (so we show an honest inline note there), plus the
@@ -1065,14 +1059,12 @@ export function PlanResults({
 
   // Reset per-row disclosure state on a new plan set OR when switching between compared versions (Sprint 10.168:
   // selectedPlanId added) — these panels are keyed by product.id only, so without this an open More-options /
-  // watch / replace panel leaks onto a different plan's row that happens to share the same product id. An
-  // in-place replace keeps planIdsKey + selectedPlanId, so the row a user is editing still survives the swap.
+  // replace panel leaks onto a different plan's row that happens to share the same product id. An in-place
+  // replace keeps planIdsKey + selectedPlanId, so the row a user is editing still survives the swap.
   useEffect(() => {
     setExpandedProductId(null);
     setDislikeProductId(null);
     setActionsProductId(null);
-    setWatchProductId(null);
-    setWatchStatus(null);
     setSimilarProductId(null);
     setNoSwapProductId(null);
   }, [planIdsKey, selectedPlanId, input.optimizationGoal, input.furnishingLevel]);
@@ -1092,53 +1084,12 @@ export function PlanResults({
     }
   }
 
-  function openWatchForm(productId: string) {
-    setWatchProductId(watchProductId === productId ? null : productId);
-    setWatchStatus(null);
-    setWatchEmail('');
-    setWatchConsent(false);
-  }
-
   // Sprint 10.62: open/close a row's secondary actions. Toggling always collapses that row's nested menus so a
-  // fresh open starts clean and a closed row never leaves an orphaned replacement/watch panel showing.
+  // fresh open starts clean and a closed row never leaves an orphaned replacement panel showing.
   function toggleActions(productId: string) {
     setActionsProductId((current) => (current === productId ? null : productId));
     setExpandedProductId(null);
     setDislikeProductId(null);
-    setWatchProductId(null);
-    setWatchStatus(null);
-  }
-
-  async function submitWatch(product: Product) {
-    if (!watchConsent) {
-      setWatchStatus({ id: product.id, type: 'error', message: t('results.watchConsentRequired') });
-      return;
-    }
-    setWatchSubmitting(true);
-    try {
-      const res = await watchProduct({
-        email: watchEmail.trim(),
-        externalId: product.externalId || product.id,
-        market: product.market,
-        consent: true
-      });
-      setWatchStatus({
-        id: product.id,
-        type: 'ok',
-        message: res.alreadyWatching ? t('results.watchAlready') : t('results.watchSuccess', { email: res.email })
-      });
-      setWatchProductId(null);
-      setWatchEmail('');
-      setWatchConsent(false);
-    } catch (error) {
-      setWatchStatus({
-        id: product.id,
-        type: 'error',
-        message: error instanceof Error ? error.message : t('results.watchError')
-      });
-    } finally {
-      setWatchSubmitting(false);
-    }
   }
 
   async function copyPlan(plan: FurnishingPlan) {
@@ -1624,9 +1575,6 @@ export function PlanResults({
                             <button type="button" onClick={() => onToggleLock(product.id)}>
                               {locked ? t('results.release') : t('results.keep')}
                             </button>
-                            <button type="button" className="watch-price-button" aria-expanded={watchProductId === product.id} onClick={() => openWatchForm(product.id)}>
-                              {t('results.watchPrice')}
-                            </button>
                           </div>
                         )}
                         {actionsOpen && expanded && !locked && (
@@ -1648,34 +1596,6 @@ export function PlanResults({
                               <p className="replacement-empty" role="status">{t(noSwapMessageKey)}</p>
                             )}
                           </div>
-                        )}
-                        {actionsOpen && watchProductId === product.id && (
-                          <div className="price-watch-form" aria-label={t('results.watchTitle')}>
-                            <span className="price-watch-title">{t('results.watchTitle')}</span>
-                            <input
-                              type="email"
-                              className="price-watch-email"
-                              value={watchEmail}
-                              onChange={(event) => setWatchEmail(event.target.value)}
-                              placeholder={t('results.watchEmailPlaceholder')}
-                              aria-label={t('results.watchEmailPlaceholder')}
-                            />
-                            <label className="price-watch-consent">
-                              <input type="checkbox" checked={watchConsent} onChange={(event) => setWatchConsent(event.target.checked)} />
-                              <span>{t('results.watchConsent')}</span>
-                            </label>
-                            <div className="price-watch-actions">
-                              <button type="button" className="price-watch-submit" onClick={() => submitWatch(product)} disabled={watchSubmitting}>
-                                {watchSubmitting ? t('results.watchSubmitting') : t('results.watchSubmit')}
-                              </button>
-                              <button type="button" onClick={() => setWatchProductId(null)}>{t('results.watchCancel')}</button>
-                            </div>
-                          </div>
-                        )}
-                        {watchStatus?.id === product.id && (
-                          <small className={watchStatus.type === 'ok' ? 'price-watch-status ok' : 'price-watch-status error'}>
-                            {watchStatus.message}
-                          </small>
                         )}
                         {similarOpen && (
                           <SimilarItemsPanel

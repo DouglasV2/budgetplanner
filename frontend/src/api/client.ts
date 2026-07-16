@@ -153,33 +153,6 @@ export async function fetchGeoCountry(): Promise<string | null> {
   }
 }
 
-// Sprint 10.34: opt-in price-drop watch. The backend stores only the email + product + threshold (with
-// explicit consent) and emails the user when the price falls; one-click unsubscribe in every alert.
-export interface PriceWatchResponse {
-  id: string;
-  productName: string;
-  email: string;
-  thresholdPercent: number;
-  baselinePrice: number;
-  active: boolean;
-  alreadyWatching: boolean;
-  createdAt: string;
-}
-
-export function watchProduct(params: {
-  email: string;
-  externalId: string;
-  market?: string;
-  thresholdPercent?: number;
-  consent: boolean;
-}) {
-  return request<PriceWatchResponse>('/api/price-watch', {
-    method: 'POST',
-    headers: { 'X-BudgetSpace-Session': sessionId() },
-    body: JSON.stringify(params)
-  });
-}
-
 // Sprint 10.8: ask the design assistant to describe a freshly generated plan. The frontend first
 // calls generatePlan, then passes the whole response here.
 export function getDesignSummary(plan: PlanGenerationResponse) {

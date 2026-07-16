@@ -739,22 +739,6 @@ const DICTIONARY: Record<string, Entry> = {
   'results.shareNative': { hr: 'Podijeli', en: 'Share' },
   'results.shareCopy': { hr: 'Kopiraj', en: 'Copy' },
   'results.shareCopied': { hr: 'Kopirano!', en: 'Copied!' },
-  // Sprint 10.34: opt-in price-drop watch. GDPR-minimal: explicit consent, says exactly what we store,
-  // one-click unsubscribe. {email} is the address the user typed back to them.
-  'results.watchPrice': { hr: 'Prati cijenu', en: 'Watch price' },
-  'results.watchTitle': { hr: 'Javi mi kad cijena padne', en: 'Tell me when the price drops' },
-  'results.watchEmailPlaceholder': { hr: 'tvoj@email.com', en: 'you@email.com' },
-  'results.watchConsent': {
-    hr: 'Pristajem da mi BudgetSpace pošalje e-mail kad cijena ovog proizvoda padne. Čuvamo samo tvoj e-mail i ovaj proizvod; odjava je moguća jednim klikom u svakom e-mailu.',
-    en: 'I agree that BudgetSpace may email me when this product’s price drops. We store only your email and this product; you can unsubscribe with one click in every email.'
-  },
-  'results.watchSubmit': { hr: 'Prati', en: 'Watch' },
-  'results.watchSubmitting': { hr: 'Spremam...', en: 'Saving...' },
-  'results.watchCancel': { hr: 'Odustani', en: 'Cancel' },
-  'results.watchSuccess': { hr: 'Spremljeno! Javit ćemo ti na {email} kad cijena padne.', en: 'Saved! We’ll email {email} when the price drops.' },
-  'results.watchAlready': { hr: 'Već pratiš ovaj proizvod.', en: 'You’re already watching this product.' },
-  'results.watchConsentRequired': { hr: 'Označi privolu da bismo ti mogli slati obavijesti.', en: 'Tick the consent box so we can notify you.' },
-  'results.watchError': { hr: 'Nešto je pošlo po zlu. Pokušaj ponovno.', en: 'Something went wrong. Please try again.' },
   'results.kept': { hr: 'Zadržano', en: 'Kept' },
   'results.whyThis': { hr: 'Zašto ovo?', en: 'Why this?' },
   'results.openInStore': { hr: 'Otvori u trgovini', en: 'Open in store' },
