@@ -3,6 +3,7 @@ import { AuthGate } from './components/AuthGate';
 import { ConsentBanner } from './components/ConsentBanner';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { LanguageSuggestion } from './components/LanguageSuggestion';
 import { HowItWorks } from './components/HowItWorks';
 import { PlannerHero } from './components/PlannerHero';
 import { Planner } from './components/Planner';
@@ -39,6 +40,8 @@ function AppShell() {
   return (
     <main>
       <Header />
+      {/* Sprint 10.188: one-time "your browser is English — switch?" prompt (self-gates; no-op for most). */}
+      <LanguageSuggestion />
       {/* Sprint 10.182: header hero band (owner mockup) — three-beat headline + subtitle + new-plan / my-plans
           actions + a drop-in visual. Replaces the slim PlannerSubnav strip; beta state is read inside. */}
       <PlannerHero />

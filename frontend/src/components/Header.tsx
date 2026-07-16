@@ -110,28 +110,37 @@ export function Header() {
               a subtle UTILITY group (country + read-in-English) and a PRIMARY group (sign-in + the CTA) —
               so it reads as an intentionally designed bar, not a row of mismatched controls. */}
           <div className="header-utility">
-            <label className="market-select" aria-label={t('header.market')}>
-              <select value={market} onChange={(event) => { setMarket(event.target.value); setMenuOpen(false); }}>
-                {MARKETS.map((option) => (
-                  <option key={option.code} value={option.code}>
-                    {option.flag} {compactMarket ? option.code : option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {/* Sprint 10.188: both utility controls now carry a visible caption (Country / Language) — a bare
+                flag-dropdown + an "EN" button gave sighted users no cue what either was for. The caption uses the
+                same localized strings that were already the aria-labels, so it needs no new translations. */}
+            <div className="utility-field">
+              <span className="utility-label">{t('header.market')}</span>
+              <label className="market-select" aria-label={t('header.market')}>
+                <select value={market} onChange={(event) => { setMarket(event.target.value); setMenuOpen(false); }}>
+                  {MARKETS.map((option) => (
+                    <option key={option.code} value={option.code}>
+                      {option.flag} {compactMarket ? option.code : option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             {/* Read-in-English toggle for visitors on a non-English market. Shows "EN" to switch to English,
                 or the market's language code (e.g. "HR") to switch back. Currency/market are unaffected. */}
             {config.lang !== 'en' && (
-              <button
-                type="button"
-                className={englishOverride ? 'lang-toggle active' : 'lang-toggle'}
-                aria-label={t('header.language')}
-                aria-pressed={englishOverride}
-                title={englishOverride ? t('header.readNative') : t('header.readEnglish')}
-                onClick={() => { setEnglishOverride(!englishOverride); setMenuOpen(false); }}
-              >
-                {englishOverride ? config.lang.toUpperCase() : 'EN'}
-              </button>
+              <div className="utility-field">
+                <span className="utility-label">{t('header.language')}</span>
+                <button
+                  type="button"
+                  className={englishOverride ? 'lang-toggle active' : 'lang-toggle'}
+                  aria-label={t('header.language')}
+                  aria-pressed={englishOverride}
+                  title={englishOverride ? t('header.readNative') : t('header.readEnglish')}
+                  onClick={() => { setEnglishOverride(!englishOverride); setMenuOpen(false); }}
+                >
+                  {englishOverride ? config.lang.toUpperCase() : 'EN'}
+                </button>
+              </div>
             )}
           </div>
           <div className="header-primary">

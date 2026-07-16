@@ -77,6 +77,19 @@ export function isSupportedMarket(code?: string): boolean {
   return !!code && MARKETS.some((market) => market.code === code.toUpperCase());
 }
 
+// Each language's own name (endonym), for UI that offers to switch language TO/FROM it — e.g. the
+// "Keep Deutsch" button on the browser-language suggestion. A visitor recognises their language by its
+// native name, not an ISO code.
+const LANG_ENDONYMS: Record<Lang, string> = {
+  hr: 'Hrvatski', en: 'English', de: 'Deutsch', it: 'Italiano', sl: 'Slovenščina',
+  fi: 'Suomi', fr: 'Français', nl: 'Nederlands', sk: 'Slovenčina', es: 'Español',
+  pt: 'Português', no: 'Norsk', sv: 'Svenska', da: 'Dansk',
+};
+
+export function languageEndonym(lang: Lang): string {
+  return LANG_ENDONYMS[lang] ?? lang.toUpperCase();
+}
+
 // Sprint 10.13 (#3): smart default — derive the market from the browser locale region (e.g.
 // "de-DE" -> DE, "sl-SI" -> SI) so a visitor starts on a sensible country without doing anything.
 // Returns undefined if the region isn't a market we support (caller falls back to HR).

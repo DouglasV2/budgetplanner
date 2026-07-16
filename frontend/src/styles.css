@@ -301,8 +301,26 @@ a {
 }
 .header-utility {
   display: flex;
-  align-items: center;
-  gap: 2px;
+  align-items: flex-end;
+  gap: 14px;
+}
+/* Sprint 10.188: each utility control (country / language) is now a labelled field — a small copper caption
+   above the control, matching the app's uppercase micro-label convention. */
+.utility-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.utility-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  padding-left: 3px;
+  line-height: 1;
+  white-space: nowrap;
 }
 .header-primary {
   display: flex;
@@ -1052,6 +1070,7 @@ input[type='range'] {
     gap: 8px;
     width: 100%;
   }
+  .utility-field,
   .market-select,
   .market-select select,
   .lang-toggle,
@@ -4761,6 +4780,64 @@ a.google-signin-button.google-signin-link:hover {
 /* Sprint 10.105: free-beta notice for the one-time Design Session model — a slim, friendly pill. */
 /* Sprint 10.145: reworked from a centered pill-with-emoji announcement (too conventional) to a slim,
    left-aligned product note — a solid BETA tag + the message, no bubble. */
+/* Sprint 10.188: browser-language suggestion bar. A slim contained card (matches the beta-notice shell width)
+   with the prompt on the left and Keep / Switch actions on the right; stacks its actions on narrow screens. */
+.lang-suggest {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  width: min(1180px, calc(100% - 40px));
+  margin: 12px auto 2px;
+  padding: 11px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+.lang-suggest-text {
+  flex: 1 1 240px;
+  line-height: 1.4;
+}
+.lang-suggest-actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+.lang-suggest-keep,
+.lang-suggest-switch {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 640;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  transition: background 0.15s ease, color 0.15s ease, filter 0.15s ease;
+}
+.lang-suggest-keep:hover {
+  background: rgba(33, 30, 25, 0.05);
+}
+.lang-suggest-switch {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+}
+.lang-suggest-switch:hover {
+  filter: brightness(1.1);
+}
+@media (max-width: 620px) {
+  .lang-suggest {
+    align-items: stretch;
+  }
+  .lang-suggest-actions {
+    justify-content: flex-end;
+  }
+}
+
 .beta-notice {
   display: flex;
   align-items: center;
