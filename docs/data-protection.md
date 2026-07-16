@@ -23,11 +23,10 @@ current when a processing purpose, subprocessor or retention period changes.
 | 1 | Account / sign-in | Google `sub`, name, email, picture | 6(1)(b) contract | Refreshed on each login (auto-rectification). |
 | 2 | Saved plans | Room/budget/style inputs, plan contents, owner key | 6(1)(b) contract | Owner = `user:<id>` (account) or `guest:<browserId>`. |
 | 3 | AI prompt parsing | Free-text prompt the user types | 6(1)(b) contract (on request) | **Dormant** (`BUDGETSPACE_AI_ENABLED=false`). Prompt sent to Gemini, **not persisted** locally. |
-| 4 | Error monitoring | Exception/stacktrace (ERROR level only) | 6(1)(f) legitimate interest | Sentry; request bodies/prompts are **not** shipped. |
-| 5 | Product-click & plan-feedback analytics | planId, productId, retailer, feedback value | 6(1)(f) legitimate interest | Pseudonymous — **no** user id, email or IP stored. |
-| 6 | Plus/Design-Session waitlist | Optional email | 6(1)(a) consent | `plus_interest`. |
-| 7 | Market/currency selection | Approximate country from CDN header | 6(1)(f) legitimate interest | IP is read from a header, **not stored**. |
-| 8 | Billing (future) | Stripe customer/subscription id | 6(1)(b) contract | **Dormant** until a paid Design Session launches. |
+| 4 | Product-click & plan-feedback analytics | planId, productId, retailer, feedback value | 6(1)(f) legitimate interest | Pseudonymous — **no** user id, email or IP stored. |
+| 5 | Plus/Design-Session waitlist | Optional email | 6(1)(a) consent | `plus_interest`. |
+| 6 | Market/currency selection | Approximate country from CDN header | 6(1)(f) legitimate interest | IP is read from a header, **not stored**. |
+| 7 | Billing (future) | Stripe customer/subscription id | 6(1)(b) contract | **Dormant** until a paid Design Session launches. |
 
 ## 3. Recipients / subprocessors
 
@@ -36,7 +35,6 @@ current when a processing purpose, subprocessor or retention period changes.
 | Google (Identity) | Google Sign-In | US | Google DPA + EU-US DPF / SCCs | Live |
 | Google (Gemini API) | AI prompt processing | US | **Paid-tier Gemini API — no training on prompts + Google Data Processing Addendum** | Live when AI is on — **paid tier confirmed** (billing account linked, prepay, "Paid 2"). Ensure the app's key is from a project under that billing account. |
 | Stripe | Payment processing | US/EU | Stripe DPA + SCCs | Dormant |
-| Sentry | Error monitoring | US | Sentry DPA + SCCs | Live (DSN blank ⇒ off) |
 | eBay | Public used-listings **source** | — | **Not a recipient** — we send eBay no personal data | Dormant (feature hidden) |
 
 **Gemini note:** the paid tier of the Gemini API (billing linked / prepaid) excludes training on your
@@ -47,7 +45,7 @@ switch products. Keep a note that you rely on Google's DPA + paid-tier data-use 
 
 ## 4. International transfers
 
-Google, Stripe and Sentry process in the US. Transfers rely on the **EU-US Data Privacy Framework** (for
+Google and Stripe process in the US. Transfers rely on the **EU-US Data Privacy Framework** (for
 DPF-certified entities) and/or **Standard Contractual Clauses**. This is disclosed to users in the Privacy
 Policy ("Who we share with"). Keep a copy of each provider's SCCs/DPF certification on file.
 
@@ -83,7 +81,7 @@ AI context with account data).
 
 ## 8. Personal-data-breach runbook (Art. 33/34)
 
-1. **Detect** — Sentry ERROR alerts, host/DB monitoring, provider notices.
+1. **Detect** — host/DB monitoring, provider notices, ERROR-level application logs.
 2. **Contain & assess** — what data, whose, how many, likely risk to individuals.
 3. **Clock** — from *awareness*, notify AZOP within **72 hours** if the breach is likely to risk
    individuals' rights (Art. 33). Note the awareness timestamp.

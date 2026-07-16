@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Sprint 10.98 (security) — the global error mapping. The headline security property: an unexpected exception's real
  * message (which may carry internals/secrets) must NEVER reach the client — only a generic 500. Also locks in that
- * unmapped paths return a quiet 404 (so scanner traffic doesn't become 500s / Sentry noise — Sprint 10.97), and the
+ * unmapped paths return a quiet 404 (so scanner traffic doesn't become 500s / ERROR-log noise — Sprint 10.97), and the
  * expected client errors map to their proper 4xx.
  */
 class GlobalExceptionHandlerTest {
@@ -58,7 +58,7 @@ class GlobalExceptionHandlerTest {
     }
 
     // Sprint 10.106: a bad client request (malformed/wrong-typed/missing param) must be a 400 — not a 500 that
-    // also fires a Sentry alert. Bots and typos hit these constantly once live.
+    // also fires an ERROR-level alert. Bots and typos hit these constantly once live.
     @Test
     void malformedOrWrongTypedRequestReturns400NotA500() {
         ResponseEntity<Map<String, String>> response = handler.handleBadClientRequest(

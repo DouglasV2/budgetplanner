@@ -73,16 +73,6 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- Sprint 10.96: error alerting via Sentry's Logback appender. Every log.error (the GlobalExceptionHandler
-         catch-all 500s + Stripe failure paths) becomes a Sentry event with its stack trace, so a prod failure
-         pages the operator instead of dying in stdout. The DSN is read from the SENTRY_DSN env var (never
-         committed); blank/unset => Sentry is disabled (no-op), so dev and any un-configured deploy are unaffected.
-         Not managed by the Spring Boot BOM, so the version is pinned; resolves from Maven Central. -->
-    <dependency>
-      <groupId>io.sentry</groupId>
-      <artifactId>sentry-logback</artifactId>
-      <version>8.16.0</version>
-    </dependency>
   </dependencies>
 
   <build>

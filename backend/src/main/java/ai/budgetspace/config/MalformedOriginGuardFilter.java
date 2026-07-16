@@ -22,7 +22,7 @@ import java.io.IOException;
  * {@link IllegalStateException} ("The port must be an integer") <em>inside</em> the filter chain, before
  * Spring MVC — so the {@code @RestControllerAdvice} never sees it and Tomcat answers {@code 500}. Harmless
  * (no data leak — the
- * error valve is silenced and stack traces are off), but it is the wrong status and it fills Sentry with
+ * error valve is silenced and stack traces are off), but it is the wrong status and it fills the logs with
  * noise every time a scanner sends a junk Origin.</p>
  *
  * <p>This guard runs the <em>same</em> parse defensively one step ahead of {@code CorsFilter}: if it throws,

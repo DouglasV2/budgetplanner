@@ -24,7 +24,7 @@ import java.util.Map;
  *   <li>{@link SavedPlanNotFoundException} (a shared /plan/&lt;id&gt; link whose plan is gone, or a non-owner)
  *       → {@code 404}, logged quietly — an expected client situation, not a server fault.</li>
  *   <li>{@link NoResourceFoundException} (an unmapped path / missing static resource — mostly bots and scanners)
- *       → {@code 404}, logged at debug so scan traffic never becomes a 500 or an ERROR-level Sentry event.</li>
+ *       → {@code 404}, logged at debug so scan traffic never becomes a 500 or an ERROR-level log event.</li>
  *   <li>{@link IllegalArgumentException} (bad input, e.g. a malformed replace request) → {@code 400}
  *       with the original message (these are already written in Croatian for the user).</li>
  *   <li>anything else → {@code 500} with a generic message; the real cause is logged at error level
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, String>> handleNoResource(NoResourceFoundException exception) {
         // An unmapped path / missing static resource — mostly bots and vulnerability scanners (/wp-login.php, /.env).
-        // Return a proper 404 and log it at DEBUG, so scan noise never becomes a 500 OR an ERROR-level Sentry event
+        // Return a proper 404 and log it at DEBUG, so scan noise never becomes a 500 OR an ERROR-level log event
         // that would drown out real failures.
         log.debug("No resource for request: {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Nije pronađeno."));
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
 
     // Sprint 10.106 (security hardening): Spring MVC framework errors for a BAD CLIENT REQUEST — malformed/
     // unreadable JSON, a wrong-typed or missing parameter — are the client's fault, not ours. Map them to a clean
-    // 400 logged at DEBUG, so routine bot/scanner/typo traffic never becomes a 500 OR an ERROR-level Sentry alert.
+    // 400 logged at DEBUG, so routine bot/scanner/typo traffic never becomes a 500 OR a noisy ERROR-level log.
     @ExceptionHandler({
             HttpMessageNotReadableException.class,
             MissingServletRequestParameterException.class,

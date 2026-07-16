@@ -49,11 +49,6 @@ services:
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
       STRIPE_PLUS_PRICE_ID: ${STRIPE_PLUS_PRICE_ID:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-      # Sprint 10.96: Sentry error alerting. Blank SENTRY_DSN => Sentry disabled (dev logs to console as before).
-      # Set it in the gitignored root .env to test alerting locally; SENTRY_DEBUG=true prints send traces.
-      SENTRY_DSN: ${SENTRY_DSN:-}
-      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-dev}
-      SENTRY_DEBUG: ${SENTRY_DEBUG:-false}
       # Sprint 10.105: free beta (one-time Design Session model) — all premium unlocked + beta notice. Set
       # BUDGETSPACE_BETA_MODE=false to preview the future paid (gated) experience locally.
       BUDGETSPACE_BETA_MODE: ${BUDGETSPACE_BETA_MODE:-true}

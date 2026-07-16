@@ -55,8 +55,8 @@ check('Privacy Policy covers temporary IP processing for rate limiting/security'
   /IP/.test(legal) && /(privremeno|temporarily|vorübergehend)/i.test(legal) && /(ograničavanj|rate limit|Ratenbegrenz)/i.test(legal));
 check('Privacy Policy discloses public shared-plan links',
   /(dijeljeni planovi|shared plans|geteilte Pläne)/i.test(legal) && /(svatko tko|anyone who|wer diesen)/i.test(legal));
-check('Privacy Policy identifies the active processors (Google, Sentry, Stripe)',
-  legal.includes('Google') && legal.includes('Sentry') && legal.includes('Stripe'));
+check('Privacy Policy identifies the active processors (Google, Stripe)',
+  legal.includes('Google') && legal.includes('Stripe'));
 check('Privacy Policy mentions consent withdrawal via Postavke privatnosti / Privacy settings',
   /(Postavke privatnosti|Privacy settings|Datenschutz-Einstellungen)/i.test(legal));
 check('Privacy Policy names the DPA (AZOP)', legal.includes('AZOP'));

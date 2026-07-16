@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 /**
  * Sprint 10.166 — weekly catalog HEALTH AUDIT + alert. Complements the rolling {@link CatalogFreshnessService}
  * (which re-probes live prices) with a cheap, network-free health check: it reads the current catalog state via
- * {@link CatalogHealthService} (no outbound fetch) and, on a schedule, logs a summary and escalates to a WARN —
- * which the Sentry appender forwards as an alert — when too much of the catalog has gone stale. This is the
+ * {@link CatalogHealthService} (no outbound fetch) and, on a schedule, logs a summary and escalates to a WARN
+ * when too much of the catalog has gone stale. This is the
  * "N products are outdated, refresh the catalog" signal an operator needs, without any request-path cost or
  * retailer hammering.
  *
@@ -49,7 +49,7 @@ public class CatalogAuditService {
     }
 
     /**
-     * Compute a catalog-health snapshot and log it — INFO normally, WARN (→ Sentry alert) when the stale share
+     * Compute a catalog-health snapshot and log it — INFO normally, WARN when the stale share
      * crosses the threshold. Returns the report so a manual/admin trigger and tests can read it directly.
      */
     public AuditReport runAudit() {
