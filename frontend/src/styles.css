@@ -4465,6 +4465,31 @@ a.google-signin-button.google-signin-link:hover {
   margin: 0;
 }
 
+/* Sprint 10.188: legal notice under the Google button — small, muted, unobtrusive; the Terms/Privacy links are
+   inline text buttons (no button chrome), so the sentence reads naturally. */
+.auth-legal-notice {
+  margin: 0;
+  max-width: 300px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+  text-align: center;
+}
+.auth-legal-link {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  font-weight: 620;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.auth-legal-link:hover {
+  color: var(--accent-strong);
+}
+
 /* Shown only for the brief moment a first-time visit waits for /me, so the app never flashes under the gate. */
 .auth-splash {
   position: fixed;

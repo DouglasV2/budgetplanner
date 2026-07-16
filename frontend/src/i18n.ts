@@ -709,6 +709,14 @@ const DICTIONARY: Record<string, Entry> = {
   'auth.signOutBody': { hr: 'Spremljeni planovi ostaju vezani uz tvoj račun — prijavi se ponovno kad god želiš.', en: 'Your saved plans stay linked to your account — sign back in whenever you like.' },
   'auth.signedInAs': { hr: 'Prijavljen kao {name}', en: 'Signed in as {name}' },
   'auth.signInError': { hr: 'Prijava nije uspjela. Pokušaj ponovno.', en: 'Sign-in failed. Please try again.' },
+  // Sprint 10.188: legal notice under the Google sign-in button. {terms} and {privacy} are rendered as clickable
+  // links (AuthGate splits the string on the tokens), so the labels are their own keys in the sentence's case.
+  'auth.legalNotice': {
+    hr: 'Nastavkom putem Googlea prihvaćaš {terms} i potvrđuješ da si pročitao/la {privacy}.',
+    en: 'By continuing with Google you accept the {terms} and confirm you have read the {privacy}.'
+  },
+  'auth.legalTerms': { hr: 'Uvjete korištenja', en: 'Terms of Use' },
+  'auth.legalPrivacy': { hr: 'Politiku privatnosti', en: 'Privacy Policy' },
 
   // Sprint 10.68: Plus upsell shown when a Free owner hits the saved-plan cap. Sprint 10.88: now an actionable
   // card (upgrade / sign-in / see-pricing), so the message no longer points "below".
