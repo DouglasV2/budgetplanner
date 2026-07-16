@@ -410,7 +410,19 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // tagged as a chair, ...). Balanced with a per-(market, category) cap (30) + per-range cap (3) for price
             // and range-name diversity. A 30-row live spot-check (2/market) re-confirmed 200 pages / matching JSON-LD
             // prices / loading images. Deterministic curl, agent-free prices. Re-check before production.
-            "/catalog/real-ikea-catalog-15k-10-184.json"
+            "/catalog/real-ikea-catalog-15k-10-184.json",
+            // Sprint 10.187 (JYSK cross-market gap-fill): +2425 web-verified JYSK products across all 13 JYSK
+            // markets (AT/DE/DK/FI/FR/HR/IT/NL/NO/PT/SE/SI/SK), concentrated in the thinnest (market × category)
+            // cells the 2026-07-16 coverage audit surfaced (FR/PT/IT were nearly empty; decor/rug/lighting/
+            // textiles were 0 across the Nordics/NL/SK). Each market's sitemap enumerated its real product URLs;
+            // EVERY row was read LIVE off its own JYSK product page — the ProductGroup JSON-LD gave the localized
+            // name + current price + priceCurrency (currency-matched to the market: EUR, or NOK/SEK/DKK for
+            // NO/SE/DK) + og:image. Deduped vs the whole existing catalog (181 already-shipped rows dropped),
+            // junk/accessory prices floored out per category, and a 6-agent adversarial judge pass (0 dropped)
+            // confirmed every row is standalone + on-taxonomy. A 26-row live spot-check (2/market) re-confirmed
+            // matching JSON-LD names + prices. Deterministic curl, agent-free prices, no fabrication. Re-check
+            // before production.
+            "/catalog/real-jysk-cross-market-gapfill-10-187.json"
     );
 
     /**

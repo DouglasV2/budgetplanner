@@ -33,7 +33,9 @@ class CatalogHealthCountTest {
 
     // Sprint 10.184: +7471 cross-market IKEA products (real-ikea-catalog-15k-10-184.json) took the shipped catalog
     // from 11_233 past the 15k target to 18_704 (distinct externalIds across every snapshot the seeder imports).
-    private static final int EXPECTED_TOTAL = 18_704;
+    // Sprint 10.187: +2425 web-verified JYSK gap-fill products across all 13 JYSK markets
+    // (real-jysk-cross-market-gapfill-10-187.json), deduped vs the existing catalog -> 21_129.
+    private static final int EXPECTED_TOTAL = 21_129;
 
     @Test
     void shippedCatalogHasTheExpectedProductCount() throws Exception {
