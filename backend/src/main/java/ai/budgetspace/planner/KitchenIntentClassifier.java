@@ -33,14 +33,14 @@ public class KitchenIntentClassifier {
     // kitchen word (AND), so word order ("kompletna L kuhinja") doesn't matter. "modern" is deliberately NOT here —
     // a plain "moderna kuhinja" is today's freestanding behaviour, only an explicit complete-ask shows sets.
     //
-    // Owner report 2026-07-18: "whole kitchen" is the SAME ask as "complete kitchen" but only the latter routed here,
+    // Owner report 2026-07-20: "whole kitchen" is the SAME ask as "complete kitchen" but only the latter routed here,
     // because the qualifier had the HR "cijel" (whole) but no English "whole"/"entire", and the "complete" stem was
     // k-only ("kompletn"), so the Romance/Dutch "complet-" family (IT "completa", ES "cocina completa", FR "complète",
     // NL "complete keuken") never matched its own direct translation. "komplet"/"complet" now cover both spellings
     // (kompletn/komplett/kompletná/completa/complete/complète); "\bwhole\b|\bentire\b" adds the English whole-word
     // synonyms (word-bounded so "wholesale"/"entirely" don't trip; still ANDed with a kitchen word, so a "whole
     // living room" stays out of scope here).
-    // Multilingual complete-qualifier stems (audit 2026-07-18): "componibil" IT (modular), "equipee"/"amenag" FR
+    // Multilingual complete-qualifier stems (audit 2026-07-20): "componibil" IT (modular), "equipee"/"amenag" FR
     // (fitted/laid-out), "einricht" DE (furnish), "valmis" FI (ready/complete), "amuebl" ES (furnish), "\bintegral"
     // ES (cocina integral = built-in), "volledig" NL (complete/full). Deliberately NOT included: "\bganze" DE (would
     // wrongly flag "ganzen neuen Küchenschrank" = a whole new cabinet, a COMPONENT) and FI "koko" (means "size" in

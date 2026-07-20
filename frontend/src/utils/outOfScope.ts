@@ -8,7 +8,7 @@ import { affirmativeHit, negatedRanges, normalizeForMatch } from './negationScop
 export type OutOfScopeCategory = 'electronics' | 'appliances' | 'materials' | 'outdoor';
 
 // A "tv komoda / tv stalak / tv element …" IS furniture (a TV stand) — never flag those as out of scope. Audit
-// 2026-07-18: added the German "tv-regal"/"tv-schrank" and the Scandinavian/German "tv-bord"/"tv-bänk"/"TV-Bank"
+// 2026-07-20: added the German "tv-regal"/"tv-schrank" and the Scandinavian/German "tv-bord"/"tv-bänk"/"TV-Bank"
 // (the list had English "board"/"bench" but not the DE/Scand "bord"/"bank"/"regal"/"schrank").
 const TV_FURNITURE = /\btv[\s-]*(komod|stalak|stalk|element|ormaric|polic|klup|stol|stand|unit|bench|cabinet|board|meubel|mobile|m[oö]bel|regal|schrank|bord|bank)/;
 

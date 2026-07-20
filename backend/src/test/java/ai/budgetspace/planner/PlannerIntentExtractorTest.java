@@ -175,7 +175,7 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Dnevni boravak, važna mi je besplatna dostava.").roomType()).isEqualTo("living-room");
     }
 
-    // --- Sprint 10.189 multilingual synonym audit (2026-07-18): every gap below is a real native word a user in a
+    // --- Sprint 10.189 multilingual synonym audit (2026-07-20): every gap below is a real native word a user in a
     // live market types, that used to silently fall back to a wrong/default value. Each positive is paired, where the
     // audit found one, with a false-positive guard for the exact over-match its adversarial pass surfaced. ---
 

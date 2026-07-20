@@ -51,7 +51,7 @@ class KitchenIntentClassifierTest {
 
     @Test
     void wholeAndEntireAndRomanceCompleteAreAllComplete() {
-        // Owner report 2026-07-18: "whole kitchen" is the SAME ask as "complete kitchen", but only the latter
+        // Owner report 2026-07-20: "whole kitchen" is the SAME ask as "complete kitchen", but only the latter
         // routed to the complete-kitchen section. The class doc literally defines COMPLETE as "the user wants a
         // whole kitchen" — so the English synonyms "whole"/"entire" must route to COMPLETE too. The HR "cijela"
         // (whole) was already handled; the English side was missing its equivalent.
@@ -74,7 +74,7 @@ class KitchenIntentClassifierTest {
 
     @Test
     void completeKitchenIsDetectedInEveryMarketLanguage() {
-        // Audit 2026-07-18: the KITCHEN_WORD list only covered 7 languages, so the COMPLETE branch was DEAD for
+        // Audit 2026-07-20: the KITCHEN_WORD list only covered 7 languages, so the COMPLETE branch was DEAD for
         // FR/PT/NO/SE/DK/SK/FI even when the user typed the perfectly ordinary native phrasing. Each case pairs the
         // native kitchen word with a native complete/whole/fitted/furnish/modular qualifier.
         assertThat(c.classify("je veux renover ma cuisine").intent()).isEqualTo(KitchenIntent.COMPLETE);       // FR renovate

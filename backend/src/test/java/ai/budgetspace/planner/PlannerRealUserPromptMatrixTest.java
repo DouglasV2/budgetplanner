@@ -33,7 +33,10 @@ class PlannerRealUserPromptMatrixTest {
             String id, String market, String lang, String register, String prompt,
             String room, Integer budget, Boolean noBudget,
             List<String> mustHave, List<String> alreadyHave, List<String> excludedRetailers,
-            List<String> preferredRetailers, Integer maxStores, String style) {
+            List<String> preferredRetailers, Integer maxStores, String style,
+            // Sprint 10.190: the matrix could not assert these two before, which is exactly why the negation
+            // gaps ("not cheap" -> lowest-price, "not too basic" -> basic) never showed up here.
+            String furnishingLevel, String optimizationGoal) {
     }
 
     static List<PromptCase> cases() throws Exception {
@@ -77,6 +80,12 @@ class PlannerRealUserPromptMatrixTest {
         if (c.style() != null) {
             assertThat(enriched.style()).as("%s style", c.id()).isEqualTo(c.style());
         }
+        if (c.furnishingLevel() != null) {
+            assertThat(enriched.furnishingLevel()).as("%s furnishingLevel", c.id()).isEqualTo(c.furnishingLevel());
+        }
+        if (c.optimizationGoal() != null) {
+            assertThat(enriched.optimizationGoal()).as("%s optimizationGoal", c.id()).isEqualTo(c.optimizationGoal());
+        }
     }
 
     @Test
@@ -91,6 +100,10 @@ class PlannerRealUserPromptMatrixTest {
         }
         long adversarial = cases.stream().filter(c -> "adversarial".equals(c.register()) || "state".equals(c.register())).count();
         assertThat(adversarial).as("adversarial + state-transition cases").isGreaterThanOrEqualTo(40L);
+        // Sprint 10.190: keep a real negation register in the matrix, so a future edit that re-breaks negation
+        // fails here and not in front of a user.
+        long negation = cases.stream().filter(c -> "negation".equals(c.register())).count();
+        assertThat(negation).as("negation cases").isGreaterThanOrEqualTo(20L);
         // unique ids
         assertThat(cases.stream().map(PromptCase::id).distinct().count()).as("unique ids").isEqualTo(cases.size());
     }

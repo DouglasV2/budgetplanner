@@ -1,4 +1,4 @@
-// Sprint 10.189 multilingual synonym audit (2026-07-18): the Move-In nudge only fires when the free-text prompt
+// Sprint 10.189 multilingual synonym audit (2026-07-20): the Move-In nudge only fires when the free-text prompt
 // names 2+ rooms (or a whole apartment). Each case below is a real native prompt that used to slip through because
 // a market's own room word was missing (so the single-room planner silently under-served a whole-apartment ask).
 import { describe, expect, it } from 'vitest';

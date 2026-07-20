@@ -43,13 +43,13 @@ final class AmountParser {
     private static final Pattern K_SUFFIX = Pattern.compile("(?<![a-z0-9])(\\d{1,3}(?:[.,]\\d{1,2})?)\\s*k(?![a-z0-9])");
     // 800e / 1000e — a bare "e" glued to a digit run is the euro shorthand (not a full "eur").
     private static final Pattern E_SUFFIX = Pattern.compile("(?<![\\d.,])(\\d{3,6})e(?![a-z0-9])");
-    // A size/quantity unit right after a number means it is NOT money. Audit 2026-07-18: added cm/mm (a furniture
+    // A size/quantity unit right after a number means it is NOT money. Audit 2026-07-20: added cm/mm (a furniture
     // dimension like "180 cm" was being read as a €180 budget) and % (a "100% pamuk" / "100% cotton" material note
     // was read as a €100 budget).
     private static final String UNIT_AFTER = "\\s*(?:m2|m²|kvadrat|kom\\b|komad|puta|\\bx\\b|osob|sjedal|godin|h\\b|cm\\b|mm\\b|%|:)";
     private static final Pattern BARE = Pattern.compile("(?<![\\d.,€$£])\\b(\\d{3,6})\\b(?!" + UNIT_AFTER + ")(?![.,]\\d)");
 
-    // Number × thousand-word (audit 2026-07-18): "10 mila €" (IT), "5 tusen kr" (NO/SE), "5 tusind" (DK), "2 tisic"
+    // Number × thousand-word (audit 2026-07-20): "10 mila €" (IT), "5 tusen kr" (NO/SE), "5 tusind" (DK), "2 tisic"
     // (SK), "2 tisoc" (SI), "3 mil" (ES/PT). A leading digit run is REQUIRED, so the bare words never fire on
     // "tusen takk" (NO "thanks a lot"), the name "Mila", or "mil" inside "million"/"família".
     private static final Pattern MULT_THOUSAND =

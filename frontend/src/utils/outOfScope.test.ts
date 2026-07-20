@@ -1,4 +1,4 @@
-// Sprint 10.189 multilingual synonym audit (2026-07-18): the honest "we don't sell {X}" banner is deterministic.
+// Sprint 10.189 multilingual synonym audit (2026-07-20): the honest "we don't sell {X}" banner is deterministic.
 // These cases are native out-of-scope prompts that used to slip past the detector (so the user got a furniture plan
 // for a washing machine / tiles / a balcony), plus the false-positive guards for TV furniture wrongly read as a TV.
 import { describe, expect, it } from 'vitest';
