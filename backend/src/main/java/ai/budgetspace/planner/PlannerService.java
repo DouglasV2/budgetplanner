@@ -1341,6 +1341,12 @@ public class PlannerService {
         double styleScore = styleMatches(product, input.style()) ? 38 : 12;
         double roomScore = matchesRoom(product, input.roomType()) ? 36 : 0;
         double ratingScore = product.getRating() * 5;
+        // Sprint 10.190: inside a cheap plan a clearly better-rated piece should beat one that is a few euro
+        // cheaper — the owner's point that asking for "jeftino" should still get you the best you can afford.
+        // Only on the price-led paths; elsewhere the plain ratingScore already carries quality.
+        boolean cheapPath = input.optimizationGoal().equals("lower-price")
+                || input.optimizationGoal().equals("lowest-price");
+        double qualityInBand = cheapPath ? product.getRating() * 6 : 0;
         double stockScore = product.isInStock() ? 10 : -80;
         double discountScore = product.getOriginalPrice() != null ? 8 : 0;
         double price = product.getPrice().doubleValue();
@@ -1365,6 +1371,10 @@ public class PlannerService {
             if (ratio > 1.0) priceBias -= 15.0 * Math.min(1.0, ratio - 1.0);
         } else if (input.optimizationGoal().equals("lowest-price") || mode.equals("budget")) {
             priceBias = Math.max(0, 34 - price / 18);
+        } else if (input.optimizationGoal().equals("lower-price")) {
+            // Sprint 10.190: "jeftinije" is a lower price BAND, not the floor — a gentler pull (peak 18 vs 34,
+            // decaying over a wider range) so the rating term still decides between comparable pieces.
+            priceBias = Math.max(0, 18 - price / 40);
         } else if (mode.equals("value")) {
             priceBias = Math.max(0, 20 - price / 55);
         } else {
@@ -1388,7 +1398,7 @@ public class PlannerService {
         // Sprint 10.179: laundry-room-only nudge so a real laundry basket wins the storage slot (0 elsewhere).
         double laundryBonus = laundryFitBonus(product, input);
 
-        return styleScore + roomScore + ratingScore + stockScore + discountScore + priceBias
+        return styleScore + roomScore + ratingScore + qualityInBand + stockScore + discountScore + priceBias
                 + leastStoresBonus + stylePriorityBonus + singleStoreBonus + coreBonus
                 + preferredRetailerBonus + requestedBonus + storeCapBonus + dataQualityBonus
                 + preferenceBonus + coherenceBonus + fitBonus + laundryBonus;

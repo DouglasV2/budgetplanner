@@ -216,7 +216,17 @@ public class PlannerIntentExtractor {
     }
 
     private PlannerInputDto applyOptimizationGoal(String text, PlannerInputDto input, NegationScope scope) {
-        if (affirmative(text, "najjeftin|sto jeftin|low cost|jeftino|budget|gunstig|guenstig|billig|cheap|barat|econom|pas cher|moins cher|bon marche", scope)) input = input.withOptimizationGoal("lowest-price");
+        // Sprint 10.190: "jeftinije/cheaper" asks for a lower price BAND, not the floor. Only the SUPERLATIVE
+        // ("najjeftinije / što jeftinije / cheapest / so günstig wie möglich") goes all the way down. Both are
+        // checked, superlative last so it wins when a prompt carries both.
+        if (affirmative(text, "jeftin|povoljn|cheap|gunstig|guenstig|billig|barat|econom|pas cher|moins cher"
+                + "|bon marche|low cost|budget", scope)) {
+            input = input.withOptimizationGoal("lower-price");
+        }
+        if (affirmative(text, "najjeftin|sto jeftin|sto povoljnije|cheapest|am gunstigsten|so gunstig wie moglich"
+                + "|lo mas barato|il piu economico|le moins cher|mais barato possivel", scope)) {
+            input = input.withOptimizationGoal("lowest-price");
+        }
         if (affirmative(text, "best value|omjer|balans|vrijednost", scope)) input = input.withOptimizationGoal("best-value");
         // Sprint 10.183: recognise the EVERYDAY way people ask for a good-looking room — "da bude lijepo", "lijepa
         // soba", "neka bude ljepše", "dopadljivo" — not just the formal "najljepše/estetski/što ljepše/ljepša

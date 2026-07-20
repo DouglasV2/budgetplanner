@@ -45,6 +45,22 @@ class PlannerServiceTest {
         assertThat(categories(alreadyHavePlan)).doesNotContain("sofa");
     }
 
+    // Sprint 10.190: "jeftino" must not mean "worst thing on the shelf". Two sofas close in price but far apart
+    // in quality — a price-led plan has to take the better-rated one.
+    @Test
+    void aCheapPlanStillPrefersTheBetterRatedPieceInItsBand() {
+        List<Product> products = new ArrayList<>(defaultProducts());
+        products.add(product("sofa-floor", "Jeftini slabi", "JYSK", "sofa", 200, 2.8));
+        products.add(product("sofa-good", "Jeftini dobar", "IKEA", "sofa", 250, 4.9));
+        PlannerService service = serviceWithProducts(products);
+
+        FurnishingPlanDto plan = service.generate(input("dnevni boravak, sto jeftinije").withBudget(1500)).plans().get(0);
+        assertThat(plan.items()).extracting(item -> item.product().id())
+                .as("the better-rated sofa wins even on the cheapest goal")
+                .contains("sofa-good")
+                .doesNotContain("sofa-floor");
+    }
+
     @Test
     void planKeepsOneProductPerCategoryWhenNothingIsLocked() {
         PlannerService service = serviceWithProducts(defaultProducts());

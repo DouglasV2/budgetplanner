@@ -205,6 +205,21 @@ class PlannerIntentExtractorTest {
     }
 
     @Test
+    void cheaperIsNotTheSameAsCheapest() {
+        // Comparative / plain → a lower price band, still quality-ranked.
+        assertThat(parse("Dnevni boravak, može malo jeftinije.").optimizationGoal()).isEqualTo("lower-price");
+        assertThat(parse("Living room, something cheaper.").optimizationGoal()).isEqualTo("lower-price");
+        assertThat(parse("Wohnzimmer, günstiger bitte.").optimizationGoal()).isEqualTo("lower-price");
+        assertThat(parse("Salón, algo barato.").optimizationGoal()).isEqualTo("lower-price");
+        // Superlative → the floor.
+        assertThat(parse("Dnevni boravak, što jeftinije.").optimizationGoal()).isEqualTo("lowest-price");
+        assertThat(parse("Just get me the cheapest sofa.").optimizationGoal()).isEqualTo("lowest-price");
+        assertThat(parse("So günstig wie möglich einrichten.").optimizationGoal()).isEqualTo("lowest-price");
+        assertThat(parse("Lo más barato posible.").optimizationGoal()).isEqualTo("lowest-price");
+        assertThat(parse("Le moins cher possible.").optimizationGoal()).isEqualTo("lowest-price");
+    }
+
+    @Test
     void doubleNegationTurnsAnExcludeIntoAPreference() {
         // "not without IKEA" means WITH IKEA — it must not exclude the store.
         PlannerInputDto de = retailerIntent("Wohnzimmer 2000, nicht ohne IKEA.");
