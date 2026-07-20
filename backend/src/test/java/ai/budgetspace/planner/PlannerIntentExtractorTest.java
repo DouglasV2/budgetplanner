@@ -205,6 +205,21 @@ class PlannerIntentExtractorTest {
     }
 
     @Test
+    void doubleNegationTurnsAnExcludeIntoAPreference() {
+        // "not without IKEA" means WITH IKEA — it must not exclude the store.
+        PlannerInputDto de = retailerIntent("Wohnzimmer 2000, nicht ohne IKEA.");
+        assertThat(de.excludedRetailers()).doesNotContain("IKEA");
+        assertThat(de.preferredRetailers()).contains("IKEA");
+
+        PlannerInputDto hr = retailerIntent("Dnevni boravak, ne bez IKEA.");
+        assertThat(hr.excludedRetailers()).doesNotContain("IKEA");
+        assertThat(hr.preferredRetailers()).contains("IKEA");
+
+        // Single negation still excludes.
+        assertThat(retailerIntent("Wohnzimmer 2000, ohne IKEA.").excludedRetailers()).contains("IKEA");
+    }
+
+    @Test
     void affirmativePathIsUnchangedByTheNegationScope() {
         // Regression guard: the positive signals from 10.189 must all still fire.
         assertThat(parse("So günstig wie möglich einrichten.").optimizationGoal()).isEqualTo("lowest-price");

@@ -70,8 +70,13 @@ public class KitchenIntentClassifier {
 
     public KitchenBrief classify(String prompt) {
         String p = normalize(prompt);
+        // Sprint 10.190: the qualifier must not sit in a NEGATED clause — "ne želim kompletnu kuhinju, samo
+        // pećnicu" is a COMPONENT ask, not a whole-kitchen one. KNOXHULT is a product line, so it is taken at
+        // face value. normalize() already folds the Nordic ligatures, so this satisfies NegationScope's contract.
+        NegationScope scope = NegationScope.of(p);
         KitchenIntent intent;
-        if (KNOXHULT.matcher(p).find() || (KITCHEN_WORD.matcher(p).find() && COMPLETE_QUALIFIER.matcher(p).find())) {
+        if (KNOXHULT.matcher(p).find()
+                || (KITCHEN_WORD.matcher(p).find() && affirmative(p, COMPLETE_QUALIFIER, scope))) {
             intent = KitchenIntent.COMPLETE;                 // whole-kitchen phrasing wins even if a part is named
         } else if (COMPONENT.matcher(p).find()) {
             intent = KitchenIntent.COMPONENT;
@@ -81,6 +86,15 @@ public class KitchenIntentClassifier {
             intent = KitchenIntent.NONE;
         }
         return new KitchenBrief(intent, parseShape(p), parseAppliances(p));
+    }
+
+    /** True when the pattern matches at least once OUTSIDE a negated clause. */
+    private boolean affirmative(String text, Pattern pattern, NegationScope scope) {
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            if (!scope.isNegated(matcher.start())) return true;
+        }
+        return false;
     }
 
     private KitchenShape parseShape(String p) {

@@ -37,7 +37,12 @@ final class NegationScope {
             + "|\\bnon\\b|\\bsenza\\b|\\bniente\\b"                                                            // IT
             + "|\\bsin\\b|\\bnada\\b|\\bnunca\\b"                                                              // ES
             + "|\\bnao\\b|\\bsem\\b"                                                                           // PT
-            + "|\\bpas\\b|\\bsans\\b|\\baucun\\w*|\\bjamais\\b"                                                // FR
+            // FR: "pas" is deliberately NOT a cue. French negation is discontinuous ("je NE veux PAS"), so
+            // counting both halves would read as a double negation and cancel itself out. The "ne" already
+            // carries it. Leaving "pas" out also keeps the two idioms that matter here clean: "pas cher"
+            // (cheap — a POSITIVE price signal) and "pas trop" (the softener handled by applyStyle).
+            // Cost: a colloquial "je veux pas ça" that drops the "ne" is not detected.
+            + "|\\bsans\\b|\\baucun\\w*|\\bjamais\\b"                                                          // FR
             + "|\\bniet\\b|\\bgeen\\b|\\bzonder\\b|\\bnooit\\b"                                                // NL
             + "|\\bei\\b|\\bala\\b|\\bilman\\b"                                                                // FI
             + "|\\binte\\b|\\bingen\\b|\\binga\\b|\\butan\\b|\\baldrig\\b"                                     // SV
@@ -51,17 +56,20 @@ final class NegationScope {
             "[,;.!?]|\\bali\\b|\\bnego\\b|\\bvec\\b|\\bbut\\b|\\baber\\b|\\bsondern\\b|\\bma\\b|\\bpero\\b"
             + "|\\bsino\\b|\\bmais\\b|\\bmaar\\b|\\bmutta\\b|\\bmen\\b|\\bale\\b|\\bvendar\\b");
 
-    private static final NegationScope EMPTY = new NegationScope(List.of());
+    private static final NegationScope EMPTY = new NegationScope(List.of(), List.of());
 
-    private final List<int[]> negated; // {startInclusive, endExclusive}
+    private final List<int[]> negated;   // {startInclusive, endExclusive} of odd-parity regions
+    private final List<int[]> cancelled; // {startInclusive, endExclusive} of clauses with an EVEN cue count >= 2
 
-    private NegationScope(List<int[]> negated) {
+    private NegationScope(List<int[]> negated, List<int[]> cancelled) {
         this.negated = negated;
+        this.cancelled = cancelled;
     }
 
     static NegationScope of(String normalizedText) {
         if (normalizedText == null || normalizedText.isBlank()) return EMPTY;
         List<int[]> spans = new ArrayList<>();
+        List<int[]> doubles = new ArrayList<>();
         for (int[] clause : clauses(normalizedText)) {
             String segment = normalizedText.substring(clause[0], clause[1]);
             Matcher cue = CUE.matcher(segment);
@@ -71,15 +79,33 @@ final class NegationScope {
                 count++;
                 if (firstCueEnd < 0) firstCueEnd = clause[0] + cue.end();
             }
-            if (count % 2 == 1) spans.add(new int[]{firstCueEnd, clause[1]});
+            if (count % 2 == 1) {
+                spans.add(new int[]{firstCueEnd, clause[1]});
+            } else if (count >= 2) {
+                doubles.add(new int[]{clause[0], clause[1]});
+            }
         }
-        return spans.isEmpty() ? EMPTY : new NegationScope(spans);
+        return spans.isEmpty() && doubles.isEmpty() ? EMPTY : new NegationScope(spans, doubles);
     }
 
     /** True when a match STARTING at this offset falls inside a negated clause. */
     boolean isNegated(int matchStart) {
-        for (int[] span : negated) {
-            if (matchStart >= span[0] && matchStart < span[1]) return true;
+        return within(negated, matchStart);
+    }
+
+    /**
+     * True when this offset sits in a clause whose negations CANCEL OUT ("nicht ohne IKEA", "ne bez tepiha").
+     * {@link #isNegated} cannot express this — it returns false both for "no negation at all" and for "negated
+     * twice" — so a caller that owns its own negative trigger (the retailer exclude window) asks this instead,
+     * and turns the exclusion into a preference.
+     */
+    boolean isDoubleNegated(int matchStart) {
+        return within(cancelled, matchStart);
+    }
+
+    private static boolean within(List<int[]> ranges, int position) {
+        for (int[] range : ranges) {
+            if (position >= range[0] && position < range[1]) return true;
         }
         return false;
     }

@@ -283,7 +283,12 @@ public class PlannerIntentExtractor {
                     + "|\\bprefier|\\bprefir|bevorzug|\\bliever\\b");
             // "ikea može" / "ikea moze proci" — a mild preference where the OK follows the store name.
             boolean preferAfter = matches(after, "\\bmoze\\b|moze proci|u redu|smije");
-            if (excludeBefore || excludeAfter) {
+            // Sprint 10.190: "nicht ohne IKEA" / "ne bez IKEA" — the exclusion is ITSELF negated, so the two
+            // cancel out and the store becomes a preference instead. isNegated() can't express this (it reads
+            // false both for "no negation" and for "negated twice"), hence the dedicated isDoubleNegated.
+            if ((excludeBefore || excludeAfter) && scope.isDoubleNegated(idx)) {
+                preferred.add(retailer);
+            } else if (excludeBefore || excludeAfter) {
                 excluded.add(retailer);
             } else if (preferBefore || preferAfter) {
                 preferred.add(retailer);

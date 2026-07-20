@@ -93,6 +93,17 @@ class KitchenIntentClassifierTest {
     }
 
     @Test
+    void aNegatedCompleteKitchenAskIsNotAcompleteKitchen() {
+        // Sprint 10.190: "I don't want a whole kitchen, just an oven" is a COMPONENT ask.
+        assertThat(c.classify("ne želim kompletnu kuhinju, samo pećnicu").intent()).isEqualTo(KitchenIntent.COMPONENT);
+        assertThat(c.classify("not a whole kitchen, just a dishwasher").intent()).isEqualTo(KitchenIntent.COMPONENT);
+        // Double negation still routes to COMPLETE.
+        assertThat(c.classify("nicht ohne eine komplette Küche").intent()).isEqualTo(KitchenIntent.COMPLETE);
+        // Affirmative regression.
+        assertThat(c.classify("trebam kompletnu kuhinju do 3000 eura").intent()).isEqualTo(KitchenIntent.COMPLETE);
+    }
+
+    @Test
     void multilingualQualifierDoesNotOverTrigger() {
         // Guards for the exact over-matches the audit's adversarial pass surfaced.
         // DE "a whole new kitchen CABINET" is a single component, not a package (we deliberately did NOT add "ganze").
