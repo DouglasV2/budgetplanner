@@ -84,6 +84,12 @@ public class PlannerIntentExtractor {
     private static final Map<String, Pattern> COLOR_PATTERNS = colorPatterns();
     private static final Map<String, Pattern> MATERIAL_PATTERNS = materialPatterns();
 
+    // Sprint 10.190: every way a user asks for a lower price, in one place — used both by the goal rules and by
+    // the negated-price inversion below them.
+    private static final String PRICE_DOWN =
+            "najjeftin|sto jeftin|low cost|jeftin|budget|gunstig|guenstig|billig|cheap|barat|econom"
+            + "|pas cher|moins cher|bon marche";
+
     // Group 1 marks an "already have / exclude" clause, group 2 marks a "need" clause.
     // Longer and negated phrases come first so "ne treba mi" wins over "treba".
     private static final Pattern CLAUSE_TRIGGER = Pattern.compile(
@@ -102,6 +108,9 @@ public class PlannerIntentExtractor {
         if (text.isBlank()) {
             return input;
         }
+        // Sprint 10.190: which parts of the sentence the user NEGATED. Computed once and consulted by every
+        // preference rule below, so "ne želim tamno" never sets the industrial style.
+        NegationScope scope = NegationScope.of(text);
 
         Optional<Integer> budget = findBudget(text);
         if (budget.isPresent()) {
@@ -114,18 +123,18 @@ public class PlannerIntentExtractor {
         Optional<Integer> size = firstNumber(text, Pattern.compile("(\\d{1,2})\\s*(m2|m²|kvadrat)"));
         if (size.isPresent()) input = input.withSize(clamp(size.get(), 8, 60));
 
-        input = applyRoom(text, input);
-        input = applyStyle(text, input);
-        input = applyFurnishingLevel(text, input);
-        input = applyOptimizationGoal(text, input);
-        input = applyRetailerIntent(text, input);
+        input = applyRoom(text, input, scope);
+        input = applyStyle(text, input, scope);
+        input = applyFurnishingLevel(text, input, scope);
+        input = applyOptimizationGoal(text, input, scope);
+        input = applyRetailerIntent(text, input, scope);
         input = applyCategories(text, input);
-        input = applyColorAndMaterialPreferences(text, input);
+        input = applyColorAndMaterialPreferences(text, input, scope);
 
         return input;
     }
 
-    private PlannerInputDto applyRoom(String text, PlannerInputDto input) {
+    private PlannerInputDto applyRoom(String text, PlannerInputDto input, NegationScope scope) {
         // Sprint 10.169: an EXPLICIT non-default room selection from the UI wins over a room merely INFERRED from
         // the prompt text. The pre-filled example prompt is a living-room, so a user who picked Bathroom/Bedroom/etc.
         // in "detailed settings" but left the example text was silently overridden back to living-room. On the
@@ -145,28 +154,28 @@ public class PlannerIntentExtractor {
         // fails / is throttled / the daily AI cap is spent) still classifies the room in every market's language.
         // Before this, a non-HR/EN prompt silently fell back to living-room (no bed, ignored budget) on any LLM
         // hiccup. "Last match wins", so a later-checked room overrides; the studio container is checked last.
-        if (matches(text, "dnevn|boravak|living|wohnzimmer|wohnraum|soggiorno|salotto|salon|sejour|woonkamer|zitkamer|obyvack|obyvacia|sala de estar|olohuone|vardagsrum|\\bstue")) input = input.withRoomType("living-room");
-        if (matches(text, "radni kutak|radni prostor|home office|homeoffice|\\bured\\b|\\boffice\\b|posao|arbeitszimmer|\\bburo\\b|ufficio|bureau|werkkamer|kantoor|pracovn|oficina|despacho|escritorio|tyohuone|kotitoimisto|kontor|pisarn|delovni|radn\\w* sob|radnu sob")) input = input.withRoomType("home-office");
-        if (matches(text, "spava|bedroom|spavac|schlafzimmer|camera da letto|chambre|slaapkamer|spaln|dormitorio|habitacion|recamara|quarto|makuuhuone|soverom|sovrum|sovevaer|makuu")) input = input.withRoomType("bedroom");
+        if (affirmative(text, "dnevn|boravak|living|wohnzimmer|wohnraum|soggiorno|salotto|salon|sejour|woonkamer|zitkamer|obyvack|obyvacia|sala de estar|olohuone|vardagsrum|\\bstue", scope)) input = input.withRoomType("living-room");
+        if (affirmative(text, "radni kutak|radni prostor|home office|homeoffice|\\bured\\b|\\boffice\\b|posao|arbeitszimmer|\\bburo\\b|ufficio|bureau|werkkamer|kantoor|pracovn|oficina|despacho|escritorio|tyohuone|kotitoimisto|kontor|pisarn|delovni|radn\\w* sob|radnu sob", scope)) input = input.withRoomType("home-office");
+        if (affirmative(text, "spava|bedroom|spavac|schlafzimmer|camera da letto|chambre|slaapkamer|spaln|dormitorio|habitacion|recamara|quarto|makuuhuone|soverom|sovrum|sovevaer|makuu", scope)) input = input.withRoomType("bedroom");
         // Sprint 10.79: home-gym de-scoped (no verified gym products) — a gym prompt no longer maps to it; the
         // room defaults instead so the user still gets a (non-empty) plan rather than an empty home-gym.
         // Sprint 10.7: new rooms. Checked after the originals, so the last room mentioned wins.
-        if (matches(text, "kuhinj|kitchen|kuche|cucina|cuisine|keuken|kuchyn|cocina|cozinha|keitti|kjokken|kokken|\\bkok\\b|koket|kuhinu")) input = input.withRoomType("kitchen");
+        if (affirmative(text, "kuhinj|kitchen|kuche|cucina|cuisine|keuken|kuchyn|cocina|cozinha|keitti|kjokken|kokken|\\bkok\\b|koket|kuhinu", scope)) input = input.withRoomType("kitchen");
         // Sprint 10.176: a named kitchen APPLIANCE implies the kitchen room even without the word "kuhinja"
         // (e.g. "trebam pećnicu i frižider"), so the appliance is planned in the kitchen (its products' room).
-        if (matches(text, "(?<!mikrovaln. )pecnic|hladnjak|frizider|perilic\\w* posu|\\bnapa\\b|zamrziva|mikrovaln|\\bkuhalo\\b|indukcijsk\\w* ploc")) input = input.withRoomType("kitchen");
-        if (matches(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|jedilnic|comedor|sala de jantar|ruokailu|spisestue|matsal|spisestue|spisrum")) input = input.withRoomType("dining-room");
+        if (affirmative(text, "(?<!mikrovaln. )pecnic|hladnjak|frizider|perilic\\w* posu|\\bnapa\\b|zamrziva|mikrovaln|\\bkuhalo\\b|indukcijsk\\w* ploc", scope)) input = input.withRoomType("kitchen");
+        if (affirmative(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|jedilnic|comedor|sala de jantar|ruokailu|spisestue|matsal|spisestue|spisrum", scope)) input = input.withRoomType("dining-room");
         // Sprint 10.181: a dining-table / dining-chair phrase implies the dining room even without the room word.
-        if (matches(text, "blagovaonski stol|trpezarijski stol|stol za blagovanje|za blagovanje|za objedovanje|blagovaonsk\\w* stolic|dining table|dining chair")) input = input.withRoomType("dining-room");
-        if (matches(text, "hodnik|predsob|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b|vorzimmer|entree|\\bentre\\b|vindfang|hodch|\\bhal\\b|\\bgang\\b|halle|hodnika|\\bcorredor\\b")) input = input.withRoomType("hallway");
+        if (affirmative(text, "blagovaonski stol|trpezarijski stol|stol za blagovanje|za blagovanje|za objedovanje|blagovaonsk\\w* stolic|dining table|dining chair", scope)) input = input.withRoomType("dining-room");
+        if (affirmative(text, "hodnik|predsob|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b|vorzimmer|entree|\\bentre\\b|vindfang|hodch|\\bhal\\b|\\bgang\\b|halle|hodnika|\\bcorredor\\b", scope)) input = input.withRoomType("hallway");
         // German "Bad" = bathroom, but a bare \bbad\b also matched the English adjective "bad" (e.g. "my sofa is
         // bad, help with the living room" was reclassified to bathroom). Require a German determiner/verb context
         // so the noun still resolves without hijacking English prompts; "badezimmer" still catches the full word.
-        if (matches(text, "kupaon|kupatil|bathroom|badezimmer|(?:\\b(?:das|mein|meine|unser|unsere|euer|im|ins|ein)\\s+bad\\b|\\bbad\\s+(?:einricht|renovier|umbau|gestalt))|bagno|salle de bain|badkamer|kupeln|kopalnic|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum|baderom|baderum|badevaerelse|kopalnico|\\bbadet\\b|badezimer")) input = input.withRoomType("bathroom");
+        if (affirmative(text, "kupaon|kupatil|bathroom|badezimmer|(?:\\b(?:das|mein|meine|unser|unsere|euer|im|ins|ein)\\s+bad\\b|\\bbad\\s+(?:einricht|renovier|umbau|gestalt))|bagno|salle de bain|badkamer|kupeln|kopalnic|\\bbano\\b|cuarto de bano|casa de banho|banheiro|kylpyhuone|badevaer|badrum|baderom|baderum|badevaerelse|kopalnico|\\bbadet\\b|badezimer", scope)) input = input.withRoomType("bathroom");
         // Sprint 10.181: a named bathroom FIXTURE implies the bathroom even without the word "kupaonica" (e.g.
         // "treba mi tuš i umivaonik") — mirrors the appliance→kitchen rule above. Word-boundary-anchored so
         // "status"/"blokade"/"komad" never mis-route.
-        if (matches(text, "wc skoljk|\\bwc\\b|skoljk|umivaonik|umivalnik|lavabo|washbasin|\\btus(?:a|u|em)?\\b|tus kabin|\\bkad[aeiou]|bathtub|\\bshower\\b|\\btoilet\\b|stranisc|sprch")) input = input.withRoomType("bathroom");
+        if (affirmative(text, "wc skoljk|\\bwc\\b|skoljk|umivaonik|umivalnik|lavabo|washbasin|\\btus(?:a|u|em)?\\b|tus kabin|\\bkad[aeiou]|bathtub|\\bshower\\b|\\btoilet\\b|stranisc|sprch", scope)) input = input.withRoomType("bathroom");
         // Sprint 10.179: utility rooms (garage / pantry / laundry / attic / basement) — furnished from the shared
         // storage/lighting pool. Checked after the standard rooms; studio (combined room) still wins last. Patterns
         // are in the NORMALIZED form the text is matched in (ASCII, diacritics stripped: ž→z, š→s, č→c) and stay
@@ -175,50 +184,57 @@ public class PlannerIntentExtractor {
         // for the live markets — ES garaje / FI autotalli / NO garasje (garage); ES/PT despensa + IT dispensa (pantry);
         // IT lavanderia / PT lavandaria / NO vaskerom / DK vaskerum / SE tvattstuga (laundry); IT mansarda|soffitta
         // (attic, "soffitt[ae]" so the ceiling word "soffitto" is not swept in); ES sotano / FI kellari (basement).
-        if (matches(text, "garaz|radionic|\\bgarage\\b|werkstatt|garaje|garasje|autotalli")) input = input.withRoomType("garage");
-        if (matches(text, "spajz|smocnic|pantry|\\bostava\\b|\\bostavu\\b|\\bostavom\\b|\\bdespensa|\\bdispensa")) input = input.withRoomType("pantry");
-        if (matches(text, "veseraj|praonic|perionic|laundry|waschkuche|waschraum|lavanderi|lavandari|vaskerom|vaskerum|tvattstug")) input = input.withRoomType("laundry");
-        if (matches(text, "tavan|potkrovlj|\\battic\\b|dachboden|mansard|soffitt[ae]")) input = input.withRoomType("attic");
-        if (matches(text, "podrum|basement|\\bcellar\\b|\\bkeller\\b|suteren|sotano|kellari")) input = input.withRoomType("basement");
+        if (affirmative(text, "garaz|radionic|\\bgarage\\b|werkstatt|garaje|garasje|autotalli", scope)) input = input.withRoomType("garage");
+        if (affirmative(text, "spajz|smocnic|pantry|\\bostava\\b|\\bostavu\\b|\\bostavom\\b|\\bdespensa|\\bdispensa", scope)) input = input.withRoomType("pantry");
+        if (affirmative(text, "veseraj|praonic|perionic|laundry|waschkuche|waschraum|lavanderi|lavandari|vaskerom|vaskerum|tvattstug", scope)) input = input.withRoomType("laundry");
+        if (affirmative(text, "tavan|potkrovlj|\\battic\\b|dachboden|mansard|soffitt[ae]", scope)) input = input.withRoomType("attic");
+        if (affirmative(text, "podrum|basement|\\bcellar\\b|\\bkeller\\b|suteren|sotano|kellari", scope)) input = input.withRoomType("basement");
         // Studio / one-room apartment is the COMBINED-room container (bed + seating + dining in one space); checked
         // last so it wins over any single-room word it co-occurs with. Bare "studio" leans studio-flat here (the
         // common furnishing sense); a rare IT/ES "studio/estudio"=home-office is left to the (primary) AI path.
-        if (matches(text, "garsonijer|garsonjer|garson|garzon|\\bstudio\\b|bedsit|one-room|one room|jednosob|einzimmer|monolocale|monolokal|studette|eenkamer|monoambiente|kitnet|yksio|ettrom|ettrums|\\betta\\b")) input = input.withRoomType("studio");
+        if (affirmative(text, "garsonijer|garsonjer|garson|garzon|\\bstudio\\b|bedsit|one-room|one room|jednosob|einzimmer|monolocale|monolokal|studette|eenkamer|monoambiente|kitnet|yksio|ettrom|ettrums|\\betta\\b", scope)) input = input.withRoomType("studio");
         return input;
     }
 
-    private PlannerInputDto applyStyle(String text, PlannerInputDto input) {
-        if (matches(text, "ne znam|svejedno|predlozi")) input = input.withStyle("surprise");
-        if (matches(text, "svijetl|prozrac|skandi|scandi|nordic|skandinav")) input = input.withStyle("bright");
-        if (matches(text, "toplo|ugodno|mekano|domac|cozy|cosy|\\bwarm\\b|\\bgemue?tlich")) input = input.withStyle("warm");
-        if (matches(text, "moder|uredno")) input = input.withStyle("modern");
-        if (matches(text, "minimal|jednostavn|cisto")) input = input.withStyle("minimal");
-        if (matches(text, "classic|klasic|klasc|klassi")) input = input.withStyle("classic");
-        if (matches(text, "industrial|industrij|tamno|crno|metal")) input = input.withStyle("industrial");
-        if (matches(text, "boho|prirodn|biljk|ratan|natural")) input = input.withStyle("boho");
+    private PlannerInputDto applyStyle(String text, PlannerInputDto input, NegationScope scope) {
+        if (affirmative(text, "ne znam|svejedno|predlozi", scope)) input = input.withStyle("surprise");
+        if (affirmative(text, "svijetl|prozrac|skandi|scandi|nordic|skandinav", scope)) input = input.withStyle("bright");
+        if (affirmative(text, "toplo|ugodno|mekano|domac|cozy|cosy|\\bwarm\\b|\\bgemue?tlich", scope)) input = input.withStyle("warm");
+        if (affirmative(text, "moder|uredno", scope)) input = input.withStyle("modern");
+        if (affirmative(text, "minimal|jednostavn|cisto", scope)) input = input.withStyle("minimal");
+        if (affirmative(text, "classic|klasic|klasc|klassi", scope)) input = input.withStyle("classic");
+        if (affirmative(text, "industrial|industrij|tamno|crno|metal", scope)) input = input.withStyle("industrial");
+        if (affirmative(text, "boho|prirodn|biljk|ratan|natural", scope)) input = input.withStyle("boho");
         return input;
     }
 
-    private PlannerInputDto applyFurnishingLevel(String text, PlannerInputDto input) {
-        if (matches(text, "osnovno|samo osnov|minimalno oprem|samo najvaznij|\\bbasics?\\b")) input = input.withFurnishingLevel("basic");
-        if (matches(text, "udobnij|normalno|dovoljno komplet")) input = input.withFurnishingLevel("comfort");
-        if (matches(text, "kompletno|sve oprem|opremi sve|\\bfull\\b|dovrsen|odmah gotovo|komplett|fully furnished|\\bcomplet[oae]?\\b")) input = input.withFurnishingLevel("complete");
+    private PlannerInputDto applyFurnishingLevel(String text, PlannerInputDto input, NegationScope scope) {
+        if (affirmative(text, "osnovno|samo osnov|minimalno oprem|samo najvaznij|\\bbasics?\\b", scope)) input = input.withFurnishingLevel("basic");
+        if (affirmative(text, "udobnij|normalno|dovoljno komplet", scope)) input = input.withFurnishingLevel("comfort");
+        if (affirmative(text, "kompletno|sve oprem|opremi sve|\\bfull\\b|dovrsen|odmah gotovo|komplett|fully furnished|\\bcomplet[oae]?\\b", scope)) input = input.withFurnishingLevel("complete");
         return input;
     }
 
-    private PlannerInputDto applyOptimizationGoal(String text, PlannerInputDto input) {
-        if (matches(text, "najjeftin|sto jeftin|low cost|jeftino|budget|gunstig|guenstig|billig|cheap|barat|econom|pas cher|moins cher|bon marche")) input = input.withOptimizationGoal("lowest-price");
-        if (matches(text, "best value|omjer|balans|vrijednost")) input = input.withOptimizationGoal("best-value");
+    private PlannerInputDto applyOptimizationGoal(String text, PlannerInputDto input, NegationScope scope) {
+        if (affirmative(text, "najjeftin|sto jeftin|low cost|jeftino|budget|gunstig|guenstig|billig|cheap|barat|econom|pas cher|moins cher|bon marche", scope)) input = input.withOptimizationGoal("lowest-price");
+        if (affirmative(text, "best value|omjer|balans|vrijednost", scope)) input = input.withOptimizationGoal("best-value");
         // Sprint 10.183: recognise the EVERYDAY way people ask for a good-looking room — "da bude lijepo", "lijepa
         // soba", "neka bude ljepše", "dopadljivo" — not just the formal "najljepše/estetski/što ljepše/ljepša
         // verzija". Text is accent-stripped (ž/š/č→z/s/c), so "ljepše"→"ljepse", "lijepu"→"lijepu". These map to
         // style-match, which flips the plan to spend-up (prefersQuality) and prefers better-rated, style-coherent
         // pieces instead of flooring to the cheapest — what a "dnevni boravak 2000, da bude lijepo" prompt wants.
-        if (matches(text, "najljep|estetsk|ljepsa verzij|sto ljepse|lijep|ljeps|dopadljiv|bonit|\\bbell[oa]\\b|elegant|beautiful|gorgeous")) input = input.withOptimizationGoal("style-match");
+        if (affirmative(text, "najljep|estetsk|ljepsa verzij|sto ljepse|lijep|ljeps|dopadljiv|bonit|\\bbell[oa]\\b|elegant|beautiful|gorgeous", scope)) input = input.withOptimizationGoal("style-match");
+        // Sprint 10.190: the single deliberate INVERSION. "neću jeftino" / "keine billigen Möbel" / "nothing
+        // cheap" is a quality signal, not merely an absent one, so it maps to the existing spend-up path. The
+        // condition is "a price-down word is present but every occurrence of it is negated", which is why an
+        // ordinary affirmative "jeftino" can never reach it. Checked last, so it wins over the rules above.
+        if (!affirmative(text, PRICE_DOWN, scope) && matches(text, PRICE_DOWN)) {
+            input = input.withOptimizationGoal("style-match");
+        }
         return input;
     }
 
-    private PlannerInputDto applyRetailerIntent(String text, PlannerInputDto input) {
+    private PlannerInputDto applyRetailerIntent(String text, PlannerInputDto input, NegationScope scope) {
         // Seed from what the caller already chose (form / API), then let the prompt refine it.
         // Without this, an explicit excludedRetailers/preferredRetailers on the request would be
         // discarded whenever the prompt also mentions the retailers.
@@ -276,6 +292,10 @@ public class PlannerIntentExtractor {
 
         // Store limit: explicit numbers win over the soft "fewer stores" wish.
         int maxStores = 0;
+        // NOTE (10.190): the store-limit phrasings are deliberately NOT negation-scoped. "ne želim više od dvije
+        // trgovine" / "ne želim puno trgovina" / "bez obilazaka" ARE the request — the negation is part of the
+        // idiom, and the token that matches ("dvije trgovine") sits after the cue, so scoping it would suppress
+        // the very rule it belongs to.
         if (matches(text, "jedna trgovina|jednu trgovinu|samo jedna|iz jedne trgovine|jedan odlazak|sve iz jedne"
                 + "|ene trgovine|eni trgovini|einem geschaft|einem laden|einem geschaeft|un negozio|un solo negozio"
                 + "|yhdesta|un seul magasin|une seule|un magasin|een winkel|jednej predajne|jednom obchode|una tienda"
@@ -338,7 +358,8 @@ public class PlannerIntentExtractor {
      */
     public PlannerInputDto applyRetailerIntentFromPrompt(String rawPrompt, PlannerInputDto seed) {
         if (rawPrompt == null || rawPrompt.isBlank() || seed == null) return seed;
-        return applyRetailerIntent(normalize(rawPrompt), seed);
+        String text = normalize(rawPrompt);
+        return applyRetailerIntent(text, seed, NegationScope.of(text));
     }
 
     private PlannerInputDto applyCategories(String text, PlannerInputDto input) {
@@ -433,17 +454,21 @@ public class PlannerIntentExtractor {
 
     // Colour/material preferences are read from the whole sentence (not from need/have clauses):
     // "zidovi u zelenoj boji, drvo i crni detalji" -> colors {green, black}, materials {wood}.
-    private PlannerInputDto applyColorAndMaterialPreferences(String text, PlannerInputDto input) {
-        List<String> colors = matchKeys(text, COLOR_PATTERNS);
-        List<String> materials = matchKeys(text, MATERIAL_PATTERNS);
+    private PlannerInputDto applyColorAndMaterialPreferences(String text, PlannerInputDto input, NegationScope scope) {
+        List<String> colors = matchKeys(text, COLOR_PATTERNS, scope);
+        List<String> materials = matchKeys(text, MATERIAL_PATTERNS, scope);
         if (colors.isEmpty() && materials.isEmpty()) return input;
         return input.withColorAndMaterialPreferences(colors, materials);
     }
 
-    private List<String> matchKeys(String text, Map<String, Pattern> patterns) {
+    // Sprint 10.190: a colour/material named inside a negated clause ("bez crne boje") is not a preference.
+    private List<String> matchKeys(String text, Map<String, Pattern> patterns, NegationScope scope) {
         List<String> found = new ArrayList<>();
         patterns.forEach((key, pattern) -> {
-            if (pattern.matcher(text).find()) found.add(key);
+            Matcher matcher = pattern.matcher(text);
+            while (matcher.find()) {
+                if (!scope.isNegated(matcher.start())) { found.add(key); return; }
+            }
         });
         return found;
     }
@@ -497,6 +522,19 @@ public class PlannerIntentExtractor {
 
     private boolean matches(String text, String regex) {
         return Pattern.compile(regex).matcher(text).find();
+    }
+
+    /**
+     * Sprint 10.190: like {@link #matches} but a hit that sits inside a NEGATED clause does not count. Every
+     * occurrence is scanned, so "ne zelim tamno, hocu tamni stol" still sees the affirmative second mention.
+     * Offsets are absolute in {@code text}, which is why this must never be handed a substring.
+     */
+    private boolean affirmative(String text, String regex, NegationScope scope) {
+        Matcher matcher = Pattern.compile(regex).matcher(text);
+        while (matcher.find()) {
+            if (!scope.isNegated(matcher.start())) return true;
+        }
+        return false;
     }
 
     private String normalize(String value) {

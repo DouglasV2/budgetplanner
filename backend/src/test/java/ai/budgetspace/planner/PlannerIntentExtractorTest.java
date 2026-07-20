@@ -179,6 +179,41 @@ class PlannerIntentExtractorTest {
     // live market types, that used to silently fall back to a wrong/default value. Each positive is paired, where the
     // audit found one, with a false-positive guard for the exact over-match its adversarial pass surfaced. ---
 
+    // --- Sprint 10.190: negation. A preference the user explicitly ruled out must never be applied. Every
+    // negated case is paired with its affirmative twin, so a suppression bug can't hide as a passing test. ---
+
+    @Test
+    void negatedPreferencesAreNotApplied() {
+        assertThat(parse("Dnevni boravak, ne želim tamno.").style()).isNotEqualTo("industrial");
+        assertThat(parse("Dnevni boravak, tamno i metalno.").style()).isEqualTo("industrial");
+
+        assertThat(parse("Living room, not too basic please.").furnishingLevel()).isNotEqualTo("basic");
+        assertThat(parse("Living room, just the basics.").furnishingLevel()).isEqualTo("basic");
+
+        assertThat(parse("Dnevni boravak, bez crne boje.").colorPreferences()).doesNotContain("black");
+        assertThat(parse("Dnevni boravak, crna boja.").colorPreferences()).contains("black");
+
+        assertThat(parse("Uredi mi dnevni boravak, ne spavaću sobu.").roomType()).isEqualTo("living-room");
+    }
+
+    @Test
+    void negatedCheapMeansQualityNotLowestPrice() {
+        // The one deliberate inversion: "I don't want it cheap" is a quality signal, not a no-op.
+        assertThat(parse("Dnevni boravak 2000 €, neću da bude jeftino.").optimizationGoal()).isEqualTo("style-match");
+        assertThat(parse("Wohnzimmer 2000, keine billigen Möbel.").optimizationGoal()).isEqualTo("style-match");
+        assertThat(parse("Living room 2000, nothing cheap.").optimizationGoal()).isEqualTo("style-match");
+    }
+
+    @Test
+    void affirmativePathIsUnchangedByTheNegationScope() {
+        // Regression guard: the positive signals from 10.189 must all still fire.
+        assertThat(parse("So günstig wie möglich einrichten.").optimizationGoal()).isEqualTo("lowest-price");
+        assertThat(parse("Le moins cher possible.").optimizationGoal()).isEqualTo("lowest-price");
+        assertThat(parse("Make the bedroom cosy.").style()).isEqualTo("warm");
+        assertThat(parse("Dnevni boravak, ne želim više od dvije trgovine.").maxStores()).isEqualTo(2);
+        assertThat(parse("Dnevni boravak do 900 €, bez tepiha.").alreadyHaveCategories()).contains("rug");
+    }
+
     @Test
     void recognisesUtilityRoomsAcrossLanguages() {
         assertThat(parse("Quiero amueblar mi garaje, unas estanterías.").roomType()).isEqualTo("garage");    // ES
