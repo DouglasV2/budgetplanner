@@ -29,22 +29,31 @@ final class AmountParser {
     private AmountParser() {
     }
 
-    // A plain integer or a European dot/space-grouped one (1.000 / 1 000). 3–6 significant digits after grouping.
-    private static final String NUMBER = "(\\d{1,3}(?:[.\\s]\\d{3})+|\\d{3,6})";
+    // A plain integer or a grouped one — European dot/space (1.000 / 1 000) OR English/US comma (1,500). 3–6
+    // significant digits after grouping. digits() strips all three separators before parsing.
+    private static final String NUMBER = "(\\d{1,3}(?:[.,\\s]\\d{3})+|\\d{3,6})";
     private static final String CURRENCY =
-            "(?:€|eur|eura|euro|kr|kroner|kronor|nok|sek|dkk|kn|kuna|gbp|pund|pounds|£|\\$)";
+            "(?:€|eur|eura|euro|kr|kroner|kronor|nok|sek|dkk|kn|kuna|gbp|pund|pounds|quid|£|\\$)";
     private static final String VERBS =
             "(?:budget|budzet|budjet|do|ispod|maksimalno|maks|max|maximum|maximal|najvise|ne preko|ne vise od|imam|oko"
-            + "|otprilike|around|about|approx|circa|cirka|\\bca\\b|etwa|environ|jusqu|fino a|hasta|alrededor|\\bate\\b"
+            + "|otprilike|around|about|approx|circa|cirka|\\bca\\b|etwa|ungefahr|environ|jusqu|fino a|hasta|alrededor|\\bate\\b"
             + "|omkring|runt|noin|under|up to|bis|za)";
 
     // 1k / 1.5k / 1,5k → ×1000. The k must follow the digits and end a word so "kuhinja" is never caught.
     private static final Pattern K_SUFFIX = Pattern.compile("(?<![a-z0-9])(\\d{1,3}(?:[.,]\\d{1,2})?)\\s*k(?![a-z0-9])");
     // 800e / 1000e — a bare "e" glued to a digit run is the euro shorthand (not a full "eur").
     private static final Pattern E_SUFFIX = Pattern.compile("(?<![\\d.,])(\\d{3,6})e(?![a-z0-9])");
-    // A size/quantity unit right after a number means it is NOT money.
-    private static final String UNIT_AFTER = "\\s*(?:m2|m²|kvadrat|kom\\b|komad|puta|\\bx\\b|osob|sjedal|godin|h\\b|:)";
+    // A size/quantity unit right after a number means it is NOT money. Audit 2026-07-18: added cm/mm (a furniture
+    // dimension like "180 cm" was being read as a €180 budget) and % (a "100% pamuk" / "100% cotton" material note
+    // was read as a €100 budget).
+    private static final String UNIT_AFTER = "\\s*(?:m2|m²|kvadrat|kom\\b|komad|puta|\\bx\\b|osob|sjedal|godin|h\\b|cm\\b|mm\\b|%|:)";
     private static final Pattern BARE = Pattern.compile("(?<![\\d.,€$£])\\b(\\d{3,6})\\b(?!" + UNIT_AFTER + ")(?![.,]\\d)");
+
+    // Number × thousand-word (audit 2026-07-18): "10 mila €" (IT), "5 tusen kr" (NO/SE), "5 tusind" (DK), "2 tisic"
+    // (SK), "2 tisoc" (SI), "3 mil" (ES/PT). A leading digit run is REQUIRED, so the bare words never fire on
+    // "tusen takk" (NO "thanks a lot"), the name "Mila", or "mil" inside "million"/"família".
+    private static final Pattern MULT_THOUSAND =
+            Pattern.compile("(?<![\\d.,])(\\d{1,3})\\s*(?:tusen|tusind|tisic|tisoc|mila|mil)\\b");
 
     private static final List<Pattern> EXPLICIT = List.of(
             Pattern.compile(NUMBER + "\\s*" + CURRENCY),          // 1000 €, 1.000 eur, 1 000 kr
@@ -78,6 +87,12 @@ final class AmountParser {
         while (e.find()) {
             Integer parsed = sane(digits(e.group(1)));
             if (parsed != null && e.start() < bestIndex) { bestIndex = e.start(); bestValue = parsed; }
+        }
+        // 3b) number × thousand-word (10 mila, 5 tusen, 2 tisic)
+        Matcher mt = MULT_THOUSAND.matcher(text);
+        while (mt.find()) {
+            Integer parsed = sane(Long.parseLong(mt.group(1)) * 1000L);
+            if (parsed != null && mt.start() < bestIndex) { bestIndex = mt.start(); bestValue = parsed; }
         }
         // 4) number-words / slang
         int[] word = parseNumberWord(text);
@@ -148,7 +163,7 @@ final class AmountParser {
     // --- helpers ---
 
     private static String digits(String grouped) {
-        return grouped == null ? "" : grouped.replaceAll("[.\\s]", "");
+        return grouped == null ? "" : grouped.replaceAll("[.,\\s]", "");
     }
 
     private static Integer fromK(String num) {

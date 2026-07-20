@@ -23,14 +23,33 @@ public class KitchenIntentClassifier {
     public enum KitchenShape { SINGLE_WALL, L_SHAPED, U_SHAPED, GALLEY, ISLAND, UNKNOWN }
     public record KitchenBrief(KitchenIntent intent, KitchenShape shape, boolean includeAppliances) {}
 
-    // "This is about a kitchen at all."
-    private static final Pattern KITCHEN_WORD = Pattern.compile("(kuhinj|kuchen|kuche|kitchen|cucina|cocina|keuken)");
+    // "This is about a kitchen at all." Multilingual across all 15 markets — kept in parity with
+    // PlannerIntentExtractor.applyRoom's kitchen list, which was already broad while THIS list lagged (only 7
+    // languages), so the whole COMPLETE branch was dead for FR/PT/NO/SE/DK/SK/FI. normalize() now folds the
+    // Nordic ligatures too, so the Scandinavian words are written in their ASCII form (kjokken/kokken/kok).
+    private static final Pattern KITCHEN_WORD = Pattern.compile(
+        "(kuhinj|kuchyn|kuchen|kuche|kitchen|cucina|cocina|cuisine|cozinh|keuken|keitti|\\bkok\\b|\\bkoket|\\bkoks|kjokken|kokken)");
     // A "whole/complete/fitted/modular/renovate/furnish" qualifier. Checked ANYWHERE in the prompt together with a
     // kitchen word (AND), so word order ("kompletna L kuhinja") doesn't matter. "modern" is deliberately NOT here —
     // a plain "moderna kuhinja" is today's freestanding behaviour, only an explicit complete-ask shows sets.
+    //
+    // Owner report 2026-07-18: "whole kitchen" is the SAME ask as "complete kitchen" but only the latter routed here,
+    // because the qualifier had the HR "cijel" (whole) but no English "whole"/"entire", and the "complete" stem was
+    // k-only ("kompletn"), so the Romance/Dutch "complet-" family (IT "completa", ES "cocina completa", FR "complète",
+    // NL "complete keuken") never matched its own direct translation. "komplet"/"complet" now cover both spellings
+    // (kompletn/komplett/kompletná/completa/complete/complète); "\bwhole\b|\bentire\b" adds the English whole-word
+    // synonyms (word-bounded so "wholesale"/"entirely" don't trip; still ANDed with a kitchen word, so a "whole
+    // living room" stays out of scope here).
+    // Multilingual complete-qualifier stems (audit 2026-07-18): "componibil" IT (modular), "equipee"/"amenag" FR
+    // (fitted/laid-out), "einricht" DE (furnish), "valmis" FI (ready/complete), "amuebl" ES (furnish), "\bintegral"
+    // ES (cocina integral = built-in), "volledig" NL (complete/full). Deliberately NOT included: "\bganze" DE (would
+    // wrongly flag "ganzen neuen Küchenschrank" = a whole new cabinet, a COMPONENT) and FI "koko" (means "size" in
+    // "keittiön koko 10 m²"). Each is ANDed with a kitchen word, and the complete-kitchen section is browse-only, so
+    // a rare over-trigger only shows an extra sets panel, never alters the main plan.
     private static final Pattern COMPLETE_QUALIFIER = Pattern.compile(
-        "(kompletn|cijel|modularn|modular|komplett|einbau|kuchenzeile|modulkuch|fitted|complete kitchen"
-        + "|renov|oprem|uredi|opremi|furnish|u paketu)");
+        "(komplet|complet|cijel|\\bwhole\\b|\\bentire\\b|modularn|modular|componibil|einbau|kuchenzeile|modulkuch"
+        + "|fitted|equipee|amenag|einricht|\\bvalmis\\b|\\bvalmiin|amuebl|\\bintegral|volledig|renov|oprem|uredi|opremi"
+        + "|furnish|u paketu)");
     // Unambiguous complete-kitchen product line (only ever a kitchen), safe on its own.
     private static final Pattern KNOXHULT = Pattern.compile("knoxhult");
 
@@ -86,6 +105,10 @@ public class KitchenIntentClassifier {
     private String normalize(String prompt) {
         if (prompt == null) return "";
         String lowered = prompt.toLowerCase(Locale.ROOT).replace('đ', 'd').replace('ð', 'd');
-        return java.text.Normalizer.normalize(lowered, java.text.Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+        // NFD strips ž/š/č/ć/ä/ö/é etc.; the Nordic/German ligatures æ ø å ß are NOT decomposed by NFD, so fold
+        // them explicitly (mirrors PlannerIntentExtractor.normalize) — otherwise a Norwegian "kjøkken", Danish
+        // "køkken" or Swedish "kök" never reduced to their ASCII kitchen tokens and the COMPLETE branch stayed dead.
+        return java.text.Normalizer.normalize(lowered, java.text.Normalizer.Form.NFD).replaceAll("\\p{M}", "")
+                .replace("æ", "ae").replace("ø", "o").replace("å", "a").replace("ß", "ss");
     }
 }

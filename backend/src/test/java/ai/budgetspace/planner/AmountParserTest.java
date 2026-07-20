@@ -80,9 +80,31 @@ class AmountParserTest {
             "planiram u 2026",           // a year is not a budget
             "godina 2030",               // a year
             "dnevni boravak",            // no number at all
+            // Sprint 10.189 audit false-positive guards:
+            "komoda siroka 180 cm i polica 200 cm",   // a furniture dimension, not a €180 budget
+            "'navlaka 100% pamuk, prava koza'",       // a material percentage, not a €100 budget
+            "tusen takk trebam sofu za stua",         // NO "thanks a lot" — no leading digit, so no thousand
+            "'mila, treba mi ormar za spavacu'",      // the name Mila must not become 1000
+            "runder esstisch 120 cm",                 // round table + dimension, not a budget
     })
     void rejectsNonBudgets(String text) {
         assertThat(AmountParser.parseBudget(text)).as(text).isEmpty();
+    }
+
+    @ParameterizedTest(name = "\"{0}\" -> {1}")
+    @CsvSource({
+            // Sprint 10.189 audit: English/US comma-grouped thousands + GB "quid" + IT/Scandinavian/Slavic combining
+            // thousand-words + the German "ungefähr" approx qualifier. Inputs are already lower-cased/accent-stripped.
+            "'budget 1,500 for the living room',        1500",  // EN comma thousands (verb)
+            "'a sofa and a rug, 1,800 quid',            1800",  // GB slang currency + comma
+            "'£1,800 for the bedroom',                  1800",  // £ prefix + comma
+            "10 mila euro per la cucina,                10000", // IT "10 mila"
+            "rundt 5 tusen kr til stua,                 5000",  // NO/SE "5 tusen"
+            "mam rozpocet 2 tisic eur na obyvacku,      2000",  // SK "2 tisic"
+            "furs wohnzimmer ungefahr 1.500 einplanen,  1500",  // DE "ungefähr" + grouped
+    })
+    void parsesMultilingualBudgetFormats(String text, int expected) {
+        assertThat(AmountParser.parseBudget(text)).as(text).contains(expected);
     }
 
     @Test

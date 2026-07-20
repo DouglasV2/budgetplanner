@@ -39,15 +39,15 @@ public class PlannerIntentExtractor {
     // but precision is: "stolic(?!a)" never swallows "stolica", and storage "komoda" is
     // ignored when it is part of "tv komoda".
     private static final Map<String, Pattern> CATEGORY_PATTERNS = Map.ofEntries(
-            Map.entry("sofa", Pattern.compile("kauc|sofa|trosjed|dvosjed|garnitur|couch")),
+            Map.entry("sofa", Pattern.compile("kauc|sofa|trosjed|dvosjed|garnitur|couch|divan[oi]|canape|sohva(?!p)")),
             Map.entry("tv-unit", Pattern.compile("tv komod|komoda za tv|tv element|tv unit|\\btv\\b|televizor")),
             Map.entry("table", Pattern.compile("\\bstolic\\b|klub stol|coffee table")),
-            Map.entry("rug", Pattern.compile("tepih|\\bsag\\b")),
+            Map.entry("rug", Pattern.compile("tepih|\\bsag\\b|teppich|carpet|\\brug\\b|alfombra|\\btapis\\b|tappet")),
             Map.entry("lighting", Pattern.compile("lamp|rasvjet|svjetilj|svjetlo")),
             Map.entry("storage", Pattern.compile("polic|regal|ormar|spremanje|(?<!tv )komod")),
             Map.entry("decor", Pattern.compile("dekor|ukras|slik|jastuk|biljk|svijec")),
-            Map.entry("desk", Pattern.compile("radni stol|pisaci stol|\\bdesk\\b")),
-            Map.entry("chair", Pattern.compile("\\bstolica\\b|\\bstolice\\b|\\bstolicu\\b|\\bstolicom\\b|fotelj|\\bchair\\b")),
+            Map.entry("desk", Pattern.compile("radni stol|pisaci stol|\\bdesk\\b|\\bschreibtisch\\b")),
+            Map.entry("chair", Pattern.compile("\\bstolica\\b|\\bstolice\\b|\\bstolicu\\b|\\bstolicom\\b|fotelj|\\bchair\\b|stuhl|\\bsillas?\\b|\\bchaise|\\bsedi[ae]\\b")),
             Map.entry("bed", Pattern.compile("krevet|\\bbed\\b|postelj|\\bbett|\\bletto\\b|\\blit\\b|\\bcama\\b|\\bseng|\\bsang\\b|\\bpostel|\\bkonty|\\blozko")),
             Map.entry("mattress", Pattern.compile("madrac|mattress|matratze|materass|matelas|colchon|colchao|patja|madrass|madras|matrac")),
             Map.entry("gym-equipment", Pattern.compile("bucic|utez|girja|klup|bench|sprava|traka za trcanje|bicikl|oprema za vjezb")),
@@ -58,7 +58,7 @@ public class PlannerIntentExtractor {
             Map.entry("kitchen-storage", Pattern.compile("kuhinjski ormar|kuhinjska polic|kuhinjsko spreman|kitchen storage")),
             Map.entry("kitchen-cart", Pattern.compile("kuhinjska kolica|servirna kolica|kitchen cart")),
             Map.entry("nightstand", Pattern.compile("nocn\\w* ormar|nightstand|nachttisch|comodino|table de chevet|nattbord|natbord")),
-            Map.entry("wardrobe", Pattern.compile("ormar za odjec|garderobni ormar|plakar|wardrobe")),
+            Map.entry("wardrobe", Pattern.compile("ormar za odjec|garderobni ormar|plakar|wardrobe|armoire(?! de (?:toilette|cuisine))|\\barmadi[oi]\\b|\\barmarios?\\b")),
             Map.entry("dresser", Pattern.compile("komoda s ladic|ladicar|dresser")),
             // Sprint 10.176 (kitchen Increment 3): kitchen appliances (parsed as must-have when named). A
             // "mikrovalna pecnica" is a microwave, so the oven pattern excludes that phrase.
@@ -158,7 +158,7 @@ public class PlannerIntentExtractor {
         if (matches(text, "blagovaon|trpezarij|dining|esszimmer|sala da pranzo|salle a manger|eetkamer|jedalen|jedilnic|comedor|sala de jantar|ruokailu|spisestue|matsal|spisestue|spisrum")) input = input.withRoomType("dining-room");
         // Sprint 10.181: a dining-table / dining-chair phrase implies the dining room even without the room word.
         if (matches(text, "blagovaonski stol|trpezarijski stol|stol za blagovanje|za blagovanje|za objedovanje|blagovaonsk\\w* stolic|dining table|dining chair")) input = input.withRoomType("dining-room");
-        if (matches(text, "hodnik|predsob|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b|vorzimmer|entree|\\bentre\\b|vindfang|hodch|\\bhal\\b|\\bgang\\b|halle|hodnika")) input = input.withRoomType("hallway");
+        if (matches(text, "hodnik|predsob|hallway|\\bflur\\b|diele|ingresso|corridoio|couloir|chodba|predsien|recibidor|pasillo|eteinen|korridor|\\bhall\\b|vorzimmer|entree|\\bentre\\b|vindfang|hodch|\\bhal\\b|\\bgang\\b|halle|hodnika|\\bcorredor\\b")) input = input.withRoomType("hallway");
         // German "Bad" = bathroom, but a bare \bbad\b also matched the English adjective "bad" (e.g. "my sofa is
         // bad, help with the living room" was reclassified to bathroom). Require a German determiner/verb context
         // so the noun still resolves without hijacking English prompts; "badezimmer" still catches the full word.
@@ -171,11 +171,15 @@ public class PlannerIntentExtractor {
         // storage/lighting pool. Checked after the standard rooms; studio (combined room) still wins last. Patterns
         // are in the NORMALIZED form the text is matched in (ASCII, diacritics stripped: ž→z, š→s, č→c) and stay
         // precise — \bostava\b / \bostavu\b, so "dostava" (delivery) and "ostaviti" (to leave) never mis-route.
-        if (matches(text, "garaz|radionic|\\bgarage\\b|werkstatt")) input = input.withRoomType("garage");
-        if (matches(text, "spajz|smocnic|pantry|\\bostava\\b|\\bostavu\\b|\\bostavom\\b")) input = input.withRoomType("pantry");
-        if (matches(text, "veseraj|praonic|perionic|laundry|waschkuche|waschraum")) input = input.withRoomType("laundry");
-        if (matches(text, "tavan|potkrovlj|\\battic\\b|dachboden")) input = input.withRoomType("attic");
-        if (matches(text, "podrum|basement|\\bcellar\\b|\\bkeller\\b|suteren")) input = input.withRoomType("basement");
+        // Sprint 10.189 (multilingual synonym audit): the utility rooms were HR/DE/EN only. Added the native words
+        // for the live markets — ES garaje / FI autotalli / NO garasje (garage); ES/PT despensa + IT dispensa (pantry);
+        // IT lavanderia / PT lavandaria / NO vaskerom / DK vaskerum / SE tvattstuga (laundry); IT mansarda|soffitta
+        // (attic, "soffitt[ae]" so the ceiling word "soffitto" is not swept in); ES sotano / FI kellari (basement).
+        if (matches(text, "garaz|radionic|\\bgarage\\b|werkstatt|garaje|garasje|autotalli")) input = input.withRoomType("garage");
+        if (matches(text, "spajz|smocnic|pantry|\\bostava\\b|\\bostavu\\b|\\bostavom\\b|\\bdespensa|\\bdispensa")) input = input.withRoomType("pantry");
+        if (matches(text, "veseraj|praonic|perionic|laundry|waschkuche|waschraum|lavanderi|lavandari|vaskerom|vaskerum|tvattstug")) input = input.withRoomType("laundry");
+        if (matches(text, "tavan|potkrovlj|\\battic\\b|dachboden|mansard|soffitt[ae]")) input = input.withRoomType("attic");
+        if (matches(text, "podrum|basement|\\bcellar\\b|\\bkeller\\b|suteren|sotano|kellari")) input = input.withRoomType("basement");
         // Studio / one-room apartment is the COMBINED-room container (bed + seating + dining in one space); checked
         // last so it wins over any single-room word it co-occurs with. Bare "studio" leans studio-flat here (the
         // common furnishing sense); a rare IT/ES "studio/estudio"=home-office is left to the (primary) AI path.
@@ -186,31 +190,31 @@ public class PlannerIntentExtractor {
     private PlannerInputDto applyStyle(String text, PlannerInputDto input) {
         if (matches(text, "ne znam|svejedno|predlozi")) input = input.withStyle("surprise");
         if (matches(text, "svijetl|prozrac|skandi|scandi|nordic|skandinav")) input = input.withStyle("bright");
-        if (matches(text, "toplo|ugodno|mekano|domac|cozy")) input = input.withStyle("warm");
+        if (matches(text, "toplo|ugodno|mekano|domac|cozy|cosy|\\bwarm\\b|\\bgemue?tlich")) input = input.withStyle("warm");
         if (matches(text, "moder|uredno")) input = input.withStyle("modern");
         if (matches(text, "minimal|jednostavn|cisto")) input = input.withStyle("minimal");
-        if (matches(text, "classic|klasic|klasc")) input = input.withStyle("classic");
+        if (matches(text, "classic|klasic|klasc|klassi")) input = input.withStyle("classic");
         if (matches(text, "industrial|industrij|tamno|crno|metal")) input = input.withStyle("industrial");
         if (matches(text, "boho|prirodn|biljk|ratan|natural")) input = input.withStyle("boho");
         return input;
     }
 
     private PlannerInputDto applyFurnishingLevel(String text, PlannerInputDto input) {
-        if (matches(text, "osnovno|samo osnov|minimalno oprem|samo najvaznij")) input = input.withFurnishingLevel("basic");
+        if (matches(text, "osnovno|samo osnov|minimalno oprem|samo najvaznij|\\bbasics?\\b")) input = input.withFurnishingLevel("basic");
         if (matches(text, "udobnij|normalno|dovoljno komplet")) input = input.withFurnishingLevel("comfort");
-        if (matches(text, "kompletno|sve oprem|opremi sve|\\bfull\\b|dovrsen|odmah gotovo")) input = input.withFurnishingLevel("complete");
+        if (matches(text, "kompletno|sve oprem|opremi sve|\\bfull\\b|dovrsen|odmah gotovo|komplett|fully furnished|\\bcomplet[oae]?\\b")) input = input.withFurnishingLevel("complete");
         return input;
     }
 
     private PlannerInputDto applyOptimizationGoal(String text, PlannerInputDto input) {
-        if (matches(text, "najjeftin|sto jeftin|low cost|jeftino|budget")) input = input.withOptimizationGoal("lowest-price");
+        if (matches(text, "najjeftin|sto jeftin|low cost|jeftino|budget|gunstig|guenstig|billig|cheap|barat|econom|pas cher|moins cher|bon marche")) input = input.withOptimizationGoal("lowest-price");
         if (matches(text, "best value|omjer|balans|vrijednost")) input = input.withOptimizationGoal("best-value");
         // Sprint 10.183: recognise the EVERYDAY way people ask for a good-looking room — "da bude lijepo", "lijepa
         // soba", "neka bude ljepše", "dopadljivo" — not just the formal "najljepše/estetski/što ljepše/ljepša
         // verzija". Text is accent-stripped (ž/š/č→z/s/c), so "ljepše"→"ljepse", "lijepu"→"lijepu". These map to
         // style-match, which flips the plan to spend-up (prefersQuality) and prefers better-rated, style-coherent
         // pieces instead of flooring to the cheapest — what a "dnevni boravak 2000, da bude lijepo" prompt wants.
-        if (matches(text, "najljep|estetsk|ljepsa verzij|sto ljepse|lijep|ljeps|dopadljiv")) input = input.withOptimizationGoal("style-match");
+        if (matches(text, "najljep|estetsk|ljepsa verzij|sto ljepse|lijep|ljeps|dopadljiv|bonit|\\bbell[oa]\\b|elegant|beautiful|gorgeous")) input = input.withOptimizationGoal("style-match");
         return input;
     }
 
@@ -253,10 +257,14 @@ public class PlannerIntentExtractor {
                     // Sprint 10.186: Croatian "neću/nećemo" (won't) + "ništa iz/od" (nothing from) — the common way
                     // users decline a store ("neću ništa iz JYSKa") that the earlier list missed.
                     + "|necu|necemo|\\bnece\\b|nista iz|nista od|ne bih|ne bi\\b"
-                    + "|brez|keine|\\bkein\\b|sans|senza|\\bsin\\b|utan|\\buden\\b|\\buten\\b|ilman|zonder|\\bgeen\\b|\\bno\\b|\\bnie\\b|niente");
+                    + "|brez|keine|\\bkein\\b|sans|senza|\\bsin\\b|utan|\\buden\\b|\\buten\\b|ilman|zonder|\\bgeen\\b|\\bno\\b|\\bnie\\b|niente"
+                    // Sprint 10.189 audit: DE "ohne", PT "sem", Scandinavian "ingen" (no/none) were missing.
+                    + "|\\bohne\\b|\\bsem\\b|\\bingen\\b");
             boolean excludeAfter = matches(after, "\\bnemoj\\b|ne treba|ne zelim|izbaci|izbjegni|preskoci");
             boolean preferBefore = matches(before, "najvise|radije|preferiram|ako moze|po mogucnosti|volio bih|voljela bih|prvenstveno|preferira"
-                    + "|najraje|liebsten|de preference|preferibilmente|preferiblemente|de preferencia|mieluiten|helst|liefst|najradsej|\\bprefer");
+                    + "|najraje|liebsten|de preference|preferibilmente|preferiblemente|de preferencia|mieluiten|helst|liefst|najradsej|\\bprefer"
+                    // Sprint 10.189 audit: ES "prefiero", PT "prefiro", DE "bevorzuge", NL "liever".
+                    + "|\\bprefier|\\bprefir|bevorzug|\\bliever\\b");
             // "ikea može" / "ikea moze proci" — a mild preference where the OK follows the store name.
             boolean preferAfter = matches(after, "\\bmoze\\b|moze proci|u redu|smije");
             if (excludeBefore || excludeAfter) {
@@ -271,9 +279,11 @@ public class PlannerIntentExtractor {
         if (matches(text, "jedna trgovina|jednu trgovinu|samo jedna|iz jedne trgovine|jedan odlazak|sve iz jedne"
                 + "|ene trgovine|eni trgovini|einem geschaft|einem laden|einem geschaeft|un negozio|un solo negozio"
                 + "|yhdesta|un seul magasin|une seule|un magasin|een winkel|jednej predajne|jednom obchode|una tienda"
-                + "|numa loja|uma loja|en butikk|en butik|ett stalle|one store|one shop|single store|samo iz ene")) {
+                + "|numa loja|uma loja|en butikk|en butik|ett stalle|one store|one shop|single store|samo iz ene"
+                // Sprint 10.189 audit: HR "jedan dućan" (colloquial for shop), SE "från en affär".
+                + "|jedan ducan|jednog ducana|jednom ducanu|fran en affar")) {
             maxStores = 1;
-        } else if (matches(text, "dvije trgovine|dvije trgovina|maksimalno dvije|maks dvije|ne vise od dvije|do dvije trgovine|najvise dvije|dvije trgovin")) {
+        } else if (matches(text, "dvije trgovine|dvije trgovina|maksimalno dvije|maks dvije|ne vise od dvije|do dvije trgovine|najvise dvije|dvije trgovin|zwei geschaft|zwei geschaeft|zwei laden|zwei laeden|due negozi|dos tiendas")) {
             maxStores = 2;
         } else if (matches(text, "ne zelim puno trgovina|sto manje trgovina|manje trgovina|bez puno obilazaka|bez obilazaka|manje obilazaka|ne zelim obilaziti|bez puno trgovina|ne bi obilaz|ne bih obilaz|ne bi da obilaz")) {
             maxStores = 2;

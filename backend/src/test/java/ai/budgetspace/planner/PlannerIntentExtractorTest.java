@@ -175,6 +175,92 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Dnevni boravak, važna mi je besplatna dostava.").roomType()).isEqualTo("living-room");
     }
 
+    // --- Sprint 10.189 multilingual synonym audit (2026-07-18): every gap below is a real native word a user in a
+    // live market types, that used to silently fall back to a wrong/default value. Each positive is paired, where the
+    // audit found one, with a false-positive guard for the exact over-match its adversarial pass surfaced. ---
+
+    @Test
+    void recognisesUtilityRoomsAcrossLanguages() {
+        assertThat(parse("Quiero amueblar mi garaje, unas estanterías.").roomType()).isEqualTo("garage");    // ES
+        assertThat(parse("Sisusta autotalli, hyllyt ja työpöytä.").roomType()).isEqualTo("garage");          // FI
+        assertThat(parse("Innrede garasjen min, hyller.").roomType()).isEqualTo("garage");                    // NO
+        assertThat(parse("Organizar la despensa con baldas.").roomType()).isEqualTo("pantry");                // ES
+        assertThat(parse("Vorrei arredare la lavanderia, scaffali.").roomType()).isEqualTo("laundry");        // IT
+        assertThat(parse("Inreda tvättstugan, hyllor.").roomType()).isEqualTo("laundry");                     // SE
+        assertThat(parse("Amueblar el sótano, estanterías.").roomType()).isEqualTo("basement");               // ES
+        assertThat(parse("Sisusta kellari, hyllyt.").roomType()).isEqualTo("basement");                        // FI
+        assertThat(parse("Arredare la mansarda, scaffalature.").roomType()).isEqualTo("attic");               // IT
+        assertThat(parse("Mobilar o corredor, um aparador.").roomType()).isEqualTo("hallway");                // PT
+    }
+
+    @Test
+    void utilityRoomSynonymsDoNotOverTrigger() {
+        // PT "escorredor de louça" (a dish rack) must NOT reclassify a kitchen prompt to hallway (\bcorredor\b is bounded).
+        assertThat(parse("Cozinha: armários e um escorredor de louça.").roomType()).isEqualTo("kitchen");
+        // IT ceiling lamp "lampada da soffitto" must NOT be read as attic ("soffitt[ae]" excludes the -o ceiling word).
+        assertThat(parse("Arredare il salotto con una lampada da soffitto.").roomType()).isNotEqualTo("attic");
+    }
+
+    @Test
+    void recognisesFurnitureCategoriesAcrossLanguages() {
+        assertThat(parse("Ich brauche einen Stuhl und einen Teppich fürs Wohnzimmer.").mustHaveCategories())
+                .contains("chair", "rug");                                                                     // DE
+        assertThat(parse("Ich brauche einen Schreibtisch fürs Arbeitszimmer.").mustHaveCategories())
+                .contains("desk");                                                                             // DE
+        assertThat(parse("Necesito una silla y una alfombra para el salón.").mustHaveCategories())
+                .contains("chair", "rug");                                                                     // ES
+        assertThat(parse("Il me faut un canapé, une chaise et un tapis.").mustHaveCategories())
+                .contains("sofa", "chair", "rug");                                                             // FR
+        assertThat(parse("J'ai besoin d'une armoire pour la chambre.").mustHaveCategories())
+                .contains("wardrobe");                                                                         // FR
+        assertThat(parse("Mi serve un divano, una sedia e un tappeto.").mustHaveCategories())
+                .contains("sofa", "chair", "rug");                                                             // IT
+        assertThat(parse("Tarvitsen sohvan olohuoneeseen.").mustHaveCategories()).contains("sofa");            // FI
+        assertThat(parse("I need a rug and a carpet for the living room.").mustHaveCategories()).contains("rug"); // EN
+    }
+
+    @Test
+    void categorySynonymsDoNotOverTrigger() {
+        // FI "sohvapöytä" is a COFFEE TABLE, not a sofa — the sohva(?!p) lookahead must keep it out of the sofa bucket.
+        assertThat(parse("Tarvitsen sohvapöydän olohuoneeseen.").mustHaveCategories()).doesNotContain("sofa");
+        // FR "armoire de toilette" is a bathroom cabinet, not a bedroom wardrobe.
+        assertThat(parse("J'ai besoin d'une armoire de toilette pour la salle de bain.").mustHaveCategories())
+                .doesNotContain("wardrobe");
+    }
+
+    @Test
+    void recognisesLevelGoalAndStyleAcrossLanguages() {
+        assertThat(parse("Die Wohnung komplett einrichten, Budget 3000.").furnishingLevel()).isEqualTo("complete"); // DE
+        assertThat(parse("I want the flat fully furnished.").furnishingLevel()).isEqualTo("complete");              // EN
+        assertThat(parse("Voglio un arredamento completo.").furnishingLevel()).isEqualTo("complete");              // IT
+        assertThat(parse("Just the basics for now.").furnishingLevel()).isEqualTo("basic");                         // EN
+        assertThat(parse("Das Wohnzimmer soll gemütlich sein.").style()).isEqualTo("warm");                        // DE
+        assertThat(parse("Make the bedroom cosy.").style()).isEqualTo("warm");                                      // EN (GB)
+        assertThat(parse("Klassischer Stil bitte.").style()).isEqualTo("classic");                                 // DE
+        assertThat(parse("So günstig wie möglich einrichten.").optimizationGoal()).isEqualTo("lowest-price");      // DE
+        assertThat(parse("Just get me the cheapest sofa.").optimizationGoal()).isEqualTo("lowest-price");          // EN
+        assertThat(parse("Lo más barato posible.").optimizationGoal()).isEqualTo("lowest-price");                  // ES
+        assertThat(parse("Le moins cher possible.").optimizationGoal()).isEqualTo("lowest-price");                 // FR
+        assertThat(parse("Make the room beautiful, budget 2000.").optimizationGoal()).isEqualTo("style-match");    // EN
+        assertThat(parse("Que quede bonito.").optimizationGoal()).isEqualTo("style-match");                        // ES
+    }
+
+    @Test
+    void recognisesRetailerIntentAcrossLanguages() {
+        assertThat(retailerIntent("Wohnzimmer 2000, ohne IKEA bitte.").excludedRetailers()).contains("IKEA");   // DE
+        assertThat(retailerIntent("Sala de estar 1500, sem IKEA.").excludedRetailers()).contains("IKEA");        // PT
+        assertThat(retailerIntent("Stue 8000 kr, ingen IKEA takk.").excludedRetailers()).contains("IKEA");       // NO
+        assertThat(retailerIntent("Salón 1800, prefiero IKEA.").preferredRetailers()).contains("IKEA");          // ES
+        assertThat(retailerIntent("Quarto 1200, prefiro IKEA.").preferredRetailers()).contains("IKEA");          // PT
+        assertThat(retailerIntent("Für das Büro 900, ich bevorzuge JYSK.").preferredRetailers()).contains("JYSK"); // DE
+        assertThat(retailerIntent("Woonkamer 1500, ik wil liever IKEA.").preferredRetailers()).contains("IKEA");  // NL
+        assertThat(retailerIntent("Wohnzimmer 2500, maximal zwei Geschäfte.").maxStores()).isEqualTo(2);          // DE
+        assertThat(retailerIntent("Soggiorno 2000, massimo due negozi.").maxStores()).isEqualTo(2);               // IT
+        assertThat(retailerIntent("Dormitorio 1500, dos tiendas como máximo.").maxStores()).isEqualTo(2);         // ES
+        assertThat(retailerIntent("Želim sve iz jednog dućana, blizu mi je.").maxStores()).isEqualTo(1);          // HR
+        assertThat(retailerIntent("Vardagsrum 8000 kr, allt från en affär.").maxStores()).isEqualTo(1);          // SE
+    }
+
     @Test
     void parsesDiningTableCategory() {
         assertThat(parse("Blagovaonica, treba mi blagovaonski stol.").mustHaveCategories())
