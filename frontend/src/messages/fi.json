@@ -133,6 +133,8 @@
   "form.furnishingCompleteDescription": "lisää myös yksityiskohdat jos budjetti antaa myöten",
   "form.goalBestValueLabel": "Paras vastine rahalle",
   "form.goalBestValueDescription": "hyvä lopputulos ilman rahan tuhlaamista",
+  "form.goalLowerPriceLabel": "Vähän edullisemmin",
+  "form.goalLowerPriceDescription": "laske hintaa, mutta valitse silti paras mikä mahtuu",
   "form.goalLowestPriceLabel": "Mahdollisimman edullisesti",
   "form.goalLowestPriceDescription": "säästä budjettia niin paljon kuin voit",
   "form.goalLeastStoresLabel": "Mahdollisimman vähän kauppoja",

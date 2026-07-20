@@ -133,6 +133,8 @@
   "form.furnishingCompleteDescription": "tilføj også detaljerne, hvis budgettet tillader det",
   "form.goalBestValueLabel": "Bedst værdi for pengene",
   "form.goalBestValueDescription": "et flot udtryk uden at spilde penge",
+  "form.goalLowerPriceLabel": "Lidt billigere",
+  "form.goalLowerPriceDescription": "pres prisen, men vælg stadig det bedste, der er plads til",
   "form.goalLowestPriceLabel": "Så billigt som muligt",
   "form.goalLowestPriceDescription": "spar så meget af budgettet, du kan",
   "form.goalLeastStoresLabel": "Så få butikker som muligt",

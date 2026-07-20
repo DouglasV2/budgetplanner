@@ -133,6 +133,8 @@
   "form.furnishingCompleteDescription": "pridaj aj detaily, ak to rozpočet dovolí",
   "form.goalBestValueLabel": "Najlepší pomer ceny a kvality",
   "form.goalBestValueDescription": "dobrý vzhľad bez plytvania peniazmi",
+  "form.goalLowerPriceLabel": "Trochu lacnejšie",
+  "form.goalLowerPriceDescription": "zníž cenu, ale vyber to najlepšie, čo sa zmestí",
   "form.goalLowestPriceLabel": "Čo najlacnejšie",
   "form.goalLowestPriceDescription": "šetri rozpočet, koľko len môžeš",
   "form.goalLeastStoresLabel": "Čo najmenej obchodov",

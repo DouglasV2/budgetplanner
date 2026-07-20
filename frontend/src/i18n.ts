@@ -415,6 +415,8 @@ const DICTIONARY: Record<string, Entry> = {
   'form.furnishingCompleteDescription': { hr: 'dodaj i detalje ako budžet drži', en: 'add the details too if the budget allows' },
   'form.goalBestValueLabel': { hr: 'Najbolji omjer', en: 'Best value' },
   'form.goalBestValueDescription': { hr: 'dobar izgled bez bacanja novca', en: 'a good look without wasting money' },
+  'form.goalLowerPriceLabel': { hr: 'Malo jeftinije', en: 'A bit cheaper' },
+  'form.goalLowerPriceDescription': { hr: 'spusti cijenu, ali i dalje biraj najbolje što stane', en: 'bring the price down, still pick the best that fits' },
   'form.goalLowestPriceLabel': { hr: 'Što jeftinije', en: 'As cheap as possible' },
   'form.goalLowestPriceDescription': { hr: 'čuvaj budžet koliko god možeš', en: 'save the budget as much as you can' },
   'form.goalLeastStoresLabel': { hr: 'Što manje trgovina', en: 'As few stores as possible' },

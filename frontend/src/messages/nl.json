@@ -133,6 +133,8 @@
   "form.furnishingCompleteDescription": "voeg ook de details toe als het budget het toelaat",
   "form.goalBestValueLabel": "Beste prijs-kwaliteit",
   "form.goalBestValueDescription": "een mooie uitstraling zonder geld te verspillen",
+  "form.goalLowerPriceLabel": "Iets goedkoper",
+  "form.goalLowerPriceDescription": "druk de prijs, maar kies nog steeds het beste dat past",
   "form.goalLowestPriceLabel": "Zo goedkoop mogelijk",
   "form.goalLowestPriceDescription": "spaar je budget zoveel je kunt",
   "form.goalLeastStoresLabel": "Zo weinig mogelijk winkels",

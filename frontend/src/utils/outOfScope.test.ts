@@ -32,6 +32,12 @@ describe('detectOutOfScope — multilingual coverage', () => {
     expect(detectOutOfScope('i need a console table for the hallway')).toBeNull(); // EN console table
   });
 
+  it('does not flag a mention the user ruled out', () => {
+    expect(detectOutOfScope('ne trebam perilicu, samo namjestaj')).toBeNull();          // HR
+    expect(detectOutOfScope('i do not want a washing machine, just furniture')).toBeNull(); // EN
+    expect(detectOutOfScope('keine waschmaschine, nur moebel')).toBeNull();             // DE
+  });
+
   it('still flags a real television / games console', () => {
     expect(detectOutOfScope('trebam televizor 55 inca')).toBe('electronics');
     expect(detectOutOfScope('i want a playstation for the living room')).toBe('electronics');

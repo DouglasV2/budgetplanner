@@ -26,6 +26,11 @@ describe('detectMultiRoom — multilingual room detection', () => {
     expect(detectMultiRoom('meine erste Wohnung komplett einrichten')).not.toBeNull();   // DE first flat
   });
 
+  it('does not count a room the user ruled out', () => {
+    // Only the kitchen is actually wanted, so this is a single-room request → no whole-apartment nudge.
+    expect(detectMultiRoom('uredi kuhinju, ne dnevni boravak')).toBeNull();
+  });
+
   it('does not read the PT "quarto de banho" (bathroom) as a bedroom', () => {
     // Single room (bathroom) → no multi-room nudge, and never a bedroom.
     expect(roomsOf('mobilar so o quarto de banho')).not.toContain('bedroom');

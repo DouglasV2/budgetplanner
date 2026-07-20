@@ -3,6 +3,8 @@
 // building materials — we say so plainly instead of silently handing back a furniture plan. This is a
 // DETERMINISTIC keyword check (not an AI paragraph): it drives a fixed, localized banner.
 
+import { affirmativeHit, negatedRanges, normalizeForMatch } from './negationScope';
+
 export type OutOfScopeCategory = 'electronics' | 'appliances' | 'materials' | 'outdoor';
 
 // A "tv komoda / tv stalak / tv element …" IS furniture (a TV stand) — never flag those as out of scope. Audit
@@ -28,14 +30,18 @@ const WALL_PAINT = /\bboja\s*za\s*zid|\bzidn\w*\s*boj|\bwall\s*paint|\bwandfarbe
 
 export function detectOutOfScope(prompt: string | undefined | null): OutOfScopeCategory | null {
   if (!prompt) return null;
-  // Fold the Nordic ø/æ that NFD leaves intact, so the Scandinavian appliance/outdoor words match in ASCII.
-  const text = prompt.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/ø/g, 'o').replace(/æ/g, 'ae');
+  const text = normalizeForMatch(prompt);
+  // Sprint 10.190: something the user RULED OUT must not raise the banner — "ne trebam perilicu, samo
+  // namještaj" is a furniture request, not an appliance one. TV_FURNITURE stays a plain test: it is an
+  // exemption, and an exemption should stay generous.
+  const ranges = negatedRanges(text);
+  const hit = (pattern: RegExp) => affirmativeHit(pattern, text, ranges);
 
-  if (ELECTRONICS.test(text) || INCHES.test(text) || (TV_BARE.test(text) && !TV_FURNITURE.test(text))) {
+  if (hit(ELECTRONICS) || hit(INCHES) || (hit(TV_BARE) && !TV_FURNITURE.test(text))) {
     return 'electronics';
   }
-  if (APPLIANCES.test(text)) return 'appliances';
-  if (MATERIALS.test(text) || FLOORING.test(text) || WALL_PAINT.test(text)) return 'materials';
-  if (OUTDOOR.test(text)) return 'outdoor';
+  if (hit(APPLIANCES)) return 'appliances';
+  if (hit(MATERIALS) || hit(FLOORING) || hit(WALL_PAINT)) return 'materials';
+  if (hit(OUTDOOR)) return 'outdoor';
   return null;
 }

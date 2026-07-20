@@ -71,6 +71,7 @@ const furnishingLevels: Array<{ value: FurnishingLevel; label: string; descripti
 
 const optimizationGoals: Array<{ value: OptimizationGoal; label: string; description: string }> = [
   { value: 'best-value', label: 'form.goalBestValueLabel', description: 'form.goalBestValueDescription' },
+  { value: 'lower-price', label: 'form.goalLowerPriceLabel', description: 'form.goalLowerPriceDescription' },
   { value: 'lowest-price', label: 'form.goalLowestPriceLabel', description: 'form.goalLowestPriceDescription' },
   { value: 'least-stores', label: 'form.goalLeastStoresLabel', description: 'form.goalLeastStoresDescription' },
   { value: 'style-match', label: 'form.goalStyleMatchLabel', description: 'form.goalStyleMatchDescription' }

@@ -1,4 +1,5 @@
 import type { RoomType } from '../types';
+import { affirmativeHit, negatedRanges, normalizeForMatch } from './negationScope';
 
 // Sprint 10.116: detect when a free-text prompt describes MORE THAN ONE room (or a whole apartment). The
 // single-room generator can only do one, so instead of silently building one room + underspending, we nudge
@@ -29,12 +30,14 @@ export interface MultiRoomHint {
 
 export function detectMultiRoom(prompt: string | undefined | null): MultiRoomHint | null {
   if (!prompt) return null;
-  // NFD strips combining marks (ä/ö/é…), but the Nordic ø/æ have no decomposition, so fold them explicitly —
-  // otherwise a Norwegian "kjøkken" or Danish "køkken" never reduces to its ASCII kitchen token. (å→a via NFD.)
-  const text = prompt.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/ø/g, 'o').replace(/æ/g, 'ae');
+  const text = normalizeForMatch(prompt);
+  // Sprint 10.190: a room the user ruled out ("uredi kuhinju, ne dnevni boravak") must not count toward the
+  // multi-room nudge, or we'd push a single-room request into the whole-apartment flow.
+  const ranges = negatedRanges(text);
+  const hit = (pattern: RegExp) => affirmativeHit(pattern, text, ranges);
 
-  const rooms = ROOM_PATTERNS.filter(([, re]) => re.test(text)).map(([room]) => room);
-  const wholeApartment = WHOLE_APARTMENT.test(text) || ROOM_COUNT.test(text);
+  const rooms = ROOM_PATTERNS.filter(([, re]) => hit(re)).map(([room]) => room);
+  const wholeApartment = hit(WHOLE_APARTMENT) || hit(ROOM_COUNT);
 
   if (rooms.length >= 2) return { rooms };
   if (wholeApartment) return { rooms: rooms.length ? rooms : ['living-room', 'bedroom'] };

@@ -133,6 +133,8 @@
   "form.furnishingCompleteDescription": "añade también los detalles si el presupuesto lo permite",
   "form.goalBestValueLabel": "Mejor relación calidad-precio",
   "form.goalBestValueDescription": "buen aspecto sin malgastar dinero",
+  "form.goalLowerPriceLabel": "Un poco más barato",
+  "form.goalLowerPriceDescription": "baja el precio, pero elige aún lo mejor que quepa",
   "form.goalLowestPriceLabel": "Lo más barato posible",
   "form.goalLowestPriceDescription": "ahorra todo lo que puedas del presupuesto",
   "form.goalLeastStoresLabel": "El menor número de tiendas posible",

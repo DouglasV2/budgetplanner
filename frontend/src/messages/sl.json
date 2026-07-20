@@ -133,6 +133,8 @@
   "form.furnishingCompleteDescription": "dodaj tudi podrobnosti, če proračun dopušča",
   "form.goalBestValueLabel": "Najboljše razmerje",
   "form.goalBestValueDescription": "lep videz brez metanja denarja stran",
+  "form.goalLowerPriceLabel": "Malo ceneje",
+  "form.goalLowerPriceDescription": "znižaj ceno, a vseeno izberi najboljše, kar gre",
   "form.goalLowestPriceLabel": "Čim ceneje",
   "form.goalLowestPriceDescription": "varčuj s proračunom, kolikor le moreš",
   "form.goalLeastStoresLabel": "Čim manj trgovin",

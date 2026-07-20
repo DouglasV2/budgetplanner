@@ -69,7 +69,9 @@ export type StyleType =
 
 export type RetailerMode = 'single' | 'multi';
 
-export type OptimizationGoal = 'lowest-price' | 'best-value' | 'least-stores' | 'style-match';
+// Sprint 10.190: 'lower-price' is the gentler middle step — "jeftinije" asks for a lower price band, while
+// 'lowest-price' stays reserved for the superlative ("što jeftinije").
+export type OptimizationGoal = 'lowest-price' | 'lower-price' | 'best-value' | 'least-stores' | 'style-match';
 
 export type FurnishingLevel = 'basic' | 'comfort' | 'complete';
 
@@ -207,6 +209,9 @@ export interface PlannerInput {
   selectedRetailers: Retailer[];
   optimizationGoal: OptimizationGoal;
   furnishingLevel: FurnishingLevel;
+  // Sprint 10.190: the complementary style of a SOFTENED request ("ne previše moderno" → modern + classic).
+  // Prompt-derived and round-trips with the plan; there is no form control for it.
+  secondaryStyles?: string[];
   mustHaveCategories: ProductCategory[];
   alreadyHaveCategories: ProductCategory[];
   lockedProductIds: string[];
