@@ -1338,7 +1338,16 @@ public class PlannerService {
     }
 
     private double scoreProduct(Product product, PlannerInputDto input, String mode, Set<String> currentRetailers, Set<String> currentColors, double perItemTarget) {
-        double styleScore = styleMatches(product, input.style()) ? 38 : 12;
+        // Sprint 10.190: a SOFTENED style ("ne previše moderno") carries a complementary secondary style. A piece
+        // that reads as BOTH is the ideal answer; a secondary-only piece is still a decent fit. For an ordinary
+        // single-style request secondaryStyles is empty, so this collapses to the previous binary 38/12.
+        // The secondary check is a STRICT tag match on purpose: styleAliases() is deliberately loose (a piece
+        // tagged only "modern" already satisfies a "classic" request), so reusing styleMatches here would hand
+        // the both-styles bonus to everything and steer nothing. The blend only pays out when the product really
+        // carries the complementary tag.
+        boolean primaryStyle = styleMatches(product, input.style());
+        boolean secondaryStyle = input.secondaryStyles().stream().anyMatch(s -> hasStyleTag(product, s));
+        double styleScore = primaryStyle && secondaryStyle ? 44 : primaryStyle ? 38 : secondaryStyle ? 30 : 12;
         double roomScore = matchesRoom(product, input.roomType()) ? 36 : 0;
         double ratingScore = product.getRating() * 5;
         // Sprint 10.190: inside a cheap plan a clearly better-rated piece should beat one that is a few euro
@@ -2631,6 +2640,14 @@ public class PlannerService {
 
     private boolean styleMatches(Product product, String requestedStyle) {
         return productStyleMatches(splitCsv(product.getStyleTags()), requestedStyle);
+    }
+
+    /** Sprint 10.190: does the product LITERALLY carry this style tag? No alias expansion — see score(). */
+    private boolean hasStyleTag(Product product, String style) {
+        if (style == null || style.isBlank()) return false;
+        String wanted = style.toLowerCase(Locale.ROOT).trim();
+        return splitCsv(product.getStyleTags()).stream()
+                .anyMatch(tag -> tag.toLowerCase(Locale.ROOT).trim().equals(wanted));
     }
 
     private boolean productStyleMatches(List<String> productTags, String requestedStyle) {

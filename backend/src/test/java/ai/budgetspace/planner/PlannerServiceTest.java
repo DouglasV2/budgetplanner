@@ -61,6 +61,26 @@ class PlannerServiceTest {
                 .doesNotContain("sofa-floor");
     }
 
+    // Sprint 10.190: a softened style ("ne previše moderno") should land on a piece that reads as BOTH modern and
+    // classic, rather than the purely modern one.
+    @Test
+    void aSoftenedStylePrefersAPieceThatReadsAsBoth() {
+        Product modernOnly = product("sofa-modern-only", "Samo moderan", "IKEA", "sofa", 400, 4.5);
+        modernOnly.setStyleTags("modern");
+        // Same retailer for both, so the retailer-diversity tie-break can't be what decides this.
+        Product both = product("sofa-both", "Moderan i klasičan", "IKEA", "sofa", 400, 4.5);
+        both.setStyleTags("modern,classic");
+        PlannerService service = serviceWithProducts(List.of(modernOnly, both));
+
+        PlannerInputDto blended = input("dnevni boravak").withStyle("modern").withSecondaryStyles(List.of("classic"));
+        FurnishingPlanDto plan = service.generate(blended).plans().get(0);
+
+        assertThat(plan.items()).extracting(item -> item.product().id())
+                .as("the piece carrying both styles wins the slot")
+                .contains("sofa-both")
+                .doesNotContain("sofa-modern-only");
+    }
+
     @Test
     void planKeepsOneProductPerCategoryWhenNothingIsLocked() {
         PlannerService service = serviceWithProducts(defaultProducts());

@@ -34,8 +34,20 @@ public record PlannerInputDto(
         // allowed to re-derive the room; when false (an explicit UI pick / template / internal caller such as
         // Move-In) the structured room is honored over the prompt (preserving Sprint 10.169). Defaults to false
         // so callers that don't send it — and a missing JSON field — keep the "honor the room" behaviour.
-        boolean roomInferred
+        boolean roomInferred,
+        // Sprint 10.190: when a style is SOFTENED ("ne previše moderno") the primary style stays in `style` and
+        // its complement lands here, so the scorer can reward a piece that reads as BOTH. Empty for every
+        // ordinary request, so existing callers and previously saved plans are unaffected.
+        List<String> secondaryStyles
 ) {
+    /**
+     * Null-guards the newest field, so a caller that builds the record directly (tests, fixtures, the AI path)
+     * can never hand the scorer a null list.
+     */
+    public PlannerInputDto {
+        secondaryStyles = secondaryStyles == null ? List.of() : secondaryStyles;
+    }
+
     /**
      * Backwards-compatible constructor for callers created before Sprint 10.7 added colour/material
      * preferences (the frontend, tests and scenario fixtures). Preferences default to empty, market to HR.
@@ -91,7 +103,7 @@ public record PlannerInputDto(
         this(prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                 optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories,
                 lockedProductIds, preferredRetailers, excludedRetailers, maxStores,
-                colorPreferences, materialPreferences, market, Map.of(), false);
+                colorPreferences, materialPreferences, market, Map.of(), false, List.of());
     }
 
     public PlannerInputDto normalized() {
@@ -118,7 +130,8 @@ public record PlannerInputDto(
                 materialPreferences == null ? List.of() : materialPreferences,
                 blank(market) ? "HR" : market.trim().toUpperCase(java.util.Locale.ROOT),
                 quantities == null ? Map.of() : quantities,
-                roomInferred
+                roomInferred,
+                secondaryStyles == null ? List.of() : secondaryStyles
         );
     }
 
@@ -184,6 +197,11 @@ public record PlannerInputDto(
         return copy().colorPreferences(nextColors).materialPreferences(nextMaterials).build();
     }
 
+    /** Sprint 10.190: the complementary style(s) of a softened request ("ne previše moderno" -> [classic]). */
+    public PlannerInputDto withSecondaryStyles(List<String> nextSecondaryStyles) {
+        return copy().secondaryStyles(nextSecondaryStyles).build();
+    }
+
     private boolean blank(String value) {
         return value == null || value.isBlank();
     }
@@ -218,6 +236,7 @@ public record PlannerInputDto(
         private String market;
         private Map<String, Integer> quantities;
         private boolean roomInferred;
+        private List<String> secondaryStyles;
 
         private Builder(PlannerInputDto source) {
             this.prompt = source.prompt();
@@ -241,6 +260,7 @@ public record PlannerInputDto(
             this.market = source.market();
             this.quantities = source.quantities();
             this.roomInferred = source.roomInferred();
+            this.secondaryStyles = source.secondaryStyles();
         }
 
         private Builder budget(int value) { this.budget = value; return this; }
@@ -262,12 +282,14 @@ public record PlannerInputDto(
         private Builder market(String value) { this.market = value; return this; }
         private Builder quantities(Map<String, Integer> value) { this.quantities = value; return this; }
         private Builder roomInferred(boolean value) { this.roomInferred = value; return this; }
+        private Builder secondaryStyles(List<String> value) { this.secondaryStyles = value; return this; }
 
         private PlannerInputDto build() {
             return new PlannerInputDto(
                     prompt, budget, roomType, style, location, size, retailerMode, selectedRetailers,
                     optimizationGoal, furnishingLevel, mustHaveCategories, alreadyHaveCategories, lockedProductIds,
-                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences, market, quantities, roomInferred
+                    preferredRetailers, excludedRetailers, maxStores, colorPreferences, materialPreferences, market,
+                    quantities, roomInferred, secondaryStyles
             ).normalized();
         }
     }

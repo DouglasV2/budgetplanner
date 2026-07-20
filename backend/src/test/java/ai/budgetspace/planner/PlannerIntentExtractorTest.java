@@ -205,6 +205,27 @@ class PlannerIntentExtractorTest {
     }
 
     @Test
+    void notTooModernBecomesAModernClassicBlend() {
+        // "ne previše moderno" is a DEGREE phrase, not a plain negation — the user wants a softer modern, so the
+        // style survives and picks up its complement instead of being dropped.
+        PlannerInputDto soft = parse("Dnevni boravak 2000 €, ne previše moderno.");
+        assertThat(soft.style()).isEqualTo("modern");
+        assertThat(soft.secondaryStyles()).containsExactly("classic");
+
+        assertThat(parse("Living room, not too modern.").secondaryStyles()).containsExactly("classic");     // EN
+        assertThat(parse("Wohnzimmer, nicht zu modern.").secondaryStyles()).containsExactly("classic");     // DE
+        assertThat(parse("Soggiorno, non troppo moderno.").secondaryStyles()).containsExactly("classic");   // IT
+        assertThat(parse("Salón, no demasiado moderno.").secondaryStyles()).containsExactly("classic");     // ES
+        assertThat(parse("Spavaća soba, ne previše minimalistički.").secondaryStyles()).containsExactly("warm");
+
+        // A plain style request stays single...
+        assertThat(parse("Dnevni boravak, moderno.").style()).isEqualTo("modern");
+        assertThat(parse("Dnevni boravak, moderno.").secondaryStyles()).isEmpty();
+        // ...and a softener aimed at something that is NOT a style leaves the blend alone.
+        assertThat(parse("Living room, not too basic please.").secondaryStyles()).isEmpty();
+    }
+
+    @Test
     void cheaperIsNotTheSameAsCheapest() {
         // Comparative / plain → a lower price band, still quality-ranked.
         assertThat(parse("Dnevni boravak, može malo jeftinije.").optimizationGoal()).isEqualTo("lower-price");

@@ -84,6 +84,21 @@ public class PlannerIntentExtractor {
     private static final Map<String, Pattern> COLOR_PATTERNS = colorPatterns();
     private static final Map<String, Pattern> MATERIAL_PATTERNS = materialPatterns();
 
+    // Sprint 10.190: "not too X" across the 15 markets. A degree phrase, not a plain negation — see applyStyle.
+    private static final Pattern SOFTENER = Pattern.compile(
+            "\\b(?:ne previse|nije pretjerano|ne bas|not too|nothing too|not overly|nicht zu|non troppo"
+            + "|no demasiado|nao muito|pas trop|niet te|ei liian|inte for|ikke for)\\b");
+
+    // The style a softened request should be blended TOWARD. "ne previše moderno" -> modern + classic.
+    private static final Map<String, String> STYLE_COMPLEMENT = Map.of(
+            "modern", "classic",
+            "classic", "modern",
+            "minimal", "warm",
+            "warm", "bright",
+            "bright", "warm",
+            "industrial", "warm",
+            "boho", "minimal");
+
     // Sprint 10.190: every way a user asks for a lower price, in one place — used both by the goal rules and by
     // the negated-price inversion below them.
     private static final String PRICE_DOWN =
@@ -205,7 +220,33 @@ public class PlannerIntentExtractor {
         if (affirmative(text, "classic|klasic|klasc|klassi", scope)) input = input.withStyle("classic");
         if (affirmative(text, "industrial|industrij|tamno|crno|metal", scope)) input = input.withStyle("industrial");
         if (affirmative(text, "boho|prirodn|biljk|ratan|natural", scope)) input = input.withStyle("boho");
+        // Sprint 10.190: "ne previše moderno" is NOT a plain negation — the user wants a SOFTER modern, not none.
+        // Keep the named style as the primary and add its complement, so the scorer can favour a piece that reads
+        // as both ("blagi modern ali classy"). Runs last and returns directly, so it wins over the suppression the
+        // negation scope applied to the same word above.
+        Matcher softener = SOFTENER.matcher(text);
+        while (softener.find()) {
+            // only the short window right after the degree phrase, so the rest of the sentence isn't swallowed
+            String window = text.substring(softener.end(), Math.min(text.length(), softener.end() + 24));
+            String softened = styleIn(window);
+            if (softened != null) {
+                return input.withStyle(softened)
+                        .withSecondaryStyles(List.of(STYLE_COMPLEMENT.getOrDefault(softened, "warm")));
+            }
+        }
         return input;
+    }
+
+    /** The style named inside a softener's window, or null when the phrase softens something else ("not too basic"). */
+    private String styleIn(String window) {
+        if (matches(window, "moder|uredno")) return "modern";
+        if (matches(window, "minimal|jednostavn|cisto")) return "minimal";
+        if (matches(window, "classic|klasic|klasc|klassi")) return "classic";
+        if (matches(window, "industrial|industrij|tamno|crno|metal")) return "industrial";
+        if (matches(window, "boho|prirodn|biljk|ratan|natural")) return "boho";
+        if (matches(window, "svijetl|prozrac|skandi|scandi|nordic|skandinav")) return "bright";
+        if (matches(window, "toplo|ugodno|mekano|domac|cozy|cosy|\\bwarm\\b|\\bgemue?tlich")) return "warm";
+        return null;
     }
 
     private PlannerInputDto applyFurnishingLevel(String text, PlannerInputDto input, NegationScope scope) {
