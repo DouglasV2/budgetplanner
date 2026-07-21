@@ -12,6 +12,7 @@
     "check:movein": "node scripts/check-move-in.mjs",
     "check:i18n": "node scripts/check-i18n.mjs",
     "check:legal": "node scripts/check-legal.mjs",
+    "check:copy": "node scripts/check-copy-refit.mjs",
     "check": "node scripts/check-i18n.mjs && node scripts/check-move-in.mjs && node scripts/check-legal.mjs"
   },
   "dependencies": {
