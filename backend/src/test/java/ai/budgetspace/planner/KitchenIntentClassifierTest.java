@@ -115,6 +115,22 @@ class KitchenIntentClassifierTest {
     }
 
     @Test
+    void adversarialKitchenCases() {
+        // The kitchen word itself must be affirmative: "not a kitchen but a complete living-room job" is NOT complete-kitchen.
+        assertThat(c.classify("nije kuhinja nego kompletno uređenje dnevnog boravka").intent()).isEqualTo(KitchenIntent.NONE);
+        // A negated product line is a component ask, not a whole kitchen.
+        assertThat(c.classify("ne želim KNOXHULT kuhinju, samo pećnicu").intent()).isEqualTo(KitchenIntent.COMPONENT);
+        // New multilingual complete/component/kitchenware tokens.
+        assertThat(c.classify("we want a full kitchen for the new flat").intent()).isEqualTo(KitchenIntent.COMPLETE);   // EN
+        assertThat(c.classify("die ganze Küche neu machen").intent()).isEqualTo(KitchenIntent.COMPLETE);               // DE
+        assertThat(c.classify("rada bi celo novo kuhinjo do 5000 evrov").intent()).isEqualTo(KitchenIntent.COMPLETE);  // SI
+        assertThat(c.classify("no quiero la cocina completa, solo el fregadero").intent()).isEqualTo(KitchenIntent.COMPONENT); // ES
+        assertThat(c.classify("gimme some pots and pans for the kitchen").intent()).isEqualTo(KitchenIntent.KITCHENWARE);      // EN
+        // Guard: a whole new CABINET is still a component, not a package.
+        assertThat(c.classify("einen ganzen neuen Küchenschrank").intent()).isEqualTo(KitchenIntent.COMPONENT);
+    }
+
+    @Test
     void aBareCabinetOrBookcaseDoesNotFalseTriggerKitchenware() {
         // "bookcase" contains "case" but must not be read as kitchenware (glasses); a NONE prompt stays NONE.
         assertThat(c.classify("i need a bookcase for the living room").intent()).isEqualTo(KitchenIntent.NONE);

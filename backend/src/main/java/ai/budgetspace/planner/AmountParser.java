@@ -46,7 +46,7 @@ final class AmountParser {
     // A size/quantity unit right after a number means it is NOT money. Audit 2026-07-20: added cm/mm (a furniture
     // dimension like "180 cm" was being read as a €180 budget) and % (a "100% pamuk" / "100% cotton" material note
     // was read as a €100 budget).
-    private static final String UNIT_AFTER = "\\s*(?:m2|m²|kvadrat|kom\\b|komad|puta|\\bx\\b|osob|sjedal|godin|h\\b|cm\\b|mm\\b|%|:)";
+    private static final String UNIT_AFTER = "\\s*(?:m2|m²|kvadrat|kom\\b|komad|puta|\\bx\\b|osob|sjedal|godin|h\\b|cm\\b|mm\\b|%|posto\\b|posti\\b|percent|prosent|procent|pourcent|prozent|pct\\b|:)";
     private static final Pattern BARE = Pattern.compile("(?<![\\d.,€$£])\\b(\\d{3,6})\\b(?!" + UNIT_AFTER + ")(?![.,]\\d)");
 
     // Number × thousand-word (audit 2026-07-20): "10 mila €" (IT), "5 tusen kr" (NO/SE), "5 tusind" (DK), "2 tisic"
@@ -103,9 +103,16 @@ final class AmountParser {
         // 5) bare standalone number — only when nothing explicit was found (lowest trust)
         Matcher b = BARE.matcher(text);
         while (b.find()) {
-            Integer parsed = sane(digits(b.group(1)));
+            String raw = b.group(1);
+            Integer parsed = sane(digits(raw));
             if (parsed == null) continue;
-            if (isYearLike(parsed, b.group(1))) continue; // 2026 alone is a year, not a budget
+            if (isYearLike(parsed, raw, text, b.start())) continue; // "u 2026" / "iz 2018" is a year, not a budget
+            // Sprint 10.190: a leading zero, or a group flanked by another 2+ digit group, is a phone/area/order
+            // number, not money — "zovite 095 123 456" must not become a €95 (or €123) budget.
+            if (raw.startsWith("0")) continue;
+            String pre = text.substring(Math.max(0, b.start() - 6), b.start());
+            String post = text.substring(b.end(), Math.min(text.length(), b.end() + 6));
+            if (pre.matches(".*\\d{2,}[\\s\\-/]$") || post.matches("^[\\s\\-/]\\d{2,}.*")) continue;
             return java.util.Optional.of(parsed);
         }
         return java.util.Optional.empty();
@@ -189,8 +196,15 @@ final class AmountParser {
         return (value >= 1 && value <= 100_000_000L) ? (int) value : null;
     }
 
-    /** A bare 4-digit number in the near-future year range is a date, not a budget. */
-    private static boolean isYearLike(int value, String raw) {
-        return raw.length() == 4 && value >= 2020 && value <= 2099;
+    /**
+     * A bare 4-digit number that is really a YEAR, not a budget. 2020-2099 is unconditionally a year (a near-future
+     * date). Sprint 10.190: 1990-2019 collides with very common real budgets ("boravak 2000"), so those count as a
+     * year ONLY when a year-preposition sits right before them ("iz 2018", "od 2015", "godine 2019").
+     */
+    private static boolean isYearLike(int value, String raw, String text, int matchStart) {
+        if (raw.length() != 4 || value < 1990 || value > 2099) return false;
+        if (value >= 2020) return true;
+        String before = text.substring(Math.max(0, matchStart - 12), matchStart);
+        return before.matches(".*\\b(?:iz|od|godin\\w*|leta|from|since|year|jahr|\\bab|anno|del)\\s*$");
     }
 }

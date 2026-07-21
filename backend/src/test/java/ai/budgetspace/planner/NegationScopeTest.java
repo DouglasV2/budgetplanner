@@ -56,6 +56,23 @@ class NegationScopeTest {
     }
 
     @Test
+    void negativeConcordReinforcesRatherThanCancels() {
+        // Slavic/Romance stack negatives for emphasis — two negative words are still ONE negation, not a cancel.
+        assertThat(negated("nikako ne zelim nesto jeftino", "jeftino")).isTrue();
+        assertThat(negated("no quiero nada barato", "barato")).isTrue();
+        assertThat(negated("non voglio niente di caro", "caro")).isTrue();
+    }
+
+    @Test
+    void twoSeparateNegationsBothApply() {
+        // "bez X i bez Y" is two exclusions, not a self-cancelling double negation.
+        assertThat(negated("bez lesnine i bez ikee", "ikee")).isTrue();
+        assertThat(negated("bez lesnine i bez ikee", "lesnine")).isTrue();
+        NegationScope s = NegationScope.of("bez lesnine i bez ikee");
+        assertThat(s.isDoubleNegated("bez lesnine i bez ikee".indexOf("ikee"))).isFalse();
+    }
+
+    @Test
     void doubleNegationCancels() {
         assertThat(negated("nicht ohne ikea", "ikea")).isFalse();
         assertThat(negated("ne bez tepiha", "tepiha")).isFalse();

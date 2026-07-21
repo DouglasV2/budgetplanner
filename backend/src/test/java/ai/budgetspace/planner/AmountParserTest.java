@@ -86,6 +86,10 @@ class AmountParserTest {
             "tusen takk trebam sofu za stua",         // NO "thanks a lot" — no leading digit, so no thousand
             "'mila, treba mi ormar za spavacu'",      // the name Mila must not become 1000
             "runder esstisch 120 cm",                 // round table + dimension, not a budget
+            // Sprint 10.190 adversarial guards:
+            "kauc mora biti 100 posto koza",          // a percentage in words, not a €100 budget
+            "stan u zgradi iz 2018 treba sve novo",   // a build year (context-gated), not a €2018 budget
+            "trebam novi kauc zovite 095 123 456",    // a phone number, not a €95/€123 budget
     })
     void rejectsNonBudgets(String text) {
         assertThat(AmountParser.parseBudget(text)).as(text).isEmpty();
@@ -105,6 +109,15 @@ class AmountParserTest {
     })
     void parsesMultilingualBudgetFormats(String text, int expected) {
         assertThat(AmountParser.parseBudget(text)).as(text).contains(expected);
+    }
+
+    @Test
+    void aBareBudgetInTheYearRangeStaysABudgetWithoutAYearPreposition() {
+        // Widening the year guard to 1990-2019 must NOT swallow a real budget: "boravak 2000" is money.
+        assertThat(AmountParser.parseBudget("dnevni boravak 2000")).contains(2000);
+        assertThat(AmountParser.parseBudget("spavaca soba za 1999")).contains(1999);
+        // ...but a year-preposition before it makes it a year again.
+        assertThat(AmountParser.parseBudget("useljavam u stan iz 2019")).isEmpty();
     }
 
     @Test

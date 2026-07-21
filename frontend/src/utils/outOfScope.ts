@@ -13,7 +13,7 @@ export type OutOfScopeCategory = 'electronics' | 'appliances' | 'materials' | 'o
 const TV_FURNITURE = /\btv[\s-]*(komod|stalak|stalk|element|ormaric|polic|klup|stol|stand|unit|bench|cabinet|board|meubel|mobile|m[oö]bel|regal|schrank|bord|bank)/;
 
 // "console"/"konzol" guarded: a "console table" / "konzolni stol" is furniture, not a games console.
-const ELECTRONICS = /\b(televizor|televizij|television|fernseher|televisore|smart\s*tv|monitor|racunal|laptop|kompjuter|computer|konzol(?!ni)|console(?!\s*table)|playstation|xbox|projektor|projector)\b/;
+const ELECTRONICS = /\b(televizor|televizij|television|fernseher|televisore|smart\s*tv|monitor|racunal\w*|laptop|kompjuter|computer|rechner|konzol(?!ni)|console(?!\s*table)|playstation|xbox|projektor|projector)\b/;
 const TV_BARE = /\btv\b/;
 const INCHES = /\b\d{2}\s*("|''|inc|incha|inch|zoll|pollic)/; // e.g. "55 inca", "55 inch"
 
@@ -37,7 +37,10 @@ export function detectOutOfScope(prompt: string | undefined | null): OutOfScopeC
   const ranges = negatedRanges(text);
   const hit = (pattern: RegExp) => affirmativeHit(pattern, text, ranges);
 
-  if (hit(ELECTRONICS) || hit(INCHES) || (hit(TV_BARE) && !TV_FURNITURE.test(text))) {
+  // Sprint 10.190: a screen-size ("55 inch") only means an electronics TV when it isn't describing a TV STAND —
+  // "TV komoda za 55 inčni TV" is furniture. Same TV_FURNITURE exemption already applied to the bare "tv" token.
+  const tvFurniture = TV_FURNITURE.test(text);
+  if (hit(ELECTRONICS) || (hit(INCHES) && !tvFurniture) || (hit(TV_BARE) && !tvFurniture)) {
     return 'electronics';
   }
   if (hit(APPLIANCES)) return 'appliances';

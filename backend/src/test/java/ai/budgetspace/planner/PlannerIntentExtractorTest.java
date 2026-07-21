@@ -265,6 +265,55 @@ class PlannerIntentExtractorTest {
         assertThat(parse("Dnevni boravak do 900 €, bez tepiha.").alreadyHaveCategories()).contains("rug");
     }
 
+    // --- Sprint 10.190 adversarial hunt: fixes for realistic messy prompts an unpredictable user types. ---
+
+    @Test
+    void adversarialNegationCasesResolveCorrectly() {
+        // Negative concord (two negatives = ONE negation, not a cancel): "not cheap" survives → quality.
+        assertThat(parse("Dnevni boravak 2000, nikako ne želim nešto jeftino.").optimizationGoal()).isEqualTo("style-match");
+        // Two separate exclusions both apply.
+        assertThat(parse("Radni kutak 600, bez Lesnine i bez IKEE.").excludedRetailers()).contains("Lesnina", "IKEA");
+    }
+
+    @Test
+    void adversarialRoomCases() {
+        // A utility LOCATION must not beat an explicitly named habitable room.
+        assertThat(parse("Uređujem spavaću sobu u potkrovlju, treba mi krevet.").roomType()).isEqualTo("bedroom");
+        // An item does not override an explicitly stated room ("mini fridge in the living room").
+        assertThat(parse("U dnevnom boravku mi treba mali frižider za piće.").roomType()).isEqualTo("living-room");
+        // ...but with no room named, the appliance still implies the kitchen.
+        assertThat(parse("Trebam pećnicu i frižider.").roomType()).isEqualTo("kitchen");
+        assertThat(parse("Sort me out a corner for my WFH grind.").roomType()).isEqualTo("home-office");   // EN abbr.
+        assertThat(parse("Zariaďujem si novú kanceláriu doma.").roomType()).isEqualTo("home-office");        // SK
+        assertThat(parse("Skal have møbler til kælderen, ca 6000 kr.").roomType()).isEqualTo("basement");    // DK
+        assertThat(parse("Vil pusse opp kjelleren og trenger noen reoler.").roomType()).isEqualTo("basement"); // NO
+    }
+
+    @Test
+    void adversarialRetailerCases() {
+        // "only NOT Pevex" must EXCLUDE Pevex, never make it the single store.
+        PlannerInputDto solo = retailerIntent("Dnevni boravak, samo ne Pevex.");
+        assertThat(solo.excludedRetailers()).contains("Pevex");
+        assertThat(solo.selectedRetailers()).doesNotContain("Pevex");
+        assertThat(retailerIntent("Sredi mi dnevni boravak, without JYSK.").excludedRetailers()).contains("JYSK");   // EN
+        assertThat(retailerIntent("Salón 1800, todo menos IKEA.").excludedRetailers()).contains("IKEA");             // ES
+        assertThat(retailerIntent("Nechcem nábytok z IKEA, radšej JYSK.").excludedRetailers()).contains("IKEA");     // SK
+        assertThat(retailerIntent("Meglio se prendi tutto da JYSK.").selectedRetailers()).containsExactly("JYSK");   // IT
+    }
+
+    @Test
+    void adversarialGoalLevelStyleCases() {
+        assertThat(parse("So billig wie möglich bitte.").optimizationGoal()).isEqualTo("lowest-price");            // DE superl.
+        assertThat(parse("Rabim dnevno sobo, nekaj poceni.").optimizationGoal()).isEqualTo("lower-price");          // SI
+        assertThat(parse("Ne najjeftinije, ali povoljno.").optimizationGoal()).isEqualTo("lower-price");            // HR
+        assertThat(parse("Opremi mi dnevni boravak, samo ono najnužnije.").furnishingLevel()).isEqualTo("basic");   // HR
+        assertThat(parse("Opremi mi baš sve, od poda do stropa.").furnishingLevel()).isEqualTo("complete");         // HR idiom
+        assertThat(parse("Algo chill y acogedor para el salón.").style()).isEqualTo("warm");                        // ES
+        assertThat(parse("Voglio un soggiorno in stile caldo e accogliente.").style()).isEqualTo("warm");           // IT
+        assertThat(parse("Jeg drømmer om en rigtig hyggelig stue.").style()).isEqualTo("warm");                     // DK
+        assertThat(parse("Haluan oikein kodikkaan olohuoneen.").style()).isEqualTo("warm");                         // FI
+    }
+
     @Test
     void recognisesUtilityRoomsAcrossLanguages() {
         assertThat(parse("Quiero amueblar mi garaje, unas estanterías.").roomType()).isEqualTo("garage");    // ES

@@ -31,6 +31,16 @@ describe('detectMultiRoom — multilingual room detection', () => {
     expect(detectMultiRoom('uredi kuhinju, ne dnevni boravak')).toBeNull();
   });
 
+  it('adversarial: a "bad feeling" is not a bathroom; a move-in phrase is a whole-apartment', () => {
+    // The English adjective "bad" must not conjure a bathroom room and fire the multi-room nudge.
+    expect(detectMultiRoom("a hand with my living room; i've a bad feeling the old sofa is too big")).toBeNull();
+    // Just-moved-in phrasings across markets trigger the whole-apartment nudge.
+    expect(detectMultiRoom('acabo de mudarme y quiero amueblar todo el piso')).not.toBeNull();      // ES
+    expect(detectMultiRoom('je viens de demenager et je dois meubler tout l appartement')).not.toBeNull(); // FR
+    expect(detectMultiRoom('we zijn net verhuisd en moeten het hele huis inrichten')).not.toBeNull();  // NL
+    expect(detectMultiRoom('vi har nettopp flyttet inn og skal moblere hele leiligheten')).not.toBeNull(); // NO
+  });
+
   it('does not read the PT "quarto de banho" (bathroom) as a bedroom', () => {
     // Single room (bathroom) → no multi-room nudge, and never a bedroom.
     expect(roomsOf('mobilar so o quarto de banho')).not.toContain('bedroom');

@@ -46,8 +46,12 @@ public class KitchenIntentClassifier {
     // wrongly flag "ganzen neuen Küchenschrank" = a whole new cabinet, a COMPONENT) and FI "koko" (means "size" in
     // "keittiön koko 10 m²"). Each is ANDed with a kitchen word, and the complete-kitchen section is browse-only, so
     // a rare over-trigger only shows an extra sets panel, never alters the main plan.
+    // Sprint 10.190 adversarial: "full kitchen" EN (not a bare \bfull\b — that hits "full set"/"budget is full");
+    // "\bganze[nrs]? kuche\b" DE with a trailing boundary so "ganzen küchenschrank" (a whole CABINET) still doesn't
+    // match; SI "celo/cela/celotn" (whole).
     private static final Pattern COMPLETE_QUALIFIER = Pattern.compile(
-        "(komplet|complet|cijel|\\bwhole\\b|\\bentire\\b|modularn|modular|componibil|einbau|kuchenzeile|modulkuch"
+        "(komplet|complet|cijel|\\bwhole\\b|\\bentire\\b|full kitchen|\\bganze[nrs]? kuche\\b|\\bcelo\\b|\\bcela\\b|celotn"
+        + "|modularn|modular|componibil|einbau|kuchenzeile|modulkuch"
         + "|fitted|equipee|amenag|einricht|\\bvalmis\\b|\\bvalmiin|amuebl|\\bintegral|volledig|renov|oprem|uredi|opremi"
         + "|furnish|u paketu)");
     // Unambiguous complete-kitchen product line (only ever a kitchen), safe on its own.
@@ -57,26 +61,28 @@ public class KitchenIntentClassifier {
     private static final Pattern COMPONENT = Pattern.compile(
         "(perilic\\w* posud|sudoper|slavin|pecnic|ploc\\w* za kuhanj|napa|hladnjak|zamrziva|kuhinjsk\\w* ormaric|ladic|radn\\w* ploc"
         + "|geschirrspul|backofen|kochfeld|dunstabzug|kuhlschrank|gefrierschrank|spule|arbeitsplatt|kuchenschrank"
-        + "|dishwasher|\\boven\\b|\\bhob\\b|cooktop|extractor hood|fridge|refrigerator|freezer|kitchen sink|kitchen cabinet|worktop|countertop)");
+        + "|dishwasher|\\boven\\b|\\bhob\\b|cooktop|extractor hood|fridge|refrigerator|freezer|kitchen sink|kitchen cabinet|worktop|countertop|fregadero)");
 
     // KITCHENWARE: pots/plates/etc. Short/ambiguous tokens are word-boundary-guarded so "bookcase" (→case) can't
     // false-trigger. Secondary — checked last.
     private static final Pattern KITCHENWARE = Pattern.compile(
         "(\\bposud|tanjur|zdjel|pribor za jelo|\\bcase\\b|\\bsalic|\\blonac|\\btava\\b|cookware|tableware|cutlery"
-        + "|\\bplates\\b|\\bbowls\\b|\\bglasses\\b|\\bmugs\\b|utensil)");
+        + "|\\bplates\\b|\\bbowls\\b|\\bglasses\\b|\\bmugs\\b|\\bpots\\b|\\bpans\\b|utensil)");
 
     private static final Pattern APPLIANCES_YES = Pattern.compile("(s uredaj|sa uredaj|s aparat|mit gerat|with appliance|incl\\w* appliance)");
     private static final Pattern APPLIANCES_NO = Pattern.compile("(bez uredaj|bez aparat|ohne gerat|without appliance|no appliance)");
 
     public KitchenBrief classify(String prompt) {
         String p = normalize(prompt);
-        // Sprint 10.190: the qualifier must not sit in a NEGATED clause — "ne želim kompletnu kuhinju, samo
-        // pećnicu" is a COMPONENT ask, not a whole-kitchen one. KNOXHULT is a product line, so it is taken at
-        // face value. normalize() already folds the Nordic ligatures, so this satisfies NegationScope's contract.
+        // Sprint 10.190: neither the kitchen word NOR the qualifier may sit in a NEGATED clause. "ne želim
+        // kompletnu kuhinju, samo pećnicu" is a COMPONENT ask; "nije kuhinja nego kompletno uređenje dnevnog
+        // boravka" is about the LIVING room (the kitchen word is negated), so it is NOT a complete-kitchen ask;
+        // "ne želim KNOXHULT kuhinju, samo pećnicu" is a COMPONENT too. normalize() folds the Nordic ligatures,
+        // so this satisfies NegationScope's contract.
         NegationScope scope = NegationScope.of(p);
         KitchenIntent intent;
-        if (KNOXHULT.matcher(p).find()
-                || (KITCHEN_WORD.matcher(p).find() && affirmative(p, COMPLETE_QUALIFIER, scope))) {
+        if (affirmative(p, KNOXHULT, scope)
+                || (affirmative(p, KITCHEN_WORD, scope) && affirmative(p, COMPLETE_QUALIFIER, scope))) {
             intent = KitchenIntent.COMPLETE;                 // whole-kitchen phrasing wins even if a part is named
         } else if (COMPONENT.matcher(p).find()) {
             intent = KitchenIntent.COMPONENT;

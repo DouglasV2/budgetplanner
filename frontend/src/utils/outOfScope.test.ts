@@ -38,6 +38,13 @@ describe('detectOutOfScope — multilingual coverage', () => {
     expect(detectOutOfScope('keine waschmaschine, nur moebel')).toBeNull();             // DE
   });
 
+  it('adversarial: inflected računalo / German Rechner flag, a TV-stand does not', () => {
+    expect(detectOutOfScope('trebam novo računalo za dnevni boravak')).toBe('electronics');   // HR inflected
+    expect(detectOutOfScope('ich brauche einen neuen Rechner fürs Wohnzimmer')).toBe('electronics'); // DE
+    // A stand FOR a 55" TV is furniture — the screen size must not flip it to electronics.
+    expect(detectOutOfScope('TV komoda za 55 inčni TV u dnevnom')).toBeNull();
+  });
+
   it('still flags a real television / games console', () => {
     expect(detectOutOfScope('trebam televizor 55 inca')).toBe('electronics');
     expect(detectOutOfScope('i want a playstation for the living room')).toBe('electronics');
