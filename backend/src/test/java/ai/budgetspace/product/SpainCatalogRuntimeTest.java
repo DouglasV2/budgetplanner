@@ -45,8 +45,8 @@ class SpainCatalogRuntimeTest {
             assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
             assertThat(product.getImageUrl()).as("imageUrl %s", product.getExternalId()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         for (String room : List.of("living-room", "bedroom", "home-office", "dining-room")) {

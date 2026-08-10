@@ -60,7 +60,7 @@ class JyskEuRoomsCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).as("real URL for %s", product.getExternalId()).startsWith("https://jysk.");
             assertThat(URI.create(product.getProductUrl()).getHost()).as("host for %s", product.getExternalId()).isNotBlank();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).as("usable %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("usable or retired %s", product.getExternalId()).isTrue();
         });
 
         // Both markets contribute hallway storage (the core hallway category).

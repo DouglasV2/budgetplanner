@@ -81,8 +81,8 @@ class Sprint10178CatalogRuntimeTest {
             assertThat(product.getCategory()).as("kitchen-set %s", product.getExternalId()).isEqualTo("kitchen-set");
             assertThat(product.getRoomTags()).as("kitchen tag %s", product.getExternalId()).contains("kitchen");
             assertThat(product.getPrice().signum()).isPositive();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
         Map<String, Long> perMarket = countByMarket(saved);
         for (String market : KITCHEN_SET_MARKETS) {
@@ -99,8 +99,8 @@ class Sprint10178CatalogRuntimeTest {
             assertThat(product.getRetailer()).isEqualTo("IKEA");
             assertThat(product.getCategory()).as("appliance category %s", product.getExternalId()).isIn(APPLIANCE_CATEGORIES);
             assertThat(product.getRoomTags()).as("kitchen tag %s", product.getExternalId()).contains("kitchen");
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
         // An oven is the anchor appliance; it must exist in a broad set of markets (GB is honestly thin — IKEA
         // barely stocks appliances in the UK — so we require >=10 of the 12, not all 12).
@@ -123,8 +123,8 @@ class Sprint10178CatalogRuntimeTest {
             assertThat(product.getProductUrl()).startsWith("https://www.victorianplumbing.co.uk/");
             // The whole point: Victorian Plumbing is MANUAL_VERIFIED_ONLY (not feed-required), so a
             // public-product-page row IS planner-eligible and can enter a GB bathroom plan (GB had no WC/bath before).
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
         assertThat(saved).as("GB toilets").anySatisfy(p -> assertThat(p.getCategory()).isEqualTo("toilet"));
         assertThat(saved).as("GB baths/showers").anySatisfy(p -> assertThat(p.getCategory()).isEqualTo("bath-shower"));
@@ -274,8 +274,8 @@ class Sprint10178CatalogRuntimeTest {
             assertThat(product.getPrice().signum()).as("price>0 %s", product.getExternalId()).isPositive();
             assertThat(product.getProductUrl()).as("real /p/ url %s", product.getExternalId()).contains("ikea.com").contains("/p/");
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
     }
 

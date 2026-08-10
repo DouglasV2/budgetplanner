@@ -29,6 +29,9 @@ import static org.mockito.Mockito.when;
  */
 class ScandinaviaCatalogRuntimeTest {
 
+    /** The day the shipped snapshot was last re-verified end to end (Sprint 10.193's live sweep). */
+    private static final String SHIPPED_ON = "2026-08-10";
+
     private record Mk(String code, String currency, List<String> files) {}
 
     private static final List<Mk> MARKETS = List.of(
@@ -65,16 +68,27 @@ class ScandinaviaCatalogRuntimeTest {
                 assertThat(product.getSourceType()).isEqualTo("public-product-page");
                 assertThat(product.getProductUrl()).startsWith("https://");
                 assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
-                assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                        .as("planner-eligible %s", product.getExternalId()).isTrue();
+                assertThat(ShippedRows.eligibleOrRetired(product))
+                        .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
                 if (product.isImageVerified()) {
                     assertThat(product.getImageUrl()).as("imageUrl %s", product.getExternalId()).isNotBlank();
                 }
-                // A sale is honest only: a verified regular price strictly above the current price, with an end date.
+                // A sale is honest only when a verified regular price sits strictly above the current one.
+                // Sprint 10.193: an end date is NOT required — JYSK states a before-price on the product page
+                // and no window, so demanding one would mean inventing it. What is required is that any stored
+                // window is still in the future: an expired window means the UI silently hides a discount that
+                // the sweep re-verified as running, so it must be cleared, not carried around.
                 if (product.getOriginalPrice() != null) {
                     assertThat(product.getOriginalPrice()).as("sale regular>current %s", product.getExternalId())
                             .isGreaterThan(product.getPrice());
-                    assertThat(product.getSaleEndsAt()).as("sale has end date %s", product.getExternalId()).isNotBlank();
+                    if (product.getSaleEndsAt() != null && !product.getSaleEndsAt().isBlank()) {
+                        assertThat(ProductTaxonomy.isParseableDate(product.getSaleEndsAt()))
+                                .as("sale window parseable %s = %s", product.getExternalId(), product.getSaleEndsAt())
+                                .isTrue();
+                        assertThat(product.getSaleEndsAt().substring(0, 10))
+                                .as("sale window not already expired %s", product.getExternalId())
+                                .isGreaterThanOrEqualTo(SHIPPED_ON);
+                    }
                 }
             });
 

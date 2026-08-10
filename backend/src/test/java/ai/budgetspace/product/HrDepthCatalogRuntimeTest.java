@@ -61,7 +61,7 @@ class HrDepthCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).as("real URL for %s", product.getExternalId()).startsWith("https://");
             assertThat(URI.create(product.getProductUrl()).getHost()).as("host for %s", product.getExternalId()).isNotBlank();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).as("usable %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("usable or retired %s", product.getExternalId()).isTrue();
         });
 
         // Bathroom coverage: storage is the planner's core category for the bathroom, plus lighting.

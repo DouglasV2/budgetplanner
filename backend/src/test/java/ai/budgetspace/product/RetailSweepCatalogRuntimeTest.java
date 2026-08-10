@@ -67,8 +67,8 @@ class RetailSweepCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).startsWith("https://");
             assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
             assertThat(product.getOriginalPrice()).as("no fabricated discount %s", product.getExternalId()).isNull();
             if (product.isImageVerified()) {
                 assertThat(product.getImageUrl()).as("imageUrl %s", product.getExternalId()).isNotBlank();

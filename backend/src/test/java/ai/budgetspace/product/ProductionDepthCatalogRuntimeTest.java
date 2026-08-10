@@ -67,7 +67,7 @@ class ProductionDepthCatalogRuntimeTest {
             assertThat(product.getCategory()).isNotBlank();
             assertThat(product.getRoomTags()).as("rooms for %s", product.getExternalId()).isNotBlank();
             assertThat(product.getStyleTags()).as("styles for %s", product.getExternalId()).isNotBlank();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).isTrue();
         });
 
         // Bedroom + dining coverage now exists in the EU markets (the gap this sprint filled).

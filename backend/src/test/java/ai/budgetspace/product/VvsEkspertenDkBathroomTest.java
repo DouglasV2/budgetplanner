@@ -51,8 +51,8 @@ class VvsEkspertenDkBathroomTest {
             assertThat(product.getPrice().signum()).as("price>0 %s", product.getExternalId()).isPositive();
             assertThat(product.getProductUrl()).startsWith("https://www.vvs-eksperten.dk/");
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         for (String category : FIXTURE_CATEGORIES) {

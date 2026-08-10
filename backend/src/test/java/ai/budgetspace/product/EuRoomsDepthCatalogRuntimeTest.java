@@ -60,7 +60,7 @@ class EuRoomsDepthCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).as("real URL for %s", product.getExternalId()).startsWith("https://");
             assertThat(URI.create(product.getProductUrl()).getHost()).as("host for %s", product.getExternalId()).isNotBlank();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).as("usable %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("usable or retired %s", product.getExternalId()).isTrue();
         });
 
         // Each of the three markets now covers the previously-empty rooms.

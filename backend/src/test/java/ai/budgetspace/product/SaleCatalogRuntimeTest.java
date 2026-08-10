@@ -48,8 +48,8 @@ class SaleCatalogRuntimeTest {
             assertThat(product.getOriginalPrice()).as("originalPrice %s", product.getExternalId())
                     .isGreaterThan(product.getPrice());
             // A sale row stays a real, sourced, planner-eligible product.
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
             // saleEndsAt is optional, but when present it must be a real date (never a fabricated window).
             if (product.getSaleEndsAt() != null && !product.getSaleEndsAt().isBlank()) {
                 assertThat(ProductTaxonomy.isParseableDate(product.getSaleEndsAt()))
@@ -62,14 +62,16 @@ class SaleCatalogRuntimeTest {
             assertThat(dto.saleEndsAt()).isEqualTo(product.getSaleEndsAt());
         });
 
-        // Concrete anchor: the EGEBY nightstand is genuinely −50% right now (regular 69.99 → 35, until
-        // 2026-06-21). If this row drifts, the sourcing/plumbing changed and must be re-verified.
+        // Concrete anchor: the EGEBY nightstand is genuinely −50% (regular 69.99 → 35). Re-confirmed live on
+        // 2026-08-10 — the shop still shows the same before-price, but the 2026-06-21 window it was harvested
+        // with is long gone, so the row no longer carries one. A discount whose window has passed is hidden by
+        // the UI, which would have buried a saving that is actually still on the shelf.
         Product egeby = onSale.stream()
                 .filter(p -> "jysk-hr-nocni-ormaric-egeby-bijela".equals(p.getExternalId()))
                 .findFirst().orElseThrow();
         assertThat(egeby.getPrice()).isEqualByComparingTo(new BigDecimal("35"));
         assertThat(egeby.getOriginalPrice()).isEqualByComparingTo(new BigDecimal("69.99"));
-        assertThat(egeby.getSaleEndsAt()).isEqualTo("2026-06-21");
+        assertThat(egeby.getSaleEndsAt()).as("no expired window is carried on a live sale").isNull();
     }
 
     @Test

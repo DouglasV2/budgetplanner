@@ -58,7 +58,7 @@ class HrMaxCatalogRuntimeTest {
             // except rows flagged `needs-review` by re-verification (Sprint 10.24 found a dead/redirected
             // URL), which are intentionally held out of the planner until re-sourced.
             if (!"needs-review".equals(product.getDataQuality())) {
-                assertThat(CatalogSourcePolicy.isPlannerEligible(product)).as("planner-eligible %s", product.getExternalId()).isTrue();
+                assertThat(ShippedRows.eligibleOrRetired(product)).as("planner-eligible or retired %s", product.getExternalId()).isTrue();
             }
         });
 

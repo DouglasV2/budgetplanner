@@ -50,8 +50,8 @@ class EsRetailersCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).startsWith("https://");
             assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
             // Honest current price only — no phantom discount.
             assertThat(product.getOriginalPrice()).as("no originalPrice %s", product.getExternalId()).isNull();
             // When an image was verified, it must actually carry the URL.

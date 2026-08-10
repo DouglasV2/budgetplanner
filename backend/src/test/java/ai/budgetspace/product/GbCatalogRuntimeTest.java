@@ -47,8 +47,8 @@ class GbCatalogRuntimeTest {
             assertThat(URI.create(product.getProductUrl()).getHost()).isEqualTo("www.ikea.com");
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
             assertThat(product.getImageUrl()).as("imageUrl %s", product.getExternalId()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         // The catalog was deduped — guard against a regression reintroducing duplicate ids/links.

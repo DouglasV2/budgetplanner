@@ -66,7 +66,7 @@ class IkeaAustriaCatalogRuntimeTest {
         assertThat(saved).allSatisfy(product -> {
             assertThat(product.getSourceReference()).isNotBlank();
             assertThat(CatalogSourcePolicy.isFeedSourceType(product.getSourceType())).isFalse();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).isTrue();
         });
     }
 

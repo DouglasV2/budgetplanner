@@ -54,8 +54,8 @@ class PevexBathroomCatalogRuntimeTest {
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
             // The whole point: Pevex is MANUAL_VERIFIED_ONLY (not feed-required), so a public-product-page row IS
             // planner-eligible and can enter a bathroom plan.
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         // The catalog must cover each fixture type so a bathroom plan can offer a toilet, a washbasin AND a bath/shower.

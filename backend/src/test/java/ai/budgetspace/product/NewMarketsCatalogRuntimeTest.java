@@ -60,7 +60,7 @@ class NewMarketsCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).as("real URL for %s", product.getExternalId()).startsWith("https://");
             assertThat(URI.create(product.getProductUrl()).getHost()).as("host for %s", product.getExternalId()).isNotBlank();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).as("usable %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("usable or retired %s", product.getExternalId()).isTrue();
         });
 
         // Both new markets cover the main rooms (living-room core + bedroom + bathroom + kitchen).

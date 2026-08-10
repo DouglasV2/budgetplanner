@@ -66,7 +66,7 @@ class JyskCrossMarketGapfillCatalogRuntimeTest {
             assertThat(product.getSourceType()).isEqualTo("public-product-page");
             assertThat(product.getProductUrl()).as("real URL for %s", product.getExternalId()).startsWith("https://jysk.");
             assertThat(URI.create(product.getProductUrl()).getHost()).as("host for %s", product.getExternalId()).isNotBlank();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).as("planner-usable %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("planner-usable %s", product.getExternalId()).isTrue();
         });
 
         // Coverage spans all 13 JYSK markets, including the non-EUR Nordic trio.

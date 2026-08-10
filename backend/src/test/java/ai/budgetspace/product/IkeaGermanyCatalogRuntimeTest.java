@@ -50,7 +50,7 @@ class IkeaGermanyCatalogRuntimeTest {
             assertThat(URI.create(product.getProductUrl()).getHost()).endsWith("ikea.com");
             assertThat(product.getProductUrl()).contains("/de/");
             assertThat(product.getSourceReference()).isNotBlank();
-            assertThat(ProductTaxonomy.canEnterPlanner(product)).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).isTrue();
         });
         assertThat(saved).anySatisfy(product -> {
             assertThat(product.getReviewRating()).isNotNull();

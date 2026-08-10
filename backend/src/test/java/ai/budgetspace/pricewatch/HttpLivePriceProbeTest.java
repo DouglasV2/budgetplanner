@@ -93,6 +93,55 @@ class HttpLivePriceProbeTest {
                 "https://www.harveynorman.hr/", "Harvey Norman")).isEqualTo(Liveness.DEAD);
     }
 
+    // --- Sprint 10.193: the price shapes the probe was blind to, found by re-probing the shipped catalog.
+
+    @Test
+    void productGroupOfferIsReadNotOnlyProduct() {
+        // jysk.at/dk/fi/fr/it/pt publish the page price ONLY under @type ProductGroup. A Product-only reader
+        // finds nothing there, so those rows could never be re-verified and sat at check-store forever.
+        String html = """
+                <script type="application/ld+json">
+                {"@context":"https://schema.org","@type":"ProductGroup","name":"Schaummatratze WELLPUR",
+                 "offers":{"@type":"Offer","url":"/schlafzimmer/matratzen/schaummatratze-160x200cm-wellpur-kvita-fest-0",
+                 "priceCurrency":"EUR","price":799}}
+                </script>""";
+        assertThat(new HttpLivePriceProbe().jsonLdPrice(html, null))
+                .contains(new java.math.BigDecimal("799"));
+    }
+
+    @Test
+    void theVariantMatchingTheRequestedPageWinsOverTheGroupPrice() {
+        // A ProductGroup lists every size; only the variant whose offer URL is the page we asked for is OUR row.
+        String html = """
+                <script type="application/ld+json">
+                {"@context":"https://schema.org","@type":"ProductGroup","name":"Sofa FALSLEV",
+                 "offers":{"@type":"Offer","priceCurrency":"EUR","price":499},
+                 "hasVariant":[
+                   {"@type":"Product","offers":{"@type":"Offer","url":"/stue/sofaer/sofa-falslev-2-pers","price":399}},
+                   {"@type":"Product","offers":{"@type":"Offer","url":"/stue/sofaer/sofa-falslev-3-pers","price":599}}]}
+                </script>""";
+        assertThat(new HttpLivePriceProbe().jsonLdPrice(html, "/stue/sofaer/sofa-falslev-3-pers"))
+                .contains(new java.math.BigDecimal("599"));
+    }
+
+    @Test
+    void aShortenedSlugIsAReSlugNotACategoryBounce() {
+        // jysk.se truncated the slug (…-natur-vildekfargat -> …-natur-vildek). The landed path is a STRING
+        // prefix of the requested one but sits at the same depth, so it is the same product, not a category.
+        assertThat(classify("https://jysk.se/sovrum/sangbord/sangbord-limfjorden-2-lador-natur-vildekfargat",
+                "https://jysk.se/sovrum/sangbord/sangbord-limfjorden-2-lador-natur-vildek", "JYSK"))
+                .isEqualTo(Liveness.LIVE);
+    }
+
+    @Test
+    void aReSlugThatAppendsAVariantIdKeepsTheRequestedId() {
+        // Bygghemma re-slugs /p-175779 -> /p-175779-175783 (same product, variant id appended). The trailing-id
+        // rule saw two DIFFERENT ids and retired a live product.
+        assertThat(classify("https://www.bygghemma.se/kok-och-bad/dusch/duschkabin-hafa-polaris-square/p-175779",
+                "https://www.bygghemma.se/kok-och-bad/dusch/duschkabin-hafa-polaris-square/p-175779-175783",
+                "Bygghemma")).isEqualTo(Liveness.LIVE);
+    }
+
     @Test
     void reSlugKeepingTheProductIdIsLiveButADifferentIdIsDead() {
         // Same trailing product id (4320261) across a slug change = same product = LIVE.

@@ -4,12 +4,12 @@
     "name": "Dvosjed FALSLEV siva tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 215,
+    "price": 279,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/dvosjed-falslev-siva-tkanina",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/264046",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -30,20 +30,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 279
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-dvosjed-egense-tamnosiva-tkanina",
     "name": "Dvosjed EGENSE tamnosiva tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 215,
+    "price": 279,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/dvosjed-egense-tamnosiva-tkanina",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/251464",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -64,8 +63,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 299
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-dvosjed-magleby-produzeni-tamnosmeda-tkanina",
@@ -77,7 +75,7 @@
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/236944",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -111,7 +109,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/236865",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -146,7 +144,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/253025",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -175,12 +173,12 @@
     "name": "Dvosjed GISTRUP prljavo bijela teddy tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 250,
+    "price": 265,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/dvosjed-gistrup-prljavo-bijela-teddy-tkanina",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/256347",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -209,12 +207,12 @@
     "name": "Dvosjed FALSLEV crna umjetna koža",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 275,
+    "price": 349,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/dvosjed-falslev-crna-umjetna-koza",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/264040",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -235,8 +233,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 349
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-magleby-tamnosmeda-tkanina",
@@ -248,7 +245,7 @@
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/236957",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -282,7 +279,7 @@
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/236872",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -311,12 +308,12 @@
     "name": "Trosjed FALSLEV siva tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 315,
+    "price": 399,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-falslev-siva-tkanina",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264058",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -337,20 +334,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 399
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-dvosjed-egedal-produzeni-bez-tkanina",
     "name": "Dvosjed EGEDAL produženi bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 315,
+    "price": 449,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/dvosjed-egedal-produzeni-bez-tkanina",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/256307",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -371,20 +367,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 449
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-falslev-crna-umjetna-koza",
     "name": "Trosjed FALSLEV crna umjetna koža",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 350,
+    "price": 449,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-falslev-crna-umjetna-koza",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264052",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -405,20 +400,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 449
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-dvosjed-bredal-produzeni-maslinasto-zelena-tkanina",
     "name": "Dvosjed BREDAL produženi maslinasto zelena tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 350,
+    "price": 449,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/dvosjed-bredal-produzeni-maslinasto-zelena-tkanina",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/256275",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -439,20 +433,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 449
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-s-produzetkom-falslev-siva-tkanina",
     "name": "Trosjed s produžetkom FALSLEV siva tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 375,
+    "price": 499,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-s-produzetkom-falslev-siva-tkanina",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/251768",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -473,20 +466,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 499
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-s-produzetkom-falslev-maslinasto-zelena-samt",
     "name": "Trosjed s produžetkom FALSLEV maslinasto zelena samt",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 375,
+    "price": 499,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-s-produzetkom-falslev-maslinasto-zelena-samt",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/236931",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -507,20 +499,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 499
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-hellerup-bez-tkanina-natur-hrast",
     "name": "Trosjed HELLERUP bež tkanina/natur hrast",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 375,
+    "price": 469,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-hellerup-bez-tkanina-natur-hrast",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/264099",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -543,20 +534,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 469
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-lyngaa-odvojiva-navlaka-bez-tkanina",
     "name": "Trosjed LYNGAA odvojiva navlaka bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 375,
+    "price": 499,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-lyngaa-odvojiva-navlaka-bez-tkanina",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/264172",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -577,8 +567,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 499
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-egense-pijesak-tkanina",
@@ -590,7 +579,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/236879",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -624,7 +613,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/264076",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -659,7 +648,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/247621",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -693,7 +682,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/251772",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -722,12 +711,12 @@
     "name": "Trosjed s produžetkom FALSLEV crna umjetna koža",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 425,
+    "price": 549,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-s-produzetkom-falslev-crna-umjetna-koza",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/256283",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -748,20 +737,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 549
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-modularni-dvosjed-skejby-bez-tkanina",
     "name": "Modularni dvosjed SKEJBY bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 430,
+    "price": 439,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/modularni-dvosjed-skejby-bez-tkanina",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/238469",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -795,7 +783,7 @@
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/256315",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -829,7 +817,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/251456",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -863,7 +851,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264064",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -897,7 +885,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264180",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -931,7 +919,7 @@
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/249857",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -960,12 +948,12 @@
     "name": "Trosjed s produžetkom HELLERUP bež tkanina/natur hrast",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 500,
+    "price": 649,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-s-produzetkom-hellerup-bez-tkanina-natur-hrast",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264111",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -988,20 +976,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 649
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-dvosjed-s-produzetkom-za-noge-jyllinge-bez-teddy",
     "name": "Dvosjed s produžetkom za noge JYLLINGE bež teddy",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 500,
+    "price": 699,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/dvosjed-s-produzetkom-za-noge-jyllinge-bez-teddy",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/236924",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1022,20 +1009,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 699
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-dvosjed-egense-tamnosiva-tkanina",
     "name": "Trosjed + dvosjed EGENSE tamnosiva tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 515,
+    "price": 529,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-dvosjed-egense-tamnosiva-tkanina",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/251465",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1057,7 +1043,7 @@
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
     "imageVerified": true,
-    "originalPrice": 698
+    "originalPrice": 678
   },
   {
     "externalId": "jysk-hr-trosjed-dvosjed-egense-pijesak-tkanina",
@@ -1069,7 +1055,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/238514",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1103,7 +1089,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/247622",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1137,7 +1123,7 @@
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/251776",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1166,12 +1152,12 @@
     "name": "Set kauča FALSLEV 2 komada siva tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 530,
+    "price": 678,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/set-kauca-falslev-2-komada-siva-tkanina",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/264630",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1192,8 +1178,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 678
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-s-produzetkom-za-noge-egense-pijesak",
@@ -1205,7 +1190,7 @@
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/236892",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1239,7 +1224,7 @@
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/251469",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1273,7 +1258,7 @@
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264070",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1302,12 +1287,12 @@
     "name": "Set kauča FALSLEV 2 komada crna umjetna koža",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 625,
+    "price": 798,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/set-kauca-falslev-2-komada-crna-umjetna-koza",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264628",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1328,8 +1313,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 798
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-podesivi-dvosjed-abildskov-siva-umjetna-koza",
@@ -1341,7 +1325,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/250518",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1375,7 +1359,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264025",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1404,12 +1388,12 @@
     "name": "Modularni trosjed SKEJBY s tabureom bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 645,
+    "price": 699,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/modularni-trosjed-skejby-s-tabureom-bez-tkanina",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/238506",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1438,12 +1422,12 @@
     "name": "Modularni dvosjed SKEJBY s produžetkom/otvoreni kraj bež tk.",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 650,
+    "price": 848,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/modularni-dvosjed-skejby-s-produzetkom-otvoreni-kraj-bez-tk",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264642",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1464,20 +1448,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 848
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-kutna-garnitura-hellerup-otvoreni-kraj-desni-bez-tk-nathr",
     "name": "Kutna garnitura HELLERUP otvoreni kraj desni bež tk./nat.hr.",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 650,
+    "price": 849,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/kutna-garnitura-hellerup-otvoreni-kraj-desni-bez-tk-nathr",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264160",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1498,20 +1481,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 849
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-s-produzetkom-allese-desni-bez-tkanina",
     "name": "Trosjed s produžetkom ALLESE desni bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 650,
+    "price": 799,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-s-produzetkom-allese-desni-bez-tkanina",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/256291",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1532,20 +1514,19 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 849
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-s-produzetkom-allese-lijevi-bez-tkanina",
     "name": "Trosjed s produžetkom ALLESE lijevi bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 650,
+    "price": 799,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/trosjed-s-produzetkom-allese-lijevi-bez-tkanina",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/256299",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1566,8 +1547,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 849
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-modularni-trosjed-lyby-pijesak-tkanina",
@@ -1579,7 +1559,7 @@
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/249855",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1608,12 +1588,12 @@
     "name": "Kutna garnitura HELLERUP desni kut bež tkanina/natur hrast",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 700,
+    "price": 899,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/kutna-garnitura-hellerup-desni-kut-bez-tkanina-natur-hrast",
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/264136",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1636,8 +1616,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 899
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-dvosjed-gedved-svjetlosiva",
@@ -1649,7 +1628,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/251792",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1683,7 +1662,7 @@
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/251789",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1712,12 +1691,12 @@
     "name": "Modularni trosjed s produžetkom SKEJBY bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 715,
+    "price": 947,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/modularni-trosjed-s-produzetkom-skejby-bez-tkanina",
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/264645",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1738,8 +1717,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 947
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-modularni-trosjed-s-produzetkom-lyby-pijesak-tkanina",
@@ -1751,7 +1729,7 @@
     "imageUrl": "https://cdn1.jysk.com/getimage/wd3.large/249853",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1780,12 +1758,12 @@
     "name": "Modularni trosjed SKEJBY produžetak/otvoreni kraj bež tkan.",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 800,
+    "price": 1067,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/modularni-trosjed-skejby-produzetak-otvoreni-kraj-bez-tkan",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264644",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1806,8 +1784,7 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 1067
+    "imageVerified": true
   },
   {
     "externalId": "jysk-hr-trosjed-vonsild-elektricni-podesivi-svjetlosiva",
@@ -1819,7 +1796,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/256331",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1853,7 +1830,7 @@
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/264634",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1882,12 +1859,12 @@
     "name": "Modularna kutna garnitura SKEJBY 5 osoba bež tkanina",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 945,
+    "price": 999,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/modularna-kutna-garnitura-skejby-5-osoba-bez-tkanina",
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/238531",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1921,7 +1898,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/264632",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1955,7 +1932,7 @@
     "imageUrl": "https://cdn3.jysk.com/getimage/wd3.large/249843",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -1989,7 +1966,7 @@
     "imageUrl": "https://cdn4.jysk.com/getimage/wd3.large/249851",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -2018,12 +1995,12 @@
     "name": "Modularna garnitura SKEJBY 5os. s produžetkom/otv. bež tkan.",
     "retailer": "JYSK",
     "category": "sofa",
-    "price": 1165,
+    "price": 1565,
     "productUrl": "https://jysk.hr/dnevni-boravak/kauci/modularna-garnitura-skejby-5os-s-produzetkom-otv-bez-tkan",
     "imageUrl": "https://cdn2.jysk.com/getimage/wd3.large/264646",
     "availabilityStatus": "in-stock",
     "deliveryNote": "Provjeri dostavu ili preuzimanje prije kupnje.",
-    "lastCheckedAt": "2026-07-27",
+    "lastCheckedAt": "2026-08-10",
     "roomTags": [
       "living-room"
     ],
@@ -2044,7 +2021,6 @@
     "sourceReference": "jysk-hr-sofa-refresh-10-168",
     "dataQuality": "complete",
     "dataQualityNotes": "Ime + cijena (JSON-LD ItemList kategorije kauci) + og:image web-provjereni na jysk.hr 2026-07-06. Re-check prije produkcije.",
-    "imageVerified": true,
-    "originalPrice": 1565
+    "imageVerified": true
   }
 ]

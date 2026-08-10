@@ -35,7 +35,11 @@ class CatalogHealthCountTest {
     // from 11_233 past the 15k target to 18_704 (distinct externalIds across every snapshot the seeder imports).
     // Sprint 10.187: +2425 web-verified JYSK gap-fill products across all 13 JYSK markets
     // (real-jysk-cross-market-gapfill-10-187.json), deduped vs the existing catalog -> 21_129.
-    private static final int EXPECTED_TOTAL = 21_129;
+    // Sprint 10.193: the Interio AT dead-link replacement file shipped in 10.192 but was never registered in
+    // RealCatalogSeeder, so none of it counted. Wiring it up adds its 2 genuinely new rows (the other 3 duplicated
+    // externalIds that already ship elsewhere and were dropped) -> 21_131, not the 21_134 the 10.192 commit reports.
+    // 10.193 then refills the cells its own dead-link sweep emptied: +9 live IKEA rows -> 21_140.
+    private static final int EXPECTED_TOTAL = 21_140;
 
     @Test
     void shippedCatalogHasTheExpectedProductCount() throws Exception {

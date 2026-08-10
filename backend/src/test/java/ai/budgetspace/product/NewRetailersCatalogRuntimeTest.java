@@ -54,7 +54,7 @@ class NewRetailersCatalogRuntimeTest {
             assertThat(ProductTaxonomy.normalizeRetailer(p.getRetailer())).as("supported retailer %s", p.getRetailer()).isPresent();
             assertThat(p.getPrice().signum()).isPositive();
             assertThat(p.getProductUrl()).startsWith("https://");
-            assertThat(ProductTaxonomy.canEnterPlanner(p)).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(p)).as("usable or retired %s", p.getExternalId()).isTrue();
         });
 
         // The new fetchable retailers actually produced products.

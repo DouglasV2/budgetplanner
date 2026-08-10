@@ -57,8 +57,8 @@ class Sprint10180CatalogRuntimeTest {
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
             assertThat(product.getRoomTags()).as("has a room %s", product.getExternalId()).isNotBlank();
             assertThat(product.getStyleTags()).as("has a style %s", product.getExternalId()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
     }
 

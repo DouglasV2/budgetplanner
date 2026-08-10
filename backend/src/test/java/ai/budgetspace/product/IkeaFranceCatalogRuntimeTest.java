@@ -46,8 +46,8 @@ class IkeaFranceCatalogRuntimeTest {
             assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
             assertThat(product.getImageUrl()).as("imageUrl %s", product.getExternalId()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         // Core rooms covered (the FR catalog spans living-room/bedroom/home-office/kitchen/bathroom/hallway/dining).

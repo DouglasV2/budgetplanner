@@ -136,6 +136,51 @@ class CatalogFreshnessServiceTest {
     }
 
     @Test
+    void anImplausiblePriceJumpIsRefusedInsteadOfWritten() {
+        // Sprint 10.193: kopalnica-online.si publishes offers.price in MINOR units ("28450" for 284,50 EUR) in
+        // the very @type Product block the probe reads. Writing that would put a 100x price in front of users,
+        // so a jump no real repricing produces is refused and the row is hedged instead.
+        Product p = product("p6", "https://shop/p6", "Kopalnica Online", "284.50", "2026-06-04");
+        when(repository.findByOrderByLastCheckedAtAsc(any(Pageable.class))).thenReturn(List.of(p));
+        when(probe.currentPrice("https://shop/p6", "Kopalnica Online")).thenReturn(Optional.of(new BigDecimal("28450")));
+
+        CatalogFreshnessService.RefreshSummary summary = service.runRefresh(NOW);
+
+        assertThat(p.getPrice()).as("the stored price survives an implausible read").isEqualByComparingTo("284.50");
+        assertThat(p.getAvailabilityStatus()).isEqualTo("check-store");
+        assertThat(p.getLastCheckedAt()).as("queue still advances").isEqualTo("2026-07-01");
+        assertThat(summary.rejected()).isEqualTo(1);
+        assertThat(summary.changed()).isZero();
+    }
+
+    @Test
+    void aPriceCollapsingByAFactorOfAHundredIsAlsoRefused() {
+        // The mirror case: a shop that starts publishing MAJOR units where it used to publish minor ones.
+        Product p = product("p7", "https://shop/p7", "Kopalnica Online", "1699.00", "2026-06-04");
+        when(repository.findByOrderByLastCheckedAtAsc(any(Pageable.class))).thenReturn(List.of(p));
+        when(probe.currentPrice("https://shop/p7", "Kopalnica Online")).thenReturn(Optional.of(new BigDecimal("1.699")));
+
+        CatalogFreshnessService.RefreshSummary summary = service.runRefresh(NOW);
+
+        assertThat(p.getPrice()).isEqualByComparingTo("1699.00");
+        assertThat(summary.rejected()).isEqualTo(1);
+    }
+
+    @Test
+    void aRealClearanceCutIsStillWritten() {
+        // The guard must not swallow genuine repricing — a 70% clearance is well inside the plausible band.
+        Product p = product("p8", "https://jysk/p8", "JYSK", "400.00", "2026-06-04");
+        when(repository.findByOrderByLastCheckedAtAsc(any(Pageable.class))).thenReturn(List.of(p));
+        when(probe.currentPrice("https://jysk/p8", "JYSK")).thenReturn(Optional.of(new BigDecimal("120.00")));
+
+        CatalogFreshnessService.RefreshSummary summary = service.runRefresh(NOW);
+
+        assertThat(p.getPrice()).isEqualByComparingTo("120.00");
+        assertThat(summary.changed()).isEqualTo(1);
+        assertThat(summary.rejected()).isZero();
+    }
+
+    @Test
     void scheduledRunDoesNothingWhenDisabled() {
         CatalogFreshnessService dormant = new CatalogFreshnessService(repository, probe, false, 60);
 

@@ -56,7 +56,7 @@ class EuDiningCatalogRuntimeTest {
             assertThat(product.getProductUrl()).startsWith("https://www.ikea.com/");
             assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
             // Verified-only gate: every EU dining row must reach plans.
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product)).as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         // Both previously-empty markets now have at least one dining table and one chair.

@@ -61,7 +61,7 @@ class HrBreadthCatalogRuntimeTest {
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
             assertThat(product.getImageUrl()).as("imageUrl %s", product.getExternalId()).isNotBlank();
             // Verified-only gate: every breadth row reaches the planner.
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product)).as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         // The IKEA HR bedroom gap (previously zero beds/mattresses/wardrobes) is now covered.

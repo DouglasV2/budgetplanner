@@ -53,7 +53,7 @@ class EuBedroomOfficeCatalogRuntimeTest {
             assertThat(product.isImageVerified()).as("verified image %s", product.getExternalId()).isTrue();
             assertThat(product.getProductUrl()).startsWith("https://www.ikea.com/");
             assertThat(URI.create(product.getProductUrl()).getHost()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product)).as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product)).as("planner-eligible or retired %s", product.getExternalId()).isTrue();
         });
 
         // Both markets gained a bedroom anchor (bed) and a home-office anchor (desk).

@@ -422,7 +422,24 @@ public class RealCatalogSeeder implements ApplicationRunner {
             // confirmed every row is standalone + on-taxonomy. A 26-row live spot-check (2/market) re-confirmed
             // matching JSON-LD names + prices. Deterministic curl, agent-free prices, no fabrication. Re-check
             // before production.
-            "/catalog/real-jysk-cross-market-gapfill-10-187.json"
+            "/catalog/real-jysk-cross-market-gapfill-10-187.json",
+
+            // Sprint 10.192 (dead-link replacements): live Interio AT products harvested from the same retailer
+            // to cover the Austrian rows that sprint retired. The file shipped in 10.192 but was never listed
+            // here, so none of it ever reached the catalog (the count stayed 21129) — the retirements landed
+            // without their replacements. Registered in 10.193, after dropping the 3 of its 5 rows whose
+            // externalId + productUrl already ship in other snapshots (a second row for the same product would
+            // break the one-row-per-product-URL invariant, and 10.193 re-verified those originals live anyway).
+            "/catalog/real-dead-link-replacements-10-192.json",
+
+            // Sprint 10.193 (freshness sweep): the sweep that re-read the whole catalog retired the rows whose
+            // product pages are gone. Only 7 (market × room × category) cells actually thinned enough to matter,
+            // and these 9 rows refill them. IKEA article numbers are global, so each replacement was found by
+            // asking the TARGET market for an article this same sweep had just confirmed live elsewhere, then
+            // reading that market's own page for the localized name, its own price and its own image. Two cells
+            // (SE/IT kitchen microwave) get no replacement: IKEA lists three microwave articles in total and both
+            // markets already carry all three, so the retired MATÄLSKARE simply has no like-for-like successor.
+            "/catalog/real-dead-link-replacements-10-193.json"
     );
 
     /**

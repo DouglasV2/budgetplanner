@@ -123,10 +123,13 @@ budgetspace:
     # stalest products' live prices with the deterministic probe, so stored prices stay honest over time. OFF
     # by default (no surprise outbound requests before launch, like price-watch); flip on in prod when wanted.
     freshness-enabled: ${BUDGETSPACE_CATALOG_FRESHNESS_ENABLED:false}
-    # Every 6h re-verify the N oldest-checked products (Spring 6-field cron). 60 x 4/day = 240/day => ~3000
-    # products under ~12 days, inside the 14-day UI freshness threshold. Tune batch to catalogSize/maxAgeDays.
+    # Every 6h re-verify the N oldest-checked products (Spring 6-field cron). The batch must satisfy
+    # batch x runsPerDay >= catalogSize / maxAgeDays, or rows age out faster than the queue can reach them.
+    # Sprint 10.193: the catalog grew to ~21k while the batch stayed at 60 (240/day = an 88-DAY pass against a
+    # 14-day staleness threshold), which is why 96% of the shipped rows read as stale. 400 x 4/day = 1600/day
+    # brings a full pass back inside ~13 days.
     freshness-cron: ${BUDGETSPACE_CATALOG_FRESHNESS_CRON:0 20 */6 * * *}
-    freshness-batch-size: ${BUDGETSPACE_CATALOG_FRESHNESS_BATCH_SIZE:60}
+    freshness-batch-size: ${BUDGETSPACE_CATALOG_FRESHNESS_BATCH_SIZE:400}
     # Sprint 10.166: weekly catalog HEALTH AUDIT. Reads DB state only (no outbound fetch), logs a summary, and
     # escalates to WARN when the stale share crosses the threshold — the "N products outdated" alert.
     # OFF by default; the prod profile turns it on (application-prod.yml).

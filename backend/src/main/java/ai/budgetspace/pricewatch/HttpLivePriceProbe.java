@@ -47,7 +47,16 @@ public class HttpLivePriceProbe implements LivePriceProbe {
     public Optional<BigDecimal> currentPrice(String productUrl, String retailer) {
         String html = fetch(productUrl);
         if (html == null) return Optional.empty();
-        return jsonLdPrice(html);
+        return jsonLdPrice(html, pathOf(productUrl));
+    }
+
+    private static String pathOf(String url) {
+        try {
+            String path = URI.create(url.trim()).getPath();
+            return path == null || path.isBlank() ? null : path;
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     @Override
@@ -104,10 +113,17 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         if (ikea) return finPath.contains("/p/") ? Liveness.LIVE : Liveness.DEAD;
         String reqId = trailingId(reqPath), finId = trailingId(finPath);
         if (reqId != null && reqId.equals(finId)) return Liveness.LIVE; // same product, re-slugged
+        // Sprint 10.193: the landed URL still CARRIES the requested id, just with more after it (Bygghemma
+        // re-slugs /p-175779 -> /p-175779-175783 when a variant id is appended). Same product -> LIVE.
+        if (reqId != null && finPath.contains(reqId)) return Liveness.LIVE;
         // Both URLs carry a product id but they DIFFER -> the requested product is gone and the site bounced us to a
         // DIFFERENT product (e.g. Kwantum salontafel-4323413 -> eettafel-4320261) -> dead.
         if (reqId != null && finId != null) return Liveness.DEAD;
-        if (!finPath.isEmpty() && reqPath.startsWith(finPath) && finPath.length() < reqPath.length()) return Liveness.DEAD; // parent/category
+        // A parent/category bounce is genuinely SHALLOWER. A landed path that is merely a string prefix at the
+        // same depth is a shortened slug (jysk.se …-natur-vildekfargat -> …-natur-vildek) — still the product.
+        if (!finPath.isEmpty() && reqPath.startsWith(finPath + "/") && depth(finPath) < depth(reqPath)) {
+            return Liveness.DEAD; // parent/category
+        }
         // Only a true bounce to the site ROOT/home is dead. A same-depth single-segment RE-SLUG (e.g. a retailer
         // like Harvey Norman whose products live at /slug and one re-slugs /trosjed-filip -> /trosjed-filip-v2) must
         // NOT be retired — the old "<=1 segment" rule wrongly killed those live products. (Sprint 10.167 fix.)
@@ -126,6 +142,15 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         return s.length() > 1 && s.endsWith("/") ? s.substring(0, s.length() - 1) : s;
     }
 
+
+    /** Path depth in segments — a real parent bounce loses at least one. */
+    private static int depth(String path) {
+        int segments = 0;
+        for (String part : path.split("/")) {
+            if (!part.isBlank()) segments++;
+        }
+        return segments;
+    }
 
     private static final Pattern PRODUCT_ID = Pattern.compile("\\d{4,}");
 
@@ -201,20 +226,77 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         }
     }
 
-    /** Parse each JSON-LD block, find a Product's offers.price. Deterministic; empty when unsure. */
-    private Optional<BigDecimal> jsonLdPrice(String html) {
+    /**
+     * Parse each JSON-LD block and find the page's offers.price. Deterministic; empty when unsure.
+     *
+     * <p>Two passes, because a listing-shaped page carries more than one price: first look for the VARIANT
+     * whose offer URL is the page we asked for (a {@code ProductGroup} lists every size, and only one of them
+     * is our row), then fall back to the first product-level offer. Package-private so the shapes can be
+     * unit-tested without a network.</p>
+     */
+    Optional<BigDecimal> jsonLdPrice(String html, String wantPath) {
+        if (wantPath != null && !wantPath.isBlank()) {
+            Matcher exact = LD_JSON.matcher(html);
+            while (exact.find()) {
+                JsonNode root = readTree(exact.group(1));
+                if (root == null) continue;
+                Optional<BigDecimal> variant = variantPrice(root, wantPath, 0);
+                if (variant.isPresent()) return variant;
+            }
+        }
         Matcher m = LD_JSON.matcher(html);
         while (m.find()) {
-            JsonNode root;
-            try {
-                root = mapper.readTree(m.group(1).trim());
-            } catch (Exception e) {
-                continue;
-            }
+            JsonNode root = readTree(m.group(1));
+            if (root == null) continue;
             Optional<BigDecimal> price = priceFromNode(root);
             if (price.isPresent()) return price;
         }
         return Optional.empty();
+    }
+
+    private JsonNode readTree(String raw) {
+        try {
+            return mapper.readTree(raw.trim());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** The offer whose URL ends with the requested path — i.e. the variant this very page is showing. */
+    private Optional<BigDecimal> variantPrice(JsonNode node, String wantPath, int depth) {
+        if (node == null || depth > 6) return Optional.empty();
+        if (node.isArray()) {
+            for (JsonNode child : node) {
+                Optional<BigDecimal> p = variantPrice(child, wantPath, depth + 1);
+                if (p.isPresent()) return p;
+            }
+            return Optional.empty();
+        }
+        if (!node.isObject()) return Optional.empty();
+        JsonNode variants = node.get("hasVariant");
+        if (variants != null && variants.isArray()) {
+            String want = stripTrailingSlash(wantPath);
+            for (JsonNode variant : variants) {
+                JsonNode offer = firstOffer(variant.get("offers"));
+                String url = offer != null && offer.hasNonNull("url") ? offer.get("url").asText()
+                        : variant.hasNonNull("url") ? variant.get("url").asText() : null;
+                if (url != null && stripTrailingSlash(url).endsWith(want)) {
+                    BigDecimal parsed = offerPrice(offer);
+                    if (parsed != null) return Optional.of(parsed);
+                }
+            }
+        }
+        for (String key : new String[]{"@graph", "mainEntity", "mainEntityOfPage"}) {
+            if (node.has(key)) {
+                Optional<BigDecimal> p = variantPrice(node.get(key), wantPath, depth + 1);
+                if (p.isPresent()) return p;
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static String stripTrailingSlash(String value) {
+        return value.length() > 1 && value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
 
     private Optional<BigDecimal> priceFromNode(JsonNode node) {
@@ -228,16 +310,11 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         }
         if (!node.isObject()) return Optional.empty();
         if (isProduct(node) && node.has("offers")) {
-            JsonNode offers = node.get("offers");
-            JsonNode offer = offers.isArray() && offers.size() > 0 ? offers.get(0) : offers;
-            if (offer != null) {
-                JsonNode price = offer.has("price") ? offer.get("price") : offer.get("lowPrice");
-                BigDecimal parsed = parsePrice(price);
-                if (parsed != null && parsed.signum() > 0) return Optional.of(parsed);
-            }
+            BigDecimal parsed = offerPrice(firstOffer(node.get("offers")));
+            if (parsed != null) return Optional.of(parsed);
         }
-        // Some sites wrap the Product inside @graph / mainEntity — recurse one level.
-        for (String key : new String[]{"@graph", "mainEntity", "mainEntityOfPage"}) {
+        // Some sites wrap the Product inside @graph / mainEntity / hasVariant — recurse.
+        for (String key : new String[]{"@graph", "mainEntity", "mainEntityOfPage", "hasVariant"}) {
             if (node.has(key)) {
                 Optional<BigDecimal> p = priceFromNode(node.get(key));
                 if (p.isPresent()) return p;
@@ -246,16 +323,43 @@ public class HttpLivePriceProbe implements LivePriceProbe {
         return Optional.empty();
     }
 
+    private static JsonNode firstOffer(JsonNode offers) {
+        if (offers == null) return null;
+        return offers.isArray() && offers.size() > 0 ? offers.get(0) : offers;
+    }
+
+    private BigDecimal offerPrice(JsonNode offer) {
+        if (offer == null) return null;
+        JsonNode price = offer.has("price") ? offer.get("price") : offer.get("lowPrice");
+        // Some storefronts nest the number: price: { unformatted: { minSingle: 129.9 } }.
+        if (price != null && price.isObject()) {
+            JsonNode unformatted = price.get("unformatted");
+            JsonNode nested = unformatted != null ? unformatted.get("minSingle") : null;
+            price = nested != null ? nested : price.get("value");
+        }
+        BigDecimal parsed = parsePrice(price);
+        return parsed != null && parsed.signum() > 0 ? parsed : null;
+    }
+
+    /**
+     * A price-carrying node. {@code ProductGroup} counts: six JYSK storefronts (AT/DK/FI/FR/IT/PT) and several
+     * Shopify shops publish the page's price ONLY under that type, so a Product-only reader saw no price at all
+     * there and left every one of those rows permanently hedged as {@code check-store}.
+     */
     private boolean isProduct(JsonNode node) {
         JsonNode type = node.get("@type");
         if (type == null) return false;
-        if (type.isTextual()) return "Product".equalsIgnoreCase(type.asText());
+        if (type.isTextual()) return isProductType(type.asText());
         if (type.isArray()) {
             for (JsonNode t : type) {
-                if (t.isTextual() && "Product".equalsIgnoreCase(t.asText())) return true;
+                if (t.isTextual() && isProductType(t.asText())) return true;
             }
         }
         return false;
+    }
+
+    private static boolean isProductType(String type) {
+        return "Product".equalsIgnoreCase(type) || "ProductGroup".equalsIgnoreCase(type);
     }
 
     private BigDecimal parsePrice(JsonNode price) {

@@ -73,12 +73,22 @@ public class CatalogFreshnessService {
     public RefreshSummary runRefresh(Instant now) {
         List<Product> batch = productRepository.findByOrderByLastCheckedAtAsc(PageRequest.of(0, batchSize));
         String today = LocalDate.ofInstant(now, ZoneOffset.UTC).toString();
-        int checked = 0, changed = 0, confirmed = 0, unverifiable = 0, retired = 0;
+        int checked = 0, changed = 0, confirmed = 0, unverifiable = 0, retired = 0, rejected = 0;
 
         for (Product product : batch) {
             checked++;
             Optional<BigDecimal> live = probe.currentPrice(product.getProductUrl(), product.getRetailer());
-            if (live.isPresent()) {
+            if (live.isPresent() && implausible(product.getPrice(), live.get())) {
+                // Sprint 10.193: the read parsed cleanly but cannot be a repricing — it is a UNIT mismatch (a
+                // shop publishing minor units, e.g. "28450" for 284,50 EUR, in the same JSON-LD field) or a
+                // mis-attributed variant. Writing it would put a 100x price in front of users, so hedge the row
+                // instead and leave the last human-verified price standing.
+                log.warn("Refusing implausible live price for {} ({}): stored {} vs read {}",
+                        product.getExternalId(), product.getProductUrl(), product.getPrice(), live.get());
+                product.setAvailabilityStatus("check-store");
+                product.setInStock(true);
+                rejected++;
+            } else if (live.isPresent()) {
                 BigDecimal current = live.get();
                 if (product.getPrice() == null || current.compareTo(product.getPrice()) != 0) {
                     product.setPrice(current);
@@ -110,10 +120,24 @@ public class CatalogFreshnessService {
             product.setLastCheckedAt(today);
             productRepository.save(product);
         }
-        return new RefreshSummary(checked, changed, confirmed, unverifiable, retired);
+        return new RefreshSummary(checked, changed, confirmed, unverifiable, retired, rejected);
     }
 
+    /**
+     * True when the freshly-read price cannot be a repricing of the stored one. Retailers discount deeply and
+     * raise prices sharply, but they do not move a price by two orders of magnitude — that shape means the page
+     * expressed the number in different units (minor vs major) or the read latched onto another product.
+     */
+    private static boolean implausible(BigDecimal stored, BigDecimal live) {
+        if (stored == null || stored.signum() <= 0 || live == null || live.signum() <= 0) return false;
+        BigDecimal limit = BigDecimal.valueOf(MAX_PLAUSIBLE_FACTOR);
+        return live.compareTo(stored.multiply(limit)) >= 0 || live.multiply(limit).compareTo(stored) <= 0;
+    }
+
+    /** A 20x move in either direction is a unit/parse error, not a sale. Clearance cuts stay far inside it. */
+    private static final int MAX_PLAUSIBLE_FACTOR = 20;
+
     /** A run summary (also handy for a manual/admin trigger and tests). */
-    public record RefreshSummary(int checked, int changed, int confirmed, int unverifiable, int retired) {
+    public record RefreshSummary(int checked, int changed, int confirmed, int unverifiable, int retired, int rejected) {
     }
 }

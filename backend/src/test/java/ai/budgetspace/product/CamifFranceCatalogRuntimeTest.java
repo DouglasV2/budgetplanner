@@ -55,8 +55,8 @@ class CamifFranceCatalogRuntimeTest {
             assertThat(URI.create(product.getProductUrl()).getHost()).contains("camif.fr");
             assertThat(product.isImageVerified()).as("imageVerified %s", product.getExternalId()).isTrue();
             assertThat(product.getImageUrl()).as("imageUrl %s", product.getExternalId()).isNotBlank();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(product))
-                    .as("planner-eligible %s", product.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(product))
+                    .as("planner-eligible or retired %s", product.getExternalId()).isTrue();
             // Honest current price only — no phantom discount on a standing web price.
             assertThat(product.getOriginalPrice()).as("no originalPrice %s", product.getExternalId()).isNull();
         });

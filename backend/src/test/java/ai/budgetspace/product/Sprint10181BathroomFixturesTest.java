@@ -54,8 +54,8 @@ class Sprint10181BathroomFixturesTest {
             assertThat(p.getProductUrl()).as("http url %s", p.getExternalId()).startsWith("http");
             assertThat(p.getImageUrl()).as("http image %s", p.getExternalId()).startsWith("http");
             assertThat(p.isImageVerified()).as("imageVerified %s", p.getExternalId()).isTrue();
-            assertThat(CatalogSourcePolicy.isPlannerEligible(p))
-                    .as("planner-eligible %s", p.getExternalId()).isTrue();
+            assertThat(ShippedRows.eligibleOrRetired(p))
+                    .as("planner-eligible or retired %s", p.getExternalId()).isTrue();
         });
     }
 
