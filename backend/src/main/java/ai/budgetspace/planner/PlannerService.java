@@ -41,14 +41,20 @@ public class PlannerService {
             "Sítio do Móvel", "Miroytengo", "Merkamueble", "Muebles BOOM", "Pronto Wonen", "Drevona", "ASKO Nábytok");
 
     private static final Map<String, List<String>> CATEGORY_FLOW_BY_ROOM = Map.ofEntries(
-            Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "textiles", "decor")),
+            // Sprint 10.193: `chair` added — the catalog carries 622 living-room ARMCHAIRS (POÄNG, STRANDMON,
+            // UDSBJERG…) across all 15 markets that no room flow asked for, so a living-room plan could only ever
+            // offer a sofa as seating and every one of those rows was unreachable outside a focused request.
+            // It sits late in the flow: extra seating is a comfort buy, after the sofa/TV unit/table/rug/light.
+            Map.entry("living-room", List.of("sofa", "tv-unit", "table", "rug", "lighting", "storage", "chair", "textiles", "decor")),
             Map.entry("home-office", List.of("desk", "chair", "lighting", "storage", "decor", "rug")),
             Map.entry("bedroom", List.of("bed", "mattress", "nightstand", "wardrobe", "dresser", "storage", "lighting", "rug", "textiles", "decor")),
             Map.entry("home-gym", List.of("gym-equipment", "storage", "lighting", "decor", "rug")),
             // Sprint 10.7: new rooms.
             Map.entry("kitchen", List.of("kitchen-cart", "kitchen-storage", "lighting", "storage", "decor")),
             Map.entry("dining-room", List.of("dining-table", "dining-chair", "lighting", "rug", "storage", "decor")),
-            Map.entry("hallway", List.of("storage", "lighting", "rug", "decor")),
+            // Sprint 10.193: `wardrobe` added — 160 real hallway wardrobes/open closets (OMAR, HAUGA, RAKKESTAD,
+            // ELVARLI, PLATSA…) are tagged `hallway` only, and the hallway flow asked for none of them.
+            Map.entry("hallway", List.of("storage", "wardrobe", "lighting", "rug", "decor")),
             // Sprint 10.169: bathroom fixtures first (toilet + washbasin + a bath/shower are what a bathroom is
             // built around; Pevex HR), then the IKEA/JYSK cabinet/mirror/lighting/textiles/decor around them.
             // Sprint 10.177: textiles (bath mat / shower curtain) added — now sourced for every market, they belong
@@ -90,14 +96,15 @@ public class PlannerService {
 
     // Za ugodniji prostor (add-comfort) po prostoru. Sve ostalo u flowu je "može kasnije".
     private static final Map<String, Set<String>> COMFORT_CATEGORIES_BY_ROOM = Map.ofEntries(
-            Map.entry("living-room", Set.of("table", "rug", "lighting", "storage", "textiles")),
+            // Sprint 10.193: an armchair is comfort seating, never a core buy — the sofa stays the room's seating.
+            Map.entry("living-room", Set.of("table", "rug", "lighting", "storage", "textiles", "chair")),
             Map.entry("home-office", Set.of("lighting", "storage")),
             Map.entry("bedroom", Set.of("nightstand", "wardrobe", "dresser", "storage", "lighting", "rug", "textiles")),
             Map.entry("home-gym", Set.of("storage", "lighting")),
             // Sprint 10.7: new rooms.
             Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
-            Map.entry("hallway", Set.of("lighting", "rug")),
+            Map.entry("hallway", Set.of("wardrobe", "lighting", "rug")),
             // Sprint 10.178: decor promoted from "later" (complete-only) to comfort, so bathroom mirrors and
             // accessories (category `decor`) surface at the default comfort level — a real bathroom shows a mirror.
             Map.entry("bathroom", Set.of("storage", "lighting", "textiles", "decor")),
