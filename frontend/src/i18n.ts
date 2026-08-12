@@ -447,7 +447,7 @@ const DICTIONARY: Record<string, Entry> = {
   'form.describeHeading': { hr: 'Što opremiti?', en: 'What to furnish?' },
   'form.describeIntro': { hr: 'Piše se normalno, kao poruka prijatelju. Stručni izrazi nisu potrebni.', en: 'Write it naturally, like texting a friend. No technical terms needed.' },
   'form.easiestChip': { hr: 'Najlakše', en: 'Easiest' },
-  'form.promptLabel': { hr: 'Dovoljno je napisati što treba opremiti i koliki je budžet, pa kliknuti Slaganje plana.', en: 'Just note what to furnish and the budget, then click Build plan.' },
+  'form.promptLabel': { hr: 'Dovoljno je upisati što treba opremiti i koliki je budžet, pa kliknuti Slaganje plana.', en: 'Just type in what to furnish and the budget, then click Build plan.' },
   'form.promptAriaLabel': { hr: 'Opis prostora i želja', en: 'Description of the space and wishes' },
   'form.promptPlaceholder': { hr: 'Npr. dnevni boravak, oko 1500 €, treba mi kauč, tepih i lampa.', en: 'E.g. living room, about €1500, I need a sofa, a rug and a lamp.' },
   'form.promptRequired': { hr: 'Prvo treba napisati što opremiti.', en: 'First describe what to furnish.' },

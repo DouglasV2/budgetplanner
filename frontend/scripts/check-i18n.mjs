@@ -2,7 +2,7 @@
 // source strings; every other market language lives in src/messages/<lang>.json and English is the runtime
 // fallback. This guard FAILS the build when a DICTIONARY key is missing from any overlay (so a new string can't
 // silently ship as English in a non-EN market), and WARNS about overlay keys no longer in the DICTIONARY.
-// Zero-dependency (regex + JSON) — run via `npm run check:i18n`.
+// Zero-dependency (regex + JSON). Run via `npm run check:i18n`.
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -22,7 +22,7 @@ if (dictKeys.size === 0) {
   process.exit(1);
 }
 
-// Pre-existing untranslated keys as of Sprint 10.183 — all from the DROPPED / unrendered subscription flow
+// Pre-existing untranslated keys as of Sprint 10.183, all from the DROPPED / unrendered subscription flow
 // (Plus/Pro pricing, `plus.*` upsells) plus `header.menu`. They fall back to English and are out of this
 // sprint's scope; excused here so the guard can still ENFORCE completeness for every new key going forward.
 // Remove entries from this list as the owner translates them (or when the dead pricing keys are deleted).
@@ -60,8 +60,8 @@ for (const file of overlays) {
 }
 
 if (missingTotal === 0) {
-  console.log(`check-i18n: OK — ${dictKeys.size} DICTIONARY keys present in all ${overlays.length} overlays` + (orphanTotal ? ` (${orphanTotal} orphan warnings)` : ''));
+  console.log(`check-i18n: OK, ${dictKeys.size} DICTIONARY keys present in all ${overlays.length} overlays` + (orphanTotal ? ` (${orphanTotal} orphan warnings)` : ''));
   process.exit(0);
 }
-console.error(`\ncheck-i18n: FAIL — ${missingTotal} missing key(s) across overlays.`);
+console.error(`\ncheck-i18n: FAIL, ${missingTotal} missing key(s) across overlays.`);
 process.exit(1);

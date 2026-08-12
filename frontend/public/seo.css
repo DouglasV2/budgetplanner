@@ -1,14 +1,14 @@
-/* BudgetSpaceAI — static SEO landing pages (frontend/public/hr/**). Standalone stylesheet: these pages are
+/* BudgetSpaceAI static SEO landing pages (frontend/public/hr/**). Standalone stylesheet: these pages are
    plain HTML served straight from nginx (no React, no bundle), so this file carries the whole look. It mirrors
    the app's warm-stone / navy / copper brand from src/styles.css, but is self-contained on purpose.
-   No inline JavaScript anywhere on these pages — CSP allows only self scripts, and there are none. */
+   No inline JavaScript anywhere on these pages; CSP allows only self scripts, and there are none. */
 
 :root {
   --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
 
-  /* Warm interior palette — same family as the app. Navy is the one action colour; copper is the small brand
+  /* Warm interior palette, same family as the app. Navy is the one action colour; copper is the small brand
      accent and the "budget fill"; sage marks positive/covered. */
   --bg: #ECE6DC;
   --surface: #FBF9F5;
@@ -50,7 +50,7 @@ body {
   font-size: 1.0625rem;
   line-height: 1.7;
   color: var(--ink);
-  /* A very soft warm depth so large empty areas don't read as a flat beige slab — low-contrast, never yellow. */
+  /* A very soft warm depth so large empty areas don't read as a flat beige slab: low-contrast, never yellow. */
   background:
     radial-gradient(circle at 0 0, rgba(165, 98, 63, 0.05), transparent 30rem),
     linear-gradient(180deg, #F1ECE3 0%, var(--bg) 46%, #E4DDD2 100%);
@@ -80,7 +80,7 @@ strong { font-weight: 600; }
 }
 
 /* ── Header ───────────────────────────────────────────────────────────────── */
-/* The header sits on a copper "budget fill" edge — the app's signature line, carried onto the landing pages. */
+/* The header sits on a copper "budget fill" edge, the app's signature line, carried onto the landing pages. */
 .site-header {
   border-bottom: 1px solid var(--border);
   box-shadow: inset 0 -3px 0 var(--copper);
@@ -228,7 +228,7 @@ h2 {
 
 /* ── Budget-allocation signature ──────────────────────────────────────────── */
 /* The one bold element: an honest, example split of a budget across a space. Each segment's flex-grow IS its
-   euro figure, so the widths are literally proportional to the money — set inline on each page. */
+   euro figure, so the widths are literally proportional to the money, set inline on each page. */
 .alloc {
   background: var(--surface);
   border: 1px solid var(--border);

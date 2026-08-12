@@ -165,7 +165,7 @@
   "form.describeHeading": "Hva skal innredes?",
   "form.describeIntro": "Det skrives naturlig, som en tekstmelding til en venn. Tekniske begreper er ikke nødvendig.",
   "form.easiestChip": "Enklest",
-  "form.promptLabel": "Bare noter hva som skal innredes og budsjettet, og klikk så Lag plan.",
+  "form.promptLabel": "Bare skriv inn hva som skal innredes og budsjettet, og klikk så Lag plan.",
   "form.promptAriaLabel": "Beskrivelse av rommet og ønsker",
   "form.promptPlaceholder": "F.eks. stue, rundt 15 000 kr, trenger sofa, teppe og lampe.",
   "form.promptRequired": "Det som skal innredes, må beskrives først.",

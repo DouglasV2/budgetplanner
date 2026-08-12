@@ -1,7 +1,7 @@
 // Sprint 10.185 (privacy/consent/legal hardening): practical guards that keep the legal pages, the analytics
 // consent layer and the AI notice HONEST as the code evolves. These assert PROPERTIES (operator identity is
 // present, forbidden claims stay gone, GA stays consent-gated, raw prompts never enter analytics) rather than
-// whole paragraphs, so they are not brittle. Zero-dependency (regex + file reads) — run via `npm run check:legal`.
+// whole paragraphs, so they are not brittle. Zero-dependency (regex + file reads). Run via `npm run check:legal`.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -64,7 +64,7 @@ check('Privacy Policy names the DPA (AZOP)', legal.includes('AZOP'));
 // ── AI transparency (Part 4) ──────────────────────────────────────────────────────────────────────
 check('AI notice key exists and is rendered near the planner input',
   i18n.includes("'planner.aiInteractionNotice'") && plannerForm.includes('planner.aiInteractionNotice'));
-check('AI notice says AI *may* interpret (deterministic fallback exists — not "every plan is AI")',
+check('AI notice says AI *may* interpret (deterministic fallback exists, not "every plan is AI")',
   /(može protumačiti|may be interpreted|kann von KI)/i.test(i18n));
 check('Privacy Policy AI section names the provider (Gemini) and the deterministic fallback',
   legal.includes('Gemini') && /(determinist|pravilima vođena|rule-based|regelbasiert)/i.test(legal));
@@ -87,9 +87,9 @@ if (leaky.length) console.error('  Leaky trackEvent call(s):\n   ' + leaky.join(
 
 // ── Report ─────────────────────────────────────────────────────────────────────────────────────────
 if (failures.length === 0) {
-  console.log(`check-legal: OK — ${ok.length} legal/analytics guards passed`);
+  console.log(`check-legal: OK, ${ok.length} legal/analytics guards passed`);
   process.exit(0);
 }
-console.error(`\ncheck-legal: FAIL — ${failures.length} of ${ok.length + failures.length} guard(s) failed:`);
+console.error(`\ncheck-legal: FAIL, ${failures.length} of ${ok.length + failures.length} guard(s) failed:`);
 for (const f of failures) console.error(`  ✗ ${f}`);
 process.exit(1);

@@ -165,7 +165,7 @@
   "form.describeHeading": "Qu'aménager ?",
   "form.describeIntro": "Ça s'écrit naturellement, comme un message à un ami. Aucun terme technique n'est nécessaire.",
   "form.easiestChip": "Le plus facile",
-  "form.promptLabel": "Il suffit d'indiquer ce qu'il faut aménager et le budget, puis de cliquer sur Créer le plan.",
+  "form.promptLabel": "Il suffit de taper ce qu'il faut aménager et le budget, puis de cliquer sur Créer le plan.",
   "form.promptAriaLabel": "Description de l'espace et des envies",
   "form.promptPlaceholder": "Ex. salon, environ 1500 €, il me faut un canapé, un tapis et une lampe.",
   "form.promptRequired": "Il faut d'abord décrire ce qu'il faut aménager.",

@@ -1,6 +1,6 @@
 // Sprint 10.183 (Move-In QoL): zero-dependency unit checks for the pure helpers in src/utils/moveInPlan.ts.
 // The repo has no test runner (build is just `tsc -b && vite build`), so we load the TS helper directly via
-// Node's built-in type-stripping (Node >= 22.6; unflagged on 23+) — the helper uses only erasable TS
+// Node's built-in type-stripping (Node >= 22.6; unflagged on 23+). The helper uses only erasable TS
 // (interfaces + `import type` + `as` casts), so no transpiler dependency is needed. Run `npm run check:movein`.
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
