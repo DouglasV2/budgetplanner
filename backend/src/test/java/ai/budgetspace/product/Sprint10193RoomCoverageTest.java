@@ -23,16 +23,17 @@ import static org.mockito.Mockito.when;
 /**
  * Sprint 10.193 — every shipped row should be REACHABLE, not merely eligible.
  *
- * <p>The 10.193 sweep audited what the planner can actually select and found two categories the catalog
- * carries in volume but no room flow ever asked for: 622 living-room ARMCHAIRS (category {@code chair},
- * which only appeared in the home-office flow) and 160 hallway WARDROBES (the hallway flow asked for
- * {@code storage} but never {@code wardrobe}). Both were invisible in a whole-room plan — a living room
- * could only ever be given a sofa to sit on — and surfaced only if the user named the piece outright,
- * because a focused plan skips the room filter.</p>
+ * <p>The 10.193 sweep audited what the planner can actually select and found 855 planner-eligible rows that
+ * no room flow ever asked for, so no whole-room plan could offer them: 622 living-room ARMCHAIRS (category
+ * {@code chair} appeared only in the home-office flow, and {@code categoryMatchesSlot} is an exact match so
+ * an armchair could not fill the sofa slot either — a living room could only ever be given a sofa to sit on),
+ * 160 hallway WARDROBES, 43 hallway BENCHES, 19 bathroom STOOLS, 2 kitchen RUNNERS, plus a handful of rows
+ * simply filed under the wrong category. They surfaced only if the user named the piece outright, because a
+ * focused plan skips the room filter.</p>
  *
- * <p>These tests pin the fix at the level that matters: a real plan, built from the whole shipped catalog,
- * offers those pieces. They are deliberately catalog-driven (no fixtures) so a future re-tagging that
- * strands the rows again fails here.</p>
+ * <p>These tests pin the fix at both levels: real plans built from the whole shipped catalog actually offer
+ * those pieces, and — the guard that was missing all along — NO eligible row is left unreachable. They are
+ * deliberately catalog-driven (no fixtures) so a future re-tagging that strands rows again fails here.</p>
  */
 class Sprint10193RoomCoverageTest {
 
@@ -60,6 +61,42 @@ class Sprint10193RoomCoverageTest {
         assertThat(planCategories(response))
                 .as("hallway wardrobes are part of a hallway plan")
                 .contains("wardrobe");
+    }
+
+    @Test
+    void everyShippedRowIsReachableBySomeRoomUnlessItIsExplicitRequestOnly() throws Exception {
+        List<Product> stranded = importWholeCatalog().stream()
+                .filter(CatalogSourcePolicy::isPlannerEligible)
+                .filter(p -> !PlannerService.EXPLICIT_REQUEST_ONLY_CATEGORIES.contains(p.getCategory()))
+                .filter(p -> !PlannerService.reachableByAnyRoom(p.getCategory(), roomTags(p)))
+                .toList();
+
+        // This is the invariant the 10.193 audit was missing: eligible is not the same as REACHABLE. A row whose
+        // category no room flow asks for in a room it is tagged for can sit in the catalog forever without a
+        // single plan ever offering it, and nothing else in the suite would notice.
+        assertThat(stranded)
+                .as("planner-eligible rows no room flow can ever select: %s",
+                        stranded.stream().limit(10)
+                                .map(p -> p.getExternalId() + " (" + p.getCategory() + " @ " + p.getRoomTags() + ")")
+                                .collect(Collectors.joining(", ")))
+                .isEmpty();
+    }
+
+    @Test
+    void theBenchesStoolsAndRunnersAreSelectableInTheirOwnRooms() {
+        // The long tail the audit turned up, each now asked for by the room it actually belongs to.
+        assertThat(PlannerService.reachableByAnyRoom("chair", List.of("hallway")))
+                .as("hallway bench").isTrue();
+        assertThat(PlannerService.reachableByAnyRoom("chair", List.of("bathroom")))
+                .as("bathroom stool").isTrue();
+        assertThat(PlannerService.reachableByAnyRoom("rug", List.of("kitchen")))
+                .as("kitchen runner").isTrue();
+        assertThat(PlannerService.reachableByAnyRoom("dining-chair", List.of("dining-room")))
+                .as("dining bench, re-filed from the generic chair category").isTrue();
+        // And the deliberate exception stays deliberate: an oven is only ever selected when asked for by name.
+        assertThat(PlannerService.EXPLICIT_REQUEST_ONLY_CATEGORIES).contains("oven", "kitchen-set");
+        assertThat(PlannerService.reachableByAnyRoom("oven", List.of("kitchen")))
+                .as("an oven is never forced into a generic kitchen plan").isFalse();
     }
 
     @Test

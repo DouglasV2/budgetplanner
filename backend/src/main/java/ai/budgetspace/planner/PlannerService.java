@@ -50,16 +50,22 @@ public class PlannerService {
             Map.entry("bedroom", List.of("bed", "mattress", "nightstand", "wardrobe", "dresser", "storage", "lighting", "rug", "textiles", "decor")),
             Map.entry("home-gym", List.of("gym-equipment", "storage", "lighting", "decor", "rug")),
             // Sprint 10.7: new rooms.
-            Map.entry("kitchen", List.of("kitchen-cart", "kitchen-storage", "lighting", "storage", "decor")),
+            // Sprint 10.193: `rug` added — kitchen runners/mats are stocked as `rug` tagged `kitchen`, which no
+            // flow asked for. Thin stock (2 rows today) simply leaves the slot unfilled in the other markets.
+            Map.entry("kitchen", List.of("kitchen-cart", "kitchen-storage", "lighting", "storage", "rug", "decor")),
             Map.entry("dining-room", List.of("dining-table", "dining-chair", "lighting", "rug", "storage", "decor")),
             // Sprint 10.193: `wardrobe` added — 160 real hallway wardrobes/open closets (OMAR, HAUGA, RAKKESTAD,
-            // ELVARLI, PLATSA…) are tagged `hallway` only, and the hallway flow asked for none of them.
-            Map.entry("hallway", List.of("storage", "wardrobe", "lighting", "rug", "decor")),
+            // ELVARLI, PLATSA…) are tagged `hallway` only, and the hallway flow asked for none of them. `chair`
+            // added for the 43 hallway BENCHES (VALTORP, PERJOHAN, TOLKNING, KALLSÖ…) — you sit on one to put
+            // your shoes on, and most of them double as shoe storage.
+            Map.entry("hallway", List.of("storage", "wardrobe", "lighting", "chair", "rug", "decor")),
             // Sprint 10.169: bathroom fixtures first (toilet + washbasin + a bath/shower are what a bathroom is
             // built around; Pevex HR), then the IKEA/JYSK cabinet/mirror/lighting/textiles/decor around them.
             // Sprint 10.177: textiles (bath mat / shower curtain) added — now sourced for every market, they belong
             // in a real bathroom plan (a comfort item, after storage + lighting).
-            Map.entry("bathroom", List.of("toilet", "washbasin", "bath-shower", "storage", "lighting", "textiles", "decor")),
+            // Sprint 10.193: `chair` added for the 19 bathroom STOOLS/step stools/shower chairs (IBBARBO, BOLMEN,
+            // BÄSINGEN, STOREDAMM…) — real bathroom pieces that no flow asked for.
+            Map.entry("bathroom", List.of("toilet", "washbasin", "bath-shower", "storage", "lighting", "textiles", "chair", "decor")),
             // Sprint 10.121: studio/one-room flat = living + bedroom combined (you sleep AND live here), so the
             // flow carries the essentials of both, sleeping pieces first. Products come from the living-room AND
             // bedroom catalog pools (see ROOM_CATALOG_TAGS / matchesRoom).
@@ -102,12 +108,12 @@ public class PlannerService {
             Map.entry("bedroom", Set.of("nightstand", "wardrobe", "dresser", "storage", "lighting", "rug", "textiles")),
             Map.entry("home-gym", Set.of("storage", "lighting")),
             // Sprint 10.7: new rooms.
-            Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage")),
+            Map.entry("kitchen", Set.of("kitchen-storage", "lighting", "storage", "rug")),
             Map.entry("dining-room", Set.of("lighting", "rug", "storage")),
-            Map.entry("hallway", Set.of("wardrobe", "lighting", "rug")),
+            Map.entry("hallway", Set.of("wardrobe", "lighting", "chair", "rug")),
             // Sprint 10.178: decor promoted from "later" (complete-only) to comfort, so bathroom mirrors and
             // accessories (category `decor`) surface at the default comfort level — a real bathroom shows a mirror.
-            Map.entry("bathroom", Set.of("storage", "lighting", "textiles", "decor")),
+            Map.entry("bathroom", Set.of("storage", "lighting", "textiles", "chair", "decor")),
             Map.entry("studio", Set.of("dining-table", "wardrobe", "table", "storage", "lighting", "rug", "textiles")),
             // Sprint 10.179: utility rooms.
             Map.entry("garage", Set.of("desk", "lighting")),
@@ -2762,6 +2768,41 @@ public class PlannerService {
     private boolean matchesRoom(Product product, String roomType) {
         for (String tag : ROOM_CATALOG_TAGS.getOrDefault(roomType, List.of(roomType))) {
             if (hasTag(product.getRoomTags(), tag)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Sprint 10.193 — categories the planner only ever selects when the user ASKS for them by name. Kitchen
+     * appliances and complete kitchen sets are deliberately kept out of a generic room plan (nobody wants a
+     * 459 EUR oven dropped into "furnish my kitchen"), so a row in one of these is unreachable by design, not
+     * by accident. Everything else in the catalog should be selectable by some room.
+     */
+    public static final Set<String> EXPLICIT_REQUEST_ONLY_CATEGORIES = Set.of(
+            "oven", "hob", "cooker-hood", "fridge", "freezer", "dishwasher", "microwave", "kitchen-set");
+
+    /**
+     * Sprint 10.193 — can ANY whole-room plan ever select this (category, roomTags) pair? A row is reachable
+     * only where some room's {@link #CATEGORY_FLOW_BY_ROOM} asks for its category AND the row carries a room
+     * tag from that room's catalog pool ({@link #ROOM_CATALOG_TAGS}); the two are independent, so a perfectly
+     * eligible product can sit in the catalog forever because no flow ever asks for its category in a room it
+     * is tagged for. That is exactly how 622 living-room armchairs and 160 hallway wardrobes went unreachable.
+     * A focused request ("trebam fotelju") bypasses the room filter, so this describes the ORDINARY path.
+     */
+    public static boolean reachableByAnyRoom(String category, Collection<String> roomTags) {
+        if (category == null || roomTags == null || roomTags.isEmpty()) return false;
+        String slot = ProductTaxonomy.isFixtureCategory(category)
+                ? "bath-shower"                                     // the three fixtures are one slot family
+                : category.trim().toLowerCase(Locale.ROOT);
+        Set<String> tags = roomTags.stream()
+                .filter(tag -> tag != null && !tag.isBlank())
+                .map(tag -> tag.trim().toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+        for (Map.Entry<String, List<String>> room : CATEGORY_FLOW_BY_ROOM.entrySet()) {
+            if (!room.getValue().contains(slot)) continue;
+            for (String pool : ROOM_CATALOG_TAGS.getOrDefault(room.getKey(), List.of(room.getKey()))) {
+                if (tags.contains(pool)) return true;
+            }
         }
         return false;
     }
